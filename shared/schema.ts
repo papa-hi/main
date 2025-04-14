@@ -126,10 +126,22 @@ export const insertPlaceSchema = createInsertSchema(places).pick({
 // User favorites schema
 export const userFavorites = pgTable("user_favorites", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  placeId: integer("place_id").notNull(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  placeId: integer("place_id").notNull().references(() => places.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Define user favorites relations
+export const userFavoritesRelations = relations(userFavorites, ({ one }) => ({
+  user: one(users, {
+    fields: [userFavorites.userId],
+    references: [users.id],
+  }),
+  place: one(places, {
+    fields: [userFavorites.placeId],
+    references: [places.id],
+  }),
+}));
 
 // Type definitions
 export type InsertUser = z.infer<typeof insertUserSchema>;

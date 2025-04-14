@@ -2,8 +2,11 @@ import {
   User, InsertUser, users, 
   Playdate, playdates, 
   Place, places,
-  userFavorites
+  userFavorites,
+  playdateParticipants
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, gt, lt, desc, sql, asc } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -424,4 +427,308 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  // User methods
+  async getUserById(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+  
+  async updateUser(id: number, userData: Partial<User>): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+    
+    return updatedUser;
+  }
+  
+  async getFeaturedUser(): Promise<User | undefined> {
+    // For demo purposes, just return a random user as featured
+    const [user] = await db
+      .select()
+      .from(users)
+      .limit(1);
+    return user || undefined;
+  }
+
+  // Playdate methods
+  async getUpcomingPlaydates(): Promise<Playdate[]> {
+    const now = new Date();
+    
+    const playdatesData = await db
+      .select()
+      .from(playdates)
+      .where(gt(playdates.startTime, now))
+      .orderBy(asc(playdates.startTime));
+    
+    // Load participants for each playdate
+    const result: Playdate[] = [];
+    
+    for (const playdate of playdatesData) {
+      const participants = await db
+        .select({
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage
+        })
+        .from(playdateParticipants)
+        .innerJoin(users, eq(playdateParticipants.userId, users.id))
+        .where(eq(playdateParticipants.playdateId, playdate.id));
+      
+      result.push({
+        ...playdate,
+        participants
+      });
+    }
+    
+    return result;
+  }
+  
+  async getPastPlaydates(): Promise<Playdate[]> {
+    const now = new Date();
+    
+    const playdatesData = await db
+      .select()
+      .from(playdates)
+      .where(lt(playdates.startTime, now))
+      .orderBy(desc(playdates.startTime));
+    
+    // Load participants for each playdate
+    const result: Playdate[] = [];
+    
+    for (const playdate of playdatesData) {
+      const participants = await db
+        .select({
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage
+        })
+        .from(playdateParticipants)
+        .innerJoin(users, eq(playdateParticipants.userId, users.id))
+        .where(eq(playdateParticipants.playdateId, playdate.id));
+      
+      result.push({
+        ...playdate,
+        participants
+      });
+    }
+    
+    return result;
+  }
+  
+  async getUserPlaydates(userId: number): Promise<Playdate[]> {
+    const playdatesData = await db
+      .select()
+      .from(playdates)
+      .where(eq(playdates.creatorId, userId))
+      .orderBy(asc(playdates.startTime));
+    
+    // Load participants for each playdate
+    const result: Playdate[] = [];
+    
+    for (const playdate of playdatesData) {
+      const participants = await db
+        .select({
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage
+        })
+        .from(playdateParticipants)
+        .innerJoin(users, eq(playdateParticipants.userId, users.id))
+        .where(eq(playdateParticipants.playdateId, playdate.id));
+      
+      result.push({
+        ...playdate,
+        participants
+      });
+    }
+    
+    return result;
+  }
+  
+  async createPlaydate(playdateData: any): Promise<Playdate> {
+    // Start a transaction
+    return await db.transaction(async (tx) => {
+      // Insert the playdate
+      const [playdate] = await tx
+        .insert(playdates)
+        .values(playdateData)
+        .returning();
+      
+      // Add the creator as a participant
+      await tx
+        .insert(playdateParticipants)
+        .values({
+          playdateId: playdate.id,
+          userId: playdateData.creatorId
+        });
+      
+      // Get the creator's info to include in the response
+      const [creator] = await tx
+        .select({
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage
+        })
+        .from(users)
+        .where(eq(users.id, playdateData.creatorId));
+      
+      return {
+        ...playdate,
+        participants: [creator]
+      };
+    });
+  }
+  
+  async deletePlaydate(id: number): Promise<boolean> {
+    // Start a transaction
+    return await db.transaction(async (tx) => {
+      // Delete all participants first (foreign key constraint)
+      await tx
+        .delete(playdateParticipants)
+        .where(eq(playdateParticipants.playdateId, id));
+      
+      // Then delete the playdate
+      const result = await tx
+        .delete(playdates)
+        .where(eq(playdates.id, id));
+      
+      return result.rowCount > 0;
+    });
+  }
+
+  // Places methods
+  async getPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]> {
+    let query = db
+      .select()
+      .from(places);
+    
+    // Filter by type if specified
+    if (options.type) {
+      if (options.type === "restaurants") {
+        query = query.where(eq(places.type, "restaurant"));
+      } else if (options.type === "playgrounds") {
+        query = query.where(eq(places.type, "playground"));
+      }
+    }
+    
+    // For now, we'll just use the rating for ordering since we can't
+    // calculate distance without more complex SQL
+    query = query.orderBy(desc(places.rating));
+    
+    const placesData = await query;
+    
+    // Add placeholder distance and isSaved properties
+    // In a real app, you'd calculate these based on user's location and saved places
+    return placesData.map(place => ({
+      ...place,
+      distance: 0, // This would be calculated based on user's coordinates
+      isSaved: false // This would be determined by checking userFavorites
+    }));
+  }
+  
+  async getNearbyPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]> {
+    // In a real app, you'd use PostGIS or similar to calculate distances
+    // For this demo, we'll just return places sorted by rating
+    let query = db
+      .select()
+      .from(places);
+    
+    // Filter by type if specified
+    if (options.type && options.type !== "all") {
+      query = query.where(eq(places.type, options.type));
+    }
+    
+    // For now, we'll just use the rating for ordering
+    query = query.orderBy(desc(places.rating)).limit(4);
+    
+    const placesData = await query;
+    
+    // Add placeholder distance and isSaved properties
+    return placesData.map(place => ({
+      ...place,
+      distance: Math.floor(Math.random() * 5000), // Random distance for demo
+      isSaved: Math.random() > 0.5 // Random saved status for demo
+    }));
+  }
+  
+  async getUserFavoritePlaces(userId: number): Promise<Place[]> {
+    const favoritePlacesData = await db
+      .select({
+        ...places,
+      })
+      .from(userFavorites)
+      .innerJoin(places, eq(userFavorites.placeId, places.id))
+      .where(eq(userFavorites.userId, userId));
+    
+    // Add distance and isSaved properties
+    return favoritePlacesData.map(place => ({
+      ...place,
+      distance: 0, // Would be calculated in a real app
+      isSaved: true // These are all saved since they're favorites
+    }));
+  }
+  
+  async addFavoritePlace(userId: number, placeId: number): Promise<any> {
+    // Check if the favorite already exists
+    const [existing] = await db
+      .select()
+      .from(userFavorites)
+      .where(and(
+        eq(userFavorites.userId, userId),
+        eq(userFavorites.placeId, placeId)
+      ));
+    
+    if (existing) {
+      return existing; // Already exists
+    }
+    
+    // Insert new favorite
+    const [favorite] = await db
+      .insert(userFavorites)
+      .values({
+        userId,
+        placeId
+      })
+      .returning();
+    
+    return favorite;
+  }
+  
+  async removeFavoritePlace(userId: number, placeId: number): Promise<boolean> {
+    const result = await db
+      .delete(userFavorites)
+      .where(and(
+        eq(userFavorites.userId, userId),
+        eq(userFavorites.placeId, placeId)
+      ));
+    
+    return result.rowCount > 0;
+  }
+}
+
+// Use the database storage implementation
+export const storage = new DatabaseStorage();
