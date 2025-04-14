@@ -588,6 +588,226 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Advanced search/filter endpoints
+  
+  // Search users with advanced parameters
+  app.get("/api/users/search", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { 
+        query, 
+        city, 
+        childMinAge, 
+        childMaxAge,
+        limit, 
+        offset 
+      } = req.query;
+      
+      // Convert query parameters to the right format
+      const searchParams: any = {};
+      
+      if (query) {
+        searchParams.searchQuery = query as string;
+      }
+      
+      if (city) {
+        searchParams.city = city as string;
+      }
+      
+      // Handle child age range if both min and max are provided
+      if (childMinAge && childMaxAge) {
+        const minAge = parseInt(childMinAge as string);
+        const maxAge = parseInt(childMaxAge as string);
+        
+        if (!isNaN(minAge) && !isNaN(maxAge)) {
+          searchParams.childAgeRange = [minAge, maxAge];
+        }
+      }
+      
+      // Handle pagination
+      if (limit) {
+        const parsedLimit = parseInt(limit as string);
+        if (!isNaN(parsedLimit)) {
+          searchParams.limit = parsedLimit;
+        }
+      }
+      
+      if (offset) {
+        const parsedOffset = parseInt(offset as string);
+        if (!isNaN(parsedOffset)) {
+          searchParams.offset = parsedOffset;
+        }
+      }
+      
+      const users = await storage.getAllUsers(searchParams);
+      
+      // Remove sensitive information
+      const sanitizedUsers = users.map(user => {
+        const { password, email, phoneNumber, ...rest } = user;
+        return rest;
+      });
+      
+      res.json(sanitizedUsers);
+    } catch (error) {
+      console.error("Error searching users:", error);
+      res.status(500).json({ error: "Failed to search users" });
+    }
+  });
+  
+  // Search playdates with advanced parameters
+  app.get("/api/playdates/search", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { 
+        query,
+        location,
+        startDateMin,
+        startDateMax,
+        hasAvailableSpots,
+        creatorId,
+        limit,
+        offset
+      } = req.query;
+      
+      // Convert query parameters to the right format
+      const searchParams: any = {};
+      
+      if (query) {
+        searchParams.searchQuery = query as string;
+      }
+      
+      if (location) {
+        searchParams.location = location as string;
+      }
+      
+      if (startDateMin) {
+        searchParams.startDateMin = new Date(startDateMin as string);
+      }
+      
+      if (startDateMax) {
+        searchParams.startDateMax = new Date(startDateMax as string);
+      }
+      
+      if (hasAvailableSpots === 'true') {
+        searchParams.hasAvailableSpots = true;
+      }
+      
+      if (creatorId) {
+        const parsedCreatorId = parseInt(creatorId as string);
+        if (!isNaN(parsedCreatorId)) {
+          searchParams.creatorId = parsedCreatorId;
+        }
+      }
+      
+      // Handle pagination
+      if (limit) {
+        const parsedLimit = parseInt(limit as string);
+        if (!isNaN(parsedLimit)) {
+          searchParams.limit = parsedLimit;
+        }
+      }
+      
+      if (offset) {
+        const parsedOffset = parseInt(offset as string);
+        if (!isNaN(parsedOffset)) {
+          searchParams.offset = parsedOffset;
+        }
+      }
+      
+      const playdates = await storage.getUpcomingPlaydates(searchParams);
+      res.json(playdates);
+    } catch (error) {
+      console.error("Error searching playdates:", error);
+      res.status(500).json({ error: "Failed to search playdates" });
+    }
+  });
+  
+  // Search places with advanced parameters
+  app.get("/api/places/search", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { 
+        query,
+        type,
+        minRating,
+        features,
+        latitude,
+        longitude,
+        sortBy,
+        sortOrder,
+        limit,
+        offset
+      } = req.query;
+      
+      // Get the authenticated user ID for favorites
+      const userId = req.user?.id;
+      
+      // Convert query parameters to the right format
+      const searchParams: any = {
+        userId // Include the user ID to check favorite status
+      };
+      
+      if (query) {
+        searchParams.searchQuery = query as string;
+      }
+      
+      if (type) {
+        searchParams.type = type as string;
+      }
+      
+      if (minRating) {
+        const parsedRating = parseFloat(minRating as string);
+        if (!isNaN(parsedRating)) {
+          searchParams.minRating = parsedRating;
+        }
+      }
+      
+      if (features) {
+        if (Array.isArray(features)) {
+          searchParams.features = features as string[];
+        } else {
+          searchParams.features = [features as string];
+        }
+      }
+      
+      if (latitude && longitude) {
+        const lat = parseFloat(latitude as string);
+        const lng = parseFloat(longitude as string);
+        
+        if (!isNaN(lat) && !isNaN(lng)) {
+          searchParams.latitude = lat;
+          searchParams.longitude = lng;
+        }
+      }
+      
+      if (sortBy) {
+        searchParams.sortBy = sortBy as 'rating' | 'distance' | 'name';
+      }
+      
+      if (sortOrder) {
+        searchParams.sortOrder = sortOrder as 'asc' | 'desc';
+      }
+      
+      // Handle pagination
+      if (limit) {
+        const parsedLimit = parseInt(limit as string);
+        if (!isNaN(parsedLimit)) {
+          searchParams.limit = parsedLimit;
+        }
+      }
+      
+      if (offset) {
+        const parsedOffset = parseInt(offset as string);
+        if (!isNaN(parsedOffset)) {
+          searchParams.offset = parsedOffset;
+        }
+      }
+      
+      const places = await storage.getPlaces(searchParams);
+      res.json(places);
+    } catch (error) {
+      console.error("Error searching places:", error);
+      res.status(500).json({ error: "Failed to search places" });
+    }
+  });
+  
   // Create HTTP server
   const httpServer = createServer(app);
   

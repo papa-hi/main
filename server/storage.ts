@@ -1147,14 +1147,14 @@ export class DatabaseStorage implements IStorage {
     const placesData = await query;
     
     // Get user favorites if userId is provided
-    let userFavorites: Record<number, boolean> = {};
+    let favoritePlaces: Record<number, boolean> = {};
     if (options.userId) {
       const favorites = await db
         .select({ placeId: userFavorites.placeId })
         .from(userFavorites)
         .where(eq(userFavorites.userId, options.userId));
       
-      userFavorites = favorites.reduce((acc, { placeId }) => {
+      favoritePlaces = favorites.reduce((acc, { placeId }) => {
         acc[placeId] = true;
         return acc;
       }, {} as Record<number, boolean>);
@@ -1199,7 +1199,7 @@ export class DatabaseStorage implements IStorage {
         return {
           ...place,
           distance,
-          isSaved: userFavorites[place.id] || false
+          isSaved: favoritePlaces[place.id] || false
         };
       });
     
