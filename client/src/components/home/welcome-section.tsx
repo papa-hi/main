@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "@/hooks/use-location";
+import { useTranslation } from "react-i18next";
 
 interface WelcomeSectionProps {
   userName: string;
@@ -9,6 +10,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weather, setWeather] = useState<{ temp: number; city: string } | null>(null);
   const { location } = useLocation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     // Update time every minute
@@ -34,9 +36,17 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
 
   const getGreeting = () => {
     const hour = currentTime.getHours();
-    if (hour < 12) return "Goedemorgen";
-    if (hour < 18) return "Goedemiddag";
-    return "Goedenavond";
+    const currentLang = i18n.language;
+    
+    if (currentLang === 'nl') {
+      if (hour < 12) return "Goedemorgen";
+      if (hour < 18) return "Goedemiddag";
+      return "Goedenavond";
+    } else {
+      if (hour < 12) return "Good morning";
+      if (hour < 18) return "Good afternoon";
+      return "Good evening";
+    }
   };
 
   return (
@@ -46,7 +56,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
           <h2 className="text-2xl font-heading font-bold mb-1">
             {getGreeting()}, {userName}!
           </h2>
-          <p className="text-sm text-secondary">Klaar om een leuke dag te plannen?</p>
+          <p className="text-sm text-secondary">{t('home.readyToday', 'Ready to plan a fun day?')}</p>
         </div>
         
         {/* Weather Widget */}
@@ -62,14 +72,22 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
       <div className="relative rounded-xl overflow-hidden mb-6">
         <img 
           src="https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=400&q=80" 
-          alt="Dad and child at playground" 
+          alt={t('home.featuredAltText', 'Dad and child at playground')} 
           className="w-full h-52 object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent flex flex-col justify-end p-6">
-          <span className="text-white text-xs font-medium bg-accent py-1 px-3 rounded-full inline-block mb-2 w-fit">Uitgelicht</span>
-          <h3 className="text-white text-xl font-heading font-bold">Vaders Weekend in het Park</h3>
-          <p className="text-white text-sm mb-3">Zondag 7 juli • Vondelpark • 10:00</p>
-          <button className="bg-white text-primary hover:bg-accent hover:text-white transition py-2 px-4 rounded-lg font-medium text-sm w-fit">Meer Info</button>
+          <span className="text-white text-xs font-medium bg-accent py-1 px-3 rounded-full inline-block mb-2 w-fit">
+            {t('home.featured', 'Featured')}
+          </span>
+          <h3 className="text-white text-xl font-heading font-bold">
+            {t('home.featuredTitle', 'Dads Weekend in the Park')}
+          </h3>
+          <p className="text-white text-sm mb-3">
+            {t('home.featuredDate', 'Sunday, July 7 • Vondelpark • 10:00')}
+          </p>
+          <button className="bg-white text-primary hover:bg-accent hover:text-white transition py-2 px-4 rounded-lg font-medium text-sm w-fit">
+            {t('common.moreInfo', 'More Info')}
+          </button>
         </div>
       </div>
     </section>

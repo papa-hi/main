@@ -13,11 +13,16 @@
   },
   "home": {
     "welcome": "Welcome back, {{name}}!",
+    "readyToday": "Ready to plan a fun day?",
     "quickActions": "Quick Actions",
     "upcomingPlaydates": "Upcoming Playdates",
     "nearbyPlaces": "Nearby Places",
     "seeAll": "See All",
-    "dadSpotlight": "Dad Spotlight"
+    "dadSpotlight": "Dad Spotlight",
+    "featured": "Featured",
+    "featuredTitle": "Dads Weekend in the Park",
+    "featuredDate": "Sunday, July 7 • Vondelpark • 10:00",
+    "featuredAltText": "Dad and child at playground"
   },
   "places": {
     "all": "All",
@@ -60,6 +65,7 @@
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
-    "edit": "Edit"
+    "edit": "Edit",
+    "moreInfo": "More Info"
   }
 }

@@ -13,11 +13,16 @@
   },
   "home": {
     "welcome": "Welkom terug, {{name}}!",
+    "readyToday": "Klaar om een leuke dag te plannen?",
     "quickActions": "Snelle Acties",
     "upcomingPlaydates": "Aankomende Speelafspraken",
     "nearbyPlaces": "Plaatsen in de Buurt",
     "seeAll": "Alles Zien",
-    "dadSpotlight": "Papa in de Spotlight"
+    "dadSpotlight": "Papa in de Spotlight",
+    "featured": "Uitgelicht",
+    "featuredTitle": "Vaders Weekend in het Park",
+    "featuredDate": "Zondag 7 juli • Vondelpark • 10:00",
+    "featuredAltText": "Vader en kind in speeltuin"
   },
   "places": {
     "all": "Alle",
