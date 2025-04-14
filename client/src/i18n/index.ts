@@ -9,6 +9,11 @@ const savedLanguage = localStorage.getItem('language');
 const browserLanguage = navigator.language.split('-')[0];
 const defaultLanguage = savedLanguage || (browserLanguage === 'nl' ? 'nl' : 'en');
 
+// Update HTML lang attribute to match the application language
+export const updateDocumentLanguage = (language: string) => {
+  document.documentElement.lang = language;
+};
+
 i18n
   .use(initReactI18next)
   .init({
@@ -30,5 +35,13 @@ i18n
       escapeValue: false // React already escapes values
     }
   });
+
+// Set initial document language
+updateDocumentLanguage(defaultLanguage);
+
+// Update document language when the i18n language changes
+i18n.on('languageChanged', (lng) => {
+  updateDocumentLanguage(lng);
+});
 
 export default i18n;
