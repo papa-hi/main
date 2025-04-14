@@ -32,7 +32,9 @@
     "features": "Kenmerken",
     "reviews": "Beoordelingen",
     "savePlace": "Plaats Opslaan",
-    "unsavePlace": "Verwijderen uit Opgeslagen"
+    "unsavePlace": "Verwijderen uit Opgeslagen",
+    "noPlacesFound": "Geen locaties gevonden",
+    "viewAllPlaces": "Bekijk alle locaties"
   },
   "playdates": {
     "create": "Speelafspraak Maken",
@@ -65,6 +67,7 @@
     "save": "Opslaan",
     "cancel": "Annuleren",
     "delete": "Verwijderen",
-    "edit": "Bewerken"
+    "edit": "Bewerken",
+    "moreInfo": "Meer Info"
   }
 }

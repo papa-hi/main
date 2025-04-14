@@ -32,7 +32,9 @@
     "features": "Features",
     "reviews": "Reviews",
     "savePlace": "Save Place",
-    "unsavePlace": "Remove from Saved"
+    "unsavePlace": "Remove from Saved",
+    "noPlacesFound": "No places found",
+    "viewAllPlaces": "View all places"
   },
   "playdates": {
     "create": "Create Playdate",

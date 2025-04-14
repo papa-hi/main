@@ -5,6 +5,7 @@ import { Place } from "@shared/schema";
 import { PlaceCard } from "../shared/place-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation as useGeoLocation } from "@/hooks/use-location";
+import { useTranslation } from "react-i18next";
 
 type PlaceType = "all" | "restaurant" | "playground";
 
@@ -12,6 +13,7 @@ export function NearbyPlaces() {
   const [location] = useLocation();
   const { location: geoLocation } = useGeoLocation();
   const [activeFilter, setActiveFilter] = useState<PlaceType>("all");
+  const { t } = useTranslation();
   
   // Extract type from URL query parameters if coming from places page
   useEffect(() => {
@@ -34,7 +36,7 @@ export function NearbyPlaces() {
     return (
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-heading font-bold">Dichtbij voor Kids</h2>
+          <h2 className="text-xl font-heading font-bold">{t('home.nearbyPlaces', 'Nearby Places')}</h2>
           <div className="flex space-x-2 text-sm">
             <Skeleton className="w-16 h-8 rounded-lg" />
             <Skeleton className="w-24 h-8 rounded-lg" />
@@ -64,10 +66,10 @@ export function NearbyPlaces() {
     return (
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-heading font-bold">Dichtbij voor Kids</h2>
+          <h2 className="text-xl font-heading font-bold">{t('home.nearbyPlaces', 'Nearby Places')}</h2>
         </div>
         <div className="bg-red-50 text-red-500 p-4 rounded-lg">
-          Er is een fout opgetreden bij het laden van de plaatsen.
+          {t('common.error', 'An error occurred')}
         </div>
       </section>
     );
@@ -80,7 +82,7 @@ export function NearbyPlaces() {
   return (
     <section className="mb-10">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-heading font-bold">Dichtbij voor Kids</h2>
+        <h2 className="text-xl font-heading font-bold">{t('home.nearbyPlaces', 'Nearby Places')}</h2>
         <div className="flex space-x-2 text-sm">
           <button 
             className={`py-1 px-3 rounded-lg font-medium ${activeFilter === "all" 
@@ -88,7 +90,7 @@ export function NearbyPlaces() {
               : "bg-white text-dark"}`}
             onClick={() => handleFilterChange("all")}
           >
-            Alles
+            {t('places.all', 'All')}
           </button>
           <button 
             className={`py-1 px-3 rounded-lg font-medium ${activeFilter === "restaurant" 
@@ -96,7 +98,7 @@ export function NearbyPlaces() {
               : "bg-white text-dark"}`}
             onClick={() => handleFilterChange("restaurant")}
           >
-            Restaurants
+            {t('places.restaurant', 'Restaurants')}
           </button>
           <button 
             className={`py-1 px-3 rounded-lg font-medium ${activeFilter === "playground" 
@@ -104,7 +106,7 @@ export function NearbyPlaces() {
               : "bg-white text-dark"}`}
             onClick={() => handleFilterChange("playground")}
           >
-            Speeltuinen
+            {t('places.playground', 'Playgrounds')}
           </button>
         </div>
       </div>
@@ -117,10 +119,10 @@ export function NearbyPlaces() {
             ))
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center py-8">
-              <p className="text-gray-500 mb-2">Geen locaties gevonden</p>
+              <p className="text-gray-500 mb-2">{t('places.noPlacesFound', 'No places found')}</p>
               <Link href="/places">
                 <button className="bg-primary text-white hover:bg-accent transition py-2 px-6 rounded-lg font-medium text-sm">
-                  Bekijk alle locaties
+                  {t('places.viewAllPlaces', 'View all places')}
                 </button>
               </Link>
             </div>
