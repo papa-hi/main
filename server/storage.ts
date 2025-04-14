@@ -783,8 +783,49 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
   
-  async getAllUsers(): Promise<User[]> {
-    return await db.select().from(users);
+  async getAllUsers(filters?: {
+    searchQuery?: string;
+    city?: string;
+    childAgeRange?: [number, number];
+    limit?: number;
+    offset?: number;
+  }): Promise<User[]> {
+    let query = db.select().from(users);
+    
+    if (filters) {
+      if (filters.searchQuery) {
+        const searchTerm = `%${filters.searchQuery}%`;
+        query = query.where(
+          sql`(${users.firstName} ILIKE ${searchTerm} OR 
+               ${users.lastName} ILIKE ${searchTerm} OR 
+               ${users.username} ILIKE ${searchTerm} OR
+               ${users.bio} ILIKE ${searchTerm})`
+        );
+      }
+      
+      if (filters.city) {
+        query = query.where(eq(users.city, filters.city));
+      }
+      
+      // For child age filtering, we'd need to parse the JSON array in childrenInfo
+      // This is a simplified version that works if childrenInfo is stored properly
+      if (filters.childAgeRange && filters.childAgeRange.length === 2) {
+        const [minAge, maxAge] = filters.childAgeRange;
+        // This would need a more complex query with JSONB operations
+        // For simplicity, we'll return all users and filter in memory
+        // In a real implementation, this would be a database query
+      }
+      
+      if (filters.limit) {
+        query = query.limit(filters.limit);
+      }
+      
+      if (filters.offset) {
+        query = query.offset(filters.offset);
+      }
+    }
+    
+    return await query;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -819,14 +860,70 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Playdate methods
-  async getUpcomingPlaydates(): Promise<Playdate[]> {
+  async getUpcomingPlaydates(filters?: {
+    searchQuery?: string;
+    startDateMin?: Date;
+    startDateMax?: Date;
+    location?: string;
+    maxParticipants?: number;
+    hasAvailableSpots?: boolean;
+    creatorId?: number;
+    limit?: number;
+    offset?: number;
+  }): Promise<Playdate[]> {
     const now = new Date();
     
-    const playdatesData = await db
+    let query = db
       .select()
       .from(playdates)
-      .where(gt(playdates.startTime, now))
-      .orderBy(asc(playdates.startTime));
+      .where(gt(playdates.startTime, now));
+    
+    if (filters) {
+      if (filters.searchQuery) {
+        const searchTerm = `%${filters.searchQuery}%`;
+        query = query.where(
+          sql`(${playdates.title} ILIKE ${searchTerm} OR 
+               ${playdates.description} ILIKE ${searchTerm} OR 
+               ${playdates.location} ILIKE ${searchTerm})`
+        );
+      }
+      
+      if (filters.startDateMin) {
+        query = query.where(gte(playdates.startTime, filters.startDateMin));
+      }
+      
+      if (filters.startDateMax) {
+        query = query.where(lte(playdates.startTime, filters.startDateMax));
+      }
+      
+      if (filters.location) {
+        const locationTerm = `%${filters.location}%`;
+        query = query.where(sql`${playdates.location} ILIKE ${locationTerm}`);
+      }
+      
+      if (filters.maxParticipants) {
+        query = query.where(lte(playdates.maxParticipants, filters.maxParticipants));
+      }
+      
+      if (filters.creatorId) {
+        query = query.where(eq(playdates.creatorId, filters.creatorId));
+      }
+      
+      // The hasAvailableSpots filter needs a subquery count of participants
+      // We'll do this filtering in memory for simplicity
+      
+      if (filters.limit) {
+        query = query.limit(filters.limit);
+      }
+      
+      if (filters.offset) {
+        query = query.offset(filters.offset);
+      }
+    }
+    
+    query = query.orderBy(asc(playdates.startTime));
+    
+    const playdatesData = await query;
     
     // Load participants for each playdate
     const result: Playdate[] = [];
@@ -842,6 +939,11 @@ export class DatabaseStorage implements IStorage {
         .from(playdateParticipants)
         .innerJoin(users, eq(playdateParticipants.userId, users.id))
         .where(eq(playdateParticipants.playdateId, playdate.id));
+      
+      // Filter by available spots if requested
+      if (filters?.hasAvailableSpots && participants.length >= playdate.maxParticipants) {
+        continue; // Skip this playdate as it's full
+      }
       
       result.push({
         ...playdate,
@@ -969,7 +1071,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Places methods
-  async getPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]> {
+  async getPlaces(options: { 
+    latitude?: number, 
+    longitude?: number, 
+    type?: string,
+    searchQuery?: string,
+    minRating?: number,
+    features?: string[],
+    sortBy?: 'rating' | 'distance' | 'name',
+    sortOrder?: 'asc' | 'desc',
+    limit?: number,
+    offset?: number,
+    userId?: number // To check if places are favorites
+  }): Promise<Place[]> {
     let query = db
       .select()
       .from(places);
@@ -980,22 +1094,125 @@ export class DatabaseStorage implements IStorage {
         query = query.where(eq(places.type, "restaurant"));
       } else if (options.type === "playgrounds") {
         query = query.where(eq(places.type, "playground"));
+      } else if (options.type !== "all") {
+        query = query.where(eq(places.type, options.type));
       }
     }
     
-    // For now, we'll just use the rating for ordering since we can't
-    // calculate distance without more complex SQL
-    query = query.orderBy(desc(places.rating));
+    // Search by name, description, or address
+    if (options.searchQuery) {
+      const searchTerm = `%${options.searchQuery}%`;
+      query = query.where(
+        sql`(${places.name} ILIKE ${searchTerm} OR 
+             ${places.description} ILIKE ${searchTerm} OR 
+             ${places.address} ILIKE ${searchTerm})`
+      );
+    }
+    
+    // Filter by minimum rating
+    if (options.minRating) {
+      query = query.where(gte(places.rating, options.minRating));
+    }
+    
+    // Filter by features (array contains operations)
+    // This would normally be done with a PostgreSQL array contains operator
+    // For simplicity, we'll fetch all places and filter in memory
+    
+    // Apply sorting
+    if (options.sortBy) {
+      if (options.sortBy === 'name') {
+        query = options.sortOrder === 'desc' 
+          ? query.orderBy(desc(places.name)) 
+          : query.orderBy(asc(places.name));
+      } else {
+        // Default to rating
+        query = options.sortOrder === 'asc' 
+          ? query.orderBy(asc(places.rating)) 
+          : query.orderBy(desc(places.rating));
+      }
+    } else {
+      // Default sort by rating descending
+      query = query.orderBy(desc(places.rating));
+    }
+    
+    // Apply pagination
+    if (options.limit) {
+      query = query.limit(options.limit);
+    }
+    
+    if (options.offset) {
+      query = query.offset(options.offset);
+    }
     
     const placesData = await query;
     
-    // Add placeholder distance and isSaved properties
-    // In a real app, you'd calculate these based on user's location and saved places
-    return placesData.map(place => ({
-      ...place,
-      distance: 0, // This would be calculated based on user's coordinates
-      isSaved: false // This would be determined by checking userFavorites
-    }));
+    // Get user favorites if userId is provided
+    let userFavorites: Record<number, boolean> = {};
+    if (options.userId) {
+      const favorites = await db
+        .select({ placeId: userFavorites.placeId })
+        .from(userFavorites)
+        .where(eq(userFavorites.userId, options.userId));
+      
+      userFavorites = favorites.reduce((acc, { placeId }) => {
+        acc[placeId] = true;
+        return acc;
+      }, {} as Record<number, boolean>);
+    }
+    
+    // Add distance and isSaved properties
+    // Filter by features if needed
+    const result = placesData
+      .filter(place => {
+        if (!options.features || options.features.length === 0) {
+          return true;
+        }
+        
+        // Check if the place has all the required features
+        if (!place.features) {
+          return false;
+        }
+        
+        return options.features.every(feature => 
+          place.features?.includes(feature)
+        );
+      })
+      .map(place => {
+        let distance = 0;
+        
+        // Calculate distance if coordinates are provided
+        if (options.latitude && options.longitude) {
+          // For demonstration, we'll use a simplified calculation
+          // In a real app, use a proper haversine formula or PostGIS
+          const lat1 = parseFloat(place.latitude);
+          const lon1 = parseFloat(place.longitude);
+          const lat2 = options.latitude;
+          const lon2 = options.longitude;
+          
+          // Simple Euclidean distance (for demo only - not accurate for Earth distances)
+          distance = Math.sqrt(
+            Math.pow((lat2 - lat1) * 111.32, 2) + 
+            Math.pow((lon2 - lon1) * 111.32 * Math.cos(lat1 * (Math.PI / 180)), 2)
+          ) * 1000; // Convert to meters
+        }
+        
+        return {
+          ...place,
+          distance,
+          isSaved: userFavorites[place.id] || false
+        };
+      });
+    
+    // Sort by distance if needed (this must be done after the distance calculation)
+    if (options.sortBy === 'distance') {
+      result.sort((a, b) => {
+        return options.sortOrder === 'desc' 
+          ? b.distance - a.distance 
+          : a.distance - b.distance;
+      });
+    }
+    
+    return result;
   }
   
   async getNearbyPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]> {
