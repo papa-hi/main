@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="theme-color" content="#4F6F52">
+  <title>Offline - Papa-Hi</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Outfit:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #F8F7F3;
+      color: #3C4235;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      background-color: #4F6F52;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo svg {
+      margin-right: 0.5rem;
+    }
+    
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      margin: 0;
+      font-size: 1.25rem;
+    }
+    
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .offline-container {
+      max-width: 500px;
+      background-color: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      color: #3C4235;
+      margin-top: 0;
+    }
+    
+    p {
+      color: #666;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    
+    .button {
+      background-color: #4F6F52;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .button:hover {
+      background-color: #FF9A3C;
+    }
+    
+    .offline-icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="6" fill="#4F6F52" />
+        <path d="M8 10H12V22H8V10Z" fill="white" />
+        <path d="M14 10H18C20.2091 10 22 11.7909 22 14C22 16.2091 20.2091 18 18 18H14V10Z" fill="white" />
+        <path d="M14 14H18V18H14V14Z" fill="#4F6F52" />
+        <path d="M8 16H12V20H8V16Z" fill="#4F6F52" />
+        <path d="M20 18H24V22H20V18Z" fill="white" />
+      </svg>
+      <h1>Papa-Hi</h1>
+    </div>
+  </header>
+  
+  <main>
+    <div class="offline-container">
+      <svg class="offline-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="#4F6F52" stroke-width="2"/>
+        <path d="M9 10.5C9 10.5 10 9 12 9C14 9 15 10.5 15 10.5" stroke="#4F6F52" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9 15H15" stroke="#4F6F52" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      
+      <h2>Je bent offline</h2>
+      <p>Het lijkt erop dat je geen internetverbinding hebt. Sommige functies van Papa-Hi zijn beperkt beschikbaar in offline modus.</p>
+      <p>Je kunt nog steeds eerder bekeken speelafspraken en favoriete plekken bekijken.</p>
+      
+      <button class="button" onclick="location.reload()">Opnieuw proberen</button>
+    </div>
+  </main>
+  
+  <script>
+    // Check if we're back online
+    window.addEventListener('online', () => {
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>

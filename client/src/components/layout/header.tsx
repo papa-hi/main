@@ -1,0 +1,122 @@
+import { Link, useLocation } from "wouter";
+import { useState } from "react";
+
+// SVG logo for Papa-Hi
+const PapaHiLogo = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="32" height="32" rx="6" fill="#4F6F52" />
+    <path d="M8 10H12V22H8V10Z" fill="white" />
+    <path d="M14 10H18C20.2091 10 22 11.7909 22 14C22 16.2091 20.2091 18 18 18H14V10Z" fill="white" />
+    <path d="M14 14H18V18H14V14Z" fill="#4F6F52" />
+    <path d="M8 16H12V20H8V16Z" fill="#4F6F52" />
+    <path d="M20 18H24V22H20V18Z" fill="white" />
+  </svg>
+);
+
+interface HeaderProps {
+  user: {
+    firstName: string;
+    profileImage: string;
+  };
+}
+
+export function Header({ user }: HeaderProps) {
+  const [location] = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
+  return (
+    <header className="bg-primary text-white py-3 px-4 shadow-md sticky top-0 z-50">
+      <div className="container mx-auto flex justify-between items-center">
+        <div className="flex items-center">
+          <PapaHiLogo />
+          <h1 className="text-xl font-heading font-bold ml-2">Papa-Hi</h1>
+        </div>
+        
+        {/* Mobile Navigation Toggle */}
+        <button 
+          className="md:hidden text-white focus:outline-none" 
+          onClick={toggleMenu}
+          aria-label="Menu"
+        >
+          <i className="fas fa-bars text-xl"></i>
+        </button>
+        
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex space-x-6 text-sm">
+          <Link href="/">
+            <a className={`font-medium hover:text-accent transition ${location === '/' ? 'text-accent' : ''}`}>
+              Home
+            </a>
+          </Link>
+          <Link href="/playdates">
+            <a className={`font-medium hover:text-accent transition ${location === '/playdates' ? 'text-accent' : ''}`}>
+              Speelafspraken
+            </a>
+          </Link>
+          <Link href="/places">
+            <a className={`font-medium hover:text-accent transition ${location.includes('/places') ? 'text-accent' : ''}`}>
+              Restaurants
+            </a>
+          </Link>
+          <Link href="/places?type=playground">
+            <a className={`font-medium hover:text-accent transition ${location.includes('/places') && location.includes('type=playground') ? 'text-accent' : ''}`}>
+              Speeltuinen
+            </a>
+          </Link>
+          <a href="#" className="font-medium hover:text-accent transition">
+            Community
+          </a>
+        </nav>
+        
+        {/* User Menu - Desktop */}
+        <div className="hidden md:flex items-center space-x-4">
+          <button className="text-white hover:text-accent" aria-label="Notifications">
+            <i className="fas fa-bell"></i>
+          </button>
+          <div className="relative group">
+            <Link href="/profile">
+              <a className="flex items-center space-x-1">
+                <img 
+                  src={user.profileImage} 
+                  alt="Profile picture" 
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <span className="text-sm font-medium">{user.firstName}</span>
+              </a>
+            </Link>
+          </div>
+        </div>
+      </div>
+      
+      {/* Mobile Menu Dropdown */}
+      {menuOpen && (
+        <div className="md:hidden bg-primary/95 absolute top-full left-0 right-0 p-4 shadow-lg z-50">
+          <nav className="flex flex-col space-y-3 text-white">
+            <Link href="/">
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">Home</a>
+            </Link>
+            <Link href="/playdates">
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">Speelafspraken</a>
+            </Link>
+            <Link href="/places">
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">Restaurants</a>
+            </Link>
+            <Link href="/places?type=playground">
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">Speeltuinen</a>
+            </Link>
+            <a href="#" className="py-2 px-4 hover:bg-primary/80 rounded-md">Community</a>
+            <Link href="/profile">
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">Mijn profiel</a>
+            </Link>
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}
+
+export default Header;
