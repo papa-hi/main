@@ -569,13 +569,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Ensure all participant IDs are integers
       const participants = req.body.participants.map((id: any) => parseInt(id));
       
-      // Ensure the current user is included in the participants
+      // Always include the current user as a participant
       if (!participants.includes(userId)) {
         participants.push(userId);
       }
       
+      console.log("Creating chat with participants:", participants);
+      
       // Create new chat
       const newChat = await storage.createChat(participants);
+      
+      console.log("Created new chat:", newChat);
+      
       res.status(201).json(newChat);
     } catch (err) {
       console.error("Error creating chat:", err);
