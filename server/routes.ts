@@ -661,70 +661,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Advanced search/filter endpoints
   
-  // Search users with advanced parameters - allow without authentication for testing
-  app.get("/api/users/search", async (req: Request, res: Response) => {
-    // Skip authentication check for testing
-    console.log("Accessing /api/users/search without authentication check");
-    try {
-      const { 
-        query, 
-        city, 
-        childMinAge, 
-        childMaxAge,
-        limit, 
-        offset 
-      } = req.query;
-      
-      // Convert query parameters to the right format
-      const searchParams: any = {};
-      
-      if (query) {
-        searchParams.searchQuery = query as string;
-      }
-      
-      if (city) {
-        searchParams.city = city as string;
-      }
-      
-      // Handle child age range if both min and max are provided
-      if (childMinAge && childMaxAge) {
-        const minAge = parseInt(childMinAge as string);
-        const maxAge = parseInt(childMaxAge as string);
-        
-        if (!isNaN(minAge) && !isNaN(maxAge)) {
-          searchParams.childAgeRange = [minAge, maxAge];
-        }
-      }
-      
-      // Handle pagination
-      if (limit) {
-        const parsedLimit = parseInt(limit as string);
-        if (!isNaN(parsedLimit)) {
-          searchParams.limit = parsedLimit;
-        }
-      }
-      
-      if (offset) {
-        const parsedOffset = parseInt(offset as string);
-        if (!isNaN(parsedOffset)) {
-          searchParams.offset = parsedOffset;
-        }
-      }
-      
-      const users = await storage.getAllUsers(searchParams);
-      
-      // Remove sensitive information
-      const sanitizedUsers = users.map(user => {
-        const { password, email, phoneNumber, ...rest } = user;
-        return rest;
-      });
-      
-      res.json(sanitizedUsers);
-    } catch (error) {
-      console.error("Error searching users:", error);
-      res.status(500).json({ error: "Failed to search users" });
-    }
-  });
+  /* User search endpoint was moved to line ~133 to appear before the /api/users/:id route */
   
   // Search playdates with advanced parameters - temporarily allow without authentication for testing
   app.get("/api/playdates/search", async (req: Request, res: Response) => {
