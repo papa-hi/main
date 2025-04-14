@@ -4,10 +4,9 @@ import { initReactI18next } from 'react-i18next';
 import enTranslations from './locales/en.json';
 import nlTranslations from './locales/nl.json';
 
-// Get language from localStorage or use browser language
+// Get language from localStorage or default to Dutch
 const savedLanguage = localStorage.getItem('language');
-const browserLanguage = navigator.language.split('-')[0];
-const defaultLanguage = savedLanguage || (browserLanguage === 'nl' ? 'nl' : 'en');
+const defaultLanguage = savedLanguage || 'nl';
 
 // Update HTML lang attribute to match the application language
 export const updateDocumentLanguage = (language: string) => {

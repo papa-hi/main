@@ -179,13 +179,19 @@ export function Header({ user }: HeaderProps) {
               <span>{t('header.language', 'Taal')}</span>
               <div className="flex space-x-2">
                 <button 
-                  onClick={() => i18n.changeLanguage('nl')} 
+                  onClick={() => {
+                    i18n.changeLanguage('nl');
+                    localStorage.setItem('language', 'nl');
+                  }} 
                   className={`flex items-center px-2 py-1 rounded ${i18n.language === 'nl' ? 'bg-accent text-white' : 'bg-primary-foreground/10'}`}
                 >
                   🇳🇱
                 </button>
                 <button 
-                  onClick={() => i18n.changeLanguage('en')} 
+                  onClick={() => {
+                    i18n.changeLanguage('en');
+                    localStorage.setItem('language', 'en');
+                  }} 
                   className={`flex items-center px-2 py-1 rounded ${i18n.language === 'en' ? 'bg-accent text-white' : 'bg-primary-foreground/10'}`}
                 >
                   🇬🇧

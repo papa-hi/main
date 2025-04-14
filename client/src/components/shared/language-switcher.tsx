@@ -27,18 +27,18 @@ export function LanguageSwitcher() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => changeLanguage('en')}>
-          <div className="flex items-center">
-            <span className="mr-2">🇬🇧</span>
-            <span>English</span>
-            {i18n.language === 'en' && <span className="ml-2">✓</span>}
-          </div>
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => changeLanguage('nl')}>
           <div className="flex items-center">
             <span className="mr-2">🇳🇱</span>
             <span>Nederlands</span>
             {i18n.language === 'nl' && <span className="ml-2">✓</span>}
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => changeLanguage('en')}>
+          <div className="flex items-center">
+            <span className="mr-2">🇬🇧</span>
+            <span>English</span>
+            {i18n.language === 'en' && <span className="ml-2">✓</span>}
           </div>
         </DropdownMenuItem>
       </DropdownMenuContent>
