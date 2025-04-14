@@ -56,7 +56,12 @@
     "emptyCalendarAlt": "Lege kalender",
     "noPlaydatesPlanned": "Geen speelafspraken gepland",
     "planNewMeetDads": "Plan een nieuwe speelafspraak om andere vaders te ontmoeten!",
-    "newPlaydate": "Nieuwe Afspraak"
+    "newPlaydate": "Nieuwe Afspraak",
+    "confirmDelete": "Weet je zeker dat je deze speelafspraak wilt verwijderen?",
+    "deleted": "Speelafspraak verwijderd",
+    "deleteSuccess": "De speelafspraak is succesvol verwijderd.",
+    "deleteError": "Er is iets misgegaan bij het verwijderen van de speelafspraak.",
+    "share": "Delen"
   },
   "profile": {
     "editProfile": "Profiel Bewerken",
