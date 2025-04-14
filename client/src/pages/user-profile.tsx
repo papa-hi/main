@@ -82,10 +82,15 @@ export default function UserProfilePage() {
       
       // Create a new chat with this user
       const response = await apiRequest("POST", "/api/chats", {
-        participants: [currentUser.id, user.id]
+        participants: [user.id]
       });
       
+      if (!response.ok) {
+        throw new Error(`Failed with status: ${response.status}`);
+      }
+      
       const newChat = await response.json();
+      console.log("Created new chat:", newChat);
       
       // Invalidate chats query to refresh chat list
       queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
@@ -96,7 +101,7 @@ export default function UserProfilePage() {
       console.error("Error creating chat:", err);
       toast({
         title: "Fout",
-        description: "Er is een fout opgetreden bij het maken van een chat",
+        description: `Er is een fout opgetreden bij het maken van een chat: ${err}`,
         variant: "destructive"
       });
     }
