@@ -55,6 +55,16 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           clearTimeout(reconnectTimeoutRef.current);
           reconnectTimeoutRef.current = null;
         }
+        
+        // Authenticate the connection
+        if (user) {
+          console.log("Authenticating WebSocket connection...");
+          newSocket.send(JSON.stringify({
+            type: 'authenticate',
+            userId: user.id,
+            token: 'mock-token' // In a real implementation, use a real auth token
+          }));
+        }
       };
       
       newSocket.onclose = () => {

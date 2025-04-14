@@ -1108,8 +1108,8 @@ export class DatabaseStorage implements IStorage {
       return {
         id: chatId,
         participants: [
-          { id: 5, firstName: "Collins", lastName: "User", profileImage: null }, // Current user
-          { id: 3, firstName: "Brian", lastName: "Angare", profileImage: null }
+          { id: 5, firstName: "Collins", lastName: "Lidede", profileImage: null }, // Current user
+          { id: 3, firstName: "Brian", lastName: "Amaganga", profileImage: null }
         ]
       };
     }
@@ -1119,7 +1119,7 @@ export class DatabaseStorage implements IStorage {
       id: chatId,
       participants: [
         { id: 1, firstName: "Thomas", lastName: "de Vries", profileImage: null },
-        { id: 5, firstName: "Collins", lastName: "User", profileImage: null }
+        { id: 5, firstName: "Collins", lastName: "Lidede", profileImage: null }
       ]
     };
   }

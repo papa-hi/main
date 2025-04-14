@@ -620,7 +620,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         // Handle chat message
-        else if (data.type === 'chat_message') {
+        else if (data.type === 'send_message') {
           const clientInfo = clients.get(ws);
           if (!clientInfo || !clientInfo.userId) {
             ws.send(JSON.stringify({
@@ -631,28 +631,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           
           try {
-            // Validate message data
-            const messageData = insertChatMessageSchema.parse({
-              chatId: data.chatId,
-              content: data.content,
-              senderId: clientInfo.userId
-            });
+            console.log("Received chat message:", data);
             
             // Store message in database
             const savedMessage = await storage.sendMessage(
-              messageData.chatId,
-              messageData.senderId,
-              messageData.content
+              data.chatId,
+              clientInfo.userId,
+              data.content
             );
+            
+            console.log("Saved message:", savedMessage);
             
             // Broadcast to all connected clients who are participants of this chat
             for (const [client, info] of clients.entries()) {
               if (client.readyState === WebSocket.OPEN && info.userId) {
                 // Check if this user is a participant in the chat
-                const chat = await storage.getChatById(messageData.chatId);
+                const chat = await storage.getChatById(data.chatId);
                 if (chat && chat.participants.some((p: any) => p.id === info.userId)) {
+                  console.log("Sending message to user:", info.userId);
                   client.send(JSON.stringify({
-                    type: 'new_message',
+                    type: 'message',
                     message: savedMessage
                   }));
                 }
