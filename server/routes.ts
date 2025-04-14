@@ -4,32 +4,44 @@ import { storage } from "./storage";
 import { playdates, places, insertPlaydateSchema, insertPlaceSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { setupAuth } from "./auth";
+
+// Middleware to check if user is authenticated
+const isAuthenticated = (req: any, res: any, next: any) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ error: "You must be logged in to access this resource" });
+};
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication
+  setupAuth(app);
+  
   // put application routes here
   // prefix all routes with /api
 
   // User routes
-  app.get("/api/users/me", async (req, res) => {
+  app.get("/api/users/me", isAuthenticated, async (req, res) => {
     try {
-      // In a real app, this would use authentication to get the current user
-      // For demo purposes, we'll return a mock user
-      const user = await storage.getUserById(1);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
+      // Get the authenticated user
+      const user = req.user;
+      
+      // Format the response to match the expected structure
+      const userWithoutPassword = { ...user };
+      delete userWithoutPassword.password;
+      
+      // Add children info if available, or default to empty array
+      if (!userWithoutPassword.childrenInfo) {
+        userWithoutPassword.childrenInfo = [];
       }
       
-      // Add some additional details
-      const userWithDetails = {
-        ...user,
-        childrenInfo: [
-          { name: "Noah", age: 6 },
-          { name: "Eva", age: 4 }
-        ],
-        favoriteLocations: ["Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht"]
-      };
+      // Add favorite locations if available, or default to empty array
+      if (!userWithoutPassword.favoriteLocations) {
+        userWithoutPassword.favoriteLocations = [];
+      }
       
-      res.json(userWithDetails);
+      res.json(userWithoutPassword);
     } catch (err) {
       console.error("Error fetching user:", err);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -61,12 +73,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/users/me", async (req, res) => {
+  app.patch("/api/users/me", isAuthenticated, async (req, res) => {
     try {
-      // In a real app, this would use authentication to get and update the current user
-      const userId = 1;
-      const updatedUser = await storage.updateUser(userId, req.body);
-      res.json(updatedUser);
+      // Get the authenticated user ID
+      const userId = req.user?.id;
+      
+      // Remove sensitive fields that shouldn't be updated directly
+      const updateData = { ...req.body };
+      delete updateData.password; // Password should be updated through a dedicated endpoint
+      
+      const updatedUser = await storage.updateUser(userId, updateData);
+      
+      // Remove password from response
+      const userWithoutPassword = { ...updatedUser };
+      delete userWithoutPassword.password;
+      
+      res.json(userWithoutPassword);
     } catch (err) {
       console.error("Error updating user:", err);
       res.status(500).json({ message: "Failed to update user" });
