@@ -68,6 +68,9 @@ export default function CreatePage() {
     description: "",
     location: "",
     maxParticipants: 5,
+    startTimeString: "",
+    endTimeString: "",
+    date: new Date(),
   };
 
   const form = useForm<CreatePlaydateFormValues>({
