@@ -3,6 +3,7 @@ import { useState } from "react";
 import { getFormattedDistance } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useTranslation } from "react-i18next";
 
 interface PlaceCardProps {
   place: Place;
@@ -10,6 +11,7 @@ interface PlaceCardProps {
 
 export function PlaceCard({ place }: PlaceCardProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isSaved, setIsSaved] = useState(place.isSaved);
   const [isToggling, setIsToggling] = useState(false);
   
@@ -22,15 +24,15 @@ export function PlaceCard({ place }: PlaceCardProps) {
         await apiRequest('DELETE', `/api/places/${place.id}/favorite`);
         setIsSaved(false);
         toast({
-          title: "Verwijderd van favorieten",
-          description: `${place.name} is verwijderd uit je favorieten.`,
+          title: t('places.removedFromFavorites', 'Removed from favorites'),
+          description: t('places.placeRemovedFromFavorites', '{{name}} has been removed from your favorites.', {name: place.name}),
         });
       } else {
         await apiRequest('POST', `/api/places/${place.id}/favorite`);
         setIsSaved(true);
         toast({
-          title: "Toegevoegd aan favorieten",
-          description: `${place.name} is toegevoegd aan je favorieten.`,
+          title: t('places.addedToFavorites', 'Added to favorites'),
+          description: t('places.placeAddedToFavorites', '{{name}} has been added to your favorites.', {name: place.name}),
         });
       }
     } catch (error) {

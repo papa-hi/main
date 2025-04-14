@@ -9,7 +9,7 @@ interface WelcomeSectionProps {
 export function WelcomeSection({ userName }: WelcomeSectionProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weather, setWeather] = useState<{ temp: number; city: string } | null>(null);
-  const { location } = useLocation();
+  const locationState = useLocation();
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
@@ -23,16 +23,16 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
 
   useEffect(() => {
     // Fetch weather data if location is available
-    if (location) {
+    if (locationState.latitude && locationState.longitude) {
       // This would be a real weather API call in production
       // For now, we'll just set mock data based on current time
       const mockTemp = 15 + Math.floor(Math.random() * 10);
       setWeather({
         temp: mockTemp,
-        city: location.city || "Amsterdam"
+        city: locationState.city || "Amsterdam"
       });
     }
-  }, [location]);
+  }, [locationState]);
 
   const getGreeting = () => {
     const hour = currentTime.getHours();

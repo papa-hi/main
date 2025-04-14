@@ -11,7 +11,7 @@ type PlaceType = "all" | "restaurant" | "playground";
 
 export function NearbyPlaces() {
   const [location] = useLocation();
-  const { location: geoLocation } = useGeoLocation();
+  const locationState = useGeoLocation();
   const [activeFilter, setActiveFilter] = useState<PlaceType>("all");
   const { t } = useTranslation();
   
@@ -25,7 +25,7 @@ export function NearbyPlaces() {
   }, [location]);
 
   const { data: places, isLoading, error } = useQuery<Place[]>({
-    queryKey: ['/api/places/nearby', geoLocation?.latitude, geoLocation?.longitude, activeFilter],
+    queryKey: ['/api/places/nearby', locationState.latitude, locationState.longitude, activeFilter],
   });
 
   const handleFilterChange = (filter: PlaceType) => {
