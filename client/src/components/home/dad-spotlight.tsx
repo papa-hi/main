@@ -4,6 +4,7 @@ import { User } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { Link } from "wouter";
 
 export function DadSpotlight() {
   const { t } = useTranslation();
@@ -43,9 +44,9 @@ export function DadSpotlight() {
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-heading font-bold">{t('home.dadSpotlight', 'Dad Spotlight')}</h2>
-          <a href="#" className="text-primary text-sm font-medium hover:text-accent transition">
+          <Link href="/discover" className="text-primary text-sm font-medium hover:text-accent transition">
             {t('dads.moreDads', 'More Dads')}
-          </a>
+          </Link>
         </div>
         
         <div className="bg-white rounded-xl shadow-sm p-6 text-center">
@@ -64,9 +65,9 @@ export function DadSpotlight() {
     <section className="mb-10">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-heading font-bold">{t('home.dadSpotlight', 'Dad Spotlight')}</h2>
-        <a href="#" className="text-primary text-sm font-medium hover:text-accent transition">
+        <Link href="/discover" className="text-primary text-sm font-medium hover:text-accent transition">
           {t('dads.moreDads', 'More Dads')}
-        </a>
+        </Link>
       </div>
       
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
