@@ -16,6 +16,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, userData: Partial<User>): Promise<User>;
+  deleteUser(id: number): Promise<boolean>;
   getFeaturedUser(): Promise<User | undefined>;
   
   // Playdate methods
@@ -24,6 +25,8 @@ export interface IStorage {
   getUserPlaydates(userId: number): Promise<Playdate[]>;
   createPlaydate(playdate: any): Promise<Playdate>;
   deletePlaydate(id: number): Promise<boolean>;
+  joinPlaydate(userId: number, playdateId: number): Promise<boolean>;
+  leavePlaydate(userId: number, playdateId: number): Promise<boolean>;
   
   // Places methods
   getPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]>;
@@ -31,6 +34,13 @@ export interface IStorage {
   getUserFavoritePlaces(userId: number): Promise<Place[]>;
   addFavoritePlace(userId: number, placeId: number): Promise<any>;
   removeFavoritePlace(userId: number, placeId: number): Promise<boolean>;
+  
+  // Chat methods
+  getChats(userId: number): Promise<Chat[]>;
+  getChatById(chatId: number): Promise<Chat | undefined>;
+  createChat(participants: number[]): Promise<Chat>;
+  getChatMessages(chatId: number, limit?: number, offset?: number): Promise<ChatMessage[]>;
+  sendMessage(chatId: number, senderId: number, content: string): Promise<ChatMessage>;
 }
 
 export class MemStorage implements IStorage {
@@ -38,19 +48,27 @@ export class MemStorage implements IStorage {
   private playdates: Map<number, Playdate>;
   private places: Map<number, Place>;
   private favorites: Map<string, boolean>; // userId-placeId composite key
+  private chats: Map<number, Chat>;
+  private messages: Map<number, ChatMessage[]>;
   
   private userIdCounter: number;
   private playdateIdCounter: number;
   private placeIdCounter: number;
+  private chatIdCounter: number;
+  private messageIdCounter: number;
 
   constructor() {
     this.users = new Map();
     this.playdates = new Map();
     this.places = new Map();
     this.favorites = new Map();
+    this.chats = new Map();
+    this.messages = new Map();
     this.userIdCounter = 1;
     this.playdateIdCounter = 1;
     this.placeIdCounter = 1;
+    this.chatIdCounter = 1;
+    this.messageIdCounter = 1;
     
     // Initialize with some sample data
     this.initializeSampleData();
