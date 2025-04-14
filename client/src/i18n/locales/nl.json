@@ -1,4 +1,67 @@
 {
+  "auth": {
+    "welcome": "Welkom bij Papa-Hi",
+    "tagline": "Verbind met andere vaders, plan speelafspraken en ontdek kindvriendelijke plekken",
+    "login": "Inloggen",
+    "register": "Registreren",
+    "username": "Gebruikersnaam",
+    "password": "Wachtwoord",
+    "confirmPassword": "Bevestig Wachtwoord",
+    "email": "E-mail",
+    "firstName": "Voornaam",
+    "lastName": "Achternaam",
+    "profileImage": "Profielfoto URL",
+    "bio": "Bio",
+    "usernamePlaceholder": "Voer je gebruikersnaam in",
+    "passwordPlaceholder": "Voer je wachtwoord in",
+    "confirmPasswordPlaceholder": "Bevestig je wachtwoord",
+    "emailPlaceholder": "Je e-mailadres",
+    "firstNamePlaceholder": "Je voornaam",
+    "lastNamePlaceholder": "Je achternaam",
+    "bioPlaceholder": "Vertel iets over jezelf (optioneel)",
+    "profileImagePlaceholder": "URL naar je profielfoto (optioneel)",
+    "profileImageHelp": "Je kunt hier een URL naar je profielfoto toevoegen of later bijwerken.",
+    "loginButton": "Inloggen",
+    "registerButton": "Account Aanmaken",
+    "noAccount": "Nog geen account?",
+    "haveAccount": "Heb je al een account?",
+    "registerLink": "Registreer hier",
+    "loginLink": "Log hier in",
+    "logoutButton": "Uitloggen",
+    "validation": {
+      "usernameRequired": "Gebruikersnaam is verplicht",
+      "passwordRequired": "Wachtwoord is verplicht",
+      "confirmPasswordRequired": "Bevestig wachtwoord is verplicht",
+      "passwordsDoNotMatch": "Wachtwoorden komen niet overeen",
+      "emailRequired": "E-mail is verplicht",
+      "invalidEmail": "E-mail is ongeldig",
+      "firstNameRequired": "Voornaam is verplicht",
+      "lastNameRequired": "Achternaam is verplicht"
+    },
+    "hero": {
+      "title": "Papa-Hi",
+      "subtitle": "De sociale app voor Nederlandse vaders",
+      "feature1": "Verbind met andere vaders in je buurt",
+      "feature2": "Vind en organiseer speelafspraken voor je kinderen",
+      "feature3": "Ontdek kindvriendelijke locaties en activiteiten"
+    },
+    "errors": {
+      "loginFailed": "Ongeldige gebruikersnaam of wachtwoord",
+      "registrationFailed": "Registratie mislukt",
+      "logoutFailed": "Uitloggen mislukt"
+    },
+    "toast": {
+      "loginSuccess": "Succesvol ingelogd",
+      "welcomeBack": "Welkom terug, {{name}}!",
+      "registrationSuccess": "Registratie voltooid",
+      "accountCreated": "Je account is succesvol aangemaakt.",
+      "logoutSuccess": "Uitgelogd",
+      "loggedOutSuccessfully": "Je bent succesvol uitgelogd.",
+      "loginFailed": "Inloggen mislukt",
+      "registrationFailed": "Registratie mislukt",
+      "logoutFailed": "Uitloggen mislukt"
+    }
+  },
   "nav": {
     "home": "Home",
     "playdates": "Speelafspraken",

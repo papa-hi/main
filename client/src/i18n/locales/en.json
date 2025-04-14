@@ -1,4 +1,67 @@
 {
+  "auth": {
+    "welcome": "Welcome to Papa-Hi",
+    "tagline": "Connect with fellow dads, find playdates, and discover family-friendly places",
+    "login": "Login",
+    "register": "Register",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "email": "Email",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "profileImage": "Profile Image URL",
+    "bio": "Bio",
+    "usernamePlaceholder": "Enter your username",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "emailPlaceholder": "Your email address",
+    "firstNamePlaceholder": "Your first name",
+    "lastNamePlaceholder": "Your last name",
+    "bioPlaceholder": "Tell us a bit about yourself (optional)",
+    "profileImagePlaceholder": "URL to your profile image (optional)",
+    "profileImageHelp": "You can add a profile image URL here or update it later.",
+    "loginButton": "Login",
+    "registerButton": "Create Account",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "registerLink": "Register here",
+    "loginLink": "Login here",
+    "logoutButton": "Logout",
+    "validation": {
+      "usernameRequired": "Username is required",
+      "passwordRequired": "Password is required",
+      "confirmPasswordRequired": "Confirm password is required",
+      "passwordsDoNotMatch": "Passwords don't match",
+      "emailRequired": "Email is required",
+      "invalidEmail": "Email is invalid",
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required"
+    },
+    "hero": {
+      "title": "Papa-Hi",
+      "subtitle": "The social app for Dutch dads",
+      "feature1": "Connect with other dads in your neighborhood",
+      "feature2": "Find and organize playdates for your kids",
+      "feature3": "Discover family-friendly locations and activities"
+    },
+    "errors": {
+      "loginFailed": "Invalid username or password",
+      "registrationFailed": "Registration failed",
+      "logoutFailed": "Logout failed"
+    },
+    "toast": {
+      "loginSuccess": "Login successful",
+      "welcomeBack": "Welcome back, {{name}}!",
+      "registrationSuccess": "Registration successful",
+      "accountCreated": "Your account has been created successfully.",
+      "logoutSuccess": "Logged out",
+      "loggedOutSuccessfully": "You have been logged out successfully.",
+      "loginFailed": "Login failed",
+      "registrationFailed": "Registration failed",
+      "logoutFailed": "Logout failed"
+    }
+  },
   "nav": {
     "home": "Home",
     "playdates": "Playdates",

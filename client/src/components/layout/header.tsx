@@ -1,7 +1,15 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/hooks/use-auth";
 import LanguageSwitcher from "../shared/language-switcher";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 // SVG logo for Papa-Hi
 const PapaHiLogo = () => (
@@ -26,9 +34,18 @@ export function Header({ user }: HeaderProps) {
   const [location] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
+  const { logoutMutation } = useAuth();
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
+  };
+  
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
@@ -83,18 +100,29 @@ export function Header({ user }: HeaderProps) {
           <button className="text-white hover:text-accent" aria-label="Notifications">
             <i className="fas fa-bell"></i>
           </button>
-          <div className="relative group">
-            <Link href="/profile">
-              <a className="flex items-center space-x-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="focus:outline-none">
+              <div className="flex items-center space-x-1">
                 <img 
                   src={user.profileImage} 
                   alt="Profile picture" 
                   className="w-8 h-8 rounded-full object-cover"
                 />
                 <span className="text-sm font-medium">{user.firstName}</span>
-              </a>
-            </Link>
-          </div>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <Link href="/profile">
+                <DropdownMenuItem className="cursor-pointer">
+                  <span>{t('header.myProfile')}</span>
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+                <span>{t('auth.logoutButton')}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       
@@ -135,6 +163,12 @@ export function Header({ user }: HeaderProps) {
                 </button>
               </div>
             </div>
+            <button 
+              onClick={handleLogout} 
+              className="py-2 px-4 mt-2 bg-red-600/20 text-white hover:bg-red-600/30 rounded-md w-full text-left"
+            >
+              {t('auth.logoutButton')}
+            </button>
           </nav>
         </div>
       )}
