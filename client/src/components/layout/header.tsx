@@ -34,7 +34,8 @@ export function Header({ user }: HeaderProps) {
   const [location] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
-  const { logoutMutation } = useAuth();
+  const { user: authUser, logoutMutation } = useAuth();
+  const isAuthenticated = !!authUser;
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -97,32 +98,42 @@ export function Header({ user }: HeaderProps) {
           {/* Language Switcher */}
           <LanguageSwitcher />
           
-          <button className="text-white hover:text-accent" aria-label="Notifications">
-            <i className="fas fa-bell"></i>
-          </button>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="focus:outline-none">
-              <div className="flex items-center space-x-1">
-                <img 
-                  src={user.profileImage} 
-                  alt="Profile picture" 
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                <span className="text-sm font-medium">{user.firstName}</span>
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <Link href="/profile">
-                <DropdownMenuItem className="cursor-pointer">
-                  <span>{t('header.myProfile')}</span>
-                </DropdownMenuItem>
-              </Link>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
-                <span>{t('auth.logoutButton')}</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {isAuthenticated ? (
+            <>
+              <button className="text-white hover:text-accent" aria-label="Notifications">
+                <i className="fas fa-bell"></i>
+              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="focus:outline-none">
+                  <div className="flex items-center space-x-1">
+                    <img 
+                      src={user.profileImage} 
+                      alt="Profile picture" 
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <span className="text-sm font-medium">{user.firstName}</span>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <Link href="/profile">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <span>{t('header.myProfile')}</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+                    <span>{t('auth.logoutButton')}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <Link href="/auth">
+              <a className="bg-white text-primary hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                {t('auth.login')}
+              </a>
+            </Link>
+          )}
         </div>
       </div>
       
@@ -143,9 +154,27 @@ export function Header({ user }: HeaderProps) {
               <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.playgrounds', 'Speeltuinen')}</a>
             </Link>
             <a href="#" className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.community', 'Community')}</a>
-            <Link href="/profile">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('header.myProfile', 'Mijn profiel')}</a>
-            </Link>
+            
+            {isAuthenticated ? (
+              <>
+                <Link href="/profile">
+                  <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('header.myProfile', 'Mijn profiel')}</a>
+                </Link>
+                <button 
+                  onClick={handleLogout} 
+                  className="py-2 px-4 mt-2 bg-red-600/20 text-white hover:bg-red-600/30 rounded-md w-full text-left"
+                >
+                  {t('auth.logoutButton')}
+                </button>
+              </>
+            ) : (
+              <Link href="/auth">
+                <a className="py-2 px-4 bg-white/10 hover:bg-white/20 rounded-md text-white font-medium">
+                  {t('auth.login')}
+                </a>
+              </Link>
+            )}
+            
             <div className="flex items-center justify-between py-2 px-4 hover:bg-primary/80 rounded-md">
               <span>{t('header.language', 'Taal')}</span>
               <div className="flex space-x-2">
@@ -163,12 +192,6 @@ export function Header({ user }: HeaderProps) {
                 </button>
               </div>
             </div>
-            <button 
-              onClick={handleLogout} 
-              className="py-2 px-4 mt-2 bg-red-600/20 text-white hover:bg-red-600/30 rounded-md w-full text-left"
-            >
-              {t('auth.logoutButton')}
-            </button>
           </nav>
         </div>
       )}

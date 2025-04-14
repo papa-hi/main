@@ -2,6 +2,7 @@ import { Header } from "./header";
 import { MobileFooter } from "./mobile-footer";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -9,12 +10,23 @@ type AppShellProps = {
 
 export default function AppShell({ children }: AppShellProps) {
   const { toast } = useToast();
+  const { user: authUser, isLoading } = useAuth();
   
-  // Mock user state - in a real app, this would come from authentication
-  const [user, setUser] = useState({
-    firstName: "Thomas",
-    profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80"
+  // Default user info when not authenticated or loading
+  const [userDisplay, setUserDisplay] = useState({
+    firstName: "",
+    profileImage: "https://placehold.co/36x36/4F6F52/white?text=P"
   });
+  
+  // Update user display info when auth user changes
+  useEffect(() => {
+    if (authUser) {
+      setUserDisplay({
+        firstName: authUser.firstName || authUser.username,
+        profileImage: authUser.profileImage || "https://placehold.co/36x36/4F6F52/white?text=" + (authUser.firstName?.[0] || authUser.username?.[0] || "P")
+      });
+    }
+  }, [authUser]);
 
   // Example of checking online status - useful for a PWA
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -48,7 +60,7 @@ export default function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header user={user} />
+      <Header user={userDisplay} />
       
       <main className="flex-grow container mx-auto px-4 pt-5 pb-20 md:pb-5 max-w-6xl">
         {children}
