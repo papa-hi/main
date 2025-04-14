@@ -38,6 +38,13 @@ export function MobileFooter() {
           </a>
         </Link>
         
+        <Link href="/chat">
+          <a className={`flex flex-col items-center py-3 px-5 ${location === '/chat' ? 'text-primary' : 'text-dark/60'}`}>
+            <i className="fas fa-comments text-lg"></i>
+            <span className="text-xs mt-1">{t('navigation.chat', 'Messages')}</span>
+          </a>
+        </Link>
+        
         <Link href="/profile">
           <a className={`flex flex-col items-center py-3 px-5 ${location === '/profile' ? 'text-primary' : 'text-dark/60'}`}>
             <i className="fas fa-user text-lg"></i>

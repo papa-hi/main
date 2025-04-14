@@ -88,6 +88,11 @@ export function Header({ user }: HeaderProps) {
               {t('nav.playgrounds', 'Speeltuinen')}
             </a>
           </Link>
+          <Link href="/chat">
+            <a className={`font-medium hover:text-accent transition ${location === '/chat' ? 'text-accent' : ''}`}>
+              {t('nav.chat', 'Berichten')}
+            </a>
+          </Link>
           <a href="#" className="font-medium hover:text-accent transition">
             {t('nav.community', 'Community')}
           </a>
@@ -152,6 +157,9 @@ export function Header({ user }: HeaderProps) {
             </Link>
             <Link href="/places?type=playground">
               <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.playgrounds', 'Speeltuinen')}</a>
+            </Link>
+            <Link href="/chat">
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.chat', 'Berichten')}</a>
             </Link>
             <a href="#" className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.community', 'Community')}</a>
             

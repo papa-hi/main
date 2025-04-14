@@ -9,6 +9,7 @@ import PlaydatesPage from "./pages/playdates";
 import PlacesPage from "./pages/places";
 import ProfilePage from "./pages/profile";
 import CreatePage from "./pages/create";
+import ChatPage from "./pages/chat";
 import AuthPage from "./pages/auth-page";
 import { useState, useEffect } from "react";
 import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
@@ -25,6 +26,7 @@ function Router() {
       <ProtectedRoute path="/places" component={PlacesPage} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
       <ProtectedRoute path="/create" component={CreatePage} />
+      <ProtectedRoute path="/chat" component={ChatPage} />
       <Route path="/auth" component={AuthPage} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />

@@ -1,14 +1,15 @@
 import { useState } from "react";
-import ChatList from "@/components/chat/chat-list";
-import ChatInterface from "@/components/chat/chat-interface";
-import { Button } from "@/components/ui/button";
-import { PlusCircle, ArrowLeft } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useQuery } from "@tanstack/react-query";
+import { ChatList } from "@/components/chat/chat-list";
+import { ChatInterface } from "@/components/chat/chat-interface";
 import { useAuth } from "@/hooks/use-auth";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
+import { ArrowLeft, Plus } from "lucide-react";
 
 interface User {
   id: number;
@@ -18,87 +19,66 @@ interface User {
 }
 
 export default function ChatPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
-  const { toast } = useToast();
   const isMobile = useIsMobile();
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [showChatList, setShowChatList] = useState(true);
-  const [showNewChatDialog, setShowNewChatDialog] = useState(false);
   
-  // Fetch all users (for starting new chats)
+  // Fetch all users to be able to start new chats
   const { data: users = [] } = useQuery<User[]>({
     queryKey: ["/api/users"],
     enabled: !!user,
   });
-
-  // Handle chat selection
+  
+  // Create new chat mutation
+  const createChatMutation = useMutation({
+    mutationFn: async (userId: number) => {
+      const res = await apiRequest("POST", "/api/chats", { participants: [userId] });
+      return await res.json();
+    },
+    onSuccess: (newChat) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
+      setSelectedChatId(newChat.id);
+      if (isMobile) {
+        setShowChatList(false);
+      }
+    },
+  });
+  
   const handleSelectChat = (chatId: number) => {
     setSelectedChatId(chatId);
     if (isMobile) {
       setShowChatList(false);
     }
   };
-
-  // Handle back button in mobile view
+  
   const handleBackToList = () => {
     setShowChatList(true);
   };
-
-  // Start a new chat with a user
-  const startNewChat = async (otherUserId: number) => {
-    try {
-      // Create a new chat with the selected user
-      const response = await apiRequest("POST", "/api/chats", {
-        participants: [otherUserId],
-      });
-      
-      const newChat = await response.json();
-      
-      // Invalidate chats cache to reload the list
-      queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
-      
-      // Select the new chat
-      setSelectedChatId(newChat.id);
-      
-      // Close the dialog
-      setShowNewChatDialog(false);
-      
-      // In mobile view, switch to chat interface
-      if (isMobile) {
-        setShowChatList(false);
-      }
-      
-      toast({
-        title: "Chat Created",
-        description: "You can now start messaging.",
-      });
-    } catch (error) {
-      console.error("Error creating chat:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create new chat",
-        variant: "destructive",
-      });
-    }
+  
+  const startNewChat = async (userId: number) => {
+    await createChatMutation.mutateAsync(userId);
   };
-
-  // Filter out current user from users list
-  const otherUsers = users.filter((u: User) => u.id !== user?.id);
-
+  
+  const otherUsers = users.filter((u) => u.id !== user?.id);
+  
   return (
-    <div className="container max-w-6xl py-6">
-      <div className="flex flex-col h-[calc(100vh-180px)] rounded-lg border overflow-hidden">
-        <div className="flex items-center justify-between p-3 border-b">
-          <h1 className="text-xl font-bold">Messages</h1>
-          <Dialog open={showNewChatDialog} onOpenChange={setShowNewChatDialog}>
+    <div className="h-full">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">{t('chat.title', 'Messages')}</h1>
+          
+          <Dialog>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <PlusCircle className="h-5 w-5" />
+              <Button variant="outline" size="sm" className="flex items-center gap-1">
+                <Plus className="h-4 w-4" />
+                {t('chat.newChat', 'New Chat')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Start a New Chat</DialogTitle>
+                <DialogTitle>{t('chat.selectUser', 'Start a conversation')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-2 mt-4">
                 {otherUsers.length === 0 ? (
