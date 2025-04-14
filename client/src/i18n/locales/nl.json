@@ -37,7 +37,12 @@
     "savePlace": "Plaats Opslaan",
     "unsavePlace": "Verwijderen uit Opgeslagen",
     "noPlacesFound": "Geen locaties gevonden",
-    "viewAllPlaces": "Bekijk alle locaties"
+    "viewAllPlaces": "Bekijk alle locaties",
+    "addedToFavorites": "Toegevoegd aan favorieten",
+    "placeAddedToFavorites": "{{name}} is toegevoegd aan je favorieten.",
+    "removedFromFavorites": "Verwijderd van favorieten",
+    "placeRemovedFromFavorites": "{{name}} is verwijderd uit je favorieten.",
+    "favoriteUpdateError": "Er is iets misgegaan bij het bijwerken van je favorieten."
   },
   "playdates": {
     "create": "Speelafspraak Maken",

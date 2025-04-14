@@ -2,6 +2,7 @@ import { Playdate } from "@shared/schema";
 import { getDay, getMonthAbbreviation, formatTime } from "@/lib/utils";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,7 @@ interface PlaydateCardProps {
 
 export function PlaydateCard({ playdate }: PlaydateCardProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isDeleting, setIsDeleting] = useState(false);
   
   const startDate = new Date(playdate.startTime);
@@ -23,7 +25,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
   const timeRange = `${formatTime(startDate)} - ${formatTime(endDate)}`;
   
   const handleDelete = async () => {
-    if (confirm("Weet je zeker dat je deze speelafspraak wilt verwijderen?")) {
+    if (confirm(t('playdates.confirmDelete', 'Are you sure you want to delete this playdate?'))) {
       setIsDeleting(true);
       
       try {
@@ -34,16 +36,16 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
         
         if (response.ok) {
           toast({
-            title: "Speelafspraak verwijderd",
-            description: "De speelafspraak is succesvol verwijderd.",
+            title: t('playdates.deleted', 'Playdate deleted'),
+            description: t('playdates.deleteSuccess', 'The playdate has been successfully deleted.'),
           });
         } else {
-          throw new Error("Er is iets misgegaan bij het verwijderen van de speelafspraak.");
+          throw new Error(t('playdates.deleteError', 'An error occurred while deleting the playdate.'));
         }
       } catch (error) {
         toast({
-          title: "Fout",
-          description: "Er is iets misgegaan bij het verwijderen van de speelafspraak.",
+          title: t('common.error', 'Error'),
+          description: t('playdates.deleteError', 'An error occurred while deleting the playdate.'),
           variant: "destructive",
         });
       } finally {
@@ -100,17 +102,17 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem>
-              <i className="fas fa-edit mr-2"></i> Bewerken
+              <i className="fas fa-edit mr-2"></i> {t('common.edit', 'Edit')}
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <i className="fas fa-share mr-2"></i> Delen
+              <i className="fas fa-share mr-2"></i> {t('playdates.share', 'Share')}
             </DropdownMenuItem>
             <DropdownMenuItem 
               className="text-red-500 focus:text-red-500" 
               onClick={handleDelete}
               disabled={isDeleting}
             >
-              <i className="fas fa-trash-alt mr-2"></i> Verwijderen
+              <i className="fas fa-trash-alt mr-2"></i> {t('common.delete', 'Delete')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

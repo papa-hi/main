@@ -37,8 +37,8 @@ export function PlaceCard({ place }: PlaceCardProps) {
       }
     } catch (error) {
       toast({
-        title: "Fout",
-        description: "Er is iets misgegaan bij het bijwerken van je favorieten.",
+        title: t('common.error', 'Error'),
+        description: t('places.favoriteUpdateError', 'An error occurred while updating your favorites.'),
         variant: "destructive",
       });
     } finally {
@@ -58,12 +58,12 @@ export function PlaceCard({ place }: PlaceCardProps) {
           {place.type === 'restaurant' ? (
             <>
               <i className="fas fa-utensils text-primary mr-1"></i>
-              Restaurant
+              {t('places.restaurant', 'Restaurant')}
             </>
           ) : (
             <>
               <i className="fas fa-tree text-primary mr-1"></i>
-              Speeltuin
+              {t('places.playground', 'Playground')}
             </>
           )}
         </div>
@@ -71,7 +71,7 @@ export function PlaceCard({ place }: PlaceCardProps) {
           className={`absolute top-3 right-3 bg-white w-8 h-8 rounded-full flex items-center justify-center ${
             isSaved ? 'text-accent' : 'text-dark hover:text-accent'
           } transition`} 
-          aria-label={isSaved ? "Remove from saved" : "Save"}
+          aria-label={isSaved ? t('places.unsavePlace', 'Remove from saved') : t('places.savePlace', 'Save Place')}
           onClick={toggleSave}
           disabled={isToggling}
         >

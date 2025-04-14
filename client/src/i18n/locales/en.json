@@ -37,7 +37,12 @@
     "savePlace": "Save Place",
     "unsavePlace": "Remove from Saved",
     "noPlacesFound": "No places found",
-    "viewAllPlaces": "View all places"
+    "viewAllPlaces": "View all places",
+    "addedToFavorites": "Added to favorites",
+    "placeAddedToFavorites": "{{name}} has been added to your favorites.",
+    "removedFromFavorites": "Removed from favorites",
+    "placeRemovedFromFavorites": "{{name}} has been removed from your favorites.",
+    "favoriteUpdateError": "An error occurred while updating your favorites."
   },
   "playdates": {
     "create": "Create Playdate",
