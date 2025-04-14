@@ -8,6 +8,8 @@ import HomePage from "./pages/home";
 import PlaydatesPage from "./pages/playdates";
 import PlacesPage from "./pages/places";
 import ProfilePage from "./pages/profile";
+import UserProfilePage from "./pages/user-profile";
+import DiscoverPage from "./pages/discover";
 import CreatePage from "./pages/create";
 import ChatPage from "./pages/chat";
 import AuthPage from "./pages/auth-page";
@@ -27,6 +29,9 @@ function Router() {
       <ProtectedRoute path="/profile" component={ProfilePage} />
       <ProtectedRoute path="/create" component={CreatePage} />
       <ProtectedRoute path="/chat" component={ChatPage} />
+      <ProtectedRoute path="/chat/:id" component={ChatPage} />
+      <ProtectedRoute path="/discover" component={DiscoverPage} />
+      <ProtectedRoute path="/users/:id" component={UserProfilePage} />
       <Route path="/auth" component={AuthPage} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />

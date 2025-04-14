@@ -68,6 +68,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all users for user directory
+  app.get("/api/users", async (req, res) => {
+    try {
+      // Get all users from storage, limiting what data is returned
+      const users = await storage.getAllUsers();
+      
+      // Filter out sensitive information
+      const safeUsers = users.map(user => {
+        const userWithoutSensitive = { ...user } as Partial<SelectUser>;
+        delete userWithoutSensitive.password;
+        
+        return {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          profileImage: user.profileImage,
+          city: user.city,
+          badge: user.badge,
+          bio: user.bio
+        };
+      });
+      
+      res.json(safeUsers);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Get user profile by ID
+  app.get("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Filter out sensitive information
+      const userWithoutSensitive = { ...user } as Partial<SelectUser>;
+      delete userWithoutSensitive.password;
+      delete userWithoutSensitive.email;
+      delete userWithoutSensitive.phoneNumber;
+      
+      // Make sure childrenInfo is available
+      if (!userWithoutSensitive.childrenInfo) {
+        userWithoutSensitive.childrenInfo = [];
+      }
+      
+      // Make sure favoriteLocations is available
+      if (!userWithoutSensitive.favoriteLocations) {
+        userWithoutSensitive.favoriteLocations = [];
+      }
+      
+      res.json(userWithoutSensitive);
+    } catch (err) {
+      console.error("Error fetching user:", err);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
   app.get("/api/users/featured", async (req, res) => {
     try {
       const featuredUser = await storage.getFeaturedUser();
