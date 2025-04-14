@@ -49,6 +49,8 @@ export default function ProfilePage() {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   
   // Fetch user profile data
   const { data: user, isLoading: userLoading } = useQuery<User>({
@@ -92,19 +94,55 @@ export default function ProfilePage() {
     }
   });
   
+  // Handle profile image selection
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfileImage(file);
+      
+      // Create a preview URL
+      const fileReader = new FileReader();
+      fileReader.onload = (e) => {
+        setPreviewUrl(e.target?.result as string);
+      };
+      fileReader.readAsDataURL(file);
+    }
+  };
+  
   const onSubmit = async (data: EditProfileFormValues) => {
     setIsSubmitting(true);
     
     try {
+      // First update the profile data via the regular API
       await apiRequest('PATCH', '/api/users/me', data);
+      
+      // If there's a profile image, upload it
+      if (profileImage) {
+        const formData = new FormData();
+        formData.append('profileImage', profileImage);
+        
+        const response = await fetch('/api/users/me/profile-image', {
+          method: 'POST',
+          credentials: 'include',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to upload profile image');
+        }
+      }
       
       toast({
         title: "Profiel bijgewerkt",
         description: "Je profielinformatie is succesvol bijgewerkt.",
       });
       
+      // Reset the states
+      setProfileImage(null);
+      setPreviewUrl(null);
       setIsEditing(false);
     } catch (error) {
+      console.error('Error updating profile:', error);
       toast({
         title: "Fout bij bijwerken",
         description: "Er is iets misgegaan bij het bijwerken van je profiel.",
@@ -229,6 +267,31 @@ export default function ProfilePage() {
         >
           Annuleren
         </Button>
+      </div>
+      
+      {/* Profile Image Upload */}
+      <div className="mb-6">
+        <h3 className="text-lg font-medium mb-2">Profielfoto</h3>
+        <div className="flex flex-col md:flex-row gap-4 items-start">
+          <div className="relative w-32 h-32 overflow-hidden rounded-lg border border-input">
+            <img 
+              src={previewUrl || user.profileImage || "https://via.placeholder.com/150?text=Profielfoto"} 
+              alt="Profielfoto" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="flex-1">
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleProfileImageChange}
+              className="max-w-sm"
+            />
+            <p className="text-sm text-muted-foreground mt-2">
+              Upload een afbeelding (max. 5MB). Formaten: JPEG, PNG, GIF.
+            </p>
+          </div>
+        </div>
       </div>
       
       <Form {...form}>
