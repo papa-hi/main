@@ -62,9 +62,22 @@ export default function CreatePage() {
   });
 
   const onSubmit = async (data: CreatePlaydateFormValues) => {
+    console.log("Form submitted with data:", data);
     setIsSubmitting(true);
     
     try {
+      // Check if the form data is valid
+      if (!data.date || !data.startTimeString || !data.endTimeString) {
+        console.error("Missing required date or time data", data);
+        toast({
+          title: "Ontbrekende informatie",
+          description: "Vul alle verplichte velden in (datum, start- en eindtijd).",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      
       // Convert the form data to the format expected by the API
       const [startHours, startMinutes] = data.startTimeString.split(':').map(Number);
       const [endHours, endMinutes] = data.endTimeString.split(':').map(Number);
@@ -84,7 +97,10 @@ export default function CreatePage() {
         maxParticipants: data.maxParticipants,
       };
       
-      await apiRequest('POST', '/api/playdates', playdateData);
+      console.log("Sending playdate data to API:", playdateData);
+      
+      const response = await apiRequest('POST', '/api/playdates', playdateData);
+      console.log("API response:", response);
       
       // Invalidate queries to refetch playdates
       queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
@@ -97,6 +113,7 @@ export default function CreatePage() {
       // Navigate to the playdates page
       navigate("/playdates");
     } catch (error) {
+      console.error("Error creating playdate:", error);
       toast({
         title: "Fout bij aanmaken",
         description: "Er is iets misgegaan bij het aanmaken van de speelafspraak.",
