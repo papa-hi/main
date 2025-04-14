@@ -116,5 +116,26 @@
       "message": "An error occurred. Please try again later.",
       "retry": "Retry"
     }
+  },
+  "pwa": {
+    "privacy": {
+      "title": "Privacy Settings",
+      "description": "To provide you with the best experience, we use location services and save your preferences. We care about your privacy and don't share your data with third parties.",
+      "essentialCookies": "Essential Cookies",
+      "essentialCookiesDesc": "Necessary for the app to function.",
+      "locationServices": "Location Services",
+      "locationServicesDesc": "Allow finding places near you.",
+      "analytics": "Analytics",
+      "analyticsDesc": "Helps us improve the app.",
+      "accept": "Accept",
+      "reject": "Reject",
+      "viewPrivacyPolicy": "View Privacy Policy"
+    },
+    "install": {
+      "title": "Install Papa-Hi",
+      "description": "Get faster access and offline capabilities on your device!",
+      "later": "Later",
+      "install": "Install"
+    }
   }
 }

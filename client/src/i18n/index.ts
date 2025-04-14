@@ -14,10 +14,14 @@ i18n
   .init({
     resources: {
       en: {
-        translation: enTranslations
+        translation: enTranslations,
+        errors: enTranslations.errors,
+        pwa: enTranslations.pwa
       },
       nl: {
-        translation: nlTranslations
+        translation: nlTranslations,
+        errors: nlTranslations.errors,
+        pwa: nlTranslations.pwa
       }
     },
     lng: defaultLanguage,

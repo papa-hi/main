@@ -116,5 +116,26 @@
       "message": "Er is een fout opgetreden. Probeer het later nog eens.",
       "retry": "Opnieuw proberen"
     }
+  },
+  "pwa": {
+    "privacy": {
+      "title": "Privacy Instellingen",
+      "description": "Om je de beste ervaring te bieden, gebruiken we locatiediensten en slaan we je voorkeuren op. We geven om je privacy en delen je gegevens niet met derden.",
+      "essentialCookies": "Essentiële Cookies",
+      "essentialCookiesDesc": "Noodzakelijk voor het functioneren van de app.",
+      "locationServices": "Locatiediensten",
+      "locationServicesDesc": "Toestaan om plaatsen in je buurt te vinden.",
+      "analytics": "Analytics",
+      "analyticsDesc": "Helpt ons de app te verbeteren.",
+      "accept": "Accepteren",
+      "reject": "Afwijzen",
+      "viewPrivacyPolicy": "Privacybeleid bekijken"
+    },
+    "install": {
+      "title": "Installeer Papa-Hi",
+      "description": "Krijg snellere toegang en offline mogelijkheden op je toestel!",
+      "later": "Later",
+      "install": "Installeren"
+    }
   }
 }

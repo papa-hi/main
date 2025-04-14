@@ -11,6 +11,7 @@ import ProfilePage from "./pages/profile";
 import CreatePage from "./pages/create";
 import { useState, useEffect } from "react";
 import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
+import ErrorBoundary from "./components/shared/error-boundary";
 
 function Router() {
   return (
@@ -68,26 +69,28 @@ function App() {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AppShell>
-        <Router />
-      </AppShell>
-      <Toaster />
-      
-      {showPrivacyConsent && (
-        <PrivacyConsentDialog 
-          onAccept={handleAcceptPrivacy} 
-          onReject={handleRejectPrivacy} 
-        />
-      )}
-      
-      {showPWAPrompt && (
-        <InstallPWAPrompt 
-          onDismiss={handleDismissPWA} 
-          onInstall={handleInstallPWA} 
-        />
-      )}
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AppShell>
+          <Router />
+        </AppShell>
+        <Toaster />
+        
+        {showPrivacyConsent && (
+          <PrivacyConsentDialog 
+            onAccept={handleAcceptPrivacy} 
+            onReject={handleRejectPrivacy} 
+          />
+        )}
+        
+        {showPWAPrompt && (
+          <InstallPWAPrompt 
+            onDismiss={handleDismissPWA} 
+            onInstall={handleInstallPWA} 
+          />
+        )}
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
