@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChatList } from "@/components/chat/chat-list";
 import { ChatInterface } from "@/components/chat/chat-interface";
 import { useAuth } from "@/hooks/use-auth";
@@ -10,6 +10,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Plus } from "lucide-react";
+import { useParams } from "wouter";
 
 interface User {
   id: number;
@@ -22,8 +23,11 @@ export default function ChatPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const isMobile = useIsMobile();
-  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
-  const [showChatList, setShowChatList] = useState(true);
+  const params = useParams();
+  // Get chatId from URL params if it exists
+  const chatIdFromParams = params.id ? parseInt(params.id, 10) : null;
+  const [selectedChatId, setSelectedChatId] = useState<number | null>(chatIdFromParams);
+  const [showChatList, setShowChatList] = useState(!chatIdFromParams || !isMobile);
   
   // Fetch all users to be able to start new chats
   const { data: users = [] } = useQuery<User[]>({
