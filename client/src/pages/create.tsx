@@ -66,6 +66,17 @@ export default function CreatePage() {
     setIsSubmitting(true);
     
     try {
+      // Log form state errors if any
+      if (Object.keys(form.formState.errors).length > 0) {
+        console.error("Form validation errors:", form.formState.errors);
+        toast({
+          title: "Formulier bevat fouten",
+          description: "Controleer alle velden en probeer het opnieuw.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       // Check if the form data is valid
       if (!data.date || !data.startTimeString || !data.endTimeString) {
         console.error("Missing required date or time data", data);
@@ -74,7 +85,6 @@ export default function CreatePage() {
           description: "Vul alle verplichte velden in (datum, start- en eindtijd).",
           variant: "destructive",
         });
-        setIsSubmitting(false);
         return;
       }
       
@@ -90,7 +100,7 @@ export default function CreatePage() {
       
       const playdateData = {
         title: data.title,
-        description: data.description,
+        description: data.description || "", // Ensure description is not null
         location: data.location,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
@@ -99,8 +109,28 @@ export default function CreatePage() {
       
       console.log("Sending playdate data to API:", playdateData);
       
-      const response = await apiRequest('POST', '/api/playdates', playdateData);
-      console.log("API response:", response);
+      // Make the API request using fetch directly to better handle responses
+      const response = await fetch('/api/playdates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(playdateData),
+        credentials: 'include',
+      });
+      
+      // Log the response status
+      console.log(`API response status: ${response.status} ${response.statusText}`);
+      
+      // Check if the response was successful
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`API error (${response.status}): ${errorText}`);
+        throw new Error(`Error: ${response.status} ${errorText || response.statusText}`);
+      }
+      
+      const responseData = await response.json();
+      console.log("API response data:", responseData);
       
       // Invalidate queries to refetch playdates
       queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
@@ -114,9 +144,15 @@ export default function CreatePage() {
       navigate("/playdates");
     } catch (error) {
       console.error("Error creating playdate:", error);
+      
+      let errorMessage = "Er is iets misgegaan bij het aanmaken van de speelafspraak.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Fout bij aanmaken",
-        description: "Er is iets misgegaan bij het aanmaken van de speelafspraak.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
