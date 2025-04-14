@@ -1339,18 +1339,178 @@ export class DatabaseStorage implements IStorage {
 
   // These methods are required by the IStorage interface but not implemented yet
   async deleteUser(id: number): Promise<boolean> {
-    // TODO: Implement
-    return true;
+    return await db.transaction(async (tx) => {
+      // First, delete all relations to avoid foreign key constraints
+      
+      // Delete user's playdate participations
+      await tx
+        .delete(playdateParticipants)
+        .where(eq(playdateParticipants.userId, id));
+      
+      // Delete user's favorite places
+      await tx
+        .delete(userFavorites)
+        .where(eq(userFavorites.userId, id));
+      
+      // Delete user's chat participations and messages
+      const userChats = await tx
+        .select({ chatId: chatParticipants.chatId })
+        .from(chatParticipants)
+        .where(eq(chatParticipants.userId, id));
+      
+      // For each chat, delete messages sent by user
+      for (const { chatId } of userChats) {
+        await tx
+          .delete(chatMessages)
+          .where(eq(chatMessages.senderId, id));
+        
+        // Remove user from chat participants
+        await tx
+          .delete(chatParticipants)
+          .where(
+            and(
+              eq(chatParticipants.chatId, chatId),
+              eq(chatParticipants.userId, id)
+            )
+          );
+        
+        // Check if chat is now empty (no participants)
+        const [{ count }] = await tx
+          .select({ count: count() })
+          .from(chatParticipants)
+          .where(eq(chatParticipants.chatId, chatId));
+        
+        // If chat is empty, delete it
+        if (Number(count) === 0) {
+          // Delete all remaining messages in the chat
+          await tx
+            .delete(chatMessages)
+            .where(eq(chatMessages.chatId, chatId));
+          
+          // Delete the chat itself
+          await tx
+            .delete(chats)
+            .where(eq(chats.id, chatId));
+        }
+      }
+      
+      // Delete playdates created by the user
+      // First get all playdates created by the user
+      const userPlaydates = await tx
+        .select({ id: playdates.id })
+        .from(playdates)
+        .where(eq(playdates.creatorId, id));
+      
+      // For each playdate, delete participants first
+      for (const { id: playdateId } of userPlaydates) {
+        await tx
+          .delete(playdateParticipants)
+          .where(eq(playdateParticipants.playdateId, playdateId));
+      }
+      
+      // Then delete the playdates themselves
+      await tx
+        .delete(playdates)
+        .where(eq(playdates.creatorId, id));
+      
+      // Finally, delete the user
+      const result = await tx
+        .delete(users)
+        .where(eq(users.id, id));
+      
+      return result.rowCount ? result.rowCount > 0 : true;
+    });
   }
 
   async joinPlaydate(userId: number, playdateId: number): Promise<boolean> {
-    // TODO: Implement
+    // Check if the playdate exists
+    const [playdate] = await db
+      .select()
+      .from(playdates)
+      .where(eq(playdates.id, playdateId));
+    
+    if (!playdate) {
+      throw new Error(`Playdate with id ${playdateId} does not exist`);
+    }
+    
+    // Check if user is already a participant
+    const [existing] = await db
+      .select()
+      .from(playdateParticipants)
+      .where(
+        and(
+          eq(playdateParticipants.playdateId, playdateId),
+          eq(playdateParticipants.userId, userId)
+        )
+      );
+    
+    if (existing) {
+      // User is already a participant
+      return true;
+    }
+    
+    // Count current participants
+    const [{ count }] = await db
+      .select({
+        count: count()
+      })
+      .from(playdateParticipants)
+      .where(eq(playdateParticipants.playdateId, playdateId));
+    
+    // Check if playdate is full
+    if (Number(count) >= playdate.maxParticipants) {
+      throw new Error(`Playdate is full (${playdate.maxParticipants} participants)`);
+    }
+    
+    // Add user as participant
+    await db
+      .insert(playdateParticipants)
+      .values({
+        playdateId,
+        userId
+      });
+    
     return true;
   }
 
   async leavePlaydate(userId: number, playdateId: number): Promise<boolean> {
-    // TODO: Implement
-    return true;
+    // Check if the playdate exists
+    const [playdate] = await db
+      .select()
+      .from(playdates)
+      .where(eq(playdates.id, playdateId));
+    
+    if (!playdate) {
+      throw new Error(`Playdate with id ${playdateId} does not exist`);
+    }
+    
+    // Check if user is a participant
+    const [existing] = await db
+      .select()
+      .from(playdateParticipants)
+      .where(
+        and(
+          eq(playdateParticipants.playdateId, playdateId),
+          eq(playdateParticipants.userId, userId)
+        )
+      );
+    
+    if (!existing) {
+      // User is not a participant
+      return false;
+    }
+    
+    // Remove user from participants
+    const result = await db
+      .delete(playdateParticipants)
+      .where(
+        and(
+          eq(playdateParticipants.playdateId, playdateId),
+          eq(playdateParticipants.userId, userId)
+        )
+      );
+    
+    return result.rowCount ? result.rowCount > 0 : true;
   }
 }
 
