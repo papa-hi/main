@@ -24,6 +24,9 @@
     "featuredDate": "Sunday, July 7 • Vondelpark • 10:00",
     "featuredAltText": "Dad and child at playground"
   },
+  "quickActions": {
+    "newPlaydate": "New Playdate"
+  },
   "places": {
     "all": "All",
     "restaurant": "Restaurants",
@@ -43,7 +46,12 @@
     "attending": "Attending",
     "participants": "Participants",
     "join": "Join",
-    "leave": "Leave"
+    "leave": "Leave",
+    "loadError": "An error occurred while loading your playdates.",
+    "emptyCalendarAlt": "Empty calendar",
+    "noPlaydatesPlanned": "No playdates planned",
+    "planNewMeetDads": "Plan a new playdate to meet other fathers!",
+    "newPlaydate": "New Playdate"
   },
   "profile": {
     "editProfile": "Edit Profile",
@@ -69,5 +77,12 @@
     "delete": "Delete",
     "edit": "Edit",
     "moreInfo": "More Info"
+  },
+  "dads": {
+    "moreDads": "More Dads",
+    "noFeaturedDadAvailable": "No featured dad is currently available.",
+    "activeDad": "Active Dad",
+    "favoriteLocations": "Favorite locations:",
+    "contact": "Contact"
   }
 }

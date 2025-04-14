@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 interface QuickActionButtonProps {
   icon: string;
@@ -20,22 +21,24 @@ function QuickActionButton({ icon, label, href }: QuickActionButtonProps) {
 }
 
 export function QuickActions() {
+  const { t } = useTranslation();
+  
   return (
     <section className="mb-10">
       <div className="grid grid-cols-3 gap-4">
         <QuickActionButton 
           icon="fas fa-calendar-plus" 
-          label="Nieuwe Afspraak" 
+          label={t('quickActions.newPlaydate', 'New Playdate')} 
           href="/create" 
         />
         <QuickActionButton 
           icon="fas fa-utensils" 
-          label="Restaurants" 
+          label={t('places.restaurant', 'Restaurants')} 
           href="/places?type=restaurant" 
         />
         <QuickActionButton 
           icon="fas fa-tree" 
-          label="Speeltuinen" 
+          label={t('places.playground', 'Playgrounds')} 
           href="/places?type=playground" 
         />
       </div>

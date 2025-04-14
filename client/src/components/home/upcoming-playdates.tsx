@@ -4,8 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { PlaydateCard } from "../shared/playdate-card";
 import { Playdate } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 export function UpcomingPlaydates() {
+  const { t } = useTranslation();
   const { data: playdates, isLoading, error } = useQuery<Playdate[]>({
     queryKey: ['/api/playdates/upcoming'],
   });
@@ -14,7 +16,7 @@ export function UpcomingPlaydates() {
     return (
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-heading font-bold">Komende Speelafspraken</h2>
+          <h2 className="text-xl font-heading font-bold">{t('home.upcomingPlaydates', 'Upcoming Playdates')}</h2>
           <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
         </div>
         <div className="space-y-4">
@@ -43,10 +45,10 @@ export function UpcomingPlaydates() {
     return (
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-heading font-bold">Komende Speelafspraken</h2>
+          <h2 className="text-xl font-heading font-bold">{t('home.upcomingPlaydates', 'Upcoming Playdates')}</h2>
         </div>
         <div className="bg-red-50 text-red-500 p-4 rounded-lg">
-          Er is een fout opgetreden bij het laden van je speelafspraken.
+          {t('playdates.loadError', 'An error occurred while loading your playdates.')}
         </div>
       </section>
     );
@@ -56,22 +58,24 @@ export function UpcomingPlaydates() {
     return (
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-heading font-bold">Komende Speelafspraken</h2>
+          <h2 className="text-xl font-heading font-bold">{t('home.upcomingPlaydates', 'Upcoming Playdates')}</h2>
           <Link href="/playdates">
-            <a className="text-primary text-sm font-medium hover:text-accent transition">Alles Bekijken</a>
+            <a className="text-primary text-sm font-medium hover:text-accent transition">{t('home.seeAll', 'See All')}</a>
           </Link>
         </div>
         
         <div className="bg-white rounded-xl p-6 shadow-sm text-center">
           <img 
             src="https://images.unsplash.com/photo-1534653299134-96a171b61581?ixlib=rb-4.0.3&auto=format&fit=crop&w=120&h=120&q=80" 
-            alt="Empty calendar" 
+            alt={t('playdates.emptyCalendarAlt', 'Empty calendar')} 
             className="w-20 h-20 object-cover rounded-full mx-auto mb-4"
           />
-          <h3 className="font-heading font-medium text-lg mb-2">Geen speelafspraken gepland</h3>
-          <p className="text-dark/70 text-sm mb-4">Plan een nieuwe speelafspraak om andere vaders te ontmoeten!</p>
+          <h3 className="font-heading font-medium text-lg mb-2">{t('playdates.noPlaydatesPlanned', 'No playdates planned')}</h3>
+          <p className="text-dark/70 text-sm mb-4">{t('playdates.planNewMeetDads', 'Plan a new playdate to meet other fathers!')}</p>
           <Link href="/create">
-            <button className="bg-primary text-white hover:bg-accent transition py-2 px-6 rounded-lg font-medium text-sm">Nieuwe Afspraak</button>
+            <button className="bg-primary text-white hover:bg-accent transition py-2 px-6 rounded-lg font-medium text-sm">
+              {t('playdates.newPlaydate', 'New Playdate')}
+            </button>
           </Link>
         </div>
       </section>
@@ -81,9 +85,9 @@ export function UpcomingPlaydates() {
   return (
     <section className="mb-10">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-heading font-bold">Komende Speelafspraken</h2>
+        <h2 className="text-xl font-heading font-bold">{t('home.upcomingPlaydates', 'Upcoming Playdates')}</h2>
         <Link href="/playdates">
-          <a className="text-primary text-sm font-medium hover:text-accent transition">Alles Bekijken</a>
+          <a className="text-primary text-sm font-medium hover:text-accent transition">{t('home.seeAll', 'See All')}</a>
         </Link>
       </div>
       

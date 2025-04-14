@@ -9,9 +9,16 @@ interface LocationState {
 }
 
 export function useLocation() {
-  const [location, setLocation] = useState<LocationState>({
+  const [locationState, setLocationState] = useState<LocationState>({
     isLoading: true
   });
+  
+  // For backward compatibility with existing components
+  const location = {
+    latitude: locationState.latitude,
+    longitude: locationState.longitude,
+    city: locationState.city
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -19,7 +26,7 @@ export function useLocation() {
     const getLocation = async () => {
       if (!navigator.geolocation) {
         if (isMounted) {
-          setLocation({
+          setLocationState({
             error: "Geolocation is not supported by your browser",
             isLoading: false
           });
@@ -38,7 +45,7 @@ export function useLocation() {
             const city = "Amsterdam";
             
             if (isMounted) {
-              setLocation({
+              setLocationState({
                 latitude,
                 longitude,
                 city,
@@ -48,7 +55,7 @@ export function useLocation() {
           },
           (error) => {
             if (isMounted) {
-              setLocation({
+              setLocationState({
                 error: error.message,
                 isLoading: false
               });
@@ -62,7 +69,7 @@ export function useLocation() {
         );
       } catch (error) {
         if (isMounted) {
-          setLocation({
+          setLocationState({
             error: "Failed to get location",
             isLoading: false
           });

@@ -3,8 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { User } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export function DadSpotlight() {
+  const { t } = useTranslation();
   // Query featured dad from the API
   const { data: featuredDad, isLoading, error } = useQuery<User>({
     queryKey: ['/api/users/featured'],
@@ -14,7 +16,7 @@ export function DadSpotlight() {
     return (
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-heading font-bold">Vader Uitgelicht</h2>
+          <h2 className="text-xl font-heading font-bold">{t('home.dadSpotlight', 'Dad Spotlight')}</h2>
           <Skeleton className="h-6 w-24" />
         </div>
         
@@ -40,12 +42,14 @@ export function DadSpotlight() {
     return (
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-heading font-bold">Vader Uitgelicht</h2>
-          <a href="#" className="text-primary text-sm font-medium hover:text-accent transition">Meer Papa's</a>
+          <h2 className="text-xl font-heading font-bold">{t('home.dadSpotlight', 'Dad Spotlight')}</h2>
+          <a href="#" className="text-primary text-sm font-medium hover:text-accent transition">
+            {t('dads.moreDads', 'More Dads')}
+          </a>
         </div>
         
         <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-          <p className="text-dark/70">Op dit moment is er geen uitgelichte vader beschikbaar.</p>
+          <p className="text-dark/70">{t('dads.noFeaturedDadAvailable', 'No featured dad is currently available.')}</p>
         </div>
       </section>
     );
@@ -59,8 +63,10 @@ export function DadSpotlight() {
   return (
     <section className="mb-10">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-heading font-bold">Vader Uitgelicht</h2>
-        <a href="#" className="text-primary text-sm font-medium hover:text-accent transition">Meer Papa's</a>
+        <h2 className="text-xl font-heading font-bold">{t('home.dadSpotlight', 'Dad Spotlight')}</h2>
+        <a href="#" className="text-primary text-sm font-medium hover:text-accent transition">
+          {t('dads.moreDads', 'More Dads')}
+        </a>
       </div>
       
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -78,14 +84,14 @@ export function DadSpotlight() {
                 {featuredDad.firstName} {featuredDad.lastName}
               </h3>
               <span className="bg-primary text-white text-xs py-1 px-2 rounded-full ml-3">
-                {featuredDad.badge || "Actieve Papa"}
+                {featuredDad.badge || t('dads.activeDad', 'Active Dad')}
               </span>
             </div>
             <p className="text-dark/80 mb-4">{featuredDad.bio}</p>
             
             {featuredDad.favoriteLocations && featuredDad.favoriteLocations.length > 0 && (
               <div className="bg-primary/5 p-4 rounded-lg mb-4">
-                <h4 className="font-heading font-medium text-sm mb-2">Favoriete plekken:</h4>
+                <h4 className="font-heading font-medium text-sm mb-2">{t('dads.favoriteLocations', 'Favorite locations:')}</h4>
                 <div className="flex flex-wrap gap-2">
                   {featuredDad.favoriteLocations.map((location, index) => (
                     <span key={index} className="bg-secondary/20 text-secondary text-xs py-1 px-2 rounded-md">
@@ -100,7 +106,7 @@ export function DadSpotlight() {
               className="bg-primary text-white hover:bg-accent transition py-2 px-6 rounded-lg font-medium text-sm"
               onClick={handleContactClick}
             >
-              Contact Opnemen
+              {t('dads.contact', 'Contact')}
             </Button>
           </div>
         </div>
