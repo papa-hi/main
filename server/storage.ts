@@ -1640,54 +1640,61 @@ export class DatabaseStorage implements IStorage {
   }
 
   async joinPlaydate(userId: number, playdateId: number): Promise<boolean> {
-    // Check if the playdate exists
-    const [playdate] = await db
-      .select()
-      .from(playdates)
-      .where(eq(playdates.id, playdateId));
-    
-    if (!playdate) {
-      throw new Error(`Playdate with id ${playdateId} does not exist`);
-    }
-    
-    // Check if user is already a participant
-    const [existing] = await db
-      .select()
-      .from(playdateParticipants)
-      .where(
-        and(
-          eq(playdateParticipants.playdateId, playdateId),
-          eq(playdateParticipants.userId, userId)
-        )
-      );
-    
-    if (existing) {
-      // User is already a participant
+    try {
+      // Check if the playdate exists
+      const [playdate] = await db
+        .select()
+        .from(playdates)
+        .where(eq(playdates.id, playdateId));
+      
+      if (!playdate) {
+        throw new Error(`Playdate with id ${playdateId} does not exist`);
+      }
+      
+      // Check if user is already a participant
+      const [existing] = await db
+        .select()
+        .from(playdateParticipants)
+        .where(
+          and(
+            eq(playdateParticipants.playdateId, playdateId),
+            eq(playdateParticipants.userId, userId)
+          )
+        );
+      
+      if (existing) {
+        // User is already a participant
+        return true;
+      }
+      
+      // Count current participants
+      const result = await db
+        .select({ 
+          participantCount: count() 
+        })
+        .from(playdateParticipants)
+        .where(eq(playdateParticipants.playdateId, playdateId));
+      
+      const participantCount = Number(result[0]?.participantCount || 0);
+      
+      // Check if playdate is full
+      if (participantCount >= playdate.maxParticipants) {
+        throw new Error(`Playdate is full (${playdate.maxParticipants} participants)`);
+      }
+      
+      // Add user as participant
+      await db
+        .insert(playdateParticipants)
+        .values({
+          playdateId,
+          userId
+        });
+      
       return true;
+    } catch (error) {
+      console.error("Error in joinPlaydate:", error);
+      throw error;
     }
-    
-    // Count current participants
-    const [{ count }] = await db
-      .select({
-        count: count()
-      })
-      .from(playdateParticipants)
-      .where(eq(playdateParticipants.playdateId, playdateId));
-    
-    // Check if playdate is full
-    if (Number(count) >= playdate.maxParticipants) {
-      throw new Error(`Playdate is full (${playdate.maxParticipants} participants)`);
-    }
-    
-    // Add user as participant
-    await db
-      .insert(playdateParticipants)
-      .values({
-        playdateId,
-        userId
-      });
-    
-    return true;
   }
 
   async leavePlaydate(userId: number, playdateId: number): Promise<boolean> {

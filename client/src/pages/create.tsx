@@ -158,7 +158,11 @@ export default function CreatePage() {
                     <Textarea
                       placeholder="Vertel meer over deze speelafspraak..."
                       className="min-h-[100px]"
-                      {...field}
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
                     />
                   </FormControl>
                   <FormMessage />
