@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { playdates, places, insertPlaydateSchema, insertPlaceSchema } from "@shared/schema";
+import { playdates, places, insertPlaydateSchema, insertPlaceSchema, User as SelectUser } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
@@ -28,7 +28,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user;
       
       // Format the response to match the expected structure
-      const userWithoutPassword = { ...user };
+      const userWithoutPassword = { ...user } as Partial<SelectUser>;
       delete userWithoutPassword.password;
       
       // Add children info if available, or default to empty array
@@ -78,14 +78,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get the authenticated user ID
       const userId = req.user?.id;
       
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       // Remove sensitive fields that shouldn't be updated directly
-      const updateData = { ...req.body };
+      const updateData = { ...req.body } as Partial<SelectUser>;
       delete updateData.password; // Password should be updated through a dedicated endpoint
       
       const updatedUser = await storage.updateUser(userId, updateData);
       
       // Remove password from response
-      const userWithoutPassword = { ...updatedUser };
+      const userWithoutPassword = { ...updatedUser } as Partial<SelectUser>;
       delete userWithoutPassword.password;
       
       res.json(userWithoutPassword);
@@ -95,10 +99,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/users/me/favorite-places", async (req, res) => {
+  app.get("/api/users/me/favorite-places", isAuthenticated, async (req, res) => {
     try {
-      // In a real app, we would use the authenticated user ID
-      const userId = 1;
+      // Get the authenticated user ID
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       const favoritePlaces = await storage.getUserFavoritePlaces(userId);
       res.json(favoritePlaces);
     } catch (err) {
@@ -107,10 +116,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/users/me/playdates", async (req, res) => {
+  app.get("/api/users/me/playdates", isAuthenticated, async (req, res) => {
     try {
-      // In a real app, we would use the authenticated user ID
-      const userId = 1;
+      // Get the authenticated user ID
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
       const userPlaydates = await storage.getUserPlaydates(userId);
       res.json(userPlaydates);
     } catch (err) {
@@ -140,13 +154,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/playdates", async (req, res) => {
+  app.post("/api/playdates", isAuthenticated, async (req, res) => {
     try {
       // Validate request body
       const validPlaydate = insertPlaydateSchema.parse(req.body);
       
-      // In a real app, we would use the authenticated user ID
-      const creatorId = 1;
+      // Get the authenticated user ID
+      const creatorId = req.user?.id;
+      
+      if (!creatorId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       
       const newPlaydate = await storage.createPlaydate({
         ...validPlaydate,
@@ -165,14 +183,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/playdates/:id", async (req, res) => {
+  app.delete("/api/playdates/:id", isAuthenticated, async (req, res) => {
     try {
       const playdateId = parseInt(req.params.id);
       if (isNaN(playdateId)) {
         return res.status(400).json({ message: "Invalid playdate ID" });
       }
       
-      // In a real app, we would ensure the user owns this playdate
+      // Get the authenticated user ID
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      // TODO: Add check to ensure user owns this playdate
+      // For now, we'll just delete it without checking ownership
+      
       const deleted = await storage.deletePlaydate(playdateId);
       
       if (!deleted) {
@@ -217,15 +244,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/places/:id/favorite", async (req, res) => {
+  app.post("/api/places/:id/favorite", isAuthenticated, async (req, res) => {
     try {
       const placeId = parseInt(req.params.id);
       if (isNaN(placeId)) {
         return res.status(400).json({ message: "Invalid place ID" });
       }
       
-      // In a real app, we would use the authenticated user ID
-      const userId = 1;
+      // Get the authenticated user ID
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       
       const favorite = await storage.addFavoritePlace(userId, placeId);
       res.status(201).json(favorite);
@@ -235,15 +266,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/places/:id/favorite", async (req, res) => {
+  app.delete("/api/places/:id/favorite", isAuthenticated, async (req, res) => {
     try {
       const placeId = parseInt(req.params.id);
       if (isNaN(placeId)) {
         return res.status(400).json({ message: "Invalid place ID" });
       }
       
-      // In a real app, we would use the authenticated user ID
-      const userId = 1;
+      // Get the authenticated user ID
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       
       const removed = await storage.removeFavoritePlace(userId, placeId);
       
