@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,6 +7,7 @@ import { insertPlaydateSchema } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -47,7 +48,20 @@ type CreatePlaydateFormValues = z.infer<typeof createPlaydateSchema>;
 export default function CreatePage() {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
+  const { user, isLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !user) {
+      toast({
+        title: "Je bent niet ingelogd",
+        description: "Je moet ingelogd zijn om een speelafspraak te maken.",
+        variant: "destructive",
+      });
+      navigate("/auth");
+    }
+  }, [isLoading, user, navigate, toast]);
   
   const defaultValues: Partial<CreatePlaydateFormValues> = {
     title: "",
