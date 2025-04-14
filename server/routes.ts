@@ -97,6 +97,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get featured user
+  app.get("/api/users/featured", isAuthenticated, async (req, res) => {
+    try {
+      const featuredUser = await storage.getFeaturedUser();
+      if (!featuredUser) {
+        return res.status(404).json({ message: "No featured user found" });
+      }
+      
+      // Add some additional details
+      const userWithDetails = {
+        ...featuredUser,
+        badge: "Actieve Papa",
+        childrenInfo: [
+          { name: "Noah", age: 6 },
+          { name: "Eva", age: 4 }
+        ],
+        favoriteLocations: ["Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht"]
+      };
+      
+      res.json(userWithDetails);
+    } catch (err) {
+      console.error("Error fetching featured user:", err);
+      res.status(500).json({ message: "Failed to fetch featured user" });
+    }
+  });
+
   // Get user profile by ID
   app.get("/api/users/:id", isAuthenticated, async (req, res) => {
     try {
@@ -130,31 +156,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (err) {
       console.error("Error fetching user:", err);
       res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
-
-  app.get("/api/users/featured", isAuthenticated, async (req, res) => {
-    try {
-      const featuredUser = await storage.getFeaturedUser();
-      if (!featuredUser) {
-        return res.status(404).json({ message: "No featured user found" });
-      }
-      
-      // Add some additional details
-      const userWithDetails = {
-        ...featuredUser,
-        badge: "Actieve Papa",
-        childrenInfo: [
-          { name: "Noah", age: 6 },
-          { name: "Eva", age: 4 }
-        ],
-        favoriteLocations: ["Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht"]
-      };
-      
-      res.json(userWithDetails);
-    } catch (err) {
-      console.error("Error fetching featured user:", err);
-      res.status(500).json({ message: "Failed to fetch featured user" });
     }
   });
 
