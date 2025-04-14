@@ -1,0 +1,65 @@
+{
+  "nav": {
+    "home": "Home",
+    "playdates": "Playdates",
+    "restaurants": "Restaurants",
+    "playgrounds": "Playgrounds",
+    "community": "Community"
+  },
+  "header": {
+    "myProfile": "My Profile",
+    "language": "Language",
+    "notifications": "Notifications"
+  },
+  "home": {
+    "welcome": "Welcome back, {{name}}!",
+    "quickActions": "Quick Actions",
+    "upcomingPlaydates": "Upcoming Playdates",
+    "nearbyPlaces": "Nearby Places",
+    "seeAll": "See All",
+    "dadSpotlight": "Dad Spotlight"
+  },
+  "places": {
+    "all": "All",
+    "restaurant": "Restaurants",
+    "playground": "Playgrounds",
+    "distance": "{{distance}} away",
+    "features": "Features",
+    "reviews": "Reviews",
+    "savePlace": "Save Place",
+    "unsavePlace": "Remove from Saved"
+  },
+  "playdates": {
+    "create": "Create Playdate",
+    "upcoming": "Upcoming Playdates",
+    "past": "Past Playdates",
+    "attending": "Attending",
+    "participants": "Participants",
+    "join": "Join",
+    "leave": "Leave"
+  },
+  "profile": {
+    "editProfile": "Edit Profile",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "city": "City",
+    "bio": "About Me",
+    "children": "Children",
+    "childName": "Child Name",
+    "childAge": "Age",
+    "password": "Password",
+    "save": "Save Changes",
+    "cancel": "Cancel"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+}
