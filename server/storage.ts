@@ -48,8 +48,9 @@ export class MemStorage implements IStorage {
   private playdates: Map<number, Playdate>;
   private places: Map<number, Place>;
   private favorites: Map<string, boolean>; // userId-placeId composite key
-  private chats: Map<number, Chat>;
-  private messages: Map<number, ChatMessage[]>;
+  private chats: Map<number, any>; // Using any for now to avoid type errors
+  private messages: Map<number, any[]>; // Using any for now to avoid type errors
+  private chatParticipants: Map<number, number[]>; // chatId -> [userId1, userId2, ...]
   
   private userIdCounter: number;
   private playdateIdCounter: number;
@@ -64,6 +65,7 @@ export class MemStorage implements IStorage {
     this.favorites = new Map();
     this.chats = new Map();
     this.messages = new Map();
+    this.chatParticipants = new Map();
     this.userIdCounter = 1;
     this.playdateIdCounter = 1;
     this.placeIdCounter = 1;
@@ -293,6 +295,56 @@ export class MemStorage implements IStorage {
     this.favorites.set(`1-${place1.id}`, true);
     this.favorites.set(`1-${place3.id}`, true);
     this.favorites.set(`1-${place6.id}`, true);
+    
+    // Sample chats
+    const chatId1 = this.chatIdCounter++;
+    const chat1 = {
+      id: chatId1,
+      createdAt: new Date(Date.now() - 86400000), // 1 day ago
+      updatedAt: new Date(Date.now() - 3600000)   // 1 hour ago
+    };
+    
+    // Chat between user1 and user2
+    this.chats.set(chatId1, chat1);
+    this.chatParticipants.set(chatId1, [1, 2]);
+    
+    // Sample messages for chat1
+    const messages1 = [
+      {
+        id: this.messageIdCounter++,
+        chatId: chatId1,
+        senderId: 1,
+        content: "Hoi Martijn! Hoe gaat het met jullie?",
+        sentAt: new Date(Date.now() - 86400000 + 3600000), // 1 day ago + 1 hour
+        isRead: true
+      },
+      {
+        id: this.messageIdCounter++,
+        chatId: chatId1,
+        senderId: 2,
+        content: "Hey Thomas! Alles goed hier, we hebben net een fijne dag in het park gehad. En met jullie?",
+        sentAt: new Date(Date.now() - 86400000 + 7200000), // 1 day ago + 2 hours
+        isRead: true
+      },
+      {
+        id: this.messageIdCounter++,
+        chatId: chatId1,
+        senderId: 1,
+        content: "Ook goed! Ik vroeg me af of jullie zin hebben om dit weekend naar Artis te gaan?",
+        sentAt: new Date(Date.now() - 43200000), // 12 hours ago
+        isRead: true
+      },
+      {
+        id: this.messageIdCounter++,
+        chatId: chatId1,
+        senderId: 2,
+        content: "Dat klinkt leuk! Laten we zaterdagochtend gaan, dan is het meestal rustiger.",
+        sentAt: new Date(Date.now() - 3600000), // 1 hour ago
+        isRead: false
+      }
+    ];
+    
+    this.messages.set(chatId1, messages1);
   }
 
   // User methods
@@ -442,6 +494,273 @@ export class MemStorage implements IStorage {
   async removeFavoritePlace(userId: number, placeId: number): Promise<boolean> {
     const key = `${userId}-${placeId}`;
     return this.favorites.delete(key);
+  }
+  
+  // Chat methods
+  async getChats(userId: number): Promise<any[]> {
+    const userChats: any[] = [];
+    
+    // For each chat, check if the user is a participant
+    for (const [chatId, chat] of this.chats.entries()) {
+      const participants = this.chatParticipants.get(chatId) || [];
+      
+      if (participants.includes(userId)) {
+        // Get the other participants' details
+        const participantsDetails = participants.map(participantId => {
+          const user = this.users.get(participantId);
+          if (user) {
+            return {
+              id: user.id,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              profileImage: user.profileImage
+            };
+          }
+          return null;
+        }).filter(Boolean);
+        
+        // Get the last message for this chat
+        const chatMessages = this.messages.get(chatId) || [];
+        const lastMessage = chatMessages.length > 0 
+          ? chatMessages[chatMessages.length - 1] 
+          : undefined;
+        
+        // Calculate unread count for this user
+        const unreadCount = chatMessages.filter(msg => 
+          !msg.isRead && msg.senderId !== userId
+        ).length;
+        
+        // Get sender name for the last message if it exists
+        let lastMessageWithSender;
+        if (lastMessage) {
+          const sender = this.users.get(lastMessage.senderId);
+          lastMessageWithSender = {
+            ...lastMessage,
+            senderName: sender ? `${sender.firstName} ${sender.lastName}` : 'Unknown'
+          };
+        }
+        
+        userChats.push({
+          ...chat,
+          participants: participantsDetails,
+          lastMessage: lastMessageWithSender,
+          unreadCount
+        });
+      }
+    }
+    
+    // Sort chats by last message time (newest first)
+    return userChats.sort((a, b) => {
+      const timeA = a.lastMessage ? new Date(a.lastMessage.sentAt).getTime() : 0;
+      const timeB = b.lastMessage ? new Date(b.lastMessage.sentAt).getTime() : 0;
+      return timeB - timeA;
+    });
+  }
+  
+  async getChatById(chatId: number): Promise<any | undefined> {
+    const chat = this.chats.get(chatId);
+    if (!chat) return undefined;
+    
+    const participants = this.chatParticipants.get(chatId) || [];
+    const participantsDetails = participants.map(participantId => {
+      const user = this.users.get(participantId);
+      if (user) {
+        return {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          profileImage: user.profileImage
+        };
+      }
+      return null;
+    }).filter(Boolean);
+    
+    return {
+      ...chat,
+      participants: participantsDetails
+    };
+  }
+  
+  async createChat(participants: number[]): Promise<any> {
+    // Verify all participants exist
+    const invalidParticipants = participants.filter(id => !this.users.has(id));
+    if (invalidParticipants.length > 0) {
+      throw new Error(`Users with ids ${invalidParticipants.join(', ')} do not exist`);
+    }
+    
+    const chatId = this.chatIdCounter++;
+    const now = new Date();
+    
+    // Create chat
+    const chat = {
+      id: chatId,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    this.chats.set(chatId, chat);
+    this.chatParticipants.set(chatId, [...participants]);
+    this.messages.set(chatId, []);
+    
+    // Return chat with participants
+    const participantsDetails = participants.map(participantId => {
+      const user = this.users.get(participantId);
+      return {
+        id: user!.id,
+        firstName: user!.firstName,
+        lastName: user!.lastName,
+        profileImage: user!.profileImage
+      };
+    });
+    
+    return {
+      ...chat,
+      participants: participantsDetails,
+      unreadCount: 0
+    };
+  }
+  
+  async getChatMessages(chatId: number, limit: number = 50, offset: number = 0): Promise<any[]> {
+    const chat = this.chats.get(chatId);
+    if (!chat) {
+      throw new Error(`Chat with id ${chatId} does not exist`);
+    }
+    
+    const messages = this.messages.get(chatId) || [];
+    
+    // Sort messages by time (oldest first)
+    const sortedMessages = [...messages].sort((a, b) => 
+      new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
+    );
+    
+    // Apply pagination
+    const paginatedMessages = sortedMessages.slice(offset, offset + limit);
+    
+    // Add sender information to each message
+    return paginatedMessages.map(message => {
+      const sender = this.users.get(message.senderId);
+      return {
+        ...message,
+        sender: sender ? {
+          id: sender.id,
+          firstName: sender.firstName,
+          lastName: sender.lastName,
+          profileImage: sender.profileImage
+        } : null
+      };
+    });
+  }
+  
+  async sendMessage(chatId: number, senderId: number, content: string): Promise<any> {
+    const chat = this.chats.get(chatId);
+    if (!chat) {
+      throw new Error(`Chat with id ${chatId} does not exist`);
+    }
+    
+    const user = this.users.get(senderId);
+    if (!user) {
+      throw new Error(`User with id ${senderId} does not exist`);
+    }
+    
+    const participants = this.chatParticipants.get(chatId) || [];
+    if (!participants.includes(senderId)) {
+      throw new Error(`User with id ${senderId} is not a participant in chat ${chatId}`);
+    }
+    
+    const messageId = this.messageIdCounter++;
+    const now = new Date();
+    
+    const message = {
+      id: messageId,
+      chatId,
+      senderId,
+      content,
+      sentAt: now,
+      isRead: false
+    };
+    
+    // Add message to chat's messages
+    const chatMessages = this.messages.get(chatId) || [];
+    chatMessages.push(message);
+    this.messages.set(chatId, chatMessages);
+    
+    // Update chat's updatedAt time
+    this.chats.set(chatId, {
+      ...chat,
+      updatedAt: now
+    });
+    
+    // Return with sender info
+    return {
+      ...message,
+      sender: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        profileImage: user.profileImage
+      }
+    };
+  }
+  
+  async deleteUser(id: number): Promise<boolean> {
+    return this.users.delete(id);
+  }
+  
+  async joinPlaydate(userId: number, playdateId: number): Promise<boolean> {
+    const playdate = this.playdates.get(playdateId);
+    if (!playdate) {
+      throw new Error(`Playdate with id ${playdateId} does not exist`);
+    }
+    
+    const user = this.users.get(userId);
+    if (!user) {
+      throw new Error(`User with id ${userId} does not exist`);
+    }
+    
+    // Check if user is already a participant
+    const isParticipant = playdate.participants.some(p => p.id === userId);
+    if (isParticipant) {
+      return true; // User is already a participant
+    }
+    
+    // Check if playdate is at max capacity
+    if (playdate.participants.length >= playdate.maxParticipants) {
+      throw new Error(`Playdate with id ${playdateId} is at max capacity`);
+    }
+    
+    // Add user to participants
+    playdate.participants.push({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      profileImage: user.profileImage || ""
+    });
+    
+    this.playdates.set(playdateId, playdate);
+    return true;
+  }
+  
+  async leavePlaydate(userId: number, playdateId: number): Promise<boolean> {
+    const playdate = this.playdates.get(playdateId);
+    if (!playdate) {
+      throw new Error(`Playdate with id ${playdateId} does not exist`);
+    }
+    
+    // Remove user from participants
+    const updatedParticipants = playdate.participants.filter(p => p.id !== userId);
+    
+    // If user is not a participant, return false
+    if (updatedParticipants.length === playdate.participants.length) {
+      return false;
+    }
+    
+    // Update playdate
+    this.playdates.set(playdateId, {
+      ...playdate,
+      participants: updatedParticipants
+    });
+    
+    return true;
   }
 }
 
