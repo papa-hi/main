@@ -1,12 +1,14 @@
-import { 
-  User, InsertUser, users, 
-  Playdate, playdates, 
+import {
+  User, InsertUser, users,
+  Playdate, playdates,
   Place, places,
   userFavorites,
-  playdateParticipants
+  playdateParticipants,
+  Chat, ChatMessage, InsertChat, InsertChatMessage,
+  chats, chatParticipants, chatMessages
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gt, lt, desc, sql, asc } from "drizzle-orm";
+import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -1076,117 +1078,262 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Chat methods
-  async getChats(userId: number): Promise<any[]> {
-    // In a real implementation, we would query the database
-    // For now, return mock data similar to MemStorage implementation
-    return [
-      {
-        id: 1,
-        participants: [
-          { id: userId, firstName: "Current", lastName: "User", profileImage: null },
-          { id: 1, firstName: "Thomas", lastName: "de Vries", profileImage: null }
-        ],
-        lastMessage: {
-          id: 1,
-          content: "Hallo! Hoe gaat het?",
-          sentAt: new Date(),
-          senderId: 1,
-          senderName: "Thomas"
-        },
-        unreadCount: 1
-      }
-    ];
-  }
-
-  async getChatById(chatId: number): Promise<any | undefined> {
-    // In a real implementation, we would query the database
-    // For the specific chatId=999 that we create, include the requesting user
-    if (chatId === 999) {
-      // This will be the newly created chat that should include the current user in participants
-      // We need to return it with the participants that were used to create it
-      // This is a temporary workaround until a proper database implementation is added
-      return {
-        id: chatId,
-        participants: [
-          { id: 5, firstName: "Collins", lastName: "Lidede", profileImage: null }, // Current user
-          { id: 3, firstName: "Brian", lastName: "Amaganga", profileImage: null }
-        ]
-      };
+  async getChats(userId: number): Promise<Chat[]> {
+    // Get all chats where the user is a participant
+    const userChats = await db
+      .select({
+        chatId: chatParticipants.chatId
+      })
+      .from(chatParticipants)
+      .where(eq(chatParticipants.userId, userId));
+    
+    const result: Chat[] = [];
+    
+    for (const { chatId } of userChats) {
+      // Get the chat details
+      const [chat] = await db
+        .select()
+        .from(chats)
+        .where(eq(chats.id, chatId));
+      
+      if (!chat) continue;
+      
+      // Get all participants for this chat
+      const participants = await db
+        .select({
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage
+        })
+        .from(chatParticipants)
+        .innerJoin(users, eq(chatParticipants.userId, users.id))
+        .where(eq(chatParticipants.chatId, chatId));
+      
+      // Get the last message for this chat
+      const [lastMessage] = await db
+        .select({
+          id: chatMessages.id,
+          content: chatMessages.content,
+          sentAt: chatMessages.sentAt,
+          senderId: chatMessages.senderId,
+          senderName: users.firstName
+        })
+        .from(chatMessages)
+        .innerJoin(users, eq(chatMessages.senderId, users.id))
+        .where(eq(chatMessages.chatId, chatId))
+        .orderBy(desc(chatMessages.sentAt))
+        .limit(1);
+      
+      // Count unread messages
+      const [{ unreadCount }] = await db
+        .select({
+          unreadCount: count()
+        })
+        .from(chatMessages)
+        .where(
+          and(
+            eq(chatMessages.chatId, chatId),
+            not(eq(chatMessages.senderId, userId)), // Not sent by the current user
+            eq(chatMessages.isRead, false) // Not read yet
+          )
+        );
+      
+      // Add this chat to the result
+      result.push({
+        ...chat,
+        participants,
+        lastMessage,
+        unreadCount: Number(unreadCount || 0)
+      });
     }
     
-    // Return mock data for other chat IDs
-    return {
-      id: chatId,
-      participants: [
-        { id: 1, firstName: "Thomas", lastName: "de Vries", profileImage: null },
-        { id: 5, firstName: "Collins", lastName: "Lidede", profileImage: null }
-      ]
-    };
-  }
-
-  async createChat(participants: number[]): Promise<any> {
-    // In a real implementation, we would insert into the database
-    // For now, return mock data similar to MemStorage implementation
-    const chatId = 999; // Mock ID
+    // Sort chats by last message time (newest first)
+    result.sort((a, b) => {
+      if (a.lastMessage && b.lastMessage) {
+        return b.lastMessage.sentAt.getTime() - a.lastMessage.sentAt.getTime();
+      }
+      return a.lastMessage ? -1 : b.lastMessage ? 1 : 0;
+    });
     
-    // Get user details for participants
-    const participantUsers = await Promise.all(
-      participants.map(async (userId) => {
-        const user = await this.getUserById(userId);
-        return {
-          id: user?.id || userId,
-          firstName: user?.firstName || "Unknown",
-          lastName: user?.lastName || "User",
-          profileImage: user?.profileImage || null
-        };
-      })
-    );
+    return result;
+  }
 
+  async getChatById(chatId: number): Promise<Chat | undefined> {
+    // Get the chat details
+    const [chat] = await db
+      .select()
+      .from(chats)
+      .where(eq(chats.id, chatId));
+    
+    if (!chat) return undefined;
+    
+    // Get all participants for this chat
+    const participants = await db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImage: users.profileImage
+      })
+      .from(chatParticipants)
+      .innerJoin(users, eq(chatParticipants.userId, users.id))
+      .where(eq(chatParticipants.chatId, chatId));
+    
     return {
-      id: chatId,
-      participants: participantUsers,
-      lastMessage: null,
-      unreadCount: 0
+      ...chat,
+      participants,
+      unreadCount: 0 // This field is only relevant for chat list
     };
   }
 
-  async getChatMessages(chatId: number, limit: number = 50, offset: number = 0): Promise<any[]> {
-    // In a real implementation, we would query the database
-    // For now, return mock data similar to MemStorage implementation
-    return [
-      {
-        id: 1,
-        chatId,
-        senderId: 1,
-        content: "Hallo! Hoe gaat het?",
-        sentAt: new Date(Date.now() - 86400000), // 1 day ago
-        sender: {
-          id: 1,
-          firstName: "Thomas",
-          lastName: "de Vries",
-          profileImage: null
+  async createChat(participants: number[]): Promise<Chat> {
+    return await db.transaction(async (tx) => {
+      // Check if a chat with these participants already exists
+      // First, get all chats for the first participant
+      const participantChats = await tx
+        .select({ chatId: chatParticipants.chatId })
+        .from(chatParticipants)
+        .where(eq(chatParticipants.userId, participants[0]));
+      
+      // For each chat, check if all other participants are members
+      for (const { chatId } of participantChats) {
+        let allParticipantsFound = true;
+        
+        for (let i = 1; i < participants.length; i++) {
+          const [participantInChat] = await tx
+            .select()
+            .from(chatParticipants)
+            .where(
+              and(
+                eq(chatParticipants.chatId, chatId),
+                eq(chatParticipants.userId, participants[i])
+              )
+            );
+          
+          if (!participantInChat) {
+            allParticipantsFound = false;
+            break;
+          }
+        }
+        
+        // If all participants are found in this chat, return it
+        if (allParticipantsFound) {
+          const existingChat = await this.getChatById(chatId);
+          if (existingChat) return existingChat;
         }
       }
-    ];
+      
+      // If no existing chat was found, create a new one
+      const [newChat] = await tx
+        .insert(chats)
+        .values({})
+        .returning();
+      
+      // Add all participants to the chat
+      for (const userId of participants) {
+        await tx
+          .insert(chatParticipants)
+          .values({
+            chatId: newChat.id,
+            userId
+          });
+      }
+      
+      // Get user details for all participants
+      const participantDetails = await tx
+        .select({
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage
+        })
+        .from(users)
+        .where(sql`${users.id} IN (${participants.join(',')})`);
+      
+      console.log("Created new chat:", {
+        ...newChat,
+        participants: participantDetails,
+        lastMessage: null,
+        unreadCount: 0
+      });
+      
+      return {
+        ...newChat,
+        participants: participantDetails,
+        lastMessage: undefined,
+        unreadCount: 0
+      };
+    });
   }
 
-  async sendMessage(chatId: number, senderId: number, content: string): Promise<any> {
-    // In a real implementation, we would insert into the database
-    // For now, return mock data similar to MemStorage implementation
-    const sender = await this.getUserById(senderId);
+  async getChatMessages(chatId: number, limit: number = 50, offset: number = 0): Promise<ChatMessage[]> {
+    // Get messages for the chat, ordered by sentAt
+    const messages = await db
+      .select()
+      .from(chatMessages)
+      .where(eq(chatMessages.chatId, chatId))
+      .orderBy(asc(chatMessages.sentAt))
+      .limit(limit)
+      .offset(offset);
+    
+    // For each message, get the sender details
+    const result: ChatMessage[] = [];
+    
+    for (const message of messages) {
+      const [sender] = await db
+        .select({
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage
+        })
+        .from(users)
+        .where(eq(users.id, message.senderId));
+      
+      result.push({
+        ...message,
+        sender
+      });
+    }
+    
+    return result;
+  }
+
+  async sendMessage(chatId: number, senderId: number, content: string): Promise<ChatMessage> {
+    // Insert the message
+    const [message] = await db
+      .insert(chatMessages)
+      .values({
+        chatId,
+        senderId,
+        content,
+        isRead: false
+      })
+      .returning();
+    
+    // Get the sender details
+    const [sender] = await db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImage: users.profileImage
+      })
+      .from(users)
+      .where(eq(users.id, senderId));
+    
+    // Update the chat's updatedAt timestamp
+    await db
+      .update(chats)
+      .set({
+        updatedAt: new Date()
+      })
+      .where(eq(chats.id, chatId));
     
     return {
-      id: Math.floor(Math.random() * 1000) + 1, // Random ID
-      chatId,
-      senderId,
-      content,
-      sentAt: new Date(),
-      sender: {
-        id: sender?.id || senderId,
-        firstName: sender?.firstName || "Unknown",
-        lastName: sender?.lastName || "User",
-        profileImage: sender?.profileImage || null
-      }
+      ...message,
+      sender
     };
   }
 
