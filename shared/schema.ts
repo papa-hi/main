@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -20,6 +21,13 @@ export const users = pgTable("users", {
   childrenInfo: jsonb("children_info"),
 });
 
+// Define user relations
+export const usersRelations = relations(users, ({ many }) => ({
+  createdPlaydates: many(playdates),
+  playdateParticipations: many(playdateParticipants),
+  favorites: many(userFavorites),
+}));
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -40,10 +48,19 @@ export const playdates = pgTable("playdates", {
   location: text("location").notNull(),
   startTime: timestamp("start_time").notNull(),
   endTime: timestamp("end_time").notNull(),
-  creatorId: integer("creator_id").notNull(),
+  creatorId: integer("creator_id").notNull().references(() => users.id),
   maxParticipants: integer("max_participants").default(5).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Define playdate relations
+export const playdatesRelations = relations(playdates, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [playdates.creatorId],
+    references: [users.id],
+  }),
+  participants: many(playdateParticipants),
+}));
 
 export const insertPlaydateSchema = createInsertSchema(playdates).pick({
   title: true,
@@ -57,10 +74,22 @@ export const insertPlaydateSchema = createInsertSchema(playdates).pick({
 // Playdate participants schema
 export const playdateParticipants = pgTable("playdate_participants", {
   id: serial("id").primaryKey(),
-  playdateId: integer("playdate_id").notNull(),
-  userId: integer("user_id").notNull(),
+  playdateId: integer("playdate_id").notNull().references(() => playdates.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   joinedAt: timestamp("joined_at").defaultNow().notNull(),
 });
+
+// Define playdate participants relations
+export const playdateParticipantsRelations = relations(playdateParticipants, ({ one }) => ({
+  playdate: one(playdates, {
+    fields: [playdateParticipants.playdateId],
+    references: [playdates.id],
+  }),
+  user: one(users, {
+    fields: [playdateParticipants.userId],
+    references: [users.id],
+  }),
+}));
 
 // Places schema
 export const places = pgTable("places", {
@@ -77,6 +106,11 @@ export const places = pgTable("places", {
   features: text("features").array(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Define places relations
+export const placesRelations = relations(places, ({ many }) => ({
+  favorites: many(userFavorites),
+}));
 
 export const insertPlaceSchema = createInsertSchema(places).pick({
   name: true,
