@@ -1,5 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../shared/language-switcher";
 
 // SVG logo for Papa-Hi
 const PapaHiLogo = () => (
@@ -23,6 +25,7 @@ interface HeaderProps {
 export function Header({ user }: HeaderProps) {
   const [location] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t, i18n } = useTranslation();
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -49,31 +52,34 @@ export function Header({ user }: HeaderProps) {
         <nav className="hidden md:flex space-x-6 text-sm">
           <Link href="/">
             <a className={`font-medium hover:text-accent transition ${location === '/' ? 'text-accent' : ''}`}>
-              Home
+              {t('nav.home', 'Home')}
             </a>
           </Link>
           <Link href="/playdates">
             <a className={`font-medium hover:text-accent transition ${location === '/playdates' ? 'text-accent' : ''}`}>
-              Speelafspraken
+              {t('nav.playdates', 'Speelafspraken')}
             </a>
           </Link>
           <Link href="/places">
             <a className={`font-medium hover:text-accent transition ${location.includes('/places') ? 'text-accent' : ''}`}>
-              Restaurants
+              {t('nav.restaurants', 'Restaurants')}
             </a>
           </Link>
           <Link href="/places?type=playground">
             <a className={`font-medium hover:text-accent transition ${location.includes('/places') && location.includes('type=playground') ? 'text-accent' : ''}`}>
-              Speeltuinen
+              {t('nav.playgrounds', 'Speeltuinen')}
             </a>
           </Link>
           <a href="#" className="font-medium hover:text-accent transition">
-            Community
+            {t('nav.community', 'Community')}
           </a>
         </nav>
         
         {/* User Menu - Desktop */}
         <div className="hidden md:flex items-center space-x-4">
+          {/* Language Switcher */}
+          <LanguageSwitcher />
+          
           <button className="text-white hover:text-accent" aria-label="Notifications">
             <i className="fas fa-bell"></i>
           </button>
@@ -97,21 +103,38 @@ export function Header({ user }: HeaderProps) {
         <div className="md:hidden bg-primary/95 absolute top-full left-0 right-0 p-4 shadow-lg z-50">
           <nav className="flex flex-col space-y-3 text-white">
             <Link href="/">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">Home</a>
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.home', 'Home')}</a>
             </Link>
             <Link href="/playdates">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">Speelafspraken</a>
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.playdates', 'Speelafspraken')}</a>
             </Link>
             <Link href="/places">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">Restaurants</a>
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.restaurants', 'Restaurants')}</a>
             </Link>
             <Link href="/places?type=playground">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">Speeltuinen</a>
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.playgrounds', 'Speeltuinen')}</a>
             </Link>
-            <a href="#" className="py-2 px-4 hover:bg-primary/80 rounded-md">Community</a>
+            <a href="#" className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.community', 'Community')}</a>
             <Link href="/profile">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">Mijn profiel</a>
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('header.myProfile', 'Mijn profiel')}</a>
             </Link>
+            <div className="flex items-center justify-between py-2 px-4 hover:bg-primary/80 rounded-md">
+              <span>{t('header.language', 'Taal')}</span>
+              <div className="flex space-x-2">
+                <button 
+                  onClick={() => i18n.changeLanguage('nl')} 
+                  className={`flex items-center px-2 py-1 rounded ${i18n.language === 'nl' ? 'bg-accent text-white' : 'bg-primary-foreground/10'}`}
+                >
+                  🇳🇱
+                </button>
+                <button 
+                  onClick={() => i18n.changeLanguage('en')} 
+                  className={`flex items-center px-2 py-1 rounded ${i18n.language === 'en' ? 'bg-accent text-white' : 'bg-primary-foreground/10'}`}
+                >
+                  🇬🇧
+                </button>
+              </div>
+            </div>
           </nav>
         </div>
       )}
