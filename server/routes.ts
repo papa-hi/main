@@ -456,6 +456,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to delete playdate" });
     }
   });
+  
+  // Join a playdate
+  app.post("/api/playdates/:id/join", isAuthenticated, async (req, res) => {
+    try {
+      const playdateId = parseInt(req.params.id);
+      if (isNaN(playdateId)) {
+        return res.status(400).json({ message: "Invalid playdate ID" });
+      }
+      
+      // Get the authenticated user ID
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      await storage.joinPlaydate(userId, playdateId);
+      
+      // Get the updated playdate to return to client
+      const updatedPlaydate = await storage.getUserPlaydates(userId);
+      
+      res.status(200).json({ 
+        message: "Successfully joined playdate", 
+        playdate: updatedPlaydate.find(p => p.id === playdateId) 
+      });
+    } catch (err) {
+      console.error("Error joining playdate:", err);
+      res.status(500).json({ message: err instanceof Error ? err.message : "Failed to join playdate" });
+    }
+  });
+  
+  // Leave a playdate
+  app.delete("/api/playdates/:id/join", isAuthenticated, async (req, res) => {
+    try {
+      const playdateId = parseInt(req.params.id);
+      if (isNaN(playdateId)) {
+        return res.status(400).json({ message: "Invalid playdate ID" });
+      }
+      
+      // Get the authenticated user ID
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const left = await storage.leavePlaydate(userId, playdateId);
+      
+      if (!left) {
+        return res.status(400).json({ message: "User is not a participant in this playdate" });
+      }
+      
+      res.status(200).json({ message: "Successfully left playdate" });
+    } catch (err) {
+      console.error("Error leaving playdate:", err);
+      res.status(500).json({ message: err instanceof Error ? err.message : "Failed to leave playdate" });
+    }
+  });
 
   // Places routes
   app.get("/api/places", async (req, res) => {
