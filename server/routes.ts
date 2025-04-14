@@ -1,12 +1,13 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { playdates, places, insertPlaydateSchema, insertPlaceSchema, User as SelectUser } from "@shared/schema";
+import { playdates, places, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
 import { upload, getFileUrl, deleteProfileImage } from "./upload";
 import path from "path";
+import { WebSocketServer, WebSocket } from 'ws';
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req: any, res: any, next: any) => {
@@ -399,7 +400,217 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Chat REST API endpoints
+  app.get("/api/chats", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const chats = await storage.getChats(userId);
+      res.json(chats);
+    } catch (err) {
+      console.error("Error fetching chats:", err);
+      res.status(500).json({ message: "Failed to fetch chats" });
+    }
+  });
+  
+  app.get("/api/chats/:id", isAuthenticated, async (req, res) => {
+    try {
+      const chatId = parseInt(req.params.id);
+      if (isNaN(chatId)) {
+        return res.status(400).json({ message: "Invalid chat ID" });
+      }
+      
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const chat = await storage.getChatById(chatId);
+      
+      if (!chat) {
+        return res.status(404).json({ message: "Chat not found" });
+      }
+      
+      // Check if user is a participant in this chat
+      const isParticipant = chat.participants.some((p: any) => p.id === userId);
+      if (!isParticipant) {
+        return res.status(403).json({ message: "You are not a participant in this chat" });
+      }
+      
+      res.json(chat);
+    } catch (err) {
+      console.error("Error fetching chat:", err);
+      res.status(500).json({ message: "Failed to fetch chat" });
+    }
+  });
+  
+  app.get("/api/chats/:id/messages", isAuthenticated, async (req, res) => {
+    try {
+      const chatId = parseInt(req.params.id);
+      if (isNaN(chatId)) {
+        return res.status(400).json({ message: "Invalid chat ID" });
+      }
+      
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      // Optional pagination parameters
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
+      
+      // Get chat to verify user is a participant
+      const chat = await storage.getChatById(chatId);
+      
+      if (!chat) {
+        return res.status(404).json({ message: "Chat not found" });
+      }
+      
+      // Check if user is a participant in this chat
+      const isParticipant = chat.participants.some((p: any) => p.id === userId);
+      if (!isParticipant) {
+        return res.status(403).json({ message: "You are not a participant in this chat" });
+      }
+      
+      const messages = await storage.getChatMessages(chatId, limit, offset);
+      res.json(messages);
+    } catch (err) {
+      console.error("Error fetching chat messages:", err);
+      res.status(500).json({ message: "Failed to fetch chat messages" });
+    }
+  });
+  
+  app.post("/api/chats", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      // Validate request body - expect array of participant IDs
+      if (!req.body.participants || !Array.isArray(req.body.participants)) {
+        return res.status(400).json({ message: "Invalid request: Expected array of participant IDs" });
+      }
+      
+      // Ensure all participant IDs are integers
+      const participants = req.body.participants.map((id: any) => parseInt(id));
+      
+      // Ensure the current user is included in the participants
+      if (!participants.includes(userId)) {
+        participants.push(userId);
+      }
+      
+      // Create new chat
+      const newChat = await storage.createChat(participants);
+      res.status(201).json(newChat);
+    } catch (err) {
+      console.error("Error creating chat:", err);
+      res.status(500).json({ message: "Failed to create chat" });
+    }
+  });
+  
+  // Create HTTP server
   const httpServer = createServer(app);
+  
+  // WebSocket Server setup
+  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  
+  // Client connections and their associated user IDs
+  const clients = new Map<WebSocket, { userId: number | null }>();
+  
+  wss.on('connection', (ws) => {
+    // Initially, the connection is not authenticated
+    clients.set(ws, { userId: null });
+    
+    console.log('WebSocket client connected');
+    
+    ws.on('message', async (message) => {
+      try {
+        const data = JSON.parse(message.toString());
+        
+        // Handle authentication message
+        if (data.type === 'authenticate') {
+          if (data.token) {
+            // In a real app, you would verify the token here
+            // For now, we'll trust the user ID sent by the client
+            clients.set(ws, { userId: data.userId });
+            ws.send(JSON.stringify({
+              type: 'authenticated',
+              success: true
+            }));
+          }
+        }
+        // Handle chat message
+        else if (data.type === 'chat_message') {
+          const clientInfo = clients.get(ws);
+          if (!clientInfo || !clientInfo.userId) {
+            ws.send(JSON.stringify({
+              type: 'error',
+              message: 'Not authenticated'
+            }));
+            return;
+          }
+          
+          try {
+            // Validate message data
+            const messageData = insertChatMessageSchema.parse({
+              chatId: data.chatId,
+              content: data.content,
+              senderId: clientInfo.userId
+            });
+            
+            // Store message in database
+            const savedMessage = await storage.sendMessage(
+              messageData.chatId,
+              messageData.senderId,
+              messageData.content
+            );
+            
+            // Broadcast to all connected clients who are participants of this chat
+            for (const [client, info] of clients.entries()) {
+              if (client.readyState === WebSocket.OPEN && info.userId) {
+                // Check if this user is a participant in the chat
+                const chat = await storage.getChatById(messageData.chatId);
+                if (chat && chat.participants.some((p: any) => p.id === info.userId)) {
+                  client.send(JSON.stringify({
+                    type: 'new_message',
+                    message: savedMessage
+                  }));
+                }
+              }
+            }
+          } catch (err) {
+            console.error('Error processing chat message:', err);
+            ws.send(JSON.stringify({
+              type: 'error',
+              message: 'Failed to process message'
+            }));
+          }
+        }
+      } catch (err) {
+        console.error('Error parsing WebSocket message:', err);
+      }
+    });
+    
+    ws.on('close', () => {
+      console.log('WebSocket client disconnected');
+      clients.delete(ws);
+    });
+    
+    // Send welcome message
+    ws.send(JSON.stringify({
+      type: 'welcome',
+      message: 'Connected to Papa-Hi chat server'
+    }));
+  });
 
   return httpServer;
 }
