@@ -133,7 +133,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/users/featured", async (req, res) => {
+  app.get("/api/users/featured", isAuthenticated, async (req, res) => {
     try {
       const featuredUser = await storage.getFeaturedUser();
       if (!featuredUser) {

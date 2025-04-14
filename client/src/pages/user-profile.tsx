@@ -10,6 +10,30 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
+// User profile interface definition
+interface UserProfile {
+  id: number;
+  firstName: string;
+  lastName: string;
+  profileImage: string | null;
+  city: string | null;
+  badge: string | null;
+  bio: string | null;
+  childrenInfo?: { name: string; age: number }[];
+  favoriteLocations?: string[];
+}
+
+// Chat interface definition
+interface Chat {
+  id: number;
+  participants: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    profileImage: string | null;
+  }[];
+}
+
 export default function UserProfilePage() {
   const { id } = useParams();
   const { user: currentUser } = useAuth();
@@ -21,13 +45,13 @@ export default function UserProfilePage() {
     data: user,
     isLoading,
     error
-  } = useQuery({
+  } = useQuery<UserProfile>({
     queryKey: [`/api/users/${id}`],
     enabled: !!id && id !== currentUser?.id.toString()
   });
   
   // Fetch existing chats to see if we already have a chat with this user
-  const { data: existingChats } = useQuery({
+  const { data: existingChats } = useQuery<Chat[]>({
     queryKey: ["/api/chats"],
     enabled: !!currentUser,
   });
@@ -35,8 +59,8 @@ export default function UserProfilePage() {
   // Check if we already have a chat with this user
   useEffect(() => {
     if (existingChats && user) {
-      const chat = existingChats.find((chat: any) => 
-        chat.participants.some((p: any) => p.id === user.id)
+      const chat = existingChats.find((chat) => 
+        chat.participants.some((p) => p.id === user.id)
       );
       
       if (chat) {
@@ -174,7 +198,7 @@ export default function UserProfilePage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {user.childrenInfo.map((child: any, index: number) => (
+              {user.childrenInfo.map((child, index) => (
                 <li key={index} className="flex items-center gap-2">
                   <span className="text-accent">•</span>
                   <span>{child.name}, {child.age} jaar</span>
@@ -193,7 +217,7 @@ export default function UserProfilePage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {user.favoriteLocations.map((location: string, index: number) => (
+              {user.favoriteLocations.map((location, index) => (
                 <li key={index} className="flex items-center gap-2">
                   <span className="text-accent">•</span>
                   <span>{location}</span>
