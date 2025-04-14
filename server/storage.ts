@@ -1074,6 +1074,123 @@ export class DatabaseStorage implements IStorage {
     
     return result.rowCount > 0;
   }
+
+  // Chat methods
+  async getChats(userId: number): Promise<any[]> {
+    // In a real implementation, we would query the database
+    // For now, return mock data similar to MemStorage implementation
+    return [
+      {
+        id: 1,
+        participants: [
+          { id: userId, firstName: "Current", lastName: "User", profileImage: null },
+          { id: 1, firstName: "Thomas", lastName: "de Vries", profileImage: null }
+        ],
+        lastMessage: {
+          id: 1,
+          content: "Hallo! Hoe gaat het?",
+          sentAt: new Date(),
+          senderId: 1,
+          senderName: "Thomas"
+        },
+        unreadCount: 1
+      }
+    ];
+  }
+
+  async getChatById(chatId: number): Promise<any | undefined> {
+    // In a real implementation, we would query the database
+    // For now, return mock data similar to MemStorage implementation
+    return {
+      id: chatId,
+      participants: [
+        { id: 1, firstName: "Thomas", lastName: "de Vries", profileImage: null },
+        { id: 3, firstName: "Brian", lastName: "Angare", profileImage: null }
+      ]
+    };
+  }
+
+  async createChat(participants: number[]): Promise<any> {
+    // In a real implementation, we would insert into the database
+    // For now, return mock data similar to MemStorage implementation
+    const chatId = 999; // Mock ID
+    
+    // Get user details for participants
+    const participantUsers = await Promise.all(
+      participants.map(async (userId) => {
+        const user = await this.getUserById(userId);
+        return {
+          id: user?.id || userId,
+          firstName: user?.firstName || "Unknown",
+          lastName: user?.lastName || "User",
+          profileImage: user?.profileImage || null
+        };
+      })
+    );
+
+    return {
+      id: chatId,
+      participants: participantUsers,
+      lastMessage: null,
+      unreadCount: 0
+    };
+  }
+
+  async getChatMessages(chatId: number, limit: number = 50, offset: number = 0): Promise<any[]> {
+    // In a real implementation, we would query the database
+    // For now, return mock data similar to MemStorage implementation
+    return [
+      {
+        id: 1,
+        chatId,
+        senderId: 1,
+        content: "Hallo! Hoe gaat het?",
+        sentAt: new Date(Date.now() - 86400000), // 1 day ago
+        sender: {
+          id: 1,
+          firstName: "Thomas",
+          lastName: "de Vries",
+          profileImage: null
+        }
+      }
+    ];
+  }
+
+  async sendMessage(chatId: number, senderId: number, content: string): Promise<any> {
+    // In a real implementation, we would insert into the database
+    // For now, return mock data similar to MemStorage implementation
+    const sender = await this.getUserById(senderId);
+    
+    return {
+      id: Math.floor(Math.random() * 1000) + 1, // Random ID
+      chatId,
+      senderId,
+      content,
+      sentAt: new Date(),
+      sender: {
+        id: sender?.id || senderId,
+        firstName: sender?.firstName || "Unknown",
+        lastName: sender?.lastName || "User",
+        profileImage: sender?.profileImage || null
+      }
+    };
+  }
+
+  // These methods are required by the IStorage interface but not implemented yet
+  async deleteUser(id: number): Promise<boolean> {
+    // TODO: Implement
+    return true;
+  }
+
+  async joinPlaydate(userId: number, playdateId: number): Promise<boolean> {
+    // TODO: Implement
+    return true;
+  }
+
+  async leavePlaydate(userId: number, playdateId: number): Promise<boolean> {
+    // TODO: Implement
+    return true;
+  }
 }
 
 // Use the database storage implementation
