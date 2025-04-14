@@ -400,24 +400,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/playdates", isAuthenticated, async (req, res) => {
     try {
+      // Log the received data
+      console.log("Received playdate creation request:", req.body);
+      
       // Validate request body
       const validPlaydate = insertPlaydateSchema.parse(req.body);
+      console.log("Validated playdate data:", validPlaydate);
       
       // Get the authenticated user ID
       const creatorId = req.user?.id;
+      console.log("Creator ID:", creatorId);
       
       if (!creatorId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
       
+      // Create the playdate
       const newPlaydate = await storage.createPlaydate({
         ...validPlaydate,
         creatorId
       });
       
+      console.log("Created new playdate:", newPlaydate);
       res.status(201).json(newPlaydate);
     } catch (err) {
       if (err instanceof ZodError) {
+        console.error("Validation error:", err.errors);
         const validationError = fromZodError(err);
         return res.status(400).json({ message: validationError.message });
       }
