@@ -9,18 +9,22 @@ import PlaydatesPage from "./pages/playdates";
 import PlacesPage from "./pages/places";
 import ProfilePage from "./pages/profile";
 import CreatePage from "./pages/create";
+import AuthPage from "./pages/auth-page";
 import { useState, useEffect } from "react";
 import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
 import ErrorBoundary from "./components/shared/error-boundary";
+import { AuthProvider } from "./hooks/use-auth";
+import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={HomePage}/>
-      <Route path="/playdates" component={PlaydatesPage}/>
-      <Route path="/places" component={PlacesPage}/>
-      <Route path="/profile" component={ProfilePage}/>
-      <Route path="/create" component={CreatePage}/>
+      <ProtectedRoute path="/" component={HomePage} />
+      <ProtectedRoute path="/playdates" component={PlaydatesPage} />
+      <ProtectedRoute path="/places" component={PlacesPage} />
+      <ProtectedRoute path="/profile" component={ProfilePage} />
+      <ProtectedRoute path="/create" component={CreatePage} />
+      <Route path="/auth" component={AuthPage} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
@@ -71,24 +75,26 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <AppShell>
-          <Router />
-        </AppShell>
-        <Toaster />
-        
-        {showPrivacyConsent && (
-          <PrivacyConsentDialog 
-            onAccept={handleAcceptPrivacy} 
-            onReject={handleRejectPrivacy} 
-          />
-        )}
-        
-        {showPWAPrompt && (
-          <InstallPWAPrompt 
-            onDismiss={handleDismissPWA} 
-            onInstall={handleInstallPWA} 
-          />
-        )}
+        <AuthProvider>
+          <AppShell>
+            <Router />
+          </AppShell>
+          <Toaster />
+          
+          {showPrivacyConsent && (
+            <PrivacyConsentDialog 
+              onAccept={handleAcceptPrivacy} 
+              onReject={handleRejectPrivacy} 
+            />
+          )}
+          
+          {showPWAPrompt && (
+            <InstallPWAPrompt 
+              onDismiss={handleDismissPWA} 
+              onInstall={handleInstallPWA} 
+            />
+          )}
+        </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );
