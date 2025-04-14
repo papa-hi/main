@@ -69,7 +69,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all users for user directory
-  app.get("/api/users", async (req, res) => {
+  app.get("/api/users", isAuthenticated, async (req, res) => {
     try {
       // Get all users from storage, limiting what data is returned
       const users = await storage.getAllUsers();
@@ -98,7 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user profile by ID
-  app.get("/api/users/:id", async (req, res) => {
+  app.get("/api/users/:id", isAuthenticated, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
       if (isNaN(userId)) {
