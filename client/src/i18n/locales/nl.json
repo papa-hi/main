@@ -4,7 +4,17 @@
     "playdates": "Speelafspraken",
     "restaurants": "Restaurants",
     "playgrounds": "Speeltuinen",
-    "community": "Community"
+    "community": "Community",
+    "new": "Nieuw",
+    "places": "Plekken",
+    "profile": "Profiel"
+  },
+  "navigation": {
+    "home": "Home",
+    "playdates": "Speelafspraken",
+    "new": "Nieuw",
+    "places": "Plekken",
+    "profile": "Profiel"
   },
   "header": {
     "myProfile": "Mijn Profiel",
@@ -94,5 +104,17 @@
     "activeDad": "Actieve Papa",
     "favoriteLocations": "Favoriete plekken:",
     "contact": "Contact Opnemen"
+  },
+  "errors": {
+    "notFound": {
+      "title": "404 Pagina Niet Gevonden",
+      "message": "De pagina die je zoekt bestaat niet.",
+      "backToHome": "Terug naar Home"
+    },
+    "generic": {
+      "title": "Er is iets misgegaan",
+      "message": "Er is een fout opgetreden. Probeer het later nog eens.",
+      "retry": "Opnieuw proberen"
+    }
   }
 }

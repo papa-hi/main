@@ -4,7 +4,17 @@
     "playdates": "Playdates",
     "restaurants": "Restaurants",
     "playgrounds": "Playgrounds",
-    "community": "Community"
+    "community": "Community",
+    "new": "New",
+    "places": "Places",
+    "profile": "Profile"
+  },
+  "navigation": {
+    "home": "Home",
+    "playdates": "Playdates",
+    "new": "New",
+    "places": "Places",
+    "profile": "Profile"
   },
   "header": {
     "myProfile": "My Profile",
@@ -94,5 +104,17 @@
     "activeDad": "Active Dad",
     "favoriteLocations": "Favorite locations:",
     "contact": "Contact"
+  },
+  "errors": {
+    "notFound": {
+      "title": "404 Page Not Found",
+      "message": "The page you are looking for does not exist.",
+      "backToHome": "Back to Home"
+    },
+    "generic": {
+      "title": "Something went wrong",
+      "message": "An error occurred. Please try again later.",
+      "retry": "Retry"
+    }
   }
 }
