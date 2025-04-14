@@ -591,7 +591,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Advanced search/filter endpoints
   
   // Search users with advanced parameters - temporarily allow without authentication for testing
-  app.get("/api/users/search", async (req: Request, res: Response) => {
+  app.get("/api/users/search", (req: Request, res: Response, next: NextFunction) => {
+    console.log("Accessing /api/users/search without authentication check");
+    next();
+  }, async (req: Request, res: Response) => {
     try {
       const { 
         query, 
@@ -808,6 +811,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Simple test endpoint with no authentication
+  app.get("/api/test", (req, res) => {
+    res.json({ message: "Test endpoint works!" });
+  });
+
   // Create HTTP server
   const httpServer = createServer(app);
   
