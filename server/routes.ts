@@ -1,10 +1,12 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { playdates, places, insertPlaydateSchema, insertPlaceSchema, User as SelectUser } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
+import { upload, getFileUrl, deleteProfileImage } from "./upload";
+import path from "path";
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req: any, res: any, next: any) => {
@@ -17,6 +19,23 @@ const isAuthenticated = (req: any, res: any, next: any) => {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupAuth(app);
+  
+  // Serve uploaded files
+  app.use('/uploads', (req, res, next) => {
+    // Security check to prevent directory traversal
+    if (req.path.includes('..')) {
+      return res.status(403).send('Forbidden');
+    }
+    next();
+  }, (req, res, next) => {
+    const uploadsPath = path.join(process.cwd(), 'uploads');
+    const filePath = path.join(uploadsPath, req.path);
+    res.sendFile(filePath, (err) => {
+      if (err) {
+        next(err);
+      }
+    });
+  });
   
   // put application routes here
   // prefix all routes with /api
@@ -96,6 +115,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (err) {
       console.error("Error updating user:", err);
       res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+  
+  // Delete user profile
+  app.delete("/api/users/me", isAuthenticated, async (req, res) => {
+    try {
+      // Get the authenticated user ID
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      // Get the current user to find the profile image (if any)
+      const currentUser = await storage.getUserById(userId);
+      if (currentUser?.profileImage) {
+        // Extract filename from the URL if it exists
+        const oldFilename = currentUser.profileImage.split('/').pop();
+        if (oldFilename) {
+          // Delete the profile image
+          deleteProfileImage(oldFilename);
+        }
+      }
+      
+      // Delete the user
+      const deleted = await storage.deleteUser(userId);
+      
+      if (!deleted) {
+        return res.status(500).json({ message: "Failed to delete user" });
+      }
+      
+      // Log the user out
+      req.logout((err) => {
+        if (err) {
+          console.error("Error logging out:", err);
+          return res.status(500).json({ message: "Failed to log out after deleting account" });
+        }
+        res.status(200).json({ message: "User account deleted successfully" });
+      });
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      res.status(500).json({ message: "Failed to delete user account" });
+    }
+  });
+  
+  // Upload profile image
+  app.post("/api/users/me/profile-image", isAuthenticated, upload.single('profileImage'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      // Get the current user to find the old profile image (if any)
+      const currentUser = await storage.getUserById(userId);
+      if (currentUser?.profileImage) {
+        // Extract filename from the URL if it exists
+        const oldFilename = currentUser.profileImage.split('/').pop();
+        if (oldFilename) {
+          // Delete the old profile image
+          deleteProfileImage(oldFilename);
+        }
+      }
+      
+      // Update user with new profile image URL
+      const filename = req.file.filename;
+      const imageUrl = `/uploads/profile-images/${filename}`;
+      
+      const updatedUser = await storage.updateUser(userId, { profileImage: imageUrl });
+      
+      // Remove password from response
+      const userWithoutPassword = { ...updatedUser } as Partial<SelectUser>;
+      delete userWithoutPassword.password;
+      
+      res.json({ 
+        success: true, 
+        user: userWithoutPassword,
+        imageUrl
+      });
+    } catch (err) {
+      console.error("Error uploading profile image:", err);
+      res.status(500).json({ message: "Failed to upload profile image" });
     }
   });
 
