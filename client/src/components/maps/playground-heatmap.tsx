@@ -89,7 +89,8 @@ interface PlaygroundHeatmapProps {
 
 export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
   const [mapCenter, setMapCenter] = useState<[number, number]>([52.3676, 4.9041]); // Default: Amsterdam
-  const { latitude, longitude, isLoading: locationLoading } = useLocation();
+  const { latitude, longitude } = useLocation();
+  const [locationAvailable, setLocationAvailable] = useState(false);
   
   // Fetch all playgrounds from the API
   const { data: places = [], isLoading: placesLoading } = useQuery<Place[]>({
@@ -99,16 +100,22 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
   // Generate points for the heatmap
   const heatmapPoints = places
     .filter(place => place.type === 'playground')
-    .map(place => place.latitude && place.longitude ? 
-      [place.latitude, place.longitude, 0.5] : // 0.5 is the intensity
-      null
-    )
+    .map(place => {
+      if (place.latitude && place.longitude) {
+        // Ensure latitude and longitude are numbers
+        const lat = typeof place.latitude === 'string' ? parseFloat(place.latitude) : place.latitude;
+        const lng = typeof place.longitude === 'string' ? parseFloat(place.longitude) : place.longitude;
+        return [lat, lng, 0.5]; // 0.5 is the intensity
+      }
+      return null;
+    })
     .filter((point): point is number[] => point !== null);
   
   // Update map center when user location is available
   useEffect(() => {
     if (latitude && longitude) {
       setMapCenter([latitude, longitude]);
+      setLocationAvailable(true);
     }
   }, [latitude, longitude]);
   
@@ -120,11 +127,12 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
           Find popular playgrounds near you. The heatmap shows playground density - red areas have more playgrounds.
         </p>
         
-        {!locationLoading && !latitude && (
+        {!locationAvailable && (
           <Button 
             onClick={() => navigator.geolocation.getCurrentPosition(
               pos => {
                 setMapCenter([pos.coords.latitude, pos.coords.longitude]);
+                setLocationAvailable(true);
               },
               err => console.error('Error getting location:', err)
             )}
@@ -157,11 +165,16 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
           {/* Add markers for each playground */}
           {places
             .filter(place => place.type === 'playground')
-            .map(place => (
-              place.latitude && place.longitude ? (
+            .map(place => {
+              // Ensure latitude and longitude are numbers
+              const lat = typeof place.latitude === 'string' ? parseFloat(place.latitude) : place.latitude;
+              const lng = typeof place.longitude === 'string' ? parseFloat(place.longitude) : place.longitude;
+              
+              // Only render markers with valid coordinates
+              return (lat && lng) ? (
                 <Marker 
                   key={place.id} 
-                  position={[place.latitude, place.longitude]}
+                  position={[lat, lng]}
                   icon={playgroundIcon}
                 >
                   <Popup>
@@ -178,7 +191,9 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                         className="mt-2 w-full text-xs"
                         variant="outline"
                         size="sm"
-                        onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`, '_blank')}
+                        onClick={() => {
+                          window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
+                        }}
                       >
                         <i className="fas fa-directions mr-1"></i>
                         Directions
@@ -186,8 +201,8 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                     </div>
                   </Popup>
                 </Marker>
-              ) : null
-            ))}
+              ) : null;
+            })}
           
           {/* Add marker for user location */}
           {latitude && longitude && (

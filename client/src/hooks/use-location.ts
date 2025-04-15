@@ -8,17 +8,18 @@ interface LocationState {
   isLoading: boolean;
 }
 
-export function useLocation() {
+interface LocationHookReturn {
+  latitude?: number;
+  longitude?: number;
+  city?: string;
+  error?: string;
+  isLoading: boolean;
+}
+
+export function useLocation(): LocationHookReturn {
   const [locationState, setLocationState] = useState<LocationState>({
     isLoading: true
   });
-  
-  // For backward compatibility with existing components
-  const location = {
-    latitude: locationState.latitude,
-    longitude: locationState.longitude,
-    city: locationState.city
-  };
 
   useEffect(() => {
     let isMounted = true;
@@ -84,5 +85,5 @@ export function useLocation() {
     };
   }, []);
 
-  return location;
+  return locationState;
 }
