@@ -83,86 +83,79 @@ export default function CreatePage() {
     setIsSubmitting(true);
     
     try {
-      // First, make sure the user is logged in
-      if (!user || !user.id) {
-        console.error("User not authenticated, redirecting to login");
-        toast({
-          title: "Niet ingelogd",
-          description: "Je moet ingelogd zijn om een speelafspraak te maken.",
-          variant: "destructive",
-        });
-        navigate("/auth");
-        return;
-      }
+      // ULTRA SIMPLE TEST WITH HARDCODED DATA TO DEBUG
+      console.log("CREATING TEST PLAYDATE WITH HARDCODED DATA");
       
-      // Convert the form data to the format expected by the API
-      const [startHours, startMinutes] = data.startTimeString.split(':').map(Number);
-      const [endHours, endMinutes] = data.endTimeString.split(':').map(Number);
-      
-      const startTime = new Date(data.date);
-      startTime.setHours(startHours, startMinutes);
-      
-      const endTime = new Date(data.date);
-      endTime.setHours(endHours, endMinutes);
-      
-      const playdateData = {
-        title: data.title || "Nieuwe speelafspraak",
-        description: data.description || "",
-        location: data.location || "Te bepalen",
-        startTime: startTime.toISOString(),
-        endTime: endTime.toISOString(),
-        maxParticipants: data.maxParticipants || 5,
+      const testPlaydate = {
+        title: "Test Speelafspraak",
+        description: "Dit is een test",
+        location: "Amsterdam",
+        startTime: new Date().toISOString(),
+        endTime: new Date(Date.now() + 3600000).toISOString(),
+        maxParticipants: 5
       };
       
-      console.log("Sending playdate data to API:", playdateData);
-
-      // SUPER SIMPLIFIED TEST - use apiRequest
+      console.log("🔥🔥🔥 Sending hardcoded test data:", testPlaydate);
+      
+      // Alert for debugging purposes
+      alert("Sending test playdate data to server, check console logs");
+      
       try {
-        console.log("Using apiRequest to POST data");
-        const result = await apiRequest('POST', '/api/playdates', playdateData);
-        console.log("API Request successful:", result);
+        // METHOD 1: XMLHttpRequest for maximum compatibility
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/playdates", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.withCredentials = true;
         
-        // Try to parse response
-        const resultData = await result.json().catch(() => ({}));
-        console.log("Result data:", resultData);
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            console.log("XHR Status:", xhr.status);
+            console.log("XHR Response:", xhr.responseText);
+            
+            if (xhr.status >= 200 && xhr.status < 300) {
+              // Success!
+              alert("SUCCESS: Playdate created via XHR!");
+              queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
+              navigate("/playdates");
+            } else {
+              // Try method 2
+              alert("XHR failed with status: " + xhr.status + ", trying fetch method...");
+            }
+          }
+        };
         
-        // Success! Invalidate queries and redirect
-        queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
-        toast({ title: "Speelafspraak aangemaakt!" });
-        navigate("/playdates");
-        return;
-      } catch (apiError) {
-        console.error("API Request error:", apiError);
-        // Continue with raw fetch as backup
+        xhr.send(JSON.stringify(testPlaydate));
+      } catch (xhrError) {
+        console.error("XHR Error:", xhrError);
+        alert("XHR Error: " + xhrError.message);
       }
       
-      // FALLBACK: Make a direct POST request  
-      console.log("Making direct fetch request with credentials included");
-      const response = await fetch('/api/playdates', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(playdateData),
-      });
-      
-      console.log("Direct fetch response status:", response.status);
-      const responseText = await response.text();
-      console.log("Response text:", responseText);
-      
-      if (!response.ok) {
-        throw new Error(`API error (${response.status}): ${responseText}`);
+      // METHOD 2: Direct fetch
+      try {
+        const response = await fetch('/api/playdates', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(testPlaydate),
+        });
+        
+        console.log("Fetch status:", response.status);
+        const responseText = await response.text();
+        console.log("Fetch response:", responseText);
+        
+        alert("Fetch status: " + response.status + ", Response: " + responseText);
+        
+        if (response.ok) {
+          queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
+          toast({ title: "Success! Playdate created via fetch" });
+          navigate("/playdates");
+        }
+      } catch (fetchError) {
+        console.error("Fetch error:", fetchError);
+        alert("Fetch Error: " + fetchError.message);
       }
       
-      // Success! Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
-      
-      toast({
-        title: "Speelafspraak aangemaakt!",
-        description: "Je nieuwe speelafspraak is succesvol aangemaakt.",
-      });
-      
-      // Navigate to the playdates page
-      navigate("/playdates");
+      return;
     } catch (error) {
       console.error("Error creating playdate:", error);
       
