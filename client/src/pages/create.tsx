@@ -126,6 +126,8 @@ export default function CreatePage() {
       
       console.log("Sending playdate data to API:", playdateData);
       
+      console.log("User authentication status:", !!user, user?.id);
+
       // Make the API request using apiRequest to ensure proper authentication
       const response = await apiRequest('POST', '/api/playdates', playdateData);
       
