@@ -58,6 +58,71 @@ export function Header({ user }: HeaderProps) {
         </div>
         
         <div className="flex items-center space-x-3">
+          {/* Mobile Language Selector */}
+          <div className="md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="focus:outline-none">
+                <button className="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-md flex items-center text-sm">
+                  <span className="text-lg mr-1">
+                    {i18n.language === 'nl' && '🇳🇱'}
+                    {i18n.language === 'en' && '🇬🇧'}
+                    {i18n.language === 'de' && '🇩🇪'}
+                    {i18n.language === 'fr' && '🇫🇷'}
+                    {i18n.language === 'es' && '🇪🇸'}
+                  </span>
+                  <i className="fas fa-chevron-down text-xs"></i>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="min-w-[120px]">
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => {
+                    i18n.changeLanguage('nl');
+                    localStorage.setItem('language', 'nl');
+                  }}
+                >
+                  <span className="mr-2">🇳🇱</span> Nederlands
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => {
+                    i18n.changeLanguage('en');
+                    localStorage.setItem('language', 'en');
+                  }}
+                >
+                  <span className="mr-2">🇬🇧</span> English
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => {
+                    i18n.changeLanguage('de');
+                    localStorage.setItem('language', 'de');
+                  }}
+                >
+                  <span className="mr-2">🇩🇪</span> Deutsch
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => {
+                    i18n.changeLanguage('fr');
+                    localStorage.setItem('language', 'fr');
+                  }}
+                >
+                  <span className="mr-2">🇫🇷</span> Français
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="cursor-pointer"
+                  onClick={() => {
+                    i18n.changeLanguage('es');
+                    localStorage.setItem('language', 'es');
+                  }}
+                >
+                  <span className="mr-2">🇪🇸</span> Español
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          
           {/* Mobile Create Button (since we removed it from footer) */}
           {isAuthenticated && (
             <Link href="/create" className="md:hidden">
