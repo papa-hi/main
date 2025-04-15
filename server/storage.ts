@@ -1042,6 +1042,77 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
   
+  async getPlaydateById(id: number): Promise<Playdate | undefined> {
+    const [playdate] = await db
+      .select()
+      .from(playdates)
+      .where(eq(playdates.id, id));
+    
+    if (!playdate) {
+      return undefined;
+    }
+    
+    // Get participants
+    const participants = await db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImage: users.profileImage
+      })
+      .from(playdateParticipants)
+      .innerJoin(users, eq(playdateParticipants.userId, users.id))
+      .where(eq(playdateParticipants.playdateId, id));
+    
+    return {
+      ...playdate,
+      participants
+    };
+  }
+  
+  async updatePlaydate(id: number, playdateData: Partial<Playdate>): Promise<Playdate> {
+    // Prepare update data (exclude non-database fields like participants)
+    const updateData: any = {};
+    
+    if (playdateData.title !== undefined) updateData.title = playdateData.title;
+    if (playdateData.description !== undefined) updateData.description = playdateData.description;
+    if (playdateData.location !== undefined) updateData.location = playdateData.location;
+    if (playdateData.startTime !== undefined) updateData.startTime = playdateData.startTime;
+    if (playdateData.endTime !== undefined) updateData.endTime = playdateData.endTime;
+    if (playdateData.maxParticipants !== undefined) updateData.maxParticipants = playdateData.maxParticipants;
+    
+    // Start a transaction
+    return await db.transaction(async (tx) => {
+      // Update the playdate
+      const [updatedPlaydate] = await tx
+        .update(playdates)
+        .set(updateData)
+        .where(eq(playdates.id, id))
+        .returning();
+      
+      if (!updatedPlaydate) {
+        throw new Error("Playdate not found");
+      }
+      
+      // Get participants
+      const participants = await tx
+        .select({
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage
+        })
+        .from(playdateParticipants)
+        .innerJoin(users, eq(playdateParticipants.userId, users.id))
+        .where(eq(playdateParticipants.playdateId, id));
+      
+      return {
+        ...updatedPlaydate,
+        participants
+      };
+    });
+  }
+  
   async createPlaydate(playdateData: any): Promise<Playdate> {
     // Start a transaction
     return await db.transaction(async (tx) => {

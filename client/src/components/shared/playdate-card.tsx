@@ -219,7 +219,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {isCreator && (
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = `/edit-playdate/${playdate.id}`}>
                 <i className="fas fa-edit mr-2"></i> {t('common.edit', 'Edit')}
               </DropdownMenuItem>
             )}
