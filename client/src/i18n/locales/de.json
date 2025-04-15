@@ -1,0 +1,204 @@
+{
+  "auth": {
+    "welcome": "Willkommen bei Papa-Hi",
+    "tagline": "Verbinde dich mit anderen Vätern, finde Spieltreffen und entdecke familienfreundliche Orte",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "email": "E-Mail",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "profileImage": "Profilbild URL",
+    "bio": "Biografie",
+    "usernamePlaceholder": "Gib deinen Benutzernamen ein",
+    "passwordPlaceholder": "Gib dein Passwort ein",
+    "confirmPasswordPlaceholder": "Bestätige dein Passwort",
+    "emailPlaceholder": "Deine E-Mail-Adresse",
+    "firstNamePlaceholder": "Dein Vorname",
+    "lastNamePlaceholder": "Dein Nachname",
+    "bioPlaceholder": "Erzähle etwas über dich (optional)",
+    "profileImagePlaceholder": "URL zu deinem Profilbild (optional)",
+    "profileImageHelp": "Du kannst hier eine Profilbild-URL hinzufügen oder später aktualisieren.",
+    "loginButton": "Anmelden",
+    "registerButton": "Konto erstellen",
+    "noAccount": "Noch kein Konto?",
+    "haveAccount": "Bereits ein Konto?",
+    "registerLink": "Hier registrieren",
+    "loginLink": "Hier anmelden",
+    "logoutButton": "Abmelden",
+    "validation": {
+      "usernameRequired": "Benutzername ist erforderlich",
+      "passwordRequired": "Passwort ist erforderlich",
+      "confirmPasswordRequired": "Passwortbestätigung ist erforderlich",
+      "passwordsDoNotMatch": "Passwörter stimmen nicht überein",
+      "emailRequired": "E-Mail ist erforderlich",
+      "invalidEmail": "E-Mail ist ungültig",
+      "firstNameRequired": "Vorname ist erforderlich",
+      "lastNameRequired": "Nachname ist erforderlich"
+    },
+    "hero": {
+      "title": "Papa-Hi",
+      "subtitle": "Die soziale App für Väter",
+      "feature1": "Verbinde dich mit anderen Vätern in deiner Nachbarschaft",
+      "feature2": "Finde und organisiere Spieltreffen für deine Kinder",
+      "feature3": "Entdecke familienfreundliche Orte und Aktivitäten"
+    },
+    "errors": {
+      "loginFailed": "Ungültiger Benutzername oder Passwort",
+      "registrationFailed": "Registrierung fehlgeschlagen",
+      "logoutFailed": "Abmeldung fehlgeschlagen"
+    },
+    "toast": {
+      "loginSuccess": "Anmeldung erfolgreich",
+      "welcomeBack": "Willkommen zurück, {{name}}!",
+      "registrationSuccess": "Registrierung erfolgreich",
+      "accountCreated": "Dein Konto wurde erfolgreich erstellt.",
+      "logoutSuccess": "Abgemeldet",
+      "loggedOutSuccessfully": "Du wurdest erfolgreich abgemeldet.",
+      "loginFailed": "Anmeldung fehlgeschlagen",
+      "registrationFailed": "Registrierung fehlgeschlagen",
+      "logoutFailed": "Abmeldung fehlgeschlagen"
+    }
+  },
+  "nav": {
+    "home": "Startseite",
+    "playdates": "Spieltreffen",
+    "restaurants": "Restaurants",
+    "playgrounds": "Spielplätze",
+    "community": "Community",
+    "new": "Neu",
+    "places": "Orte",
+    "profile": "Profil"
+  },
+  "navigation": {
+    "home": "Startseite",
+    "playdates": "Spieltreffen",
+    "new": "Neu",
+    "places": "Orte",
+    "profile": "Profil"
+  },
+  "header": {
+    "myProfile": "Mein Profil",
+    "language": "Sprache",
+    "notifications": "Benachrichtigungen"
+  },
+  "home": {
+    "welcome": "Willkommen zurück, {{name}}!",
+    "readyToday": "Bereit für einen spaßigen Tag?",
+    "quickActions": "Schnellaktionen",
+    "upcomingPlaydates": "Kommende Spieltreffen",
+    "nearbyPlaces": "Orte in der Nähe",
+    "seeAll": "Alle anzeigen",
+    "dadSpotlight": "Vater im Rampenlicht",
+    "featured": "Empfohlen",
+    "featuredTitle": "Väter-Wochenende im Park",
+    "featuredDate": "Sonntag, 7. Juli • Vondelpark • 10:00",
+    "featuredAltText": "Vater und Kind auf dem Spielplatz"
+  },
+  "quickActions": {
+    "newPlaydate": "Neues Spieltreffen"
+  },
+  "places": {
+    "all": "Alle",
+    "restaurant": "Restaurants",
+    "playground": "Spielplätze",
+    "distance": "{{distance}} entfernt",
+    "features": "Funktionen",
+    "reviews": "Bewertungen",
+    "savePlace": "Ort speichern",
+    "unsavePlace": "Aus Gespeicherten entfernen",
+    "noPlacesFound": "Keine Orte gefunden",
+    "viewAllPlaces": "Alle Orte anzeigen",
+    "addedToFavorites": "Zu Favoriten hinzugefügt",
+    "placeAddedToFavorites": "{{name}} wurde zu deinen Favoriten hinzugefügt.",
+    "removedFromFavorites": "Aus Favoriten entfernt",
+    "placeRemovedFromFavorites": "{{name}} wurde aus deinen Favoriten entfernt.",
+    "favoriteUpdateError": "Beim Aktualisieren deiner Favoriten ist ein Fehler aufgetreten."
+  },
+  "playdates": {
+    "create": "Spieltreffen erstellen",
+    "upcoming": "Kommende Spieltreffen",
+    "past": "Vergangene Spieltreffen",
+    "attending": "Teilnahme",
+    "participants": "Teilnehmer",
+    "join": "Teilnehmen",
+    "leave": "Verlassen",
+    "loadError": "Beim Laden deiner Spieltreffen ist ein Fehler aufgetreten.",
+    "emptyCalendarAlt": "Leerer Kalender",
+    "noPlaydatesPlanned": "Keine Spieltreffen geplant",
+    "planNewMeetDads": "Plane ein neues Spieltreffen, um andere Väter zu treffen!",
+    "newPlaydate": "Neues Spieltreffen",
+    "confirmDelete": "Bist du sicher, dass du dieses Spieltreffen löschen möchtest?",
+    "deleted": "Spieltreffen gelöscht",
+    "deleteSuccess": "Das Spieltreffen wurde erfolgreich gelöscht.",
+    "deleteError": "Beim Löschen des Spieltreffens ist ein Fehler aufgetreten.",
+    "share": "Teilen"
+  },
+  "profile": {
+    "editProfile": "Profil bearbeiten",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "city": "Stadt",
+    "bio": "Über mich",
+    "children": "Kinder",
+    "childName": "Kindname",
+    "childAge": "Alter",
+    "password": "Passwort",
+    "save": "Änderungen speichern",
+    "cancel": "Abbrechen"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "retry": "Wiederholen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "moreInfo": "Mehr Informationen"
+  },
+  "dads": {
+    "moreDads": "Weitere Väter",
+    "noFeaturedDadAvailable": "Derzeit ist kein empfohlener Vater verfügbar.",
+    "activeDad": "Aktiver Vater",
+    "favoriteLocations": "Lieblingsorte:",
+    "contact": "Kontakt"
+  },
+  "errors": {
+    "notFound": {
+      "title": "404 Seite nicht gefunden",
+      "message": "Die gesuchte Seite existiert nicht.",
+      "backToHome": "Zurück zur Startseite"
+    },
+    "generic": {
+      "title": "Etwas ist schiefgelaufen",
+      "message": "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
+      "retry": "Wiederholen"
+    }
+  },
+  "pwa": {
+    "privacy": {
+      "title": "Datenschutzeinstellungen",
+      "description": "Um dir die beste Erfahrung zu bieten, nutzen wir Standortdienste und speichern deine Präferenzen. Wir achten auf deinen Datenschutz und teilen deine Daten nicht mit Dritten.",
+      "essentialCookies": "Essentielle Cookies",
+      "essentialCookiesDesc": "Notwendig für die Funktionalität der App.",
+      "locationServices": "Standortdienste",
+      "locationServicesDesc": "Ermöglicht das Finden von Orten in deiner Nähe.",
+      "analytics": "Analytik",
+      "analyticsDesc": "Hilft uns, die App zu verbessern.",
+      "accept": "Akzeptieren",
+      "reject": "Ablehnen",
+      "viewPrivacyPolicy": "Datenschutzrichtlinie anzeigen"
+    },
+    "install": {
+      "title": "Papa-Hi installieren",
+      "description": "Erhalte schnelleren Zugriff und Offline-Funktionen auf deinem Gerät!",
+      "later": "Später",
+      "install": "Installieren"
+    }
+  }
+}

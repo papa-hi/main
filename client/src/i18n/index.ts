@@ -3,6 +3,9 @@ import { initReactI18next } from 'react-i18next';
 
 import enTranslations from './locales/en.json';
 import nlTranslations from './locales/nl.json';
+import deTranslations from './locales/de.json';
+import frTranslations from './locales/fr.json';
+import esTranslations from './locales/es.json';
 
 // Get language from localStorage or default to Dutch
 const savedLanguage = localStorage.getItem('language');
@@ -26,6 +29,21 @@ i18n
         translation: nlTranslations,
         errors: nlTranslations.errors,
         pwa: nlTranslations.pwa
+      },
+      de: {
+        translation: deTranslations,
+        errors: deTranslations.errors,
+        pwa: deTranslations.pwa
+      },
+      fr: {
+        translation: frTranslations,
+        errors: frTranslations.errors,
+        pwa: frTranslations.pwa
+      },
+      es: {
+        translation: esTranslations,
+        errors: esTranslations.errors,
+        pwa: esTranslations.pwa
       }
     },
     lng: defaultLanguage,
