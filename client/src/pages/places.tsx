@@ -117,6 +117,15 @@ export default function PlacesPage() {
     <div className="py-2">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-heading font-bold">Locaties voor Kids</h1>
+        <Button
+          variant="outline"
+          onClick={() => setLocation('/playground-map')}
+          className="flex items-center gap-2"
+        >
+          <i className="fas fa-map-marked-alt"></i>
+          <span className="hidden sm:inline">Speeltuin Kaart</span>
+          <span className="sm:hidden">Kaart</span>
+        </Button>
       </div>
       
       {/* Search Form */}
