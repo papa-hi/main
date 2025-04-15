@@ -8,7 +8,7 @@ import {
   chats, chatParticipants, chatMessages
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not } from "drizzle-orm";
+import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not, inArray } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -1604,6 +1604,7 @@ export class DatabaseStorage implements IStorage {
       }
       
       // Get user details for all participants
+      // Use proper parameterized query with 'in' operator instead of raw SQL
       const participantDetails = await tx
         .select({
           id: users.id,
@@ -1612,7 +1613,7 @@ export class DatabaseStorage implements IStorage {
           profileImage: users.profileImage
         })
         .from(users)
-        .where(sql`${users.id} IN (${participants.join(',')})`);
+        .where(inArray(users.id, participants));
       
       console.log("Created new chat:", {
         ...newChat,
