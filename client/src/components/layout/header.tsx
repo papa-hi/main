@@ -58,6 +58,16 @@ export function Header({ user }: HeaderProps) {
         </div>
         
         <div className="flex items-center space-x-3">
+          {/* Mobile Create Button (since we removed it from footer) */}
+          {isAuthenticated && (
+            <Link href="/create" className="md:hidden">
+              <a className="bg-accent/90 hover:bg-accent text-white px-2 py-1 rounded-md flex items-center text-sm">
+                <i className="fas fa-plus mr-1"></i>
+                <span>{t('navigation.new', 'New')}</span>
+              </a>
+            </Link>
+          )}
+          
           {/* Mobile User Profile Section */}
           <div className="md:hidden flex items-center">
             {isAuthenticated ? (
