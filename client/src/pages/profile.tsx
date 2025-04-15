@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { User, Playdate, Place } from "@shared/schema";
 import { useForm } from "react-hook-form";
@@ -23,6 +23,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useAuth } from "@/hooks/use-auth";
 
 // Profile editing form schema
 const editProfileSchema = z.object({
@@ -53,6 +65,9 @@ export default function ProfilePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { logoutMutation } = useAuth();
   
   // Fetch user profile data
   const { data: user, isLoading: userLoading } = useQuery<User>({
@@ -60,14 +75,56 @@ export default function ProfilePage() {
   });
   
   // Fetch user's favorite places
-  const { data: favoritePlaces, isLoading: placesLoading } = useQuery({
+  const { data: favoritePlaces = [], isLoading: placesLoading } = useQuery<Place[]>({
     queryKey: ['/api/users/me/favorite-places'],
   });
   
   // Fetch user's created playdates
-  const { data: createdPlaydates, isLoading: playdatesLoading } = useQuery({
+  const { data: createdPlaydates = [], isLoading: playdatesLoading } = useQuery<Playdate[]>({
     queryKey: ['/api/users/me/playdates'],
   });
+  
+  // Function to handle account deletion
+  const handleDeleteAccount = () => {
+    setIsDeleteConfirmOpen(true);
+  };
+  
+  // Function to perform the actual account deletion
+  const confirmDeleteAccount = async () => {
+    setIsDeleting(true);
+    
+    try {
+      const response = await fetch('/api/users/me', {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete account');
+      }
+      
+      toast({
+        title: "Account verwijderd",
+        description: "Je account is succesvol verwijderd.",
+      });
+      
+      // Logout the user
+      await logoutMutation.mutateAsync();
+      
+      // Redirect to home page
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Fout bij verwijderen",
+        description: "Er is iets misgegaan bij het verwijderen van je account.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteConfirmOpen(false);
+    }
+  };
   
   // Form setup for profile editing
   const form = useForm<EditProfileFormValues>({
@@ -393,7 +450,16 @@ export default function ProfilePage() {
             )}
           />
           
-          <div className="flex justify-end">
+          <div className="flex justify-between">
+            <Button 
+              type="button" 
+              variant="destructive"
+              onClick={handleDeleteAccount}
+              disabled={isSubmitting}
+            >
+              <i className="fas fa-trash-alt mr-2"></i> Account Verwijderen
+            </Button>
+            
             <Button 
               type="submit" 
               className="bg-primary hover:bg-accent text-white" 
@@ -419,6 +485,36 @@ export default function ProfilePage() {
       </div>
       
       {isEditing ? renderProfileEditForm() : renderProfileView()}
+      
+      {/* Delete Account Confirmation Dialog */}
+      <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Account verwijderen?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Weet je zeker dat je je account wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+              Al je gegevens, inclusief je speelafspraken en berichten, worden permanent verwijderd.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                confirmDeleteAccount();
+              }}
+              className="bg-destructive text-destructive-foreground"
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <><i className="fas fa-spinner fa-spin mr-2"></i> Verwijderen...</>
+              ) : (
+                <>Account Verwijderen</>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       
       {/* Tabs for favorite places and created playdates */}
       <div className="mt-8">

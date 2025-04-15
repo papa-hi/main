@@ -155,7 +155,13 @@
     "childAge": "Age",
     "password": "Password",
     "save": "Save Changes",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "deleteAccount": "Delete Account",
+    "confirmDelete": "Are you sure you want to delete your account?",
+    "deleteWarning": "This action cannot be undone. All your data, including playdates and messages, will be permanently deleted.",
+    "accountDeleted": "Account deleted",
+    "accountDeletedSuccess": "Your account has been successfully deleted.",
+    "accountDeleteError": "An error occurred while deleting your account."
   },
   "common": {
     "loading": "Loading...",
