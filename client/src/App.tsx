@@ -14,6 +14,7 @@ import CreatePage from "./pages/create";
 import EditPlaydatePage from "./pages/edit-playdate";
 import ChatPage from "./pages/chat";
 import AuthPage from "./pages/auth-page";
+import PlaygroundMapPage from "./pages/playground-map";
 import TestCreatePlaydate from "./pages/test-create-playdate";
 import SimpleTestPage from "./pages/simple-test";
 import { useState, useEffect } from "react";
@@ -36,6 +37,7 @@ function Router() {
       <ProtectedRoute path="/chat/:id" component={ChatPage} />
       <ProtectedRoute path="/discover" component={DiscoverPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
+      <ProtectedRoute path="/playground-map" component={PlaygroundMapPage} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/test-create" component={TestCreatePlaydate} />
       <Route path="/simple-test" component={SimpleTestPage} />
