@@ -164,9 +164,9 @@ export default function CreatePage() {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Titel</FormLabel>
+                  <FormLabel htmlFor="title">Titel</FormLabel>
                   <FormControl>
-                    <Input placeholder="Bijv. 'Speelmiddag in het park'" {...field} />
+                    <Input id="title" placeholder="Bijv. 'Speelmiddag in het park'" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -178,9 +178,10 @@ export default function CreatePage() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Beschrijving</FormLabel>
+                  <FormLabel htmlFor="description">Beschrijving</FormLabel>
                   <FormControl>
                     <Textarea
+                      id="description"
                       placeholder="Vertel meer over deze speelafspraak..."
                       className="min-h-[100px]"
                       value={field.value || ''}
@@ -200,11 +201,12 @@ export default function CreatePage() {
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Datum</FormLabel>
+                  <FormLabel htmlFor="date">Datum</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
+                          id="date"
                           variant="outline"
                           className={cn(
                             "w-full pl-3 text-left font-normal",
@@ -241,11 +243,12 @@ export default function CreatePage() {
                 name="startTimeString"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Starttijd</FormLabel>
+                    <FormLabel htmlFor="startTimeString">Starttijd</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input 
+                          id="startTimeString"
                           type="time" 
                           className="pl-10" 
                           {...field} 
@@ -262,11 +265,12 @@ export default function CreatePage() {
                 name="endTimeString"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Eindtijd</FormLabel>
+                    <FormLabel htmlFor="endTimeString">Eindtijd</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input 
+                          id="endTimeString"
                           type="time" 
                           className="pl-10" 
                           {...field} 
@@ -284,11 +288,12 @@ export default function CreatePage() {
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Locatie</FormLabel>
+                  <FormLabel htmlFor="location">Locatie</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input 
+                        id="location"
                         placeholder="Bijv. 'Vondelpark, Amsterdam'" 
                         className="pl-10" 
                         {...field} 
@@ -305,9 +310,10 @@ export default function CreatePage() {
               name="maxParticipants"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Maximaal aantal deelnemers</FormLabel>
+                  <FormLabel htmlFor="maxParticipants">Maximaal aantal deelnemers</FormLabel>
                   <FormControl>
                     <Input
+                      id="maxParticipants"
                       type="number"
                       min={1}
                       max={50}
