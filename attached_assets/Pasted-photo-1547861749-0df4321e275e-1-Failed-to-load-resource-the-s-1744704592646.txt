@@ -1,0 +1,149 @@
+photo-1547861749-0df4321e275e:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+photo-1632944968416-50a875746d0a:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+photo-1680099567302-d1e26339a2ef:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+_app-7f377635f2d974c9.js:13 Invalid href 'https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev//' passed to next/router in page: '/replEnvironmentDesktop'. Repeated forward-slashes (//) or backslashes \ are not valid in the href.
+(anonymous) @ _app-7f377635f2d974c9.js:13Understand this error
+client:536 WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/?token=SW16woKLSw2C' failed: 
+setupWebSocket @ client:536Understand this error
+photo-1547861749-0df4321e275e:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+photo-1632944968416-50a875746d0a:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+photo-1680099567302-d1e26339a2ef:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+client:536 WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/?token=SW16woKLSw2C' failed: 
+setupWebSocket @ client:536Understand this error
+photo-1680099567302-d1e26339a2ef:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+photo-1547861749-0df4321e275e:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+photo-1632944968416-50a875746d0a:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+photo-1680099567302-d1e26339a2ef:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+photo-1632944968416-50a875746d0a:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+photo-1547861749-0df4321e275e:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+client:536 WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/?token=SW16woKLSw2C' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/?token=SW16woKLSw2C' failed: 
+setupWebSocket @ client:536Understand this error
+photo-1632944968416-50a875746d0a:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+photo-1547861749-0df4321e275e:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+photo-1680099567302-d1e26339a2ef:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+990chunk-RPCDYKBN.js?v=e36dcffe:521 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at WelcomeSection (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/home/welcome-section.tsx:21:34)
+    at div
+    at HomePage (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/pages/home.tsx:28:21)
+    at Route (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e36dcffe:323:16)
+    at ProtectedRoute (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/lib/protected-route.tsx:23:3)
+    at Switch (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e36dcffe:379:17)
+    at Router
+    at main
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:21:32)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e36dcffe:2805:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?t=1744704281473&v=DrV2t7ab77LQguk8Z2Yx3:105:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=DrV2t7ab77LQguk8Z2Yx3:25:3)
+printWarning @ chunk-RPCDYKBN.js?v=e36dcffe:521Understand this error
+
+                
+          
+          
+          
+         Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.Understand this warning
+10chunk-RPCDYKBN.js?v=e36dcffe:521 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at WelcomeSection (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/home/welcome-section.tsx:21:34)
+    at div
+    at HomePage (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/pages/home.tsx:28:21)
+    at Route (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e36dcffe:323:16)
+    at ProtectedRoute (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/lib/protected-route.tsx:23:3)
+    at Switch (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e36dcffe:379:17)
+    at Router
+    at main
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:21:32)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e36dcffe:2805:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?t=1744704281473&v=DrV2t7ab77LQguk8Z2Yx3:105:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=DrV2t7ab77LQguk8Z2Yx3:25:3)
+printWarning @ chunk-RPCDYKBN.js?v=e36dcffe:521Understand this error
+1062welcome-section.tsx:30 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at WelcomeSection (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/home/welcome-section.tsx:21:34)
+    at div
+    at HomePage (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/pages/home.tsx:28:21)
+    at Route (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e36dcffe:323:16)
+    at ProtectedRoute (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/lib/protected-route.tsx:23:3)
+    at Switch (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e36dcffe:379:17)
+    at Router
+    at main
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:21:32)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e36dcffe:2805:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?t=1744704281473&v=DrV2t7ab77LQguk8Z2Yx3:105:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=DrV2t7ab77LQguk8Z2Yx3:25:3)
+printWarning @ chunk-RPCDYKBN.js?v=e36dcffe:521
+error @ chunk-RPCDYKBN.js?v=e36dcffe:505
+checkForNestedUpdates @ chunk-RPCDYKBN.js?v=e36dcffe:19665
+scheduleUpdateOnFiber @ chunk-RPCDYKBN.js?v=e36dcffe:18533
+dispatchSetState @ chunk-RPCDYKBN.js?v=e36dcffe:12403
+(anonymous) @ welcome-section.tsx:30
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=e36dcffe:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=e36dcffe:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=e36dcffe:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=e36dcffe:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=e36dcffe:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=e36dcffe:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=e36dcffe:19447
+(anonymous) @ chunk-RPCDYKBN.js?v=e36dcffe:19328
+workLoop @ chunk-RPCDYKBN.js?v=e36dcffe:197
+flushWork @ chunk-RPCDYKBN.js?v=e36dcffe:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=e36dcffe:384Understand this error
