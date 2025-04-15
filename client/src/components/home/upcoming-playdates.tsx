@@ -18,25 +18,13 @@ export function UpcomingPlaydates() {
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-heading font-bold">{t('home.upcomingPlaydates', 'Upcoming Playdates')}</h2>
-          <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
         </div>
-        <div className="space-y-4">
-          {[1, 2].map((i) => (
-            <div key={i} className="bg-white rounded-xl p-4 shadow-sm">
-              <div className="flex items-start">
-                <Skeleton className="flex-shrink-0 w-14 h-14 rounded-lg mr-4" />
-                <div className="flex-grow">
-                  <Skeleton className="h-5 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-2/3 mb-2" />
-                  <div className="flex space-x-1">
-                    <Skeleton className="w-6 h-6 rounded-full" />
-                    <Skeleton className="w-6 h-6 rounded-full" />
-                    <Skeleton className="w-6 h-6 rounded-full" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="bg-white rounded-xl p-4 shadow-sm flex justify-center items-center">
+          <AnimatedLoader 
+            character="blocks" 
+            size="sm" 
+            text={t('common.loading', 'Loading playdates...')} 
+          />
         </div>
       </section>
     );

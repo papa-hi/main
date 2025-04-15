@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { User } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { AnimatedLoader } from "@/components/ui/animated-loader";
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
 
@@ -18,22 +19,14 @@ export function DadSpotlight() {
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-heading font-bold">{t('home.dadSpotlight', 'Dad Spotlight')}</h2>
-          <Skeleton className="h-6 w-24" />
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="md:flex">
-            <Skeleton className="md:w-1/3 h-64" />
-            <div className="p-6 md:w-2/3">
-              <div className="flex items-center mb-4">
-                <Skeleton className="h-6 w-48" />
-                <Skeleton className="h-6 w-24 ml-3" />
-              </div>
-              <Skeleton className="h-24 w-full mb-4" />
-              <Skeleton className="h-32 w-full mb-4" />
-              <Skeleton className="h-10 w-32" />
-            </div>
-          </div>
+        <div className="bg-white rounded-xl shadow-sm p-6 flex justify-center items-center" style={{ minHeight: '250px' }}>
+          <AnimatedLoader 
+            character="robot" 
+            size="md" 
+            text={t('dads.loadingFeaturedDad', 'Finding a cool dad to highlight...')} 
+          />
         </div>
       </section>
     );
