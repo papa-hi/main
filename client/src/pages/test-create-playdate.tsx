@@ -9,6 +9,38 @@ export default function TestCreatePage() {
     setIsLoading(true);
     setResult("Running test...");
 
+    try {
+      // First, try a direct request to see if we're authenticated
+      const authCheckResponse = await fetch('/api/user', {
+        credentials: 'include'
+      });
+      
+      // Handle the response status
+      setResult(prev => `${prev}\n\nAuthentication check: ${authCheckResponse.status}`);
+      
+      // Clone the response for text and json use
+      const responseClone = authCheckResponse.clone();
+      
+      // Process response based on status
+      if (authCheckResponse.ok) {
+        try {
+          const userData = await authCheckResponse.json();
+          setResult(prev => `${prev}\nUser data: ${JSON.stringify(userData, null, 2)}`);
+        } catch (parseError) {
+          setResult(prev => `${prev}\nError parsing user data: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+        }
+      } else {
+        try {
+          const errorText = await responseClone.text();
+          setResult(prev => `${prev}\nNot authenticated: ${errorText}`);
+        } catch (textError) {
+          setResult(prev => `${prev}\nError getting error text: ${textError instanceof Error ? textError.message : String(textError)}`);
+        }
+      }
+    } catch (e) {
+      setResult(prev => `${prev}\nError checking auth: ${e instanceof Error ? e.message : String(e)}`);
+    }
+
     const testPlaydate = {
       title: "Test Playdate " + new Date().toLocaleTimeString(),
       description: "This is a test playdate",
@@ -17,6 +49,12 @@ export default function TestCreatePage() {
       endTime: new Date(Date.now() + 3600000).toISOString(),
       maxParticipants: 5
     };
+    
+    setResult(prev => `${prev}\n\nTest data: ${JSON.stringify(testPlaydate, null, 2)}`);
+    
+    // Show the actual date objects that would be created
+    setResult(prev => `${prev}\n\nStartTime as Date: ${new Date(testPlaydate.startTime)}`);
+    setResult(prev => `${prev}\nEndTime as Date: ${new Date(testPlaydate.endTime)}`);
 
     try {
       // Test with XMLHttpRequest

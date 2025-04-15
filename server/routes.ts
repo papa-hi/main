@@ -445,8 +445,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       try {
+        // Pre-process dates for validation
+        const playdateData = {
+          ...req.body,
+          // Convert ISO strings to Date objects
+          startTime: req.body.startTime ? new Date(req.body.startTime) : undefined,
+          endTime: req.body.endTime ? new Date(req.body.endTime) : undefined
+        };
+        
+        console.log("Processed dates:", {
+          originalStartTime: req.body.startTime,
+          convertedStartTime: playdateData.startTime,
+          originalEndTime: req.body.endTime,
+          convertedEndTime: playdateData.endTime
+        });
+        
         // Validate request body
-        const validPlaydate = insertPlaydateSchema.parse(req.body);
+        const validPlaydate = insertPlaydateSchema.parse(playdateData);
         console.log("Validated playdate data:", validPlaydate);
         
         // Create the playdate
