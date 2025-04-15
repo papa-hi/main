@@ -95,28 +95,6 @@ export default function CreatePage() {
         return;
       }
       
-      // Log form state errors if any
-      if (Object.keys(form.formState.errors).length > 0) {
-        console.error("Form validation errors:", form.formState.errors);
-        toast({
-          title: "Formulier bevat fouten",
-          description: "Controleer alle velden en probeer het opnieuw.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Check if the form data is valid
-      if (!data.date || !data.startTimeString || !data.endTimeString) {
-        console.error("Missing required date or time data", data);
-        toast({
-          title: "Ontbrekende informatie",
-          description: "Vul alle verplichte velden in (datum, start- en eindtijd).",
-          variant: "destructive",
-        });
-        return;
-      }
-      
       // Convert the form data to the format expected by the API
       const [startHours, startMinutes] = data.startTimeString.split(':').map(Number);
       const [endHours, endMinutes] = data.endTimeString.split(':').map(Number);
@@ -128,25 +106,42 @@ export default function CreatePage() {
       endTime.setHours(endHours, endMinutes);
       
       const playdateData = {
-        title: data.title,
-        description: data.description || "", // Ensure description is not null
-        location: data.location,
+        title: data.title || "Nieuwe speelafspraak",
+        description: data.description || "",
+        location: data.location || "Te bepalen",
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
-        maxParticipants: data.maxParticipants || 5, // Ensure maxParticipants is not null or NaN
+        maxParticipants: data.maxParticipants || 5,
       };
       
       console.log("Sending playdate data to API:", playdateData);
-      console.log("User authentication status:", !!user, user?.id);
 
-      // Make a direct POST request instead of using apiRequest
+      // SUPER SIMPLIFIED TEST - use apiRequest
+      try {
+        console.log("Using apiRequest to POST data");
+        const result = await apiRequest('POST', '/api/playdates', playdateData);
+        console.log("API Request successful:", result);
+        
+        // Try to parse response
+        const resultData = await result.json().catch(() => ({}));
+        console.log("Result data:", resultData);
+        
+        // Success! Invalidate queries and redirect
+        queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
+        toast({ title: "Speelafspraak aangemaakt!" });
+        navigate("/playdates");
+        return;
+      } catch (apiError) {
+        console.error("API Request error:", apiError);
+        // Continue with raw fetch as backup
+      }
+      
+      // FALLBACK: Make a direct POST request  
       console.log("Making direct fetch request with credentials included");
       const response = await fetch('/api/playdates', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Important for cookies!
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(playdateData),
       });
       
@@ -154,14 +149,9 @@ export default function CreatePage() {
       const responseText = await response.text();
       console.log("Response text:", responseText);
       
-      // Check if response is ok (status code 2xx)
       if (!response.ok) {
         throw new Error(`API error (${response.status}): ${responseText}`);
       }
-      
-      // Try to parse the response if it's json
-      const responseData = responseText ? JSON.parse(responseText) : {};
-      console.log("Parsed response data:", responseData);
       
       // Success! Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });

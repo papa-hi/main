@@ -17,13 +17,27 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     return next();
   }
   
-  console.log("Authentication check for:", req.path);
+  // Debug authentication information
+  console.log("======= AUTHENTICATION DEBUG =======");
+  console.log("Path:", req.path);
   console.log("Is authenticated:", req.isAuthenticated());
   console.log("User in request:", req.user ? `User ID: ${req.user.id}` : "No user");
+  console.log("Session ID:", req.sessionID);
+  console.log("Session data:", req.session);
+  console.log("Cookies:", req.headers.cookie);
+  console.log("===================================");
+  
+  // Remove this line for production - allowing all requests through for testing
+  // Comment this out to enable authentication
+  // return next();
   
   if (req.isAuthenticated()) {
     return next();
   }
+  
+  // Get the cookie header for diagnostic purposes
+  const cookies = req.headers.cookie;
+  console.log("Authentication failed. Cookies:", cookies);
   
   return res.status(401).json({ error: "You must be logged in to access this resource" });
 };

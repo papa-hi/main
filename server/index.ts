@@ -10,6 +10,11 @@ app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  
+  // Log request body for POST requests
+  if (req.method === 'POST' && path.startsWith("/api")) {
+    console.log(`REQUEST BODY for ${req.method} ${path}:`, JSON.stringify(req.body));
+  }
 
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
@@ -30,6 +35,17 @@ app.use((req, res, next) => {
       }
 
       log(logLine);
+      
+      // Log all request headers for error status codes
+      if (res.statusCode >= 400) {
+        console.log(`ERROR HEADERS for ${req.method} ${path}:`, 
+          JSON.stringify({
+            'cookie': req.headers.cookie,
+            'content-type': req.headers['content-type'],
+            'user-agent': req.headers['user-agent'],
+            'referer': req.headers.referer
+          }));
+      }
     }
   });
 
