@@ -6,10 +6,12 @@ import { NearbyPlaces } from "../components/home/nearby-places";
 import { DadSpotlight } from "../components/home/dad-spotlight";
 import { useLocation } from "@/hooks/use-location";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function HomePage() {
   const { toast } = useToast();
   const { location, error: locationError, isLoading } = useLocation();
+  const { user } = useAuth();
   
   // Request location permission if not already granted
   useEffect(() => {
@@ -48,7 +50,7 @@ export default function HomePage() {
 
   return (
     <div>
-      <WelcomeSection userName="Thomas" />
+      <WelcomeSection userName={user?.firstName || "Bezoeker"} />
       <QuickActions />
       <UpcomingPlaydates />
       <NearbyPlaces />
