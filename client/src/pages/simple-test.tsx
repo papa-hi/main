@@ -1,68 +1,140 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
+import { useLocation } from "wouter";
 
 export default function SimpleTestPage() {
-  const [result, setResult] = useState<string>("No test run yet");
-  const [isLoading, setIsLoading] = useState(false);
+  const [location, navigate] = useLocation();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [title, setTitle] = useState("Test Playdate");
+  const [description, setDescription] = useState("This is a test playdate");
+  const [locationText, setLocationText] = useState("Amsterdam");
+  const [participants, setParticipants] = useState(5);
+  const [results, setResults] = useState("");
 
-  const runTest = async () => {
-    setIsLoading(true);
-    setResult("Running test...");
-
+  const handleTestSubmit = async () => {
+    setIsSubmitting(true);
+    setResults("");
+    
     try {
-      // Create test data
-      const testPlaydate = {
-        title: "Simple Test " + new Date().toLocaleTimeString(),
-        description: "This is a simple test playdate",
-        location: "Amsterdam",
-        startTime: new Date().toISOString(),
-        endTime: new Date(Date.now() + 3600000).toISOString(),
-        maxParticipants: 5
+      // Create a simple object with minimal data
+      const playdate = {
+        title,
+        description,
+        location: locationText,
+        maxParticipants: participants
       };
-
-      setResult(prev => prev + "\n\nSending test playdate: " + JSON.stringify(testPlaydate));
-
-      // Simple fetch request
-      const response = await fetch('/api/playdates', {
+      
+      // Send the request to our test endpoint
+      const response = await fetch('/api/playdates/test-create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(testPlaydate),
+        body: JSON.stringify(playdate),
       });
-
-      const responseText = await response.text();
       
-      if (response.ok) {
-        setResult(prev => prev + "\n\nSuccess! Playdate created:\n" + responseText);
-      } else {
-        setResult(prev => prev + "\n\nRequest failed: " + response.status + "\n" + responseText);
+      const responseText = await response.text();
+      setResults(`Status: ${response.status}\n\nResponse: ${responseText}`);
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} - ${responseText}`);
+      }
+      
+      try {
+        const newPlaydate = JSON.parse(responseText);
+        console.log("Successfully created playdate:", newPlaydate);
+        
+        // Update the UI
+        queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
+        toast({
+          title: "Playdate Created Successfully!",
+          description: "Your test playdate has been created."
+        });
+      } catch (parseError) {
+        console.error("Error parsing JSON response:", parseError);
       }
     } catch (error) {
-      setResult(prev => prev + "\n\nError: " + (error instanceof Error ? error.message : String(error)));
+      console.error("Error creating playdate:", error);
+      
+      let errorMessage = "There was an error creating the playdate.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "Error Creating Playdate",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Simple Playdate Test</h1>
-      
+    <div className="container py-8">
       <div className="mb-6">
-        <Button 
-          onClick={runTest} 
-          disabled={isLoading}
-          className="mb-4"
+        <h1 className="text-3xl font-bold">Simple Playdate Creation Test</h1>
+        <p className="text-muted-foreground">This page provides a simplified way to test playdate creation</p>
+      </div>
+      
+      <div className="grid gap-6 max-w-xl">
+        <div>
+          <label htmlFor="title" className="block text-sm font-medium mb-1">Title</label>
+          <Input 
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium mb-1">Description</label>
+          <Textarea 
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="location" className="block text-sm font-medium mb-1">Location</label>
+          <Input 
+            id="location"
+            value={locationText}
+            onChange={(e) => setLocationText(e.target.value)}
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="participants" className="block text-sm font-medium mb-1">Max Participants</label>
+          <Input 
+            id="participants"
+            type="number"
+            value={participants}
+            onChange={(e) => setParticipants(parseInt(e.target.value) || 5)}
+          />
+        </div>
+        
+        <Button
+          onClick={handleTestSubmit}
+          disabled={isSubmitting}
+          className="w-full"
         >
-          {isLoading ? "Running Test..." : "Create Test Playdate"}
+          {isSubmitting ? "Creating..." : "Create Test Playdate"}
         </Button>
         
-        <div className="p-4 border rounded-md bg-slate-50">
-          <h3 className="text-lg font-medium mb-2">Test Result:</h3>
-          <pre className="whitespace-pre-wrap break-words bg-slate-100 p-3 rounded text-sm overflow-auto max-h-[400px]">
-            {result}
-          </pre>
-        </div>
+        {results && (
+          <div className="mt-6">
+            <h2 className="text-xl font-bold mb-2">Results</h2>
+            <pre className="bg-gray-100 p-4 rounded-md overflow-auto max-h-[300px] whitespace-pre-wrap">
+              {results}
+            </pre>
+          </div>
+        )}
       </div>
     </div>
   );
