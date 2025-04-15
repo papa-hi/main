@@ -1,0 +1,18 @@
+welcome-section.tsx:30 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at WelcomeSection (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/home/welcome-section.tsx:21:34)
+    at div
+    at HomePage (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/pages/home.tsx:28:21)
+    at Route (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e36dcffe:323:16)
+    at ProtectedRoute (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/lib/protected-route.tsx:23:3)
+    at Switch (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e36dcffe:379:17)
+    at Router
+    at main
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:21:32)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e36dcffe:2805:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?t=1744704281473&v=VL9J0vmZq7VTfSBeFRWD_:105:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=VL9J0vmZq7VTfSBeFRWD_:25:3)

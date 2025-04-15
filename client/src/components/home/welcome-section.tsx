@@ -23,7 +23,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
 
   useEffect(() => {
     // Fetch weather data if location is available
-    if (locationState.latitude && locationState.longitude) {
+    if (locationState.latitude && locationState.longitude && !weather) {
       // This would be a real weather API call in production
       // For now, we'll just set mock data based on current time
       const mockTemp = 15 + Math.floor(Math.random() * 10);
@@ -32,7 +32,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
         city: locationState.city || "Amsterdam"
       });
     }
-  }, [locationState]);
+  }, [locationState.latitude, locationState.longitude, locationState.city, weather]);
 
   const getGreeting = () => {
     const hour = currentTime.getHours();
