@@ -528,6 +528,24 @@ export class MemStorage implements IStorage {
     return this.favorites.delete(key);
   }
   
+  async createPlace(placeData: any): Promise<Place> {
+    const id = this.placeIdCounter++;
+    
+    // Create a new place with the provided data
+    const place: Place = {
+      ...placeData,
+      id,
+      rating: placeData.rating || 45,  // Default rating if not provided
+      reviewCount: placeData.reviewCount || 0,  // Default review count
+      createdAt: new Date(),
+      distance: 0,  // This will be calculated when queried with coordinates
+      isSaved: false
+    };
+    
+    this.places.set(id, place);
+    return place;
+  }
+  
   // Chat methods
   async getChats(userId: number): Promise<any[]> {
     const userChats: any[] = [];
