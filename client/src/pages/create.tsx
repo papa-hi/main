@@ -139,44 +139,31 @@ export default function CreatePage() {
       console.log("Sending playdate data to API:", playdateData);
       console.log("User authentication status:", !!user, user?.id);
 
-      try {
-        // First check if we're authenticated
-        const userCheckResponse = await fetch('/api/user', { credentials: 'include' });
-        console.log("Auth check response:", userCheckResponse.status, await userCheckResponse.clone().text());
-        
-        if (!userCheckResponse.ok) {
-          // Try to refresh the session by hitting the auth endpoint
-          console.log("Auth check failed, attempting to refresh session...");
-          throw new Error("Authentication failed. Please log in again.");
-        }
-      } catch (authError) {
-        console.error("Authentication check failed:", authError);
-        toast({
-          title: "Sessie verlopen",
-          description: "Je sessie is verlopen. Log opnieuw in om door te gaan.",
-          variant: "destructive",
-        });
-        navigate("/auth");
-        return;
-      }
-
-      // Make the API request using apiRequest to ensure proper authentication
-      const response = await apiRequest('POST', '/api/playdates', playdateData);
+      // Make a direct POST request instead of using apiRequest
+      console.log("Making direct fetch request with credentials included");
+      const response = await fetch('/api/playdates', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Important for cookies!
+        body: JSON.stringify(playdateData),
+      });
       
-      // Log the response status
-      console.log(`API response status: ${response.status} ${response.statusText}`);
+      console.log("Direct fetch response status:", response.status);
+      const responseText = await response.text();
+      console.log("Response text:", responseText);
       
-      // Check if the response was successful
+      // Check if response is ok (status code 2xx)
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`API error (${response.status}): ${errorText}`);
-        throw new Error(`Error: ${response.status} ${errorText || response.statusText}`);
+        throw new Error(`API error (${response.status}): ${responseText}`);
       }
       
-      const responseData = await response.json();
-      console.log("API response data:", responseData);
+      // Try to parse the response if it's json
+      const responseData = responseText ? JSON.parse(responseText) : {};
+      console.log("Parsed response data:", responseData);
       
-      // Invalidate queries to refetch playdates
+      // Success! Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
       
       toast({

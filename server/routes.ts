@@ -405,40 +405,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/playdates", isAuthenticated, async (req, res) => {
     try {
-      // Log the received data
-      console.log("Received playdate creation request:", req.body);
-      console.log("Authenticated user info:", req.user);
-      console.log("Authentication status:", req.isAuthenticated());
-      
-      // Validate request body
-      const validPlaydate = insertPlaydateSchema.parse(req.body);
-      console.log("Validated playdate data:", validPlaydate);
+      // Log everything for debugging
+      console.log("======= CREATE PLAYDATE REQUEST =======");
+      console.log("Request body:", req.body);
+      console.log("Auth user:", req.user);
+      console.log("Is authenticated:", req.isAuthenticated());
+      console.log("Session ID:", req.sessionID);
+      console.log("Session data:", req.session);
+      console.log("Cookies:", req.headers.cookie);
+      console.log("=======================================");
       
       // Get the authenticated user ID
       const creatorId = req.user?.id;
-      console.log("Creator ID:", creatorId);
       
       if (!creatorId) {
+        console.log("ERROR: User not authenticated or ID missing");
         return res.status(401).json({ error: "User not authenticated" });
       }
       
-      // Create the playdate
-      const newPlaydate = await storage.createPlaydate({
-        ...validPlaydate,
-        creatorId
-      });
-      
-      console.log("Created new playdate:", newPlaydate);
-      res.status(201).json(newPlaydate);
-    } catch (err) {
-      if (err instanceof ZodError) {
-        console.error("Validation error:", err.errors);
-        const validationError = fromZodError(err);
-        return res.status(400).json({ error: validationError.message });
+      try {
+        // Validate request body
+        const validPlaydate = insertPlaydateSchema.parse(req.body);
+        console.log("Validated playdate data:", validPlaydate);
+        
+        // Create the playdate
+        const newPlaydate = await storage.createPlaydate({
+          ...validPlaydate,
+          creatorId
+        });
+        
+        console.log("Successfully created new playdate:", newPlaydate);
+        return res.status(201).json(newPlaydate);
+      } catch (validationErr) {
+        if (validationErr instanceof ZodError) {
+          console.error("Validation error:", validationErr.errors);
+          const validationError = fromZodError(validationErr);
+          return res.status(400).json({ error: validationError.message });
+        }
+        throw validationErr;
       }
-      
-      console.error("Error creating playdate:", err);
-      res.status(500).json({ error: "Failed to create playdate" });
+    } catch (err) {
+      console.error("Fatal error creating playdate:", err);
+      return res.status(500).json({ error: "Failed to create playdate", details: err instanceof Error ? err.message : String(err) });
     }
   });
 
