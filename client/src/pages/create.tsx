@@ -83,6 +83,18 @@ export default function CreatePage() {
     setIsSubmitting(true);
     
     try {
+      // First, make sure the user is logged in
+      if (!user || !user.id) {
+        console.error("User not authenticated, redirecting to login");
+        toast({
+          title: "Niet ingelogd",
+          description: "Je moet ingelogd zijn om een speelafspraak te maken.",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return;
+      }
+      
       // Log form state errors if any
       if (Object.keys(form.formState.errors).length > 0) {
         console.error("Form validation errors:", form.formState.errors);
@@ -121,12 +133,32 @@ export default function CreatePage() {
         location: data.location,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
-        maxParticipants: data.maxParticipants,
+        maxParticipants: data.maxParticipants || 5, // Ensure maxParticipants is not null or NaN
       };
       
       console.log("Sending playdate data to API:", playdateData);
-      
       console.log("User authentication status:", !!user, user?.id);
+
+      try {
+        // First check if we're authenticated
+        const userCheckResponse = await fetch('/api/user', { credentials: 'include' });
+        console.log("Auth check response:", userCheckResponse.status, await userCheckResponse.clone().text());
+        
+        if (!userCheckResponse.ok) {
+          // Try to refresh the session by hitting the auth endpoint
+          console.log("Auth check failed, attempting to refresh session...");
+          throw new Error("Authentication failed. Please log in again.");
+        }
+      } catch (authError) {
+        console.error("Authentication check failed:", authError);
+        toast({
+          title: "Sessie verlopen",
+          description: "Je sessie is verlopen. Log opnieuw in om door te gaan.",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return;
+      }
 
       // Make the API request using apiRequest to ensure proper authentication
       const response = await apiRequest('POST', '/api/playdates', playdateData);

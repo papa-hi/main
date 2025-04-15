@@ -10,17 +10,22 @@ import path from "path";
 import { WebSocketServer, WebSocket } from 'ws';
 
 // Middleware to check if user is authenticated
-const isAuthenticated = (req: any, res: any, next: any) => {
+const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   // For search endpoints, we'll bypass authentication for testing purposes
   if (req.path.includes("/search")) {
     console.log("Bypassing authentication for search route:", req.path);
     return next();
   }
   
+  console.log("Authentication check for:", req.path);
+  console.log("Is authenticated:", req.isAuthenticated());
+  console.log("User in request:", req.user ? `User ID: ${req.user.id}` : "No user");
+  
   if (req.isAuthenticated()) {
     return next();
   }
-  res.status(401).json({ error: "You must be logged in to access this resource" });
+  
+  return res.status(401).json({ error: "You must be logged in to access this resource" });
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
