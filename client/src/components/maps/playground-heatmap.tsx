@@ -367,92 +367,53 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
         </MapContainer>
       </div>
       
-      {/* Add Playground Dialog */}
-      <Dialog 
-        open={showAddDialog}
-        onOpenChange={(open) => {
-          if (!open) {
-            setShowAddDialog(false);
-            setSelectedLocation(null);
-            form.reset();
-          }
-        }}
-      >
-        <DialogContent 
-          className="sm:max-w-[500px] map-dialog-content"
+      {/* Custom Modal Dialog - Simple approach that's guaranteed to work */}
+      {showAddDialog && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowAddDialog(false);
+              setSelectedLocation(null);
+              form.reset();
+            }
+          }}
         >
-          <DialogHeader>
-            <DialogTitle>{t('playgroundMap.addNewPlayground', 'Add New Playground')}</DialogTitle>
-          </DialogHeader>
-          
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('common.name', 'Name')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t('playgroundMap.playgroundNamePlaceholder', 'e.g. Central Park Playground')} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder={t('playgroundMap.descriptionPlaceholder', 'e.g. Playground with swings, slides, and climbing area')} 
-                        {...field} 
-                        value={field.value || ''}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('common.address', 'Address')}</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder={t('playgroundMap.addressPlaceholder', 'e.g. 123 Main St, Amsterdam')} 
-                        {...field} 
-                        value={field.value || ''}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="grid grid-cols-2 gap-4">
+          <div 
+            className="bg-white rounded-lg p-6 shadow-xl max-w-[500px] w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold">{t('playgroundMap.addNewPlayground', 'Add New Playground')}</h2>
+            </div>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="latitude"
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('common.latitude', 'Latitude')}</FormLabel>
+                      <FormLabel>{t('common.name', 'Name')}</FormLabel>
                       <FormControl>
-                        <Input
-                          type="text" 
-                          disabled
-                          value={field.value.toString()}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value);
-                            field.onChange(isNaN(value) ? 0 : value);
-                          }}
+                        <Input placeholder={t('playgroundMap.playgroundNamePlaceholder', 'e.g. Central Park Playground')} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('common.description', 'Description')}</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder={t('playgroundMap.descriptionPlaceholder', 'e.g. Playground with swings, slides, and climbing area')} 
+                          {...field} 
+                          value={field.value || ''}
                         />
                       </FormControl>
                       <FormMessage />
@@ -462,57 +423,99 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                 
                 <FormField
                   control={form.control}
-                  name="longitude"
+                  name="address"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('common.longitude', 'Longitude')}</FormLabel>
+                      <FormLabel>{t('common.address', 'Address')}</FormLabel>
                       <FormControl>
                         <Input 
-                          type="text"
-                          disabled
-                          value={field.value.toString()}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value);
-                            field.onChange(isNaN(value) ? 0 : value);
-                          }}
+                          placeholder={t('playgroundMap.addressPlaceholder', 'e.g. 123 Main St, Amsterdam')} 
+                          {...field} 
+                          value={field.value || ''}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
-              
-              <DialogFooter className="pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setShowAddDialog(false);
-                    setSelectedLocation(null);
-                    form.reset();
-                  }}
-                >
-                  {t('common.cancel', 'Cancel')}
-                </Button>
-                <Button 
-                  type="submit"
-                  disabled={addPlaygroundMutation.isPending}
-                >
-                  {addPlaygroundMutation.isPending ? (
-                    <>
-                      <i className="fas fa-spinner fa-spin mr-2"></i>
-                      {t('common.adding', 'Adding...')}
-                    </>
-                  ) : (
-                    t('common.add', 'Add')
-                  )}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="latitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('common.latitude', 'Latitude')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text" 
+                            disabled
+                            value={field.value.toString()}
+                            onChange={(e) => {
+                              const value = parseFloat(e.target.value);
+                              field.onChange(isNaN(value) ? 0 : value);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="longitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('common.longitude', 'Longitude')}</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="text"
+                            disabled
+                            value={field.value.toString()}
+                            onChange={(e) => {
+                              const value = parseFloat(e.target.value);
+                              field.onChange(isNaN(value) ? 0 : value);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="pt-4 flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowAddDialog(false);
+                      setSelectedLocation(null);
+                      form.reset();
+                    }}
+                  >
+                    {t('common.cancel', 'Cancel')}
+                  </Button>
+                  <Button 
+                    type="submit"
+                    disabled={addPlaygroundMutation.isPending}
+                  >
+                    {addPlaygroundMutation.isPending ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin mr-2"></i>
+                        {t('common.adding', 'Adding...')}
+                      </>
+                    ) : (
+                      t('common.add', 'Add')
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
