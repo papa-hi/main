@@ -88,10 +88,10 @@ export default function AuthPage() {
         const formData = new FormData();
         formData.append('profileImage', profileImageFile);
         
-        const response = await apiRequest('POST', '/api/upload/profile-image', formData, {
-          headers: {
-            // Don't set Content-Type header, it will be set automatically with boundary for FormData
-          }
+        const response = await fetch('/api/upload/profile-image', {
+          method: 'POST',
+          body: formData
+          // Don't set Content-Type header, it will be set automatically with boundary for FormData
         });
         
         if (response.ok) {

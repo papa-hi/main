@@ -38,6 +38,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupAuth(app);
   
+  // Handle profile image upload during registration (no auth required)
+  app.post("/api/upload/profile-image", upload.single('profileImage'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      // Get filename and construct URL
+      const filename = req.file.filename;
+      const imageUrl = `/uploads/profile-images/${filename}`;
+      
+      res.json({ 
+        success: true, 
+        imageUrl
+      });
+    } catch (err) {
+      console.error("Error uploading profile image:", err);
+      res.status(500).json({ message: "Failed to upload profile image" });
+    }
+  });
+  
   // Serve uploaded files
   app.use('/uploads', (req, res, next) => {
     // Security check to prevent directory traversal

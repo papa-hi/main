@@ -10,7 +10,8 @@
     "email": "Email",
     "firstName": "First Name",
     "lastName": "Last Name",
-    "profileImage": "Profile Image URL",
+    "profileImage": "Profile Image",
+    "profileImageUrl": "Or use Profile Image URL",
     "bio": "Bio",
     "usernamePlaceholder": "Enter your username",
     "passwordPlaceholder": "Enter your password",
@@ -19,8 +20,9 @@
     "firstNamePlaceholder": "Your first name",
     "lastNamePlaceholder": "Your last name",
     "bioPlaceholder": "Tell us a bit about yourself (optional)",
-    "profileImagePlaceholder": "URL to your profile image (optional)",
-    "profileImageHelp": "You can add a profile image URL here or update it later.",
+    "profileImagePlaceholder": "URL to your profile image",
+    "profileImageHelp": "You can add a profile image here or update it later.",
+    "uploadProfileImage": "Upload Profile Image",
     "loginButton": "Login",
     "registerButton": "Create Account",
     "noAccount": "Don't have an account?",
@@ -48,7 +50,11 @@
     "errors": {
       "loginFailed": "Invalid username or password",
       "registrationFailed": "Registration failed",
-      "logoutFailed": "Logout failed"
+      "logoutFailed": "Logout failed",
+      "fileTooLarge": "File too large",
+      "fileSizeLimit": "Maximum file size is 5MB",
+      "invalidFileType": "Invalid file type",
+      "imageFilesOnly": "Only image files are allowed"
     },
     "toast": {
       "loginSuccess": "Login successful",
@@ -159,6 +165,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
+    "remove": "Remove",
     "moreInfo": "More Info"
   },
   "dads": {
