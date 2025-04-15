@@ -434,7 +434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create a playdate with the authenticated user as creator
-      const newPlaydate = await storage.createPlaydate({
+      const playdateData = {
         title: req.body.title,
         description: req.body.description || "Test description",
         location: req.body.location || "Test location",
@@ -442,7 +442,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         endTime: endTime,
         creatorId: userId, // Use authenticated user's ID
         maxParticipants: req.body.maxParticipants || 5
-      });
+      };
+      
+      console.log("TEST ENDPOINT: Playdate data being sent to storage:", playdateData);
+      console.log("TEST ENDPOINT: Creator ID specifically:", playdateData.creatorId);
+      
+      const newPlaydate = await storage.createPlaydate(playdateData);
       
       console.log("Successfully created test playdate:", newPlaydate);
       return res.status(201).json(newPlaydate);
@@ -523,10 +528,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Validated playdate data:", validPlaydate);
         
         // Create the playdate
-        const newPlaydate = await storage.createPlaydate({
+        const playdateDataWithCreator = {
           ...validPlaydate,
           creatorId
-        });
+        };
+        
+        console.log("REGULAR ENDPOINT: Final playdate data with creatorId:", playdateDataWithCreator);
+        
+        const newPlaydate = await storage.createPlaydate(playdateDataWithCreator);
         
         console.log("Successfully created new playdate:", newPlaydate);
         return res.status(201).json(newPlaydate);

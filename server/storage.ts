@@ -1115,12 +1115,16 @@ export class DatabaseStorage implements IStorage {
   
   async createPlaydate(playdateData: any): Promise<Playdate> {
     // Start a transaction
+    console.log("DatabaseStorage.createPlaydate called with data:", playdateData);
+    
     return await db.transaction(async (tx) => {
       // Insert the playdate
       const [playdate] = await tx
         .insert(playdates)
         .values(playdateData)
         .returning();
+      
+      console.log("Playdate inserted with ID:", playdate.id, "and creatorId:", playdateData.creatorId);
       
       // Add the creator as a participant
       await tx
@@ -1140,6 +1144,8 @@ export class DatabaseStorage implements IStorage {
         })
         .from(users)
         .where(eq(users.id, playdateData.creatorId));
+      
+      console.log("Retrieved creator info:", creator);
       
       return {
         ...playdate,
