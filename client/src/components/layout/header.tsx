@@ -185,7 +185,7 @@ export function Header({ user }: HeaderProps) {
             
             <div className="flex items-center justify-between py-2 px-4 hover:bg-primary/80 rounded-md">
               <span>{t('header.language', 'Taal')}</span>
-              <div className="flex space-x-2">
+              <div className="flex flex-wrap gap-2">
                 <button 
                   onClick={() => {
                     i18n.changeLanguage('nl');
@@ -203,6 +203,33 @@ export function Header({ user }: HeaderProps) {
                   className={`flex items-center px-2 py-1 rounded ${i18n.language === 'en' ? 'bg-accent text-white' : 'bg-primary-foreground/10'}`}
                 >
                   🇬🇧
+                </button>
+                <button 
+                  onClick={() => {
+                    i18n.changeLanguage('de');
+                    localStorage.setItem('language', 'de');
+                  }} 
+                  className={`flex items-center px-2 py-1 rounded ${i18n.language === 'de' ? 'bg-accent text-white' : 'bg-primary-foreground/10'}`}
+                >
+                  🇩🇪
+                </button>
+                <button 
+                  onClick={() => {
+                    i18n.changeLanguage('fr');
+                    localStorage.setItem('language', 'fr');
+                  }} 
+                  className={`flex items-center px-2 py-1 rounded ${i18n.language === 'fr' ? 'bg-accent text-white' : 'bg-primary-foreground/10'}`}
+                >
+                  🇫🇷
+                </button>
+                <button 
+                  onClick={() => {
+                    i18n.changeLanguage('es');
+                    localStorage.setItem('language', 'es');
+                  }} 
+                  className={`flex items-center px-2 py-1 rounded ${i18n.language === 'es' ? 'bg-accent text-white' : 'bg-primary-foreground/10'}`}
+                >
+                  🇪🇸
                 </button>
               </div>
             </div>

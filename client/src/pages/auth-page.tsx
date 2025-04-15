@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useTranslation } from "react-i18next";
@@ -11,7 +11,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2 } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 type LoginFormValues = {
   username: string;
@@ -21,6 +24,7 @@ type LoginFormValues = {
 // Extend the insertUserSchema to add validation rules specific to registration
 const registerFormSchema = insertUserSchema.extend({
   confirmPassword: z.string().min(1, "Confirm password is required"),
+  profileImageFile: z.any().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -75,9 +79,35 @@ export default function AuthPage() {
   };
 
   const onRegisterSubmit = async (data: RegisterFormValues) => {
-    // Remove confirmPassword as it's not part of the insertUserSchema
-    const { confirmPassword, ...userData } = data;
-    registerMutation.mutate(userData);
+    // Remove confirmPassword and profileImageFile as they're not part of the insertUserSchema
+    const { confirmPassword, profileImageFile, ...userData } = data;
+    
+    try {
+      // If there's a file upload, handle it first
+      if (profileImageFile) {
+        const formData = new FormData();
+        formData.append('profileImage', profileImageFile);
+        
+        const response = await apiRequest('POST', '/api/upload/profile-image', formData, {
+          headers: {
+            // Don't set Content-Type header, it will be set automatically with boundary for FormData
+          }
+        });
+        
+        if (response.ok) {
+          const { imageUrl } = await response.json();
+          // Set the profile image URL
+          userData.profileImage = imageUrl;
+        } else {
+          throw new Error('Failed to upload profile image');
+        }
+      }
+      
+      // Register the user with the image URL if uploaded
+      registerMutation.mutate(userData);
+    } catch (error) {
+      console.error('Error during registration:', error);
+    }
   };
 
   if (isLoading) {
@@ -275,20 +305,119 @@ export default function AuthPage() {
                     
                     <FormField
                       control={registerForm.control}
+                      name="profileImageFile"
+                      render={({ field }) => {
+                        const [previewImage, setPreviewImage] = useState<string | null>(null);
+                        const fileInputRef = useRef<HTMLInputElement>(null);
+                        const { toast } = useToast();
+                        
+                        const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (file.size > 5 * 1024 * 1024) {
+                              toast({
+                                title: t("auth:errors.fileTooLarge", "File too large"),
+                                description: t("auth:errors.fileSizeLimit", "Maximum file size is 5MB"),
+                                variant: "destructive"
+                              });
+                              return;
+                            }
+                            
+                            if (!file.type.startsWith('image/')) {
+                              toast({
+                                title: t("auth:errors.invalidFileType", "Invalid file type"),
+                                description: t("auth:errors.imageFilesOnly", "Only image files are allowed"),
+                                variant: "destructive"
+                              });
+                              return;
+                            }
+                            
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              setPreviewImage(reader.result as string);
+                            };
+                            reader.readAsDataURL(file);
+                            field.onChange(file);
+                          }
+                        };
+                        
+                        const clearFile = () => {
+                          setPreviewImage(null);
+                          field.onChange(null);
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = '';
+                          }
+                        };
+                        
+                        return (
+                          <FormItem>
+                            <FormLabel>{t("auth:profileImage", "Profile Image")}</FormLabel>
+                            <div className="space-y-4">
+                              {previewImage ? (
+                                <div className="flex flex-col items-center gap-3">
+                                  <Avatar className="h-24 w-24">
+                                    <AvatarImage src={previewImage} alt="Profile preview" />
+                                    <AvatarFallback>
+                                      {registerForm.getValues("firstName")?.[0]}{registerForm.getValues("lastName")?.[0]}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <Button 
+                                    type="button" 
+                                    variant="destructive" 
+                                    size="sm" 
+                                    onClick={clearFile}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <X className="h-4 w-4" />
+                                    {t("common:remove", "Remove")}
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col items-center gap-3">
+                                  <div className="relative">
+                                    <Input 
+                                      type="file" 
+                                      accept="image/*"
+                                      ref={fileInputRef}
+                                      onChange={handleFileChange}
+                                      className="hidden"
+                                      id="profile-image-upload"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      onClick={() => fileInputRef.current?.click()}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Upload className="h-4 w-4" />
+                                      {t("auth:uploadProfileImage", "Upload Profile Image")}
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            <FormDescription>
+                              {t("auth:profileImageHelp", "You can add a profile image here or update it later.")}
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }}
+                    />
+                    
+                    <FormField
+                      control={registerForm.control}
                       name="profileImage"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t("auth:profileImage", "Profile Image URL")}</FormLabel>
+                          <FormLabel>{t("auth:profileImageUrl", "Or use Profile Image URL (optional)")}</FormLabel>
                           <FormControl>
                             <Input 
-                              placeholder={t("auth:profileImagePlaceholder", "URL to your profile image (optional)")} 
+                              placeholder={t("auth:profileImagePlaceholder", "URL to your profile image")} 
                               {...field} 
                               value={field.value || ""}
                             />
                           </FormControl>
-                          <FormDescription>
-                            {t("auth:profileImageHelp", "You can add a profile image URL here or update it later.")}
-                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
