@@ -50,22 +50,56 @@ function Router() {
 function App() {
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
   const [showPWAPrompt, setShowPWAPrompt] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
+    // Register service worker for PWA capabilities
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          })
+          .catch(error => {
+            console.log('ServiceWorker registration failed: ', error);
+          });
+      });
+    }
+
     // Check if privacy consent is already given
     const hasGivenConsent = localStorage.getItem('privacy_consent');
     if (!hasGivenConsent) {
       setShowPrivacyConsent(true);
     }
 
-    // Show PWA install prompt after a delay
-    const hasInstalled = localStorage.getItem('pwa_installed');
-    if (!hasInstalled) {
-      const timer = setTimeout(() => {
-        setShowPWAPrompt(true);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
+    // Capture beforeinstallprompt event for PWA installation
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the default prompt
+      e.preventDefault();
+      // Store the event for later use
+      setDeferredPrompt(e);
+      
+      // Only show the prompt if the user hasn't explicitly installed
+      const hasInstalled = localStorage.getItem('pwa_installed');
+      if (!hasInstalled) {
+        const timer = setTimeout(() => {
+          setShowPWAPrompt(true);
+        }, 3000);
+        return () => clearTimeout(timer);
+      }
+    });
+
+    // Listen for the appinstalled event
+    window.addEventListener('appinstalled', () => {
+      localStorage.setItem('pwa_installed', 'true');
+      setShowPWAPrompt(false);
+      console.log('PWA successfully installed');
+    });
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', () => {});
+      window.removeEventListener('appinstalled', () => {});
+    };
   }, []);
 
   const handleAcceptPrivacy = () => {
@@ -83,9 +117,27 @@ function App() {
   };
 
   const handleInstallPWA = () => {
-    localStorage.setItem('pwa_installed', 'true');
+    if (deferredPrompt) {
+      // Show the install prompt
+      deferredPrompt.prompt();
+      
+      // Wait for the user to respond to the prompt
+      deferredPrompt.userChoice.then((choiceResult: { outcome: string }) => {
+        if (choiceResult.outcome === 'accepted') {
+          localStorage.setItem('pwa_installed', 'true');
+          console.log('User accepted the install prompt');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+        // Clear the saved prompt as it can't be used again
+        setDeferredPrompt(null);
+      });
+    } else {
+      // If deferredPrompt is not available, iOS or other browser might not support PWA install via prompt
+      console.log('PWA installation not supported directly. Setting flag anyway.');
+      localStorage.setItem('pwa_installed', 'true');
+    }
     setShowPWAPrompt(false);
-    // Actual installation logic is handled by browser
   };
 
   return (
