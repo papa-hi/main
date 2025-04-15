@@ -73,10 +73,11 @@ export function Header({ user }: HeaderProps) {
                 </Link>
                 <button 
                   onClick={handleLogout}
-                  className="text-white/80 hover:text-white"
+                  className="bg-red-500/20 hover:bg-red-500/30 text-white px-2 py-1 rounded-md flex items-center text-sm"
                   aria-label="Logout"
                 >
-                  <i className="fas fa-sign-out-alt text-lg"></i>
+                  <i className="fas fa-sign-out-alt mr-1"></i>
+                  <span>{t('auth.logoutButton', 'Logout')}</span>
                 </button>
               </div>
             ) : (
