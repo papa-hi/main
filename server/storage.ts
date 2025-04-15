@@ -26,7 +26,9 @@ export interface IStorage {
   getUpcomingPlaydates(): Promise<Playdate[]>;
   getPastPlaydates(): Promise<Playdate[]>;
   getUserPlaydates(userId: number): Promise<Playdate[]>;
+  getPlaydateById(id: number): Promise<Playdate | undefined>;
   createPlaydate(playdate: any): Promise<Playdate>;
+  updatePlaydate(id: number, playdate: Partial<Playdate>): Promise<Playdate>;
   deletePlaydate(id: number): Promise<boolean>;
   joinPlaydate(userId: number, playdateId: number): Promise<boolean>;
   leavePlaydate(userId: number, playdateId: number): Promise<boolean>;
@@ -435,6 +437,28 @@ export class MemStorage implements IStorage {
     
     this.playdates.set(id, playdate);
     return playdate;
+  }
+  
+  async getPlaydateById(id: number): Promise<Playdate | undefined> {
+    return this.playdates.get(id);
+  }
+  
+  async updatePlaydate(id: number, playdateData: Partial<Playdate>): Promise<Playdate> {
+    const playdate = this.playdates.get(id);
+    if (!playdate) {
+      throw new Error("Playdate not found");
+    }
+    
+    // Create an updated playdate with the new data
+    const updatedPlaydate: Playdate = {
+      ...playdate,
+      ...playdateData,
+      // Don't override the participants array with an empty one
+      participants: playdateData.participants || playdate.participants
+    };
+    
+    this.playdates.set(id, updatedPlaydate);
+    return updatedPlaydate;
   }
   
   async deletePlaydate(id: number): Promise<boolean> {
