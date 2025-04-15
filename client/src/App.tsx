@@ -13,6 +13,7 @@ import DiscoverPage from "./pages/discover";
 import CreatePage from "./pages/create";
 import ChatPage from "./pages/chat";
 import AuthPage from "./pages/auth-page";
+import TestCreatePlaydate from "./pages/test-create-playdate";
 import { useState, useEffect } from "react";
 import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
 import ErrorBoundary from "./components/shared/error-boundary";
@@ -33,6 +34,7 @@ function Router() {
       <ProtectedRoute path="/discover" component={DiscoverPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/test-create" component={TestCreatePlaydate} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

@@ -980,7 +980,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log("Saved message:", savedMessage);
             
             // Broadcast to all connected clients who are participants of this chat
-            for (const [client, info] of clients.entries()) {
+            for (const [client, info] of Array.from(clients.entries())) {
               if (client.readyState === WebSocket.OPEN && info.userId) {
                 // Check if this user is a participant in the chat
                 const chat = await storage.getChatById(data.chatId);
