@@ -17,36 +17,21 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     return next();
   }
   
-  // Debug authentication information
-  console.log("======= AUTHENTICATION DEBUG =======");
-  console.log("Path:", req.path);
-  console.log("Is authenticated:", req.isAuthenticated());
-  console.log("User in request:", req.user ? `User ID: ${req.user.id}` : "No user");
-  console.log("Session ID:", req.sessionID);
-  console.log("Session data:", req.session);
-  console.log("Cookies:", req.headers.cookie);
-  console.log("===================================");
-  
-  // TEMPORARY FIX: Allow any /api/playdates endpoint through for debugging
-  if (req.path === '/api/playdates') {
-    console.log("*** BYPASSING AUTH FOR PLAYDATES CREATION (TEMPORARY FIX) ***");
-    if (!req.user) {
-      // Mock a user for testing purposes
-      (req as any).user = { id: 3, username: 'Angare' };
-      console.log("*** MOCKED USER FOR TESTING: " + JSON.stringify((req as any).user) + " ***");
-    }
-    return next();
+  // For request debugging, log headers
+  if (req.method === 'GET' && req.path === '/api/user' && !req.isAuthenticated()) {
+    console.log("ERROR HEADERS for GET /api/user:", JSON.stringify(req.headers));
+  }
+
+  // For API requests, show the full request body
+  if (req.method === 'POST' && req.path === '/api/playdates') {
+    console.log("REQUEST BODY for POST /api/playdates:", JSON.stringify(req.body));
   }
   
   if (req.isAuthenticated()) {
     return next();
   }
   
-  // Get the cookie header for diagnostic purposes
-  const cookies = req.headers.cookie;
-  console.log("Authentication failed. Cookies:", cookies);
-  
-  return res.status(401).json({ error: "You must be logged in to access this resource" });
+  return res.status(401).json({ error: "Not authenticated" });
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
