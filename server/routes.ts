@@ -8,6 +8,7 @@ import { setupAuth } from "./auth";
 import { upload, getFileUrl, deleteProfileImage } from "./upload";
 import path from "path";
 import { WebSocketServer, WebSocket } from 'ws';
+import { fetchNearbyPlaygrounds } from "./maps-service";
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
