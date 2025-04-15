@@ -39,94 +39,109 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     const connectWebSocket = () => {
       setConnecting(true);
       
-      // Choose the appropriate protocol based on the current connection
-      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const wsUrl = `${protocol}//${window.location.host}/ws`;
-      
-      const newSocket = new WebSocket(wsUrl);
-      
-      newSocket.onopen = () => {
-        console.log("WebSocket connection established");
-        setConnected(true);
+      try {
+        // Choose the appropriate protocol based on the current connection
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const host = window.location.host || "localhost:5000"; // Fallback to default port
+        const wsUrl = `${protocol}//${host}/ws`;
+        
+        console.log(`Attempting to connect to WebSocket at: ${wsUrl}`);
+        const newSocket = new WebSocket(wsUrl);
+        
+        newSocket.onopen = () => {
+          console.log("WebSocket connection established");
+          setConnected(true);
+          setConnecting(false);
+          
+          // Clear any existing reconnect timeouts
+          if (reconnectTimeoutRef.current) {
+            clearTimeout(reconnectTimeoutRef.current);
+            reconnectTimeoutRef.current = null;
+          }
+          
+          // Authenticate the connection
+          if (user) {
+            console.log("Authenticating WebSocket connection...");
+            newSocket.send(JSON.stringify({
+              type: 'authenticate',
+              userId: user.id,
+              token: 'mock-token' // In a real implementation, use a real auth token
+            }));
+          }
+        };
+        
+        newSocket.onclose = () => {
+          console.log("WebSocket connection closed");
+          setConnected(false);
+          
+          // Set up reconnection
+          if (!reconnectTimeoutRef.current) {
+            reconnectTimeoutRef.current = setTimeout(() => {
+              reconnectTimeoutRef.current = null;
+              connectWebSocket();
+            }, 3000);
+          }
+        };
+        
+        newSocket.onerror = (error) => {
+          console.error("WebSocket error:", error);
+        };
+        
+        newSocket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            
+            if (data.type === "message") {
+              const message = data.message;
+              
+              setMessages((prevMessages) => {
+                const chatMessages = [...(prevMessages[message.chatId] || [])];
+                
+                // Check if the message already exists
+                const messageExists = chatMessages.some(m => m.id === message.id);
+                
+                if (!messageExists) {
+                  chatMessages.push(message);
+                  
+                  // Sort messages by sentAt
+                  chatMessages.sort((a, b) => {
+                    return new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime();
+                  });
+                }
+                
+                return {
+                  ...prevMessages,
+                  [message.chatId]: chatMessages,
+                };
+              });
+            } else if (data.type === "initial_messages") {
+              const { chatId, messages: initialMessages } = data;
+              
+              setMessages((prevMessages) => ({
+                ...prevMessages,
+                [chatId]: initialMessages.sort((a: Message, b: Message) => {
+                  return new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime();
+                }),
+              }));
+            }
+          } catch (error) {
+            console.error("Error parsing WebSocket message:", error);
+          }
+        };
+        
+        setSocket(newSocket);
+      } catch (error) {
+        console.error("Failed to create WebSocket connection:", error);
         setConnecting(false);
         
-        // Clear any existing reconnect timeouts
-        if (reconnectTimeoutRef.current) {
-          clearTimeout(reconnectTimeoutRef.current);
-          reconnectTimeoutRef.current = null;
-        }
-        
-        // Authenticate the connection
-        if (user) {
-          console.log("Authenticating WebSocket connection...");
-          newSocket.send(JSON.stringify({
-            type: 'authenticate',
-            userId: user.id,
-            token: 'mock-token' // In a real implementation, use a real auth token
-          }));
-        }
-      };
-      
-      newSocket.onclose = () => {
-        console.log("WebSocket connection closed");
-        setConnected(false);
-        
-        // Set up reconnection
+        // Schedule reconnection attempt
         if (!reconnectTimeoutRef.current) {
           reconnectTimeoutRef.current = setTimeout(() => {
             reconnectTimeoutRef.current = null;
             connectWebSocket();
-          }, 3000);
+          }, 5000);
         }
-      };
-      
-      newSocket.onerror = (error) => {
-        console.error("WebSocket error:", error);
-      };
-      
-      newSocket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          
-          if (data.type === "message") {
-            const message = data.message;
-            
-            setMessages((prevMessages) => {
-              const chatMessages = [...(prevMessages[message.chatId] || [])];
-              
-              // Check if the message already exists
-              const messageExists = chatMessages.some(m => m.id === message.id);
-              
-              if (!messageExists) {
-                chatMessages.push(message);
-                
-                // Sort messages by sentAt
-                chatMessages.sort((a, b) => {
-                  return new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime();
-                });
-              }
-              
-              return {
-                ...prevMessages,
-                [message.chatId]: chatMessages,
-              };
-            });
-          } else if (data.type === "initial_messages") {
-            const { chatId, messages: initialMessages } = data;
-            
-            setMessages((prevMessages) => ({
-              ...prevMessages,
-              [chatId]: initialMessages.sort((a: Message, b: Message) => {
-                return new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime();
-              }),
-            }));
-          }
-        } catch (error) {
-          console.error("Error parsing WebSocket message:", error);
-        }
-      };
-      
-      setSocket(newSocket);
+      }
     };
     
     connectWebSocket();

@@ -126,15 +126,8 @@ export default function CreatePage() {
       
       console.log("Sending playdate data to API:", playdateData);
       
-      // Make the API request using fetch directly to better handle responses
-      const response = await fetch('/api/playdates', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(playdateData),
-        credentials: 'include',
-      });
+      // Make the API request using apiRequest to ensure proper authentication
+      const response = await apiRequest('POST', '/api/playdates', playdateData);
       
       // Log the response status
       console.log(`API response status: ${response.status} ${response.statusText}`);
