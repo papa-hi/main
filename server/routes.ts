@@ -513,6 +513,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update a playdate
+  app.put("/api/playdates/:id", isAuthenticated, async (req, res) => {
+    try {
+      const playdateId = parseInt(req.params.id);
+      if (isNaN(playdateId)) {
+        return res.status(400).json({ message: "Invalid playdate ID" });
+      }
+      
+      // Get the authenticated user ID
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      // Get the playdate to check ownership
+      const playdates = await storage.getUserPlaydates(userId);
+      const playdate = playdates.find(p => p.id === playdateId);
+      
+      // Check if user is the creator (first participant)
+      if (!playdate || playdate.participants[0]?.id !== userId) {
+        return res.status(403).json({ message: "Only the creator can update this playdate" });
+      }
+      
+      // Process dates for validation
+      const updateData = {
+        ...req.body,
+        // Convert ISO strings to Date objects if provided
+        startTime: req.body.startTime ? new Date(req.body.startTime) : undefined,
+        endTime: req.body.endTime ? new Date(req.body.endTime) : undefined
+      };
+      
+      // Update the playdate
+      const updatedPlaydate = await storage.updatePlaydate(playdateId, updateData);
+      
+      res.status(200).json(updatedPlaydate);
+    } catch (err) {
+      console.error("Error updating playdate:", err);
+      res.status(500).json({ message: "Failed to update playdate" });
+    }
+  });
+  
+  // Delete a playdate
   app.delete("/api/playdates/:id", isAuthenticated, async (req, res) => {
     try {
       const playdateId = parseInt(req.params.id);
@@ -527,8 +570,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
       
-      // TODO: Add check to ensure user owns this playdate
-      // For now, we'll just delete it without checking ownership
+      // Get the playdate to check ownership
+      const playdates = await storage.getUserPlaydates(userId);
+      const playdate = playdates.find(p => p.id === playdateId);
+      
+      // Check if user is the creator (first participant)
+      if (!playdate || playdate.participants[0]?.id !== userId) {
+        return res.status(403).json({ message: "Only the creator can delete this playdate" });
+      }
       
       const deleted = await storage.deletePlaydate(playdateId);
       
