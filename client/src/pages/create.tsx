@@ -30,6 +30,7 @@ export default function CreatePage() {
   const [participants, setParticipants] = useState(5);
   const [date, setDate] = useState<Date>(new Date());
   const [startTime, setStartTime] = useState("10:00");
+  const [endTime, setEndTime] = useState("11:00");
   
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -48,14 +49,15 @@ export default function CreatePage() {
     setIsSubmitting(true);
     
     try {
-      // Create date with selected date and time
+      // Create date with selected date and start time
       const selectedDate = new Date(date);
-      const [hours, minutes] = startTime.split(':').map(Number);
-      selectedDate.setHours(hours || 0, minutes || 0, 0, 0);
+      const [startHours, startMinutes] = startTime.split(':').map(Number);
+      selectedDate.setHours(startHours || 0, startMinutes || 0, 0, 0);
       
-      // Calculate end time (1 hour after start time)
-      const endDate = new Date(selectedDate);
-      endDate.setHours(endDate.getHours() + 1);
+      // Create end date with the same date but end time
+      const endDate = new Date(date);
+      const [endHours, endMinutes] = endTime.split(':').map(Number);
+      endDate.setHours(endHours || 0, endMinutes || 0, 0, 0);
       
       // Create a playdate object with all fields
       const playdate = {
@@ -172,18 +174,35 @@ export default function CreatePage() {
             </Popover>
           </div>
           
-          <div>
-            <label htmlFor="startTime" className="block text-sm font-medium mb-1">Starttijd</label>
-            <div className="relative">
-              <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input 
-                id="startTime"
-                type="time" 
-                className="pl-10" 
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                required
-              />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="startTime" className="block text-sm font-medium mb-1">Starttijd</label>
+              <div className="relative">
+                <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  id="startTime"
+                  type="time" 
+                  className="pl-10" 
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label htmlFor="endTime" className="block text-sm font-medium mb-1">Eindtijd</label>
+              <div className="relative">
+                <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  id="endTime"
+                  type="time" 
+                  className="pl-10" 
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  required
+                />
+              </div>
             </div>
           </div>
           
