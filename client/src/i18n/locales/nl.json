@@ -67,10 +67,12 @@
     "playdates": "Speelafspraken",
     "restaurants": "Restaurants",
     "playgrounds": "Speeltuinen",
+    "playgroundMap": "Speeltuin Kaart",
     "community": "Community",
     "new": "Nieuw",
     "places": "Plekken",
-    "profile": "Profiel"
+    "profile": "Profiel",
+    "chat": "Berichten"
   },
   "navigation": {
     "home": "Home",
@@ -179,6 +181,21 @@
       "message": "Er is een fout opgetreden. Probeer het later nog eens.",
       "retry": "Opnieuw proberen"
     }
+  },
+  "playgroundMap": {
+    "title": "Speeltuin Kaart",
+    "description": "Ontdek speeltuinen en hun populariteit in jouw omgeving",
+    "aboutHeatmap": "Over de Heatmap",
+    "heatmapExplanation": "De speeltuin heatmap toont gebieden met hoge concentraties speeltuinen. Rode gebieden geven meer speeltuinen dicht bij elkaar aan, terwijl blauwe gebieden minder speeltuinen hebben.",
+    "heatmapUsage": "Gebruik deze kaart om gebieden te vinden met veel speeltuinen, ideaal voor het plannen van speelafspraken met meerdere opties in de buurt.",
+    "lowDensity": "Lagere dichtheid",
+    "mediumDensity": "Gemiddelde dichtheid",
+    "highDensity": "Hogere dichtheid",
+    "tips": "Tips voor het vinden van geweldige speeltuinen",
+    "tip1": "Zoek naar speeltuinen in rode gebieden voor meer opties dicht bij elkaar",
+    "tip2": "Klik op een speeltuin marker om details te zien en een routebeschrijving te krijgen",
+    "tip3": "Gebruik je huidige locatie om speeltuinen in je buurt te vinden",
+    "tip4": "Plan speelafspraken bij speeltuinen met meerdere opties in de buurt voor het geval een te druk is"
   },
   "pwa": {
     "privacy": {

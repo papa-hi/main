@@ -13,6 +13,7 @@ import { Place } from '@shared/schema';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { useLocation } from '@/hooks/use-location';
+import { useTranslation } from 'react-i18next';
 
 // Fix marker icon issue in React
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -88,6 +89,7 @@ interface PlaygroundHeatmapProps {
 }
 
 export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
+  const { t } = useTranslation();
   const [mapCenter, setMapCenter] = useState<[number, number]>([52.3676, 4.9041]); // Default: Amsterdam
   const { latitude, longitude } = useLocation();
   const [locationAvailable, setLocationAvailable] = useState(false);
@@ -122,9 +124,9 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
   return (
     <div className={`w-full ${className}`}>
       <div className="bg-white p-4 rounded-xl shadow-sm mb-4">
-        <h2 className="text-lg font-bold mb-2">Playground Heatmap</h2>
+        <h2 className="text-lg font-bold mb-2">{t('playgroundMap.title', 'Playground Heatmap')}</h2>
         <p className="text-sm text-muted-foreground mb-4">
-          Find popular playgrounds near you. The heatmap shows playground density - red areas have more playgrounds.
+          {t('playgroundMap.description', 'Discover playgrounds and their popularity in your area')}
         </p>
         
         {!locationAvailable && (
@@ -140,7 +142,7 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
             className="mb-4"
           >
             <i className="fas fa-location-arrow mr-2"></i>
-            Use My Location
+            {t('places.useMyLocation', 'Use My Location')}
           </Button>
         )}
       </div>
@@ -181,11 +183,11 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                     <div className="p-1">
                       <h3 className="font-medium text-base">{place.name}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {place.description ? place.description.substring(0, 100) + '...' : 'No description available.'}
+                        {place.description ? place.description.substring(0, 100) + '...' : t('common.noDescription', 'No description available.')}
                       </p>
                       <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
                         <i className="fas fa-map-marker-alt text-primary"></i>
-                        <span>{place.address || 'No address'}</span>
+                        <span>{place.address || t('common.noAddress', 'No address')}</span>
                       </div>
                       <Button 
                         className="mt-2 w-full text-xs"
@@ -196,7 +198,7 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                         }}
                       >
                         <i className="fas fa-directions mr-1"></i>
-                        Directions
+                        {t('common.directions', 'Directions')}
                       </Button>
                     </div>
                   </Popup>
@@ -209,7 +211,7 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
             <Marker position={[latitude, longitude]}>
               <Popup>
                 <div className="p-1">
-                  <h3 className="font-medium">Your Location</h3>
+                  <h3 className="font-medium">{t('places.yourLocation', 'Your Location')}</h3>
                 </div>
               </Popup>
             </Marker>
