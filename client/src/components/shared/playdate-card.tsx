@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { useLocation } from "wouter";
 
 interface PlaydateCardProps {
   playdate: Playdate;
@@ -21,6 +22,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
   const { toast } = useToast();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [_, navigate] = useLocation();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
@@ -219,7 +221,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {isCreator && (
-              <DropdownMenuItem onClick={() => window.location.href = `/edit-playdate/${playdate.id}`}>
+              <DropdownMenuItem onClick={() => navigate(`/edit-playdate/${playdate.id}`)}>
                 <i className="fas fa-edit mr-2"></i> {t('common.edit', 'Edit')}
               </DropdownMenuItem>
             )}
