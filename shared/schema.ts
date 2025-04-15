@@ -62,15 +62,8 @@ export const playdatesRelations = relations(playdates, ({ one, many }) => ({
   participants: many(playdateParticipants),
 }));
 
-// First create the base schema for insertion
-const basePlaydateSchema = createInsertSchema(playdates);
-
-// Then create a custom schema that transforms string dates to Date objects
-export const insertPlaydateSchema = basePlaydateSchema.extend({
-  // Override the timestamp fields to accept ISO strings and convert them to Date objects
-  startTime: z.string().transform(str => new Date(str)),
-  endTime: z.string().transform(str => new Date(str)),
-}).pick({
+// Create the schema with standard validation
+export const insertPlaydateSchema = createInsertSchema(playdates).pick({
   title: true,
   description: true,
   location: true,
