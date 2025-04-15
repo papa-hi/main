@@ -450,6 +450,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch past playdates" });
     }
   });
+  
+  // Get a single playdate by ID
+  app.get("/api/playdates/:id", async (req, res) => {
+    try {
+      const playdateId = parseInt(req.params.id);
+      if (isNaN(playdateId)) {
+        return res.status(400).json({ message: "Invalid playdate ID" });
+      }
+      
+      const playdate = await storage.getPlaydateById(playdateId);
+      if (!playdate) {
+        return res.status(404).json({ message: "Playdate not found" });
+      }
+      
+      res.json(playdate);
+    } catch (err) {
+      console.error("Error fetching playdate:", err);
+      res.status(500).json({ message: "Failed to fetch playdate" });
+    }
+  });
 
   app.post("/api/playdates", isAuthenticated, async (req, res) => {
     try {
