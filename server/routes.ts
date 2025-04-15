@@ -403,6 +403,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/playdates/test-create", isAuthenticated, async (req, res) => {
     try {
       console.log("TEST ENDPOINT: Creating playdate with data:", req.body);
+      console.log("TEST ENDPOINT: Authenticated user:", req.user);
+      console.log("TEST ENDPOINT: Session:", req.session);
       
       // Get the authenticated user's ID
       const userId = req.user?.id;
@@ -410,6 +412,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
+      
+      console.log("TEST ENDPOINT: Using userId:", userId);
       
       // Basic data validation
       if (!req.body.title) {
