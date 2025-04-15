@@ -1411,7 +1411,33 @@ export class DatabaseStorage implements IStorage {
         eq(userFavorites.placeId, placeId)
       ));
     
-    return result.rowCount > 0;
+    return result.rowCount! > 0;
+  }
+  
+  async createPlace(placeData: any): Promise<Place> {
+    // Insert the place into the database
+    const [place] = await db
+      .insert(places)
+      .values({
+        name: placeData.name,
+        type: placeData.type || 'playground',
+        description: placeData.description || null,
+        address: placeData.address || 'No address provided',
+        latitude: placeData.latitude.toString(),
+        longitude: placeData.longitude.toString(),
+        imageUrl: placeData.imageUrl || "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80",
+        rating: placeData.rating || 45,
+        reviewCount: placeData.reviewCount || 0,
+        features: placeData.features || null,
+      })
+      .returning();
+    
+    // Return with distance and saved status
+    return {
+      ...place,
+      distance: 0, // This will be calculated when queried with coordinates
+      isSaved: false
+    };
   }
 
   // Chat methods
