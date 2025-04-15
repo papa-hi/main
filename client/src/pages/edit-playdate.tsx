@@ -27,6 +27,7 @@ export default function EditPlaydatePage() {
   const { t } = useTranslation();
   const { user, isLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -105,6 +106,55 @@ export default function EditPlaydatePage() {
       navigate("/auth");
     }
   }, [isLoading, user, navigate, toast, t]);
+  
+  const handleDelete = async () => {
+    // Confirm deletion with the user
+    if (!window.confirm(t('playdates.confirmDelete', 'Weet je zeker dat je deze speelafspraak wilt verwijderen?'))) {
+      return;
+    }
+    
+    setIsDeleting(true);
+    
+    try {
+      // Send delete request to the server
+      const response = await fetch(`/api/playdates/${playdateId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Error deleting playdate (${response.status}):`, errorText);
+        throw new Error(`Error deleting playdate: ${errorText}`);
+      }
+      
+      // Update UI and redirect
+      queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/playdates/past'] });
+      
+      toast({
+        title: t('playdates.deleted', 'Speelafspraak verwijderd!'),
+        description: t('playdates.deleteSuccess', 'Je speelafspraak is succesvol verwijderd.')
+      });
+      
+      // Redirect to the playdates list
+      navigate("/playdates", { replace: true });
+    } catch (error) {
+      console.error("Error deleting playdate:", error);
+      
+      let errorMessage = t('playdates.deleteError', 'Er is iets misgegaan bij het verwijderen van de speelafspraak.');
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: t('common.error', 'Fout bij verwijderen'),
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -325,22 +375,33 @@ export default function EditPlaydatePage() {
             <p className="text-sm text-muted-foreground mt-1">{t('playdates.participantsNote', 'Inclusief jezelf en je kinderen')}</p>
           </div>
           
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-between gap-3 pt-4">
             <Button 
               type="button" 
-              variant="outline" 
-              onClick={() => navigate("/playdates")}
-              disabled={isSubmitting}
+              variant="destructive" 
+              onClick={handleDelete}
+              disabled={isSubmitting || isDeleting}
             >
-              {t('common.cancel', 'Annuleren')}
+              {isDeleting ? t('common.deleting', 'Verwijderen...') : t('common.delete', 'Verwijderen')}
             </Button>
-            <Button 
-              type="submit" 
-              className="bg-primary hover:bg-primary-dark text-white"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? t('common.saving', 'Opslaan...') : t('common.save', 'Opslaan')}
-            </Button>
+            
+            <div className="flex gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => navigate("/playdates")}
+                disabled={isSubmitting || isDeleting}
+              >
+                {t('common.cancel', 'Annuleren')}
+              </Button>
+              <Button 
+                type="submit" 
+                className="bg-primary hover:bg-primary-dark text-white"
+                disabled={isSubmitting || isDeleting}
+              >
+                {isSubmitting ? t('common.saving', 'Opslaan...') : t('common.save', 'Opslaan')}
+              </Button>
+            </div>
           </div>
         </form>
       </div>
