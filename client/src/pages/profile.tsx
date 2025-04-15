@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { User } from "@shared/schema";
+import { User, Playdate, Place } from "@shared/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PlaceCard } from "@/components/shared/place-card";
 import { PlaydateCard } from "@/components/shared/playdate-card";
+import { useLocation } from "wouter";
 import {
   Form,
   FormControl,
@@ -47,6 +48,7 @@ type EditProfileFormValues = z.infer<typeof editProfileSchema>;
 
 export default function ProfilePage() {
   const { toast } = useToast();
+  const [_, navigate] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
@@ -436,14 +438,89 @@ export default function ProfilePage() {
             ) : createdPlaydates && createdPlaydates.length > 0 ? (
               <div className="space-y-4">
                 {createdPlaydates.map((playdate) => (
-                  <PlaydateCard key={playdate.id} playdate={playdate} />
+                  <div key={playdate.id} className="bg-white rounded-xl p-4 shadow-sm">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 w-14 h-14 bg-accent/10 rounded-lg flex flex-col items-center justify-center mr-4">
+                        <span className="text-accent font-bold text-lg">{playdate.startTime ? new Date(playdate.startTime).getDate() : ''}</span>
+                        <span className="text-accent text-xs uppercase">
+                          {playdate.startTime ? new Date(playdate.startTime).toLocaleString('nl-NL', { month: 'short' }) : ''}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-heading font-medium text-base mb-1">{playdate.title}</h3>
+                        <div className="flex items-center text-sm text-dark/70 mb-2">
+                          <i className="fas fa-clock mr-1 text-xs"></i>
+                          <span>
+                            {playdate.startTime && new Date(playdate.startTime).toLocaleTimeString('nl-NL', {hour: '2-digit', minute:'2-digit'})} - 
+                            {playdate.endTime && new Date(playdate.endTime).toLocaleTimeString('nl-NL', {hour: '2-digit', minute:'2-digit'})}
+                          </span>
+                          <i className="fas fa-map-marker-alt ml-3 mr-1 text-xs"></i>
+                          <span>{playdate.location}</span>
+                        </div>
+                        <div className="flex items-center mb-2">
+                          <span className="text-xs text-dark/60">
+                            {playdate.participants.length} / {playdate.maxParticipants} deelnemers
+                          </span>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-3">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="text-xs flex items-center gap-1"
+                            onClick={() => navigate(`/edit-playdate/${playdate.id}`)}
+                          >
+                            <i className="fas fa-edit"></i> Bewerken
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            className="text-xs flex items-center gap-1"
+                            onClick={async () => {
+                              if (window.confirm('Weet je zeker dat je deze speelafspraak wilt verwijderen?')) {
+                                try {
+                                  const response = await fetch(`/api/playdates/${playdate.id}`, {
+                                    method: 'DELETE',
+                                    credentials: 'include'
+                                  });
+                                  
+                                  if (response.ok) {
+                                    toast({
+                                      title: "Speelafspraak verwijderd",
+                                      description: "De speelafspraak is succesvol verwijderd.",
+                                    });
+                                    
+                                    // Refresh the data
+                                    window.location.reload();
+                                  } else {
+                                    throw new Error('Fout bij verwijderen');
+                                  }
+                                } catch (error) {
+                                  toast({
+                                    title: "Fout",
+                                    description: "Er is iets misgegaan bij het verwijderen van de speelafspraak.",
+                                    variant: "destructive",
+                                  });
+                                }
+                              }
+                            }}
+                          >
+                            <i className="fas fa-trash-alt"></i> Verwijderen
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : (
               <div className="bg-white rounded-xl p-6 shadow-sm text-center">
                 <h3 className="font-heading font-medium text-lg mb-2">Geen speelafspraken gepland</h3>
                 <p className="text-dark/70 text-sm mb-4">Je hebt nog geen speelafspraken gemaakt.</p>
-                <Button className="bg-primary text-white hover:bg-accent transition">
+                <Button 
+                  className="bg-primary text-white hover:bg-accent transition"
+                  onClick={() => window.location.href = "/create"}
+                >
                   Nieuwe Afspraak
                 </Button>
               </div>
