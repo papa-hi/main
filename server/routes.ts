@@ -400,9 +400,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Simple test endpoint for playdate creation
-  app.post("/api/playdates/test-create", async (req, res) => {
+  app.post("/api/playdates/test-create", isAuthenticated, async (req, res) => {
     try {
       console.log("TEST ENDPOINT: Creating playdate with data:", req.body);
+      
+      // Get the authenticated user's ID
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       
       // Basic data validation
       if (!req.body.title) {
@@ -422,14 +429,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         endTime = new Date(req.body.endTime);
       }
       
-      // Create a playdate with user-provided data (user ID 3 for testing)
+      // Create a playdate with the authenticated user as creator
       const newPlaydate = await storage.createPlaydate({
         title: req.body.title,
         description: req.body.description || "Test description",
         location: req.body.location || "Test location",
         startTime: startTime,
         endTime: endTime,
-        creatorId: 3, // Hardcoded user ID for testing
+        creatorId: userId, // Use authenticated user's ID
         maxParticipants: req.body.maxParticipants || 5
       });
       
