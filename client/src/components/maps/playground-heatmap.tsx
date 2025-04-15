@@ -4,16 +4,27 @@ import {
   TileLayer, 
   Marker, 
   Popup, 
-  useMap 
+  useMap,
+  useMapEvents
 } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
 import { Place } from '@shared/schema';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { useLocation } from '@/hooks/use-location';
 import { useTranslation } from 'react-i18next';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
 
 // Fix marker icon issue in React
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -88,11 +99,92 @@ interface PlaygroundHeatmapProps {
   className?: string;
 }
 
+// Component to handle click on map for adding a new playground
+function AddPlaygroundMarker({ 
+  onSelectLocation 
+}: { 
+  onSelectLocation: (position: [number, number]) => void 
+}) {
+  const map = useMapEvents({
+    click: (e) => {
+      onSelectLocation([e.latlng.lat, e.latlng.lng]);
+    },
+  });
+  
+  return null;
+}
+
+// Form schema for playground creation
+const playgroundFormSchema = z.object({
+  name: z.string().min(3, { message: "Name must be at least 3 characters" }),
+  description: z.string().optional(),
+  address: z.string().optional(),
+  latitude: z.number(),
+  longitude: z.number(),
+});
+
+type PlaygroundFormValues = z.infer<typeof playgroundFormSchema>;
+
 export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
   const { t } = useTranslation();
+  const { toast } = useToast();
+  const { user } = useAuth();
   const [mapCenter, setMapCenter] = useState<[number, number]>([52.3676, 4.9041]); // Default: Amsterdam
   const { latitude, longitude } = useLocation();
   const [locationAvailable, setLocationAvailable] = useState(false);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<[number, number] | null>(null);
+  const [addMode, setAddMode] = useState(false);
+  
+  // Form definition
+  const form = useForm<PlaygroundFormValues>({
+    resolver: zodResolver(playgroundFormSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      address: '',
+      latitude: 0,
+      longitude: 0,
+    },
+  });
+  
+  // Mutation for adding a new playground
+  const addPlaygroundMutation = useMutation({
+    mutationFn: async (data: PlaygroundFormValues) => {
+      const response = await apiRequest('POST', '/api/playgrounds', data);
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: t('playgroundMap.addSuccess', 'Playground Added'),
+        description: t('playgroundMap.addSuccessMessage', 'Thank you for contributing to our community playground map!'),
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/places/search'] });
+      setShowAddDialog(false);
+      setAddMode(false);
+    },
+    onError: (error) => {
+      toast({
+        title: t('playgroundMap.addError', 'Error Adding Playground'),
+        description: error.message || t('playgroundMap.addErrorMessage', 'There was an error adding the playground. Please try again.'),
+        variant: 'destructive',
+      });
+    },
+  });
+  
+  // Function to handle form submission
+  const onSubmit = (data: PlaygroundFormValues) => {
+    addPlaygroundMutation.mutate(data);
+  };
+  
+  // Update form values when location is selected
+  useEffect(() => {
+    if (selectedLocation) {
+      form.setValue('latitude', selectedLocation[0]);
+      form.setValue('longitude', selectedLocation[1]);
+      setShowAddDialog(true);
+    }
+  }, [selectedLocation, form]);
   
   // Fetch all playgrounds from the API
   const { data: places = [], isLoading: placesLoading } = useQuery<Place[]>({
@@ -124,26 +216,68 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
   return (
     <div className={`w-full ${className}`}>
       <div className="bg-white p-4 rounded-xl shadow-sm mb-4">
-        <h2 className="text-lg font-bold mb-2">{t('playgroundMap.title', 'Playground Heatmap')}</h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          {t('playgroundMap.description', 'Discover playgrounds and their popularity in your area')}
-        </p>
-        
-        {!locationAvailable && (
-          <Button 
-            onClick={() => navigator.geolocation.getCurrentPosition(
-              pos => {
-                setMapCenter([pos.coords.latitude, pos.coords.longitude]);
-                setLocationAvailable(true);
-              },
-              err => console.error('Error getting location:', err)
+        <div className="flex flex-wrap gap-2 items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold mb-2">{t('playgroundMap.title', 'Playground Heatmap')}</h2>
+            <p className="text-sm text-muted-foreground">
+              {t('playgroundMap.description', 'Discover playgrounds and their popularity in your area')}
+            </p>
+          </div>
+          
+          <div className="flex gap-2">
+            {user && !addMode && (
+              <Button 
+                onClick={() => setAddMode(true)} 
+                variant="default"
+                size="sm"
+                className="flex items-center"
+              >
+                <i className="fas fa-plus mr-1"></i>
+                {t('playgroundMap.addPlayground', 'Add Playground')}
+              </Button>
             )}
-            variant="outline"
-            className="mb-4"
-          >
-            <i className="fas fa-location-arrow mr-2"></i>
-            {t('places.useMyLocation', 'Use My Location')}
-          </Button>
+            
+            {addMode && (
+              <Button 
+                onClick={() => setAddMode(false)} 
+                variant="outline"
+                size="sm"
+                className="flex items-center"
+              >
+                <i className="fas fa-times mr-1"></i>
+                {t('common.cancel', 'Cancel')}
+              </Button>
+            )}
+            
+            {!locationAvailable && (
+              <Button 
+                onClick={() => navigator.geolocation.getCurrentPosition(
+                  pos => {
+                    setMapCenter([pos.coords.latitude, pos.coords.longitude]);
+                    setLocationAvailable(true);
+                  },
+                  err => console.error('Error getting location:', err)
+                )}
+                variant="outline"
+                size="sm"
+                className="flex items-center"
+              >
+                <i className="fas fa-location-arrow mr-1"></i>
+                {t('places.useMyLocation', 'Use My Location')}
+              </Button>
+            )}
+          </div>
+        </div>
+        
+        {addMode && (
+          <div className="mt-4 p-3 bg-muted/20 border border-border rounded-lg">
+            <h3 className="text-sm font-medium mb-2">
+              {t('playgroundMap.addPlaygroundInstructions', 'Click on the map to add a new playground')}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {t('playgroundMap.addPlaygroundTip', 'Select the exact location of the playground on the map')}
+            </p>
+          </div>
         )}
       </div>
       
@@ -163,6 +297,13 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
           
           {/* Add heatmap layer */}
           <HeatmapLayer points={heatmapPoints} />
+          
+          {/* Add playground marker mode */}
+          {addMode && user && (
+            <AddPlaygroundMarker 
+              onSelectLocation={setSelectedLocation} 
+            />
+          )}
           
           {/* Add markers for each playground */}
           {places
@@ -218,6 +359,145 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
           )}
         </MapContainer>
       </div>
+      
+      {/* Add Playground Dialog */}
+      <Dialog 
+        open={showAddDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowAddDialog(false);
+            setSelectedLocation(null);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{t('playgroundMap.addNewPlayground', 'Add New Playground')}</DialogTitle>
+          </DialogHeader>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('common.name', 'Name')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t('playgroundMap.playgroundNamePlaceholder', 'e.g. Central Park Playground')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder={t('playgroundMap.descriptionPlaceholder', 'e.g. Playground with swings, slides, and climbing area')} 
+                        {...field} 
+                        value={field.value || ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('common.address', 'Address')}</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder={t('playgroundMap.addressPlaceholder', 'e.g. 123 Main St, Amsterdam')} 
+                        {...field} 
+                        value={field.value || ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="latitude"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('common.latitude', 'Latitude')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="any" 
+                          disabled
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="longitude"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('common.longitude', 'Longitude')}</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="any"
+                          disabled
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <DialogFooter className="pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowAddDialog(false);
+                    setSelectedLocation(null);
+                  }}
+                >
+                  {t('common.cancel', 'Cancel')}
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={addPlaygroundMutation.isPending}
+                >
+                  {addPlaygroundMutation.isPending ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin mr-2"></i>
+                      {t('common.adding', 'Adding...')}
+                    </>
+                  ) : (
+                    t('common.add', 'Add')
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
