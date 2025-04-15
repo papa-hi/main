@@ -402,6 +402,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Log the received data
       console.log("Received playdate creation request:", req.body);
+      console.log("Authenticated user info:", req.user);
+      console.log("Authentication status:", req.isAuthenticated());
       
       // Validate request body
       const validPlaydate = insertPlaydateSchema.parse(req.body);
@@ -412,7 +414,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Creator ID:", creatorId);
       
       if (!creatorId) {
-        return res.status(401).json({ message: "User not authenticated" });
+        return res.status(401).json({ error: "User not authenticated" });
       }
       
       // Create the playdate
@@ -427,11 +429,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (err instanceof ZodError) {
         console.error("Validation error:", err.errors);
         const validationError = fromZodError(err);
-        return res.status(400).json({ message: validationError.message });
+        return res.status(400).json({ error: validationError.message });
       }
       
       console.error("Error creating playdate:", err);
-      res.status(500).json({ message: "Failed to create playdate" });
+      res.status(500).json({ error: "Failed to create playdate" });
     }
   });
 

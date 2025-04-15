@@ -67,7 +67,7 @@ export default function CreatePage() {
     title: "",
     description: "",
     location: "",
-    maxParticipants: 5,
+    maxParticipants: 5, // Make sure this is a number, not a string
     startTimeString: "",
     endTimeString: "",
     date: new Date(),
@@ -335,7 +335,11 @@ export default function CreatePage() {
                       min={1}
                       max={50}
                       {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                      value={field.value || 5}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? 5 : parseInt(e.target.value, 10);
+                        field.onChange(isNaN(value) ? 5 : value);
+                      }}
                     />
                   </FormControl>
                   <FormDescription>
