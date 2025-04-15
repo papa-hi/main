@@ -39,6 +39,7 @@ export interface IStorage {
   getUserFavoritePlaces(userId: number): Promise<Place[]>;
   addFavoritePlace(userId: number, placeId: number): Promise<any>;
   removeFavoritePlace(userId: number, placeId: number): Promise<boolean>;
+  createPlace(place: any): Promise<Place>;
   
   // Chat methods
   getChats(userId: number): Promise<Chat[]>;

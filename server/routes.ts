@@ -998,11 +998,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sortBy,
         sortOrder,
         limit,
-        offset
+        offset,
+        source // 'osm' for OpenStreetMap or 'db' for database
       } = req.query;
       
       // Get the authenticated user ID for favorites
       const userId = req.user?.id;
+
+      // If source is "osm" and coordinates are provided, fetch from OpenStreetMap
+      if (source === "osm" && latitude && longitude && type === "playground") {
+        const lat = parseFloat(latitude as string);
+        const lng = parseFloat(longitude as string);
+        
+        if (!isNaN(lat) && !isNaN(lng)) {
+          // Fetch playgrounds from OpenStreetMap
+          try {
+            const radius = req.query.radius ? parseInt(req.query.radius as string) : 5000;
+            console.log(`Fetching OpenStreetMap playgrounds near ${lat},${lng} with radius ${radius}m`);
+            
+            const osmPlaygrounds = await fetchNearbyPlaygrounds(lat, lng, radius);
+            
+            // Add favorite status if user is logged in
+            if (userId) {
+              // Fetch user's favorite places to check against
+              const userFavorites = await storage.getUserFavoritePlaces(userId);
+              const favoriteIds = new Set(userFavorites.map(place => place.id));
+              
+              // Mark places as favorite if they're in user's favorites
+              osmPlaygrounds.forEach(playground => {
+                playground.isSaved = favoriteIds.has(playground.id);
+              });
+            }
+            
+            // Return OSM playgrounds
+            return res.json(osmPlaygrounds);
+          } catch (osmError) {
+            console.error("Error fetching from OpenStreetMap:", osmError);
+            // Continue with database lookup as fallback
+          }
+        }
+      }
       
       // Convert query parameters to the right format
       const searchParams: any = {
@@ -1070,6 +1105,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error searching places:", error);
       res.status(500).json({ error: "Failed to search places" });
+    }
+  });
+  
+  // Get playgrounds from OpenStreetMap API
+  app.get("/api/playgrounds/osm", async (req: Request, res: Response) => {
+    try {
+      const { latitude, longitude, radius } = req.query;
+      
+      if (!latitude || !longitude) {
+        return res.status(400).json({ error: "Latitude and longitude are required" });
+      }
+      
+      const lat = parseFloat(latitude as string);
+      const lng = parseFloat(longitude as string);
+      const rad = radius ? parseInt(radius as string) : 5000;
+      
+      if (isNaN(lat) || isNaN(lng)) {
+        return res.status(400).json({ error: "Invalid latitude or longitude" });
+      }
+      
+      const playgrounds = await fetchNearbyPlaygrounds(lat, lng, rad);
+      
+      // Add favorite status if user is logged in
+      if (req.user?.id) {
+        const userFavorites = await storage.getUserFavoritePlaces(req.user.id);
+        const favoriteIds = new Set(userFavorites.map(place => place.id));
+        
+        playgrounds.forEach(playground => {
+          playground.isSaved = favoriteIds.has(playground.id);
+        });
+      }
+      
+      res.json(playgrounds);
+    } catch (error) {
+      console.error("Error fetching playgrounds from OpenStreetMap:", error);
+      res.status(500).json({ error: "Failed to fetch playgrounds from OpenStreetMap" });
+    }
+  });
+  
+  // Add a user-contributed playground
+  app.post("/api/playgrounds", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      // Validate required fields
+      if (!req.body.name || !req.body.latitude || !req.body.longitude) {
+        return res.status(400).json({ error: "Name, latitude, and longitude are required" });
+      }
+      
+      // Create a new place object
+      const playgroundData = {
+        name: req.body.name,
+        type: "playground",
+        description: req.body.description || "User-contributed playground",
+        address: req.body.address || "",
+        latitude: req.body.latitude.toString(),
+        longitude: req.body.longitude.toString(),
+        imageUrl: req.body.imageUrl || "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80",
+        features: req.body.features || [],
+      };
+      
+      try {
+        // Validate the playground data against the schema
+        insertPlaceSchema.parse(playgroundData);
+      } catch (validationError) {
+        if (validationError instanceof ZodError) {
+          const readableError = fromZodError(validationError);
+          return res.status(400).json({ error: readableError.message });
+        }
+        throw validationError;
+      }
+      
+      // Save the playground
+      const newPlayground = await storage.createPlace(playgroundData);
+      
+      res.status(201).json(newPlayground);
+    } catch (error) {
+      console.error("Error creating playground:", error);
+      res.status(500).json({ error: "Failed to create playground" });
     }
   });
   
