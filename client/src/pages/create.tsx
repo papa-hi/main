@@ -116,7 +116,9 @@ export default function CreatePage() {
         description: "Je nieuwe speelafspraak is succesvol aangemaakt."
       });
       
-      navigate("/playdates");
+      // Always redirect to the playdates list
+      console.log("Redirecting to playdates list");
+      navigate("/playdates", { replace: true });
     } catch (error) {
       console.error("Error creating playdate:", error);
       

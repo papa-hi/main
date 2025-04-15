@@ -53,6 +53,10 @@ export default function SimpleTestPage() {
           title: "Playdate Created Successfully!",
           description: "Your test playdate has been created."
         });
+        
+        // Redirect to playdates list page
+        console.log("Redirecting to playdates list");
+        navigate("/playdates", { replace: true });
       } catch (parseError) {
         console.error("Error parsing JSON response:", parseError);
       }
