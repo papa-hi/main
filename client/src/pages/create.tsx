@@ -83,34 +83,20 @@ export default function CreatePage() {
     setIsSubmitting(true);
     
     try {
-      // Format dates from form data
-      const [startHours, startMinutes] = data.startTimeString.split(':').map(Number);
-      const [endHours, endMinutes] = data.endTimeString.split(':').map(Number);
-      
-      // Create Date objects with the proper date and time
-      const startDate = new Date(data.date); 
-      startDate.setHours(startHours, startMinutes);
-      
-      const endDate = new Date(data.date);
-      endDate.setHours(endHours, endMinutes);
-      
-      // Create the playdate object to send to the API
+      // Create a simplified object with just the essential fields
       const playdate = {
         title: data.title || "Nieuwe speelafspraak",
         description: data.description || "",
         location: data.location || "Te bepalen",
-        startTime: startDate.toISOString(), // Convert to ISO string for sending
-        endTime: endDate.toISOString(),     // Convert to ISO string for sending
         maxParticipants: data.maxParticipants || 5
       };
       
-      console.log("Sending playdate data:", playdate);
+      console.log("Sending simplified playdate data to test endpoint:", playdate);
       
-      // Send the request to create a playdate
-      const response = await fetch('/api/playdates', {
+      // Send the request to our simplified test endpoint
+      const response = await fetch('/api/playdates/test-create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(playdate),
       });
       

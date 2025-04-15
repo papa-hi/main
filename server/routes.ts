@@ -398,6 +398,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch upcoming playdates" });
     }
   });
+  
+  // Simple test endpoint for playdate creation
+  app.post("/api/playdates/test-create", async (req, res) => {
+    try {
+      console.log("TEST ENDPOINT: Creating playdate with data:", req.body);
+      
+      // Basic data validation
+      if (!req.body.title) {
+        return res.status(400).json({ error: "Title is required" });
+      }
+      
+      // Create a playdate with hardcoded data for testing (user ID 3)
+      const newPlaydate = await storage.createPlaydate({
+        title: req.body.title,
+        description: req.body.description || "Test description",
+        location: req.body.location || "Test location",
+        startTime: new Date(),
+        endTime: new Date(Date.now() + 3600000),
+        creatorId: 3, // Hardcoded user ID for testing
+        maxParticipants: req.body.maxParticipants || 5
+      });
+      
+      console.log("Successfully created test playdate:", newPlaydate);
+      return res.status(201).json(newPlaydate);
+    } catch (err) {
+      console.error("Error creating test playdate:", err);
+      return res.status(500).json({ error: "Failed to create test playdate", details: err instanceof Error ? err.message : String(err) });
+    }
+  });
 
   app.get("/api/playdates/past", async (req, res) => {
     try {
