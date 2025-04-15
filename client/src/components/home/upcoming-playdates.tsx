@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PlaydateCard } from "../shared/playdate-card";
 import { Playdate } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AnimatedLoader } from "@/components/ui/animated-loader";
 import { useTranslation } from "react-i18next";
 
 export function UpcomingPlaydates() {
