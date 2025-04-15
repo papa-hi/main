@@ -6,7 +6,16 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Users } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon, MapPin, Users, Clock } from "lucide-react";
 
 export default function CreatePage() {
   const [location, navigate] = useLocation();
@@ -19,6 +28,8 @@ export default function CreatePage() {
   const [description, setDescription] = useState("");
   const [locationText, setLocationText] = useState("");
   const [participants, setParticipants] = useState(5);
+  const [date, setDate] = useState<Date>(new Date());
+  const [startTime, setStartTime] = useState("10:00");
   
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -37,11 +48,22 @@ export default function CreatePage() {
     setIsSubmitting(true);
     
     try {
-      // Create a simplified object with just the essential fields
+      // Create date with selected date and time
+      const selectedDate = new Date(date);
+      const [hours, minutes] = startTime.split(':').map(Number);
+      selectedDate.setHours(hours || 0, minutes || 0, 0, 0);
+      
+      // Calculate end time (1 hour after start time)
+      const endDate = new Date(selectedDate);
+      endDate.setHours(endDate.getHours() + 1);
+      
+      // Create a playdate object with all fields
       const playdate = {
         title: title || "Nieuwe speelafspraak",
         description: description || "",
         location: locationText || "Te bepalen",
+        startTime: selectedDate.toISOString(),
+        endTime: endDate.toISOString(),
         maxParticipants: participants || 5
       };
       
@@ -120,6 +142,49 @@ export default function CreatePage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+          </div>
+          
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium mb-1">Datum</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="date"
+                  variant="outline"
+                  className={cn(
+                    "w-full pl-3 text-left font-normal justify-start",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP", { locale: nl }) : "Kies een datum"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(newDate) => newDate && setDate(newDate)}
+                  disabled={(date) => date < new Date()}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          
+          <div>
+            <label htmlFor="startTime" className="block text-sm font-medium mb-1">Starttijd</label>
+            <div className="relative">
+              <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input 
+                id="startTime"
+                type="time" 
+                className="pl-10" 
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                required
+              />
+            </div>
           </div>
           
           <div>

@@ -409,13 +409,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Title is required" });
       }
       
-      // Create a playdate with hardcoded data for testing (user ID 3)
+      // Process dates from the request
+      let startTime = new Date();
+      let endTime = new Date(Date.now() + 3600000);
+      
+      // If startTime and endTime are provided in the request, use them
+      if (req.body.startTime) {
+        startTime = new Date(req.body.startTime);
+      }
+      
+      if (req.body.endTime) {
+        endTime = new Date(req.body.endTime);
+      }
+      
+      // Create a playdate with user-provided data (user ID 3 for testing)
       const newPlaydate = await storage.createPlaydate({
         title: req.body.title,
         description: req.body.description || "Test description",
         location: req.body.location || "Test location",
-        startTime: new Date(),
-        endTime: new Date(Date.now() + 3600000),
+        startTime: startTime,
+        endTime: endTime,
         creatorId: 3, // Hardcoded user ID for testing
         maxParticipants: req.body.maxParticipants || 5
       });
