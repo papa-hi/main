@@ -57,14 +57,46 @@ export function Header({ user }: HeaderProps) {
           <h1 className="text-xl font-heading font-bold ml-2">Papa-Hi</h1>
         </div>
         
-        {/* Mobile Navigation Toggle */}
-        <button 
-          className="md:hidden text-white focus:outline-none" 
-          onClick={toggleMenu}
-          aria-label="Menu"
-        >
-          <i className="fas fa-bars text-xl"></i>
-        </button>
+        <div className="flex items-center space-x-3">
+          {/* Mobile User Profile Section */}
+          <div className="md:hidden flex items-center">
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-3">
+                <Link href="/profile">
+                  <a className="text-white hover:text-accent">
+                    <img 
+                      src={user.profileImage} 
+                      alt="Profile" 
+                      className="w-8 h-8 rounded-full object-cover border-2 border-white/20"
+                    />
+                  </a>
+                </Link>
+                <button 
+                  onClick={handleLogout}
+                  className="text-white/80 hover:text-white"
+                  aria-label="Logout"
+                >
+                  <i className="fas fa-sign-out-alt text-lg"></i>
+                </button>
+              </div>
+            ) : (
+              <Link href="/auth">
+                <a className="bg-white/10 text-white hover:bg-white/20 px-2 py-1 rounded text-sm">
+                  {t('auth.login', 'Login')}
+                </a>
+              </Link>
+            )}
+          </div>
+          
+          {/* Mobile Navigation Toggle */}
+          <button 
+            className="md:hidden text-white focus:outline-none" 
+            onClick={toggleMenu}
+            aria-label="Menu"
+          >
+            <i className="fas fa-bars text-xl"></i>
+          </button>
+        </div>
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6 text-sm">

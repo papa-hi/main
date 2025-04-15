@@ -1,20 +1,9 @@
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@/hooks/use-auth";
 
 export function MobileFooter() {
   const [location] = useLocation();
   const { t } = useTranslation();
-  const { user, logoutMutation } = useAuth();
-  const isAuthenticated = !!user;
-
-  const handleLogout = async () => {
-    try {
-      await logoutMutation.mutateAsync();
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
 
   return (
     <footer className="md:hidden fixed bottom-0 w-full bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.05)] z-40">
@@ -69,32 +58,6 @@ export function MobileFooter() {
             <span className="text-xs mt-1">{t('navigation.chat', 'Messages')}</span>
           </a>
         </Link>
-        
-        {isAuthenticated ? (
-          <>
-            <Link href="/profile">
-              <a className={`flex flex-col items-center py-3 px-2 ${location === '/profile' ? 'text-primary' : 'text-dark/60'}`}>
-                <i className="fas fa-user text-lg"></i>
-                <span className="text-xs mt-1">{t('navigation.profile', 'Profile')}</span>
-              </a>
-            </Link>
-            
-            <button 
-              onClick={handleLogout}
-              className="flex flex-col items-center py-3 px-2 text-red-500"
-            >
-              <i className="fas fa-sign-out-alt text-lg"></i>
-              <span className="text-xs mt-1">{t('auth.logoutButton', 'Logout')}</span>
-            </button>
-          </>
-        ) : (
-          <Link href="/auth">
-            <a className={`flex flex-col items-center py-3 px-2 ${location === '/auth' ? 'text-primary' : 'text-dark/60'}`}>
-              <i className="fas fa-sign-in-alt text-lg"></i>
-              <span className="text-xs mt-1">{t('auth.loginButton', 'Login')}</span>
-            </a>
-          </Link>
-        )}
       </nav>
     </footer>
   );
