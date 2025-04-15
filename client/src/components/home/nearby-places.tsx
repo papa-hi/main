@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Place } from "@shared/schema";
 import { PlaceCard } from "../shared/place-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AnimatedLoader } from "@/components/ui/animated-loader";
 import { useLocation as useGeoLocation } from "@/hooks/use-location";
 import { useTranslation } from "react-i18next";
 
@@ -38,14 +37,26 @@ export function NearbyPlaces() {
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-heading font-bold">{t('home.nearbyPlaces', 'Nearby Places')}</h2>
+          <div className="flex space-x-2 text-sm">
+            <Skeleton className="w-16 h-8 rounded-lg" />
+            <Skeleton className="w-24 h-8 rounded-lg" />
+            <Skeleton className="w-24 h-8 rounded-lg" />
+          </div>
         </div>
         
-        <div className="bg-white rounded-xl p-6 shadow-sm flex justify-center">
-          <AnimatedLoader 
-            character="kite" 
-            size="sm" 
-            text={t('common.searchingNearby', 'Discovering nearby places...')} 
-          />
+        <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+          <div className="flex space-x-4 pb-4 w-max">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64">
+                <Skeleton className="w-full h-40 rounded-t-xl" />
+                <div className="p-4">
+                  <Skeleton className="h-5 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-2/3 mb-2" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );

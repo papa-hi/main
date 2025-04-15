@@ -16,7 +16,6 @@ import ChatPage from "./pages/chat";
 import AuthPage from "./pages/auth-page";
 import TestCreatePlaydate from "./pages/test-create-playdate";
 import SimpleTestPage from "./pages/simple-test";
-import LoadingDemo from "./pages/loading-demo";
 import { useState, useEffect } from "react";
 import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
 import ErrorBoundary from "./components/shared/error-boundary";
@@ -40,7 +39,6 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <Route path="/test-create" component={TestCreatePlaydate} />
       <Route path="/simple-test" component={SimpleTestPage} />
-      <Route path="/loading-demo" component={LoadingDemo} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
