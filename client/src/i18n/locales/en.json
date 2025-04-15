@@ -73,10 +73,12 @@
     "playdates": "Playdates",
     "restaurants": "Restaurants",
     "playgrounds": "Playgrounds",
+    "playgroundMap": "Playground Map",
     "community": "Community",
     "new": "New",
     "places": "Places",
-    "profile": "Profile"
+    "profile": "Profile",
+    "chat": "Messages"
   },
   "navigation": {
     "home": "Home",
@@ -192,6 +194,21 @@
       "message": "An error occurred. Please try again later.",
       "retry": "Retry"
     }
+  },
+  "playgroundMap": {
+    "title": "Playground Map",
+    "description": "Discover playgrounds and their popularity in your area",
+    "aboutHeatmap": "About the Heatmap",
+    "heatmapExplanation": "The playground heatmap shows areas with high concentrations of playgrounds. Red areas indicate more playgrounds close together, while blue areas have fewer playgrounds.",
+    "heatmapUsage": "Use this map to find areas with many playgrounds, which are ideal for planning playdates with multiple options nearby.",
+    "lowDensity": "Lower density",
+    "mediumDensity": "Medium density",
+    "highDensity": "Higher density",
+    "tips": "Tips for Finding Great Playgrounds",
+    "tip1": "Look for playgrounds in red areas for more options in close proximity",
+    "tip2": "Click on a playground marker to see details and get directions",
+    "tip3": "Use your current location to find playgrounds near you",
+    "tip4": "Arrange playdates at playgrounds with multiple options nearby in case one is too crowded"
   },
   "pwa": {
     "privacy": {

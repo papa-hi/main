@@ -32,7 +32,7 @@ export function MobileFooter() {
         </Link>
         
         <Link href="/places">
-          <a className={`flex flex-col items-center py-3 px-2 ${location.includes('/places') ? 'text-primary' : 'text-dark/60'}`}>
+          <a className={`flex flex-col items-center py-3 px-2 ${(location.includes('/places') || location === '/playground-map') ? 'text-primary' : 'text-dark/60'}`}>
             <i className="fas fa-map-marker-alt text-lg"></i>
             <span className="text-xs mt-1">{t('navigation.places', 'Places')}</span>
           </a>
