@@ -490,8 +490,8 @@ export default function ProfilePage() {
                                       description: "De speelafspraak is succesvol verwijderd.",
                                     });
                                     
-                                    // Refresh the data
-                                    window.location.reload();
+                                    // Refresh the data by invalidating the query
+                                    queryClient.invalidateQueries({ queryKey: ['/api/users/me/playdates'] });
                                   } else {
                                     throw new Error('Fout bij verwijderen');
                                   }
@@ -519,7 +519,7 @@ export default function ProfilePage() {
                 <p className="text-dark/70 text-sm mb-4">Je hebt nog geen speelafspraken gemaakt.</p>
                 <Button 
                   className="bg-primary text-white hover:bg-accent transition"
-                  onClick={() => window.location.href = "/create"}
+                  onClick={() => navigate("/create")}
                 >
                   Nieuwe Afspraak
                 </Button>
@@ -544,7 +544,10 @@ export default function ProfilePage() {
               <div className="bg-white rounded-xl p-6 shadow-sm text-center">
                 <h3 className="font-heading font-medium text-lg mb-2">Geen favoriete plekken</h3>
                 <p className="text-dark/70 text-sm mb-4">Je hebt nog geen plekken als favoriet gemarkeerd.</p>
-                <Button className="bg-primary text-white hover:bg-accent transition">
+                <Button 
+                  className="bg-primary text-white hover:bg-accent transition"
+                  onClick={() => navigate("/places")}
+                >
                   Plekken Ontdekken
                 </Button>
               </div>
