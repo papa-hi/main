@@ -281,11 +281,12 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
         )}
       </div>
       
-      <div className="rounded-xl overflow-hidden shadow-md h-[500px] relative">
+      <div className="rounded-xl overflow-hidden shadow-md h-[500px] relative" style={{ zIndex: 10 }}>
         <MapContainer 
           center={mapCenter} 
           zoom={13} 
           style={{ height: '100%', width: '100%' }}
+          zoomControl={true}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -360,17 +361,29 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
         </MapContainer>
       </div>
       
-      {/* Add Playground Dialog */}
-      <Dialog 
-        open={showAddDialog}
-        onOpenChange={(open) => {
-          if (!open) {
-            setShowAddDialog(false);
-            setSelectedLocation(null);
-          }
-        }}
-      >
-        <DialogContent className="sm:max-w-[500px]">
+      {/* Add Playground Dialog - Using Portal to ensure it appears above the map */}
+      {showAddDialog && createPortal(
+        <Dialog 
+          open={showAddDialog}
+          onOpenChange={(open) => {
+            if (!open) {
+              setShowAddDialog(false);
+              setSelectedLocation(null);
+              form.reset();
+            }
+          }}
+          modal={true}
+        >
+          <DialogContent 
+          className="sm:max-w-[500px] fixed z-50"
+          style={{ 
+            position: 'fixed',
+            zIndex: 9999,
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)'
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{t('playgroundMap.addNewPlayground', 'Add New Playground')}</DialogTitle>
           </DialogHeader>
@@ -476,6 +489,7 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                   onClick={() => {
                     setShowAddDialog(false);
                     setSelectedLocation(null);
+                    form.reset();
                   }}
                 >
                   {t('common.cancel', 'Cancel')}
@@ -497,7 +511,7 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
             </form>
           </Form>
         </DialogContent>
-      </Dialog>
+      </Dialog>, document.body)}
     </div>
   );
 }
