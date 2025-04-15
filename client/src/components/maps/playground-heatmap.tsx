@@ -146,6 +146,7 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
       latitude: 0,
       longitude: 0,
     },
+    mode: 'onChange',
   });
   
   // Mutation for adding a new playground
@@ -281,7 +282,12 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
         )}
       </div>
       
-      <div className="rounded-xl overflow-hidden shadow-md h-[500px] relative" style={{ zIndex: 10 }}>
+      <div 
+        className="rounded-xl overflow-hidden shadow-md h-[500px] relative" 
+        style={{ 
+          zIndex: 10,
+          pointerEvents: showAddDialog ? 'none' : 'auto' 
+        }}>
         <MapContainer 
           center={mapCenter} 
           zoom={13} 
@@ -440,11 +446,13 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                       <FormLabel>{t('common.latitude', 'Latitude')}</FormLabel>
                       <FormControl>
                         <Input
-                          type="number"
-                          step="any" 
+                          type="text" 
                           disabled
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                          value={field.value.toString()}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            field.onChange(isNaN(value) ? 0 : value);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -460,11 +468,13 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                       <FormLabel>{t('common.longitude', 'Longitude')}</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
-                          step="any"
+                          type="text"
                           disabled
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                          value={field.value.toString()}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            field.onChange(isNaN(value) ? 0 : value);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
