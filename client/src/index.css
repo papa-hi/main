@@ -62,3 +62,23 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Custom styles to fix dialog z-index issues with maps */
+.dialog-above-map {
+  z-index: 9999 !important;
+}
+
+.map-dialog-content {
+  z-index: 9999 !important;
+  position: relative;
+}
+
+/* Override shadcn Dialog component stacking context */
+[data-radix-portal] {
+  z-index: 9999 !important;
+}
+
+/* Override shadcn Dialog for map use */
+[role="dialog"][aria-modal="true"] {
+  z-index: 9999 !important;
+}

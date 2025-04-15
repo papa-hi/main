@@ -361,28 +361,19 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
         </MapContainer>
       </div>
       
-      {/* Add Playground Dialog - Using Portal to ensure it appears above the map */}
-      {showAddDialog && createPortal(
-        <Dialog 
-          open={showAddDialog}
-          onOpenChange={(open) => {
-            if (!open) {
-              setShowAddDialog(false);
-              setSelectedLocation(null);
-              form.reset();
-            }
-          }}
-          modal={true}
-        >
-          <DialogContent 
-          className="sm:max-w-[500px] fixed z-50"
-          style={{ 
-            position: 'fixed',
-            zIndex: 9999,
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)'
-          }}
+      {/* Add Playground Dialog */}
+      <Dialog 
+        open={showAddDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowAddDialog(false);
+            setSelectedLocation(null);
+            form.reset();
+          }
+        }}
+      >
+        <DialogContent 
+          className="sm:max-w-[500px] map-dialog-content"
         >
           <DialogHeader>
             <DialogTitle>{t('playgroundMap.addNewPlayground', 'Add New Playground')}</DialogTitle>
@@ -511,7 +502,7 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
             </form>
           </Form>
         </DialogContent>
-      </Dialog>, document.body)}
+      </Dialog>
     </div>
   );
 }
