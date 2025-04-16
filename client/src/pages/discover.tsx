@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation } from "@/hooks/use-location";
 import { MapPin, Search, Users } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface User {
   id: number;
@@ -21,6 +22,7 @@ interface User {
 }
 
 export default function DiscoverPage() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const { city } = useLocation();
   
