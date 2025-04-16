@@ -132,20 +132,40 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                   });
                 }
                 
-                return {
+                const updatedMessages = {
                   ...prevMessages,
                   [message.chatId]: chatMessages,
                 };
+                
+                // Store updated messages to localStorage with timestamp
+                localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
+                  messages: updatedMessages,
+                  timestamp: Date.now()
+                }));
+                
+                return updatedMessages;
               });
             } else if (data.type === "initial_messages") {
               const { chatId, messages: initialMessages } = data;
               
-              setMessages((prevMessages) => ({
-                ...prevMessages,
-                [chatId]: initialMessages.sort((a: Message, b: Message) => {
+              setMessages((prevMessages) => {
+                const sortedMessages = initialMessages.sort((a: Message, b: Message) => {
                   return new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime();
-                }),
-              }));
+                });
+                
+                const updatedMessages = {
+                  ...prevMessages,
+                  [chatId]: sortedMessages,
+                };
+                
+                // Store updated messages to localStorage with timestamp
+                localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
+                  messages: updatedMessages,
+                  timestamp: Date.now()
+                }));
+                
+                return updatedMessages;
+              });
             }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);
@@ -223,6 +243,38 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [socket, connected, messages]);
+  
+  // Check for expired messages on component mount and periodically
+  useEffect(() => {
+    const checkExpiredMessages = () => {
+      try {
+        const storedData = localStorage.getItem('papa-hi-chat-messages');
+        if (storedData) {
+          const { timestamp } = JSON.parse(storedData);
+          const now = Date.now();
+          
+          // If the stored timestamp is older than the expiration time, clear messages
+          if (now - timestamp >= MESSAGE_EXPIRATION_TIME) {
+            console.log('Chat messages have expired, clearing cache');
+            localStorage.removeItem('papa-hi-chat-messages');
+            setMessages({});
+          }
+        }
+      } catch (err) {
+        console.error('Error checking message expiration:', err);
+      }
+    };
+    
+    // Check on component mount
+    checkExpiredMessages();
+    
+    // Set interval to check daily
+    const dailyCheck = setInterval(checkExpiredMessages, 24 * 60 * 60 * 1000);
+    
+    return () => {
+      clearInterval(dailyCheck);
+    };
+  }, []);
 
   return (
     <ChatContext.Provider

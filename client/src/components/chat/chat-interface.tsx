@@ -121,6 +121,11 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
         )}
       </div>
       
+      {/* Chat Expiration Notice */}
+      <div className="bg-muted/50 px-4 py-2 text-xs text-muted-foreground text-center border-b">
+        {t('chat.expirationNotice', 'Chat history is only kept for 1 week to ensure privacy')}
+      </div>
+      
       {/* Messages Area */}
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4" ref={scrollAreaRef}>
