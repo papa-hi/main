@@ -1,6 +1,9 @@
 import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { useAuth } from "@/hooks/use-auth";
 
+// Message expiration time: 1 week in milliseconds
+const MESSAGE_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000;
+
 type Message = {
   id: number;
   chatId: number;
@@ -29,7 +32,27 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
-  const [messages, setMessages] = useState<Record<number, Message[]>>({});
+  const [messages, setMessages] = useState<Record<number, Message[]>>(() => {
+    try {
+      // Load messages from localStorage with expiration check
+      const storedData = localStorage.getItem('papa-hi-chat-messages');
+      if (storedData) {
+        const { messages, timestamp } = JSON.parse(storedData);
+        const now = Date.now();
+
+        // Check if data is expired (older than 1 week)
+        if (now - timestamp < MESSAGE_EXPIRATION_TIME) {
+          return messages;
+        } else {
+          console.log('Chat messages have expired, clearing cache');
+          localStorage.removeItem('papa-hi-chat-messages');
+        }
+      }
+    } catch (err) {
+      console.error('Error loading cached messages:', err);
+    }
+    return {};
+  });
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Setup WebSocket connection
