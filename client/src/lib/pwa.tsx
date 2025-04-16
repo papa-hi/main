@@ -5,16 +5,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "react-i18next";
 
-// SVG logo for Papa-Hi
+// Logo for Papa-Hi
 const PapaHiLogo = () => (
-  <svg width="48" height="48" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="32" height="32" rx="6" fill="#4F6F52" />
-    <path d="M8 10H12V22H8V10Z" fill="white" />
-    <path d="M14 10H18C20.2091 10 22 11.7909 22 14C22 16.2091 20.2091 18 18 18H14V10Z" fill="white" />
-    <path d="M14 14H18V18H14V14Z" fill="#4F6F52" />
-    <path d="M8 16H12V20H8V16Z" fill="#4F6F52" />
-    <path d="M20 18H24V22H20V18Z" fill="white" />
-  </svg>
+  <img 
+    src="/images/papa-hi.png" 
+    alt="Papa-Hi Logo" 
+    width="48" 
+    height="48" 
+    className="rounded-full" 
+  />
 );
 
 interface PrivacyConsentDialogProps {
