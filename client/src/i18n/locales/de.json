@@ -168,6 +168,19 @@
     "favoriteLocations": "Lieblingsorte:",
     "contact": "Kontakt"
   },
+  "chat": {
+    "online": "Online",
+    "offline": "Offline",
+    "typeMessage": "Nachricht eingeben...",
+    "startConversation": "Starte eine Unterhaltung mit",
+    "connectionLost": "Verbindung verloren. Wiederverbinden...",
+    "expirationNotice": "Der Chatverlauf wird aus Datenschutzgründen nur 1 Woche gespeichert",
+    "noMessages": "Keine Nachrichten",
+    "loadMore": "Mehr laden",
+    "messageDeleted": "Diese Nachricht wurde gelöscht",
+    "yesterday": "Gestern",
+    "today": "Heute"
+  },
   "errors": {
     "notFound": {
       "title": "404 Seite nicht gefunden",

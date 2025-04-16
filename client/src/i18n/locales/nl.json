@@ -170,6 +170,19 @@
     "favoriteLocations": "Favoriete plekken:",
     "contact": "Contact Opnemen"
   },
+  "chat": {
+    "online": "Online",
+    "offline": "Offline",
+    "typeMessage": "Typ een bericht...",
+    "startConversation": "Start een gesprek met",
+    "connectionLost": "Verbinding verbroken. Opnieuw verbinden...",
+    "expirationNotice": "Chatgeschiedenis wordt slechts 1 week bewaard voor privacy",
+    "noMessages": "Geen berichten",
+    "loadMore": "Meer laden",
+    "messageDeleted": "Dit bericht is verwijderd",
+    "yesterday": "Gisteren",
+    "today": "Vandaag"
+  },
   "errors": {
     "notFound": {
       "title": "404 Pagina Niet Gevonden",

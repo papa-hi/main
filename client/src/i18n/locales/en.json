@@ -186,6 +186,19 @@
     "favoriteLocations": "Favorite locations:",
     "contact": "Contact"
   },
+  "chat": {
+    "online": "Online",
+    "offline": "Offline",
+    "typeMessage": "Type a message...",
+    "startConversation": "Start a conversation with",
+    "connectionLost": "Connection lost. Reconnecting...",
+    "expirationNotice": "Chat history is only kept for 1 week to ensure privacy",
+    "noMessages": "No messages",
+    "loadMore": "Load more",
+    "messageDeleted": "This message was deleted",
+    "yesterday": "Yesterday",
+    "today": "Today"
+  },
   "errors": {
     "notFound": {
       "title": "404 Page Not Found",

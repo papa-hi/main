@@ -168,6 +168,19 @@
     "favoriteLocations": "Lugares favoritos:",
     "contact": "Contacto"
   },
+  "chat": {
+    "online": "En línea",
+    "offline": "Desconectado",
+    "typeMessage": "Escribe un mensaje...",
+    "startConversation": "Inicia una conversación con",
+    "connectionLost": "Conexión perdida. Reconectando...",
+    "expirationNotice": "El historial de chat solo se guarda durante 1 semana para garantizar la privacidad",
+    "noMessages": "Sin mensajes",
+    "loadMore": "Cargar más",
+    "messageDeleted": "Este mensaje fue eliminado",
+    "yesterday": "Ayer",
+    "today": "Hoy"
+  },
   "errors": {
     "notFound": {
       "title": "404 Página no encontrada",

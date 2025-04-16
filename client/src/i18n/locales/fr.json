@@ -168,6 +168,19 @@
     "favoriteLocations": "Lieux favoris :",
     "contact": "Contact"
   },
+  "chat": {
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "typeMessage": "Écrivez un message...",
+    "startConversation": "Commencez une conversation avec",
+    "connectionLost": "Connexion perdue. Reconnexion...",
+    "expirationNotice": "L'historique des discussions n'est conservé que pendant 1 semaine pour la confidentialité",
+    "noMessages": "Aucun message",
+    "loadMore": "Charger plus",
+    "messageDeleted": "Ce message a été supprimé",
+    "yesterday": "Hier",
+    "today": "Aujourd'hui"
+  },
   "errors": {
     "notFound": {
       "title": "404 Page non trouvée",
