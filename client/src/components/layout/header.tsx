@@ -187,12 +187,7 @@ export function Header({ user }: HeaderProps) {
           </Link>
           <Link href="/places">
             <a className={`font-medium hover:text-accent transition ${location.includes('/places') ? 'text-accent' : ''}`}>
-              {t('nav.restaurants', 'Restaurants')}
-            </a>
-          </Link>
-          <Link href="/places?type=playground">
-            <a className={`font-medium hover:text-accent transition ${location.includes('/places') && location.includes('type=playground') ? 'text-accent' : ''}`}>
-              {t('nav.playgrounds', 'Speeltuinen')}
+              {t('nav.places', 'Places')}
             </a>
           </Link>
           <Link href="/playground-map">
@@ -265,10 +260,7 @@ export function Header({ user }: HeaderProps) {
               <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.playdates', 'Speelafspraken')}</a>
             </Link>
             <Link href="/places">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.restaurants', 'Restaurants')}</a>
-            </Link>
-            <Link href="/places?type=playground">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.playgrounds', 'Speeltuinen')}</a>
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.places', 'Places')}</a>
             </Link>
             <Link href="/playground-map">
               <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.playgroundMap', 'Speeltuin Kaart')}</a>
