@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation as useGeoLocation } from "@/hooks/use-location";
+import { useTranslation } from "react-i18next";
 
 export default function PlacesPage() {
+  const { t } = useTranslation();
   const [location, setLocation] = useLocation();
-  const { location: geoLocation } = useGeoLocation();
+  const { latitude, longitude } = useGeoLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   
@@ -39,7 +41,7 @@ export default function PlacesPage() {
   }, [activeTab, setLocation]);
 
   const { data: places, isLoading } = useQuery<Place[]>({
-    queryKey: ['/api/places', geoLocation?.latitude, geoLocation?.longitude, activeTab],
+    queryKey: ['/api/places', latitude, longitude, activeTab],
   });
   
   const filteredPlaces = places?.filter(place => {
@@ -53,7 +55,7 @@ export default function PlacesPage() {
       return (
         place.name.toLowerCase().includes(searchLower) ||
         place.address.toLowerCase().includes(searchLower) ||
-        place.features.some(f => f.toLowerCase().includes(searchLower))
+        (place.features && place.features.some(f => f.toLowerCase().includes(searchLower)))
       );
     }
     
@@ -86,18 +88,18 @@ export default function PlacesPage() {
     if (!filteredPlaces || filteredPlaces.length === 0) {
       return (
         <div className="bg-white rounded-xl p-8 shadow-sm text-center">
-          <h3 className="font-heading font-medium text-lg mb-2">Geen locaties gevonden</h3>
+          <h3 className="font-heading font-medium text-lg mb-2">{t('places.noPlacesFound')}</h3>
           <p className="text-dark/70 text-sm mb-4">
             {searchTerm 
-              ? `Geen resultaten voor "${searchTerm}"` 
-              : "Er zijn geen locaties die aan je criteria voldoen."}
+              ? t('places.noResultsFor', { searchTerm }) 
+              : t('places.noPlacesMatchingCriteria')}
           </p>
           {searchTerm && (
             <Button 
               variant="outline" 
               onClick={() => setSearchTerm("")}
             >
-              Zoekopdracht wissen
+              {t('places.clearSearch')}
             </Button>
           )}
         </div>
@@ -116,15 +118,15 @@ export default function PlacesPage() {
   return (
     <div className="py-2">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-heading font-bold">Locaties voor Kids</h1>
+        <h1 className="text-2xl font-heading font-bold">{t('places.placesForKids', 'Places for Kids')}</h1>
         <Button
           variant="outline"
           onClick={() => setLocation('/playground-map')}
           className="flex items-center gap-2"
         >
           <i className="fas fa-map-marked-alt"></i>
-          <span className="hidden sm:inline">Speeltuin Kaart</span>
-          <span className="sm:hidden">Kaart</span>
+          <span className="hidden sm:inline">{t('nav.playgroundMap')}</span>
+          <span className="sm:hidden">{t('nav.map', 'Map')}</span>
         </Button>
       </div>
       
@@ -133,13 +135,13 @@ export default function PlacesPage() {
         <div className="flex gap-2">
           <Input
             type="text"
-            placeholder="Zoek op naam, locatie of faciliteiten..."
+            placeholder={t('places.searchPlaceholder', 'Search by name, location or features...')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-grow"
           />
           <Button type="submit" className="bg-primary hover:bg-accent text-white">
-            <i className="fas fa-search mr-2"></i> Zoeken
+            <i className="fas fa-search mr-2"></i> {t('common.search', 'Search')}
           </Button>
         </div>
       </form>
@@ -147,9 +149,9 @@ export default function PlacesPage() {
       {/* Tabs for filtering */}
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-6">
         <TabsList className="mb-6 w-full grid grid-cols-3">
-          <TabsTrigger value="all" className="text-sm">Alles</TabsTrigger>
-          <TabsTrigger value="restaurants" className="text-sm">Restaurants</TabsTrigger>
-          <TabsTrigger value="playgrounds" className="text-sm">Speeltuinen</TabsTrigger>
+          <TabsTrigger value="all" className="text-sm">{t('places.all')}</TabsTrigger>
+          <TabsTrigger value="restaurants" className="text-sm">{t('places.restaurant')}</TabsTrigger>
+          <TabsTrigger value="playgrounds" className="text-sm">{t('places.playground')}</TabsTrigger>
         </TabsList>
       </Tabs>
       

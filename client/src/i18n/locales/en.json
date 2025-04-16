@@ -126,7 +126,12 @@
     "placeAddedToFavorites": "{{name}} has been added to your favorites.",
     "removedFromFavorites": "Removed from favorites",
     "placeRemovedFromFavorites": "{{name}} has been removed from your favorites.",
-    "favoriteUpdateError": "An error occurred while updating your favorites."
+    "favoriteUpdateError": "An error occurred while updating your favorites.",
+    "placesForKids": "Places for Kids",
+    "searchPlaceholder": "Search by name, location or features...",
+    "noResultsFor": "No results for \"{{searchTerm}}\"",
+    "noPlacesMatchingCriteria": "There are no places matching your criteria.",
+    "clearSearch": "Clear search"
   },
   "playdates": {
     "create": "Create Playdate",
