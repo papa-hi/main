@@ -121,6 +121,7 @@ const playgroundFormSchema = z.object({
   address: z.string().optional(),
   latitude: z.number(),
   longitude: z.number(),
+  image: z.instanceof(File).optional(),
 });
 
 type PlaygroundFormValues = z.infer<typeof playgroundFormSchema>;
