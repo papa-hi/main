@@ -13,13 +13,15 @@ import {
 
 // Logo for Papa-Hi
 const PapaHiLogo = () => (
-  <img 
-    src="/images/papa-hi.png" 
-    alt="Papa-Hi Logo" 
-    width="48" 
-    height="48" 
-    className="rounded-full" 
-  />
+  <div className="flex items-center">
+    <img 
+      src="/images/papa-hi.png" 
+      alt="Papa-Hi Logo" 
+      width="64" 
+      height="64" 
+      className="rounded-full" 
+    />
+  </div>
 );
 
 interface HeaderProps {
@@ -49,11 +51,11 @@ export function Header({ user }: HeaderProps) {
   };
 
   return (
-    <header className="bg-primary text-white py-3 px-4 shadow-md sticky top-0 z-50">
+    <header className="bg-primary text-white py-4 px-4 shadow-md sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
           <PapaHiLogo />
-          <h1 className="text-xl font-heading font-bold ml-2">Papa-Hi</h1>
+          <h1 className="text-2xl font-heading font-bold ml-3">Papa-Hi</h1>
         </div>
         
         <div className="flex items-center space-x-3">
