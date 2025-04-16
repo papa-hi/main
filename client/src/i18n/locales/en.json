@@ -204,6 +204,17 @@
     "yesterday": "Yesterday",
     "today": "Today"
   },
+  "discover": {
+    "title": "Discover Other Dads",
+    "subtitle": "Find and connect with other dads in your area",
+    "searchPlaceholder": "Search by name or location...",
+    "errorLoading": "An error occurred while loading users.",
+    "tryAgain": "Try Again",
+    "noUsersFound": "No users found",
+    "tryOtherSearch": "Try different search terms or remove filters.",
+    "nearby": "Nearby",
+    "viewProfile": "View Profile"
+  },
   "errors": {
     "notFound": {
       "title": "404 Page Not Found",

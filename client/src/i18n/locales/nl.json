@@ -188,6 +188,17 @@
     "yesterday": "Gisteren",
     "today": "Vandaag"
   },
+  "discover": {
+    "title": "Ontdek Andere Vaders",
+    "subtitle": "Vind en connect met andere vaders in jouw buurt",
+    "searchPlaceholder": "Zoek op naam of locatie...",
+    "errorLoading": "Er is een fout opgetreden bij het laden van gebruikers.",
+    "tryAgain": "Probeer opnieuw",
+    "noUsersFound": "Geen gebruikers gevonden",
+    "tryOtherSearch": "Probeer andere zoektermen of verwijder de filters.",
+    "nearby": "Dichtbij",
+    "viewProfile": "Bekijk Profiel"
+  },
   "errors": {
     "notFound": {
       "title": "404 Pagina Niet Gevonden",

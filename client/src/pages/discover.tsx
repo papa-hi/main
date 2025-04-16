@@ -50,15 +50,15 @@ export default function DiscoverPage() {
   return (
     <div className="py-4">
       <div className="mb-6">
-        <h1 className="text-2xl font-heading font-bold">Ontdek Andere Vaders</h1>
-        <p className="text-muted-foreground">Vind en connect met andere vaders in jouw buurt</p>
+        <h1 className="text-2xl font-heading font-bold">{t('discover.title')}</h1>
+        <p className="text-muted-foreground">{t('discover.subtitle')}</p>
       </div>
       
       {/* Search Bar */}
       <div className="relative mb-6">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Zoek op naam of locatie..."
+          placeholder={t('discover.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
@@ -93,9 +93,9 @@ export default function DiscoverPage() {
       {/* Error State */}
       {error && (
         <div className="text-center py-8">
-          <p className="text-destructive mb-4">Er is een fout opgetreden bij het laden van gebruikers.</p>
+          <p className="text-destructive mb-4">{t('discover.errorLoading')}</p>
           <Button onClick={() => window.location.reload()}>
-            Probeer opnieuw
+            {t('discover.tryAgain')}
           </Button>
         </div>
       )}
@@ -104,9 +104,9 @@ export default function DiscoverPage() {
       {filteredUsers?.length === 0 && (
         <div className="text-center py-8 bg-muted/40 rounded-lg">
           <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-medium mb-2">Geen gebruikers gevonden</h3>
+          <h3 className="text-lg font-medium mb-2">{t('discover.noUsersFound')}</h3>
           <p className="text-muted-foreground">
-            Probeer andere zoektermen of verwijder de filters.
+            {t('discover.tryOtherSearch')}
           </p>
         </div>
       )}
@@ -142,7 +142,7 @@ export default function DiscoverPage() {
                         <MapPin className="h-3 w-3 mr-1" />
                         <span>{user.city}</span>
                         {city && user.city.includes(city) && (
-                          <Badge variant="secondary" className="ml-2 text-xs">Dichtbij</Badge>
+                          <Badge variant="secondary" className="ml-2 text-xs">{t('discover.nearby')}</Badge>
                         )}
                       </div>
                     )}
@@ -158,7 +158,7 @@ export default function DiscoverPage() {
               
               <CardFooter className="flex justify-end">
                 <Link href={`/users/${user.id}`}>
-                  <Button size="sm" variant="outline">Bekijk Profiel</Button>
+                  <Button size="sm" variant="outline">{t('discover.viewProfile')}</Button>
                 </Link>
               </CardFooter>
             </Card>
