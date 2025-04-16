@@ -70,7 +70,9 @@
     "community": "Comunidad",
     "new": "Nuevo",
     "places": "Lugares",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "map": "Mapa",
+    "playgroundMap": "Mapa de parques"
   },
   "navigation": {
     "home": "Inicio",
@@ -115,7 +117,12 @@
     "placeAddedToFavorites": "{{name}} ha sido añadido a tus favoritos.",
     "removedFromFavorites": "Eliminado de favoritos",
     "placeRemovedFromFavorites": "{{name}} ha sido eliminado de tus favoritos.",
-    "favoriteUpdateError": "Ocurrió un error al actualizar tus favoritos."
+    "favoriteUpdateError": "Ocurrió un error al actualizar tus favoritos.",
+    "placesForKids": "Lugares para niños",
+    "searchPlaceholder": "Buscar por nombre, ubicación o características...",
+    "noResultsFor": "No hay resultados para \"{{searchTerm}}\"",
+    "noPlacesMatchingCriteria": "No hay lugares que coincidan con tus criterios.",
+    "clearSearch": "Borrar búsqueda"
   },
   "playdates": {
     "create": "Crear cita de juego",
@@ -159,7 +166,8 @@
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "edit": "Editar",
-    "moreInfo": "Más información"
+    "moreInfo": "Más información",
+    "search": "Buscar"
   },
   "dads": {
     "moreDads": "Más padres",
