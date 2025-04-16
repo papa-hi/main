@@ -1191,6 +1191,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Add a playground with image upload
+  app.post("/api/playgrounds/with-image", isAuthenticated, upload.single('placeImage'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      // Validate required fields from form data
+      if (!req.body.name || !req.body.latitude || !req.body.longitude) {
+        return res.status(400).json({ error: "Name, latitude, and longitude are required" });
+      }
+      
+      let imageUrl = "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80";
+      
+      // If image was uploaded, generate URL
+      if (req.file) {
+        const filename = req.file.filename;
+        imageUrl = `/uploads/place-images/${filename}`;
+      }
+      
+      // Create a new place object
+      const playgroundData = {
+        name: req.body.name,
+        type: "playground",
+        description: req.body.description || "User-contributed playground",
+        address: req.body.address || "",
+        latitude: req.body.latitude.toString(),
+        longitude: req.body.longitude.toString(),
+        imageUrl: imageUrl,
+        features: req.body.features || [],
+      };
+      
+      try {
+        // Validate the playground data against the schema
+        insertPlaceSchema.parse(playgroundData);
+      } catch (validationError) {
+        if (validationError instanceof ZodError) {
+          const readableError = fromZodError(validationError);
+          return res.status(400).json({ error: readableError.message });
+        }
+        throw validationError;
+      }
+      
+      // Save the playground
+      const newPlayground = await storage.createPlace(playgroundData);
+      
+      res.status(201).json(newPlayground);
+    } catch (error) {
+      console.error("Error creating playground with image:", error);
+      res.status(500).json({ error: "Failed to create playground" });
+    }
+  });
+  
   // Simple test endpoint with no authentication
   app.get("/api/test", (req, res) => {
     res.json({ message: "Test endpoint works!" });

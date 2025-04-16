@@ -153,8 +153,40 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
   // Mutation for adding a new playground
   const addPlaygroundMutation = useMutation({
     mutationFn: async (data: PlaygroundFormValues) => {
-      const response = await apiRequest('POST', '/api/playgrounds', data);
-      return await response.json();
+      // If there's an image, use FormData to handle file upload
+      if (data.image) {
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description || '');
+        formData.append('address', data.address || '');
+        formData.append('latitude', data.latitude.toString());
+        formData.append('longitude', data.longitude.toString());
+        formData.append('placeImage', data.image);
+        
+        // Use fetch directly for FormData
+        const response = await fetch('/api/playgrounds/with-image', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to add playground');
+        }
+        
+        return await response.json();
+      } else {
+        // Use standard JSON request if no image
+        const response = await apiRequest('POST', '/api/playgrounds', {
+          name: data.name,
+          description: data.description,
+          address: data.address,
+          latitude: data.latitude,
+          longitude: data.longitude
+        });
+        return await response.json();
+      }
     },
     onSuccess: () => {
       toast({
@@ -331,8 +363,23 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                   <Popup>
                     <div className="p-1">
                       <h3 className="font-medium text-base">{place.name}</h3>
+                      
+                      {place.imageUrl && (
+                        <div className="my-2">
+                          <img
+                            src={place.imageUrl}
+                            alt={place.name}
+                            className="w-full h-32 object-cover rounded"
+                            onError={(e) => {
+                              // Fallback if image fails to load
+                              e.currentTarget.src = "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80";
+                            }}
+                          />
+                        </div>
+                      )}
+                      
                       <p className="text-sm text-muted-foreground">
-                        {place.description ? place.description.substring(0, 100) + '...' : t('common.noDescription', 'No description available.')}
+                        {place.description ? place.description.substring(0, 100) + (place.description.length > 100 ? '...' : '') : t('common.noDescription', 'No description available.')}
                       </p>
                       <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
                         <i className="fas fa-map-marker-alt text-primary"></i>
@@ -485,6 +532,85 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                     )}
                   />
                 </div>
+                
+                <FormField
+                  control={form.control}
+                  name="image"
+                  render={({ field }) => {
+                    const [previewImage, setPreviewImage] = useState<string | null>(null);
+                    return (
+                      <FormItem>
+                        <FormLabel>{t('playgroundMap.uploadImage', 'Upload Photo')}</FormLabel>
+                        <FormControl>
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    if (file.size > 5 * 1024 * 1024) {
+                                      toast({
+                                        title: t("errors.fileTooLarge", "File too large"),
+                                        description: t("errors.fileSizeLimit", "Maximum file size is 5MB"),
+                                        variant: "destructive"
+                                      });
+                                      return;
+                                    }
+                                    
+                                    if (!file.type.startsWith('image/')) {
+                                      toast({
+                                        title: t("errors.invalidFileType", "Invalid file type"),
+                                        description: t("errors.imageFilesOnly", "Only image files are allowed"),
+                                        variant: "destructive"
+                                      });
+                                      return;
+                                    }
+                                    
+                                    const reader = new FileReader();
+                                    reader.onload = () => {
+                                      setPreviewImage(reader.result as string);
+                                    };
+                                    reader.readAsDataURL(file);
+                                    field.onChange(file);
+                                  }
+                                }}
+                              />
+                              {field.value && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  type="button"
+                                  onClick={() => {
+                                    field.onChange(undefined);
+                                    setPreviewImage(null);
+                                  }}
+                                >
+                                  <i className="fas fa-times mr-1"></i>
+                                  {t("common.clear", "Clear")}
+                                </Button>
+                              )}
+                            </div>
+                            {previewImage && (
+                              <div className="mt-2">
+                                <img 
+                                  src={previewImage} 
+                                  alt={t("playgroundMap.previewImage", "Preview")} 
+                                  className="w-full max-h-40 object-cover rounded-md"
+                                />
+                              </div>
+                            )}
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {t('playgroundMap.uploadImageHelp', 'Upload a photo of the playground (Optional)')}
+                            </p>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
                 
                 <div className="pt-4 flex justify-end gap-2">
                   <Button
