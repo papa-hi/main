@@ -70,7 +70,9 @@
     "community": "Community",
     "new": "Neu",
     "places": "Orte",
-    "profile": "Profil"
+    "profile": "Profil",
+    "map": "Karte",
+    "playgroundMap": "Spielplatz Karte"
   },
   "navigation": {
     "home": "Startseite",
@@ -115,7 +117,12 @@
     "placeAddedToFavorites": "{{name}} wurde zu deinen Favoriten hinzugefügt.",
     "removedFromFavorites": "Aus Favoriten entfernt",
     "placeRemovedFromFavorites": "{{name}} wurde aus deinen Favoriten entfernt.",
-    "favoriteUpdateError": "Beim Aktualisieren deiner Favoriten ist ein Fehler aufgetreten."
+    "favoriteUpdateError": "Beim Aktualisieren deiner Favoriten ist ein Fehler aufgetreten.",
+    "placesForKids": "Orte für Kinder",
+    "searchPlaceholder": "Nach Name, Ort oder Eigenschaften suchen...",
+    "noResultsFor": "Keine Ergebnisse für \"{{searchTerm}}\"",
+    "noPlacesMatchingCriteria": "Es gibt keine Orte, die deinen Kriterien entsprechen.",
+    "clearSearch": "Suche löschen"
   },
   "playdates": {
     "create": "Spieltreffen erstellen",
@@ -159,7 +166,8 @@
     "cancel": "Abbrechen",
     "delete": "Löschen",
     "edit": "Bearbeiten",
-    "moreInfo": "Mehr Informationen"
+    "moreInfo": "Mehr Informationen",
+    "search": "Suchen"
   },
   "dads": {
     "moreDads": "Weitere Väter",

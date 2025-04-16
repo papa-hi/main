@@ -117,7 +117,12 @@
     "placeAddedToFavorites": "{{name}} is toegevoegd aan je favorieten.",
     "removedFromFavorites": "Verwijderd van favorieten",
     "placeRemovedFromFavorites": "{{name}} is verwijderd uit je favorieten.",
-    "favoriteUpdateError": "Er is iets misgegaan bij het bijwerken van je favorieten."
+    "favoriteUpdateError": "Er is iets misgegaan bij het bijwerken van je favorieten.",
+    "placesForKids": "Locaties voor Kids",
+    "searchPlaceholder": "Zoek op naam, locatie of faciliteiten...",
+    "noResultsFor": "Geen resultaten voor \"{{searchTerm}}\"",
+    "noPlacesMatchingCriteria": "Er zijn geen locaties die aan je criteria voldoen.",
+    "clearSearch": "Zoekopdracht wissen"
   },
   "playdates": {
     "create": "Speelafspraak Maken",
