@@ -10,8 +10,8 @@ const PapaHiLogo = () => (
   <img 
     src="/images/papa-hi.png" 
     alt="Papa-Hi Logo" 
-    width="48" 
-    height="48" 
+    width="64" 
+    height="64" 
     className="rounded-full" 
   />
 );
