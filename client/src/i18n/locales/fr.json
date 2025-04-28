@@ -48,7 +48,11 @@
     "errors": {
       "loginFailed": "Nom d'utilisateur ou mot de passe invalide",
       "registrationFailed": "L'inscription a échoué",
-      "logoutFailed": "La déconnexion a échoué"
+      "logoutFailed": "La déconnexion a échoué",
+      "fileTooLarge": "Fichier trop volumineux",
+      "fileSizeLimit": "La taille maximale du fichier est de 8MB",
+      "invalidFileType": "Type de fichier invalide",
+      "imageFilesOnly": "Seuls les fichiers image sont autorisés"
     },
     "toast": {
       "loginSuccess": "Connexion réussie",

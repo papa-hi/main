@@ -48,7 +48,11 @@
     "errors": {
       "loginFailed": "Ungültiger Benutzername oder Passwort",
       "registrationFailed": "Registrierung fehlgeschlagen",
-      "logoutFailed": "Abmeldung fehlgeschlagen"
+      "logoutFailed": "Abmeldung fehlgeschlagen",
+      "fileTooLarge": "Datei zu groß",
+      "fileSizeLimit": "Maximale Dateigröße beträgt 8MB",
+      "invalidFileType": "Ungültiger Dateityp",
+      "imageFilesOnly": "Nur Bilddateien sind erlaubt"
     },
     "toast": {
       "loginSuccess": "Anmeldung erfolgreich",

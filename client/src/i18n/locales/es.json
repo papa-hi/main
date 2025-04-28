@@ -48,7 +48,11 @@
     "errors": {
       "loginFailed": "Nombre de usuario o contraseña inválidos",
       "registrationFailed": "Registro fallido",
-      "logoutFailed": "Cierre de sesión fallido"
+      "logoutFailed": "Cierre de sesión fallido",
+      "fileTooLarge": "Archivo demasiado grande",
+      "fileSizeLimit": "El tamaño máximo del archivo es 8MB",
+      "invalidFileType": "Tipo de archivo inválido",
+      "imageFilesOnly": "Solo se permiten archivos de imagen"
     },
     "toast": {
       "loginSuccess": "Inicio de sesión exitoso",
