@@ -948,10 +948,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    // Ensure optional fields are properly handled
+    const userDataToInsert = {
+      ...insertUser,
+      phoneNumber: insertUser.phoneNumber || null,
+      profileImage: insertUser.profileImage || null,
+      bio: insertUser.bio || null,
+      city: insertUser.city || null,
+      badge: null,  // Default value for badge
+      favoriteLocations: []  // Default empty array for favoriteLocations
+    };
+
     const [user] = await db
       .insert(users)
-      .values(insertUser)
+      .values(userDataToInsert)
       .returning();
+    
     return user;
   }
   

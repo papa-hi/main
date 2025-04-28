@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { User, Playdate, Place } from "@shared/schema";
 import { useForm } from "react-hook-form";
@@ -146,7 +146,7 @@ export default function ProfilePage() {
   });
   
   // Update form values when user data is loaded
-  useState(() => {
+  useEffect(() => {
     if (user) {
       form.reset({
         firstName: user.firstName,
@@ -157,7 +157,7 @@ export default function ProfilePage() {
         city: user.city || "",
       });
     }
-  });
+  }, [user, form]);
   
   // Handle profile image selection
   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
