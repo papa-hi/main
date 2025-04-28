@@ -70,6 +70,8 @@ export default function AuthPage() {
       lastName: "",
       bio: "",
       profileImage: "",
+      phoneNumber: "",
+      city: "",
     },
     resolver: zodResolver(registerFormSchema),
   });
@@ -284,6 +286,44 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={registerForm.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t("auth:phoneNumber", "Phone Number")}</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder={t("auth:phoneNumberPlaceholder", "Your phone number (optional)")} 
+                                {...field} 
+                                value={field.value || ""}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={registerForm.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t("auth:city", "City")}</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder={t("auth:cityPlaceholder", "Your city (optional)")} 
+                                {...field} 
+                                value={field.value || ""}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                     
                     <FormField
                       control={registerForm.control}
