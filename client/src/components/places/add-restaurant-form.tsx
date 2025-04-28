@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
 
 // Form schema for restaurant creation
 const restaurantFormSchema = z.object({
@@ -103,7 +103,6 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
       queryClient.invalidateQueries({ queryKey: ['/api/places'] });
       queryClient.invalidateQueries({ queryKey: ['/api/places/nearby'] });
       form.reset();
-      setOpen(false);
       if (onSuccess) onSuccess();
     },
     onError: (error) => {
