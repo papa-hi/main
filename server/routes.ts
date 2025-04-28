@@ -1290,6 +1290,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Add generic place (restaurant or playground)
+  app.post("/api/places", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      // Validate required fields
+      if (!req.body.name || !req.body.latitude || !req.body.longitude || !req.body.type) {
+        return res.status(400).json({ error: "Name, latitude, longitude, and type are required" });
+      }
+      
+      // Validate type is either restaurant or playground
+      if (req.body.type !== 'restaurant' && req.body.type !== 'playground') {
+        return res.status(400).json({ error: "Type must be either 'restaurant' or 'playground'" });
+      }
+      
+      // Create a new place object
+      const placeData = {
+        name: req.body.name,
+        type: req.body.type,
+        description: req.body.description || "",
+        address: req.body.address || "",
+        latitude: req.body.latitude.toString(),
+        longitude: req.body.longitude.toString(),
+        imageUrl: req.body.imageUrl || (
+          req.body.type === 'restaurant' 
+            ? "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80"
+            : "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80"
+        ),
+        features: req.body.features || [],
+      };
+      
+      try {
+        // Validate the place data against the schema
+        insertPlaceSchema.parse(placeData);
+      } catch (validationError) {
+        if (validationError instanceof ZodError) {
+          const readableError = fromZodError(validationError);
+          return res.status(400).json({ error: readableError.message });
+        }
+        throw validationError;
+      }
+      
+      // Save the place
+      const newPlace = await storage.createPlace(placeData);
+      
+      res.status(201).json(newPlace);
+    } catch (error) {
+      console.error("Error creating place:", error);
+      res.status(500).json({ error: "Failed to create place" });
+    }
+  });
+  
   // Simple test endpoint with no authentication
   app.get("/api/test", (req, res) => {
     res.json({ message: "Test endpoint works!" });
