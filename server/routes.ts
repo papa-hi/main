@@ -1243,6 +1243,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         imageUrl = `/uploads/place-images/${filename}`;
       }
       
+      // Parse features if they were sent as a JSON string (from FormData)
+      let features = [];
+      if (req.body.features) {
+        try {
+          if (typeof req.body.features === 'string') {
+            features = JSON.parse(req.body.features);
+          } else if (Array.isArray(req.body.features)) {
+            features = req.body.features;
+          }
+        } catch (e) {
+          console.error("Error parsing features JSON:", e);
+        }
+      }
+      
       // Create a new place object
       const playgroundData = {
         name: req.body.name,
@@ -1252,7 +1266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         latitude: req.body.latitude.toString(),
         longitude: req.body.longitude.toString(),
         imageUrl: imageUrl,
-        features: req.body.features || [],
+        features: features,
       };
       
       try {

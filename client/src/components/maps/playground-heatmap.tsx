@@ -122,6 +122,7 @@ const playgroundFormSchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
   image: z.instanceof(File).optional(),
+  features: z.array(z.string()).default([]),
 });
 
 type PlaygroundFormValues = z.infer<typeof playgroundFormSchema>;
@@ -146,6 +147,7 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
       address: '',
       latitude: 0,
       longitude: 0,
+      features: [],
     },
     mode: 'onChange',
   });
@@ -162,6 +164,11 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
         formData.append('latitude', data.latitude.toString());
         formData.append('longitude', data.longitude.toString());
         formData.append('placeImage', data.image);
+        
+        // Add features as a JSON string
+        if (data.features && data.features.length > 0) {
+          formData.append('features', JSON.stringify(data.features));
+        }
         
         // Use fetch directly for FormData
         const response = await fetch('/api/playgrounds/with-image', {
@@ -183,7 +190,8 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
           description: data.description,
           address: data.address,
           latitude: data.latitude,
-          longitude: data.longitude
+          longitude: data.longitude,
+          features: data.features
         });
         return await response.json();
       }
@@ -532,6 +540,43 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                     )}
                   />
                 </div>
+                
+                <FormField
+                  control={form.control}
+                  name="features"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('common.features', 'Features')}</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-wrap gap-2">
+                          {['Restrooms', 'Picnic tables', 'Benches', 'Sandbox', 'Water games'].map((feature) => (
+                            <Button
+                              key={feature}
+                              type="button"
+                              variant={field.value.includes(feature) ? "default" : "outline"}
+                              size="sm"
+                              className={field.value.includes(feature) ? "bg-primary text-white" : ""}
+                              onClick={() => {
+                                if (field.value.includes(feature)) {
+                                  field.onChange(field.value.filter(f => f !== feature));
+                                } else {
+                                  field.onChange([...field.value, feature]);
+                                }
+                              }}
+                            >
+                              {field.value.includes(feature) && <i className="fas fa-check mr-1"></i>}
+                              {feature}
+                            </Button>
+                          ))}
+                        </div>
+                      </FormControl>
+                      <FormDescription>
+                        {t('playgroundMap.featuresHelp', 'Select all features available at this playground')}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
                 <FormField
                   control={form.control}
