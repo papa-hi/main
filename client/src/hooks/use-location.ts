@@ -26,9 +26,12 @@ export function useLocation(): LocationHookReturn {
 
   useEffect(() => {
     let isMounted = true;
+    console.log("Location hook initialized");
 
     const getLocation = async () => {
+      // Check if geolocation is supported
       if (!navigator.geolocation) {
+        console.log("Geolocation not supported by this browser");
         if (isMounted) {
           setLocationState({
             error: "Geolocation is not supported by your browser",
@@ -38,17 +41,32 @@ export function useLocation(): LocationHookReturn {
         return;
       }
 
+      // Fallback values in case geolocation is denied
+      const fallbackLocation = {
+        latitude: 52.3676,  // Amsterdam coordinates as fallback
+        longitude: 4.9041,
+        city: "Amsterdam",
+        country: "NL",
+        isLoading: false
+      };
+
       try {
+        console.log("Requesting geolocation permission...");
         navigator.geolocation.getCurrentPosition(
           async (position) => {
+            console.log("Geolocation permission granted");
             const { latitude, longitude } = position.coords;
+            console.log(`Location obtained: ${latitude}, ${longitude}`);
             
             try {
               // Get API key from server
+              console.log("Fetching API key from server");
               const keyResponse = await axios.get('/api/env');
               const apiKey = keyResponse.data.OPEN_WEATHER_API_KEY;
+              console.log("API key retrieved successfully");
               
               // Use OpenWeatherMap reverse geocoding to get city name
+              console.log("Fetching city name from coordinates...");
               const response = await axios.get(
                 `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${apiKey}`
               );
@@ -59,6 +77,9 @@ export function useLocation(): LocationHookReturn {
               if (response.data && response.data.length > 0) {
                 city = response.data[0].name;
                 country = response.data[0].country;
+                console.log(`City name found: ${city}, ${country}`);
+              } else {
+                console.log("No city data found in API response");
               }
               
               if (isMounted) {
@@ -84,11 +105,11 @@ export function useLocation(): LocationHookReturn {
             }
           },
           (error) => {
+            console.log("Geolocation permission denied or error:", error.message);
+            // If user denied permission, use fallback location
             if (isMounted) {
-              setLocationState({
-                error: error.message,
-                isLoading: false
-              });
+              console.log("Using fallback location (Amsterdam)");
+              setLocationState(fallbackLocation);
             }
           },
           {
@@ -98,11 +119,11 @@ export function useLocation(): LocationHookReturn {
           }
         );
       } catch (error) {
+        console.error("Unexpected error in geolocation request:", error);
         if (isMounted) {
-          setLocationState({
-            error: "Failed to get location",
-            isLoading: false
-          });
+          // Use fallback location on error
+          console.log("Using fallback location after error");
+          setLocationState(fallbackLocation);
         }
       }
     };

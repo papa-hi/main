@@ -108,7 +108,16 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
           </div>
         )}
         
-        {/* Error state (just don't show anything) */}
+        {/* Fallback state when both loading is false and there's an error/no city data */}
+        {!weatherLoading && (weatherError || !city) && (
+          <div className="bg-white rounded-lg p-3 shadow-sm flex items-center space-x-3">
+            <i className="fas fa-sun text-accent text-lg"></i>
+            <div>
+              <span className="text-sm font-medium">18°C</span>
+              <p className="text-xs text-muted-foreground">Amsterdam, NL</p>
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Featured Section - Promoted Community Events */}
