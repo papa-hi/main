@@ -32,7 +32,6 @@ interface AddRestaurantFormProps {
 export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
 
   // Form definition
   const form = useForm<RestaurantFormValues>({
@@ -122,190 +121,175 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="default" className="flex items-center gap-2">
-          <i className="fas fa-plus"></i>
-          {t('places.addRestaurant', 'Add Restaurant')}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>{t('places.addNewRestaurant', 'Add New Restaurant')}</DialogTitle>
-          <DialogDescription>
-            {t('places.addRestaurantDescription', 'Share a kid-friendly restaurant with other parents')}
-          </DialogDescription>
-        </DialogHeader>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('common.name', 'Name')}</FormLabel>
+              <FormControl>
+                <Input placeholder={t('places.restaurantNamePlaceholder', 'e.g. Family Kitchen')} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('common.name', 'Name')}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={t('places.restaurantNamePlaceholder', 'e.g. Family Kitchen')} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('common.description', 'Description')}</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder={t('places.restaurantDescriptionPlaceholder', 'e.g. Family-friendly restaurant with play area')} 
-                      {...field} 
-                      value={field.value || ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('common.address', 'Address')}</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder={t('places.addressPlaceholder', 'e.g. 123 Main St, Amsterdam')} 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="latitude"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('common.latitude', 'Latitude')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number" 
-                        step="any"
-                        value={field.value}
-                        onChange={(e) => {
-                          const value = parseFloat(e.target.value);
-                          field.onChange(isNaN(value) ? 0 : value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="longitude"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('common.longitude', 'Longitude')}</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number"
-                        step="any"
-                        value={field.value}
-                        onChange={(e) => {
-                          const value = parseFloat(e.target.value);
-                          field.onChange(isNaN(value) ? 0 : value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('common.description', 'Description')}</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder={t('places.restaurantDescriptionPlaceholder', 'e.g. Family-friendly restaurant with play area')} 
+                  {...field} 
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('common.address', 'Address')}</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder={t('places.addressPlaceholder', 'e.g. 123 Main St, Amsterdam')} 
+                  {...field} 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="latitude"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('common.latitude', 'Latitude')}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number" 
+                    step="any"
+                    value={field.value}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      field.onChange(isNaN(value) ? 0 : value);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="longitude"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('common.longitude', 'Longitude')}</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number"
+                    step="any"
+                    value={field.value}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      field.onChange(isNaN(value) ? 0 : value);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={getUserLocation}
+        >
+          <i className="fas fa-location-arrow mr-2"></i>
+          {t('places.useMyLocation', 'Use My Current Location')}
+        </Button>
+        
+        <FormField
+          control={form.control}
+          name="features"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('common.features', 'Features')}</FormLabel>
+              <FormControl>
+                <div className="flex flex-wrap gap-2">
+                  {['Kids menu', 'High Chairs', 'Changing Tables', 'Play corner', 'Stroller accessible'].map((feature) => (
+                    <Button
+                      key={feature}
+                      type="button"
+                      variant={field.value.includes(feature) ? "default" : "outline"}
+                      size="sm"
+                      className={field.value.includes(feature) ? "bg-primary text-white" : ""}
+                      onClick={() => {
+                        if (field.value.includes(feature)) {
+                          field.onChange(field.value.filter(f => f !== feature));
+                        } else {
+                          field.onChange([...field.value, feature]);
+                        }
+                      }}
+                    >
+                      {field.value.includes(feature) && <i className="fas fa-check mr-1"></i>}
+                      {feature}
+                    </Button>
+                  ))}
+                </div>
+              </FormControl>
+              <FormDescription>
+                {t('places.featuresHelp', 'Select all features available at this restaurant')}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <div className="pt-4 flex justify-end gap-2">
+          {onSuccess && (
             <Button
               type="button"
               variant="outline"
-              className="w-full"
-              onClick={getUserLocation}
+              onClick={onSuccess}
             >
-              <i className="fas fa-location-arrow mr-2"></i>
-              {t('places.useMyLocation', 'Use My Current Location')}
+              {t('common.cancel', 'Cancel')}
             </Button>
-            
-            <FormField
-              control={form.control}
-              name="features"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('common.features', 'Features')}</FormLabel>
-                  <FormControl>
-                    <div className="flex flex-wrap gap-2">
-                      {['Kids menu', 'High Chairs', 'Changing Tables', 'Play corner', 'Stroller accessible'].map((feature) => (
-                        <Button
-                          key={feature}
-                          type="button"
-                          variant={field.value.includes(feature) ? "default" : "outline"}
-                          size="sm"
-                          className={field.value.includes(feature) ? "bg-primary text-white" : ""}
-                          onClick={() => {
-                            if (field.value.includes(feature)) {
-                              field.onChange(field.value.filter(f => f !== feature));
-                            } else {
-                              field.onChange([...field.value, feature]);
-                            }
-                          }}
-                        >
-                          {field.value.includes(feature) && <i className="fas fa-check mr-1"></i>}
-                          {feature}
-                        </Button>
-                      ))}
-                    </div>
-                  </FormControl>
-                  <FormDescription>
-                    {t('places.featuresHelp', 'Select all features available at this restaurant')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <div className="pt-4 flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-              >
-                {t('common.cancel', 'Cancel')}
-              </Button>
-              <Button 
-                type="submit"
-                disabled={addRestaurantMutation.isPending}
-              >
-                {addRestaurantMutation.isPending ? (
-                  <>
-                    <i className="fas fa-spinner fa-spin mr-2"></i>
-                    {t('common.adding', 'Adding...')}
-                  </>
-                ) : (
-                  t('common.add', 'Add')
-                )}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+          )}
+          <Button 
+            type="submit"
+            disabled={addRestaurantMutation.isPending}
+          >
+            {addRestaurantMutation.isPending ? (
+              <>
+                <i className="fas fa-spinner fa-spin mr-2"></i>
+                {t('common.adding', 'Adding...')}
+              </>
+            ) : (
+              t('common.add', 'Add')
+            )}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

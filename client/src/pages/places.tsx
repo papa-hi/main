@@ -9,9 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation as useGeoLocation } from "@/hooks/use-location";
 import { useTranslation } from "react-i18next";
+import { AddRestaurantForm } from "@/components/places/add-restaurant-form";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function PlacesPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [location, setLocation] = useLocation();
   const { latitude, longitude } = useGeoLocation();
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,6 +70,9 @@ export default function PlacesPage() {
     // Search is already handled by the filteredPlaces computation
   };
   
+  // Define state for showing add restaurant form
+  const [showAddRestaurantForm, setShowAddRestaurantForm] = useState(false);
+  
   const renderPlaceGrid = () => {
     if (isLoading) {
       return (
@@ -119,16 +125,38 @@ export default function PlacesPage() {
     <div className="py-2">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-heading font-bold">{t('places.placesForKids', 'Places for Kids')}</h1>
-        <Button
-          variant="outline"
-          onClick={() => setLocation('/playground-map')}
-          className="flex items-center gap-2"
-        >
-          <i className="fas fa-map-marked-alt"></i>
-          <span className="hidden sm:inline">{t('nav.playgroundMap')}</span>
-          <span className="sm:hidden">{t('nav.map', 'Map')}</span>
-        </Button>
+        <div className="flex gap-2">
+          {user && activeTab === 'restaurants' && (
+            <Button 
+              onClick={() => setShowAddRestaurantForm(!showAddRestaurantForm)}
+              className="flex items-center gap-1 text-sm"
+              variant="default"
+            >
+              <i className={`fas fa-${showAddRestaurantForm ? 'times' : 'plus'} mr-1`}></i>
+              {showAddRestaurantForm 
+                ? t('places.cancel', 'Cancel') 
+                : t('places.addRestaurant', 'Add Restaurant')}
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => setLocation('/playground-map')}
+            className="flex items-center gap-1 text-sm"
+          >
+            <i className="fas fa-map-marked-alt mr-1"></i>
+            <span className="hidden sm:inline">{t('nav.playgroundMap')}</span>
+            <span className="sm:hidden">{t('nav.map', 'Map')}</span>
+          </Button>
+        </div>
       </div>
+      
+      {/* Add Restaurant Form */}
+      {user && showAddRestaurantForm && activeTab === 'restaurants' && (
+        <div className="mb-8 p-6 bg-white rounded-xl shadow-sm">
+          <h2 className="text-xl font-bold mb-4">{t('places.addNewRestaurant', 'Add New Restaurant')}</h2>
+          <AddRestaurantForm onSuccess={() => setShowAddRestaurantForm(false)} />
+        </div>
+      )}
       
       {/* Search Form */}
       <form onSubmit={handleSearch} className="mb-6">
