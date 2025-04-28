@@ -163,6 +163,26 @@ export default function ProfilePage() {
   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Check file size (max 8MB)
+      if (file.size > 8 * 1024 * 1024) {
+        toast({
+          title: "Bestand te groot",
+          description: "Maximale bestandsgrootte is 8MB",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Ongeldig bestandstype",
+          description: "Alleen afbeeldingsbestanden zijn toegestaan",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       setProfileImage(file);
       
       // Create a preview URL
