@@ -386,11 +386,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Update user with new profile image URL
+      // Update user with new profile image URL using our helper function
       const filename = req.file.filename;
-      const imageUrl = `/uploads/profile-images/${filename}`;
+      const imageUrl = getFileUrl(filename, 'profile-image');
       
-      const updatedUser = await storage.updateUser(userId, { profileImage: imageUrl });
+      // Store just the filename path to make it work across restarts
+      const profileImagePath = `/uploads/profile-images/${filename}`;
+      const updatedUser = await storage.updateUser(userId, { profileImage: profileImagePath });
       
       // Remove password from response
       const userWithoutPassword = { ...updatedUser } as Partial<SelectUser>;
@@ -1236,12 +1238,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Name, latitude, and longitude are required" });
       }
       
+      // Default place image URL
       let imageUrl = "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80";
+      let imageFilename = "";
       
-      // If image was uploaded, generate URL
+      // If image was uploaded, generate URL using our helper function
       if (req.file) {
-        const filename = req.file.filename;
-        imageUrl = `/uploads/place-images/${filename}`;
+        imageFilename = req.file.filename;
+        // Use the getFileUrl function to handle missing files and fallbacks
+        imageUrl = getFileUrl(imageFilename, 'place-image');
+        // Store the path in the database
+        imageUrl = `/uploads/place-images/${imageFilename}`;
       }
       
       // Parse features if they were sent as a JSON string (from FormData)
