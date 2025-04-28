@@ -7,6 +7,7 @@ import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
 import { upload, getFileUrl, deleteProfileImage } from "./upload";
 import path from "path";
+import fs from "fs";
 import { WebSocketServer, WebSocket } from 'ws';
 import { fetchNearbyPlaygrounds } from "./maps-service";
 
@@ -70,11 +71,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }, (req, res, next) => {
     const uploadsPath = path.join(process.cwd(), 'uploads');
     const filePath = path.join(uploadsPath, req.path);
-    res.sendFile(filePath, (err) => {
-      if (err) {
-        next(err);
-      }
-    });
+    
+    // Add debug logging
+    console.log(`[FILE_SERVER] Request for: ${req.path}`);
+    console.log(`[FILE_SERVER] Full path: ${filePath}`);
+    console.log(`[FILE_SERVER] Process CWD: ${process.cwd()}`);
+    
+    // Check if file exists before sending
+    if (fs.existsSync(filePath)) {
+      res.sendFile(filePath, (err) => {
+        if (err) {
+          console.error(`[FILE_SERVER] Error sending file: ${err.message}`);
+          next(err);
+        }
+      });
+    } else {
+      console.error(`[FILE_SERVER] File not found: ${filePath}`);
+      res.status(404).send('File not found');
+    }
   });
   
   // put application routes here
