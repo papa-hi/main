@@ -353,7 +353,7 @@ export default function ProfilePage() {
               className="max-w-sm"
             />
             <p className="text-sm text-muted-foreground mt-2">
-              Upload een afbeelding (max. 5MB). Formaten: JPEG, PNG, GIF.
+              Upload een afbeelding (max. 8MB). Formaten: JPEG, PNG, GIF.
             </p>
           </div>
         </div>
