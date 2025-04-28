@@ -4,8 +4,8 @@
   "description": "De sociale app voor vaders in Nederland om speelafspraken te maken en kindvriendelijke locaties te vinden.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F8F7F3",
-  "theme_color": "#4F6F52",
+  "background_color": "#000000",
+  "theme_color": "#04a3b3",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -19,6 +19,24 @@
       "type": "image/svg+xml",
       "sizes": "512x512",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "180x180",
+      "purpose": "any"
     }
   ],
   "screenshots": [],
