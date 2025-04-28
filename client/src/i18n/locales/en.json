@@ -56,7 +56,7 @@
       "registrationFailed": "Registration failed",
       "logoutFailed": "Logout failed",
       "fileTooLarge": "File too large",
-      "fileSizeLimit": "Maximum file size is 5MB",
+      "fileSizeLimit": "Maximum file size is 8MB",
       "invalidFileType": "Invalid file type",
       "imageFilesOnly": "Only image files are allowed"
     },
