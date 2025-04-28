@@ -126,7 +126,39 @@
     "searchPlaceholder": "Buscar por nombre, ubicación o características...",
     "noResultsFor": "No hay resultados para \"{{searchTerm}}\"",
     "noPlacesMatchingCriteria": "No hay lugares que coincidan con tus criterios.",
-    "clearSearch": "Borrar búsqueda"
+    "clearSearch": "Borrar búsqueda",
+    "addRestaurant": "Añadir restaurante",
+    "addNewRestaurant": "Añadir nuevo restaurante",
+    "cancel": "Cancelar",
+    "restaurantNamePlaceholder": "ej. Cocina Familiar",
+    "restaurantDescriptionPlaceholder": "ej. Restaurante familiar con área de juegos",
+    "addressPlaceholder": "ej. Calle Principal 123, Madrid",
+    "useMyLocation": "Usar mi ubicación actual",
+    "featuresHelp": "Selecciona todas las características disponibles en este restaurante",
+    "restaurantAdded": "Restaurante añadido",
+    "restaurantAddedMessage": "El restaurante ha sido añadido con éxito.",
+    "addError": "Error al añadir restaurante",
+    "addErrorMessage": "Ha ocurrido un error al añadir el restaurante. Por favor, inténtalo de nuevo.",
+    "locationUpdated": "Ubicación actualizada",
+    "locationCoordinatesSet": "Se han establecido las coordenadas de ubicación.",
+    "locationError": "Error de ubicación",
+    "couldNotGetLocation": "No se pudo obtener tu ubicación actual.",
+    "browserNotSupported": "Navegador no compatible",
+    "geolocationNotSupported": "La geolocalización no es compatible con este navegador.",
+    "restaurantFeatures": {
+      "kidsMenu": "Menú infantil",
+      "highChairs": "Sillas altas",
+      "changingTables": "Cambiadores",
+      "playCorner": "Zona de juegos",
+      "strollerAccessible": "Accesible para cochecitos"
+    },
+    "playgroundFeatures": {
+      "restrooms": "Baños",
+      "picnicTables": "Mesas de picnic",
+      "benches": "Bancos",
+      "sandbox": "Arenero",
+      "waterGames": "Juegos de agua"
+    }
   },
   "playdates": {
     "create": "Crear cita de juego",
