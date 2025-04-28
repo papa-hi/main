@@ -1777,89 +1777,123 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  // These methods are required by the IStorage interface but not implemented yet
+  // User deletion with proper error handling
   async deleteUser(id: number): Promise<boolean> {
-    return await db.transaction(async (tx) => {
-      // First, delete all relations to avoid foreign key constraints
-      
-      // Delete user's playdate participations
-      await tx
-        .delete(playdateParticipants)
-        .where(eq(playdateParticipants.userId, id));
-      
-      // Delete user's favorite places
-      await tx
-        .delete(userFavorites)
-        .where(eq(userFavorites.userId, id));
-      
-      // Delete user's chat participations and messages
-      const userChats = await tx
-        .select({ chatId: chatParticipants.chatId })
-        .from(chatParticipants)
-        .where(eq(chatParticipants.userId, id));
-      
-      // For each chat, delete messages sent by user
-      for (const { chatId } of userChats) {
-        await tx
-          .delete(chatMessages)
-          .where(eq(chatMessages.senderId, id));
-        
-        // Remove user from chat participants
-        await tx
-          .delete(chatParticipants)
-          .where(
-            and(
-              eq(chatParticipants.chatId, chatId),
-              eq(chatParticipants.userId, id)
-            )
-          );
-        
-        // Check if chat is now empty (no participants)
-        const [{ count }] = await tx
-          .select({ count: count() })
-          .from(chatParticipants)
-          .where(eq(chatParticipants.chatId, chatId));
-        
-        // If chat is empty, delete it
-        if (Number(count) === 0) {
-          // Delete all remaining messages in the chat
+    console.log(`[DatabaseStorage] Starting deletion of user with ID ${id}`);
+    
+    try {
+      return await db.transaction(async (tx) => {
+        try {
+          // First, delete all relations to avoid foreign key constraints
+          console.log(`[DatabaseStorage] Deleting user ${id}'s playdate participations`);
           await tx
-            .delete(chatMessages)
-            .where(eq(chatMessages.chatId, chatId));
+            .delete(playdateParticipants)
+            .where(eq(playdateParticipants.userId, id));
           
-          // Delete the chat itself
+          console.log(`[DatabaseStorage] Deleting user ${id}'s favorite places`);
+          // Delete user's favorite places
           await tx
-            .delete(chats)
-            .where(eq(chats.id, chatId));
+            .delete(userFavorites)
+            .where(eq(userFavorites.userId, id));
+          
+          console.log(`[DatabaseStorage] Finding user ${id}'s chats`);
+          // Delete user's chat participations and messages
+          const userChats = await tx
+            .select({ chatId: chatParticipants.chatId })
+            .from(chatParticipants)
+            .where(eq(chatParticipants.userId, id));
+          
+          console.log(`[DatabaseStorage] Processing ${userChats.length} chats for user ${id}`);
+          // For each chat, delete messages sent by user
+          for (const { chatId } of userChats) {
+            console.log(`[DatabaseStorage] Deleting messages from user ${id} in chat ${chatId}`);
+            await tx
+              .delete(chatMessages)
+              .where(eq(chatMessages.senderId, id));
+            
+            console.log(`[DatabaseStorage] Removing user ${id} from chat ${chatId} participants`);
+            // Remove user from chat participants
+            await tx
+              .delete(chatParticipants)
+              .where(
+                and(
+                  eq(chatParticipants.chatId, chatId),
+                  eq(chatParticipants.userId, id)
+                )
+              );
+            
+            console.log(`[DatabaseStorage] Checking if chat ${chatId} is now empty`);
+            // Check if chat is now empty (no participants)
+            const participantsCountResult = await tx
+              .select({ count: count() })
+              .from(chatParticipants)
+              .where(eq(chatParticipants.chatId, chatId));
+            
+            if (!participantsCountResult || participantsCountResult.length === 0) {
+              console.log(`[DatabaseStorage] Error: No count result returned for chat ${chatId}`);
+              continue;
+            }
+            
+            const participantCount = Number(participantsCountResult[0].count);
+            console.log(`[DatabaseStorage] Chat ${chatId} has ${participantCount} participants left`);
+            
+            // If chat is empty, delete it
+            if (participantCount === 0) {
+              console.log(`[DatabaseStorage] Deleting all messages in empty chat ${chatId}`);
+              // Delete all remaining messages in the chat
+              await tx
+                .delete(chatMessages)
+                .where(eq(chatMessages.chatId, chatId));
+              
+              console.log(`[DatabaseStorage] Deleting empty chat ${chatId}`);
+              // Delete the chat itself
+              await tx
+                .delete(chats)
+                .where(eq(chats.id, chatId));
+            }
+          }
+          
+          console.log(`[DatabaseStorage] Finding playdates created by user ${id}`);
+          // Delete playdates created by the user
+          // First get all playdates created by the user
+          const userPlaydates = await tx
+            .select({ id: playdates.id })
+            .from(playdates)
+            .where(eq(playdates.creatorId, id));
+          
+          console.log(`[DatabaseStorage] Processing ${userPlaydates.length} playdates created by user ${id}`);
+          // For each playdate, delete participants first
+          for (const { id: playdateId } of userPlaydates) {
+            console.log(`[DatabaseStorage] Deleting participants for playdate ${playdateId}`);
+            await tx
+              .delete(playdateParticipants)
+              .where(eq(playdateParticipants.playdateId, playdateId));
+          }
+          
+          console.log(`[DatabaseStorage] Deleting all playdates created by user ${id}`);
+          // Then delete the playdates themselves
+          await tx
+            .delete(playdates)
+            .where(eq(playdates.creatorId, id));
+          
+          console.log(`[DatabaseStorage] Finally deleting user ${id}`);
+          // Finally, delete the user
+          const result = await tx
+            .delete(users)
+            .where(eq(users.id, id));
+          
+          const success = result.rowCount ? result.rowCount > 0 : true;
+          console.log(`[DatabaseStorage] User ${id} deletion result: ${success}`);
+          return success;
+        } catch (txError) {
+          console.error(`[DatabaseStorage] Transaction error while deleting user ${id}:`, txError);
+          throw txError;
         }
-      }
-      
-      // Delete playdates created by the user
-      // First get all playdates created by the user
-      const userPlaydates = await tx
-        .select({ id: playdates.id })
-        .from(playdates)
-        .where(eq(playdates.creatorId, id));
-      
-      // For each playdate, delete participants first
-      for (const { id: playdateId } of userPlaydates) {
-        await tx
-          .delete(playdateParticipants)
-          .where(eq(playdateParticipants.playdateId, playdateId));
-      }
-      
-      // Then delete the playdates themselves
-      await tx
-        .delete(playdates)
-        .where(eq(playdates.creatorId, id));
-      
-      // Finally, delete the user
-      const result = await tx
-        .delete(users)
-        .where(eq(users.id, id));
-      
-      return result.rowCount ? result.rowCount > 0 : true;
-    });
+      });
+    } catch (error) {
+      console.error(`[DatabaseStorage] Error deleting user ${id}:`, error);
+      return false;
+    }
   }
 
   async joinPlaydate(userId: number, playdateId: number): Promise<boolean> {
