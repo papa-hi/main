@@ -61,14 +61,39 @@ export const upload = multer({
 export const getFileUrl = (filename: string, type: 'profile-image' | 'place-image' | 'other' = 'other'): string => {
   if (!filename) return '';
   
-  const baseUrl = process.env.BASE_URL || '';
-  if (type === 'profile-image') {
-    return `${baseUrl}/uploads/profile-images/${filename}`;
-  } else if (type === 'place-image') {
-    return `${baseUrl}/uploads/place-images/${filename}`;
-  } else {
-    return `${baseUrl}/uploads/${filename}`;
+  // If the filename already starts with http or https, it's an external URL
+  if (filename.startsWith('http://') || filename.startsWith('https://')) {
+    return filename;
   }
+  
+  const baseUrl = process.env.BASE_URL || '';
+  let filepath = '';
+  
+  if (type === 'profile-image') {
+    filepath = `${baseUrl}/uploads/profile-images/${filename}`;
+    
+    // Check if file exists (for profile images)
+    const fullPath = path.join(process.cwd(), 'uploads', 'profile-images', path.basename(filename));
+    if (!fs.existsSync(fullPath)) {
+      console.log(`[FILE_SERVER] File not found: ${fullPath}, using default image`);
+      // Return a default profile image
+      return `https://ui-avatars.com/api/?name=${encodeURIComponent(path.basename(filename, path.extname(filename)))}&background=random`;
+    }
+  } else if (type === 'place-image') {
+    filepath = `${baseUrl}/uploads/place-images/${filename}`;
+    
+    // Check if file exists (for place images)
+    const fullPath = path.join(process.cwd(), 'uploads', 'place-images', path.basename(filename));
+    if (!fs.existsSync(fullPath)) {
+      console.log(`[FILE_SERVER] File not found: ${fullPath}, using default image`);
+      // Return a default place image
+      return 'https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop';
+    }
+  } else {
+    filepath = `${baseUrl}/uploads/${filename}`;
+  }
+  
+  return filepath;
 };
 
 // Utility function to delete old profile image

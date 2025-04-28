@@ -47,12 +47,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No file uploaded" });
       }
       
-      // Get filename and construct URL
+      // Get filename and construct URL using our helper function
       const filename = req.file.filename;
-      const imageUrl = `/uploads/profile-images/${filename}`;
+      const imageUrl = getFileUrl(filename, 'profile-image');
       
       res.json({ 
         success: true, 
+        filename, // Return filename separately
         imageUrl
       });
     } catch (err) {
