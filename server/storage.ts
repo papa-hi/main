@@ -753,7 +753,83 @@ export class MemStorage implements IStorage {
   }
   
   async deleteUser(id: number): Promise<boolean> {
-    return this.users.delete(id);
+    console.log(`[MemStorage] Starting deletion of user with ID ${id}`);
+    
+    try {
+      // First remove the user from all playdates they're participating in
+      for (const [playdateId, playdate] of this.playdates.entries()) {
+        const updatedParticipants = playdate.participants.filter(p => p.id !== id);
+        
+        if (updatedParticipants.length !== playdate.participants.length) {
+          // User was a participant, update the playdate
+          this.playdates.set(playdateId, {
+            ...playdate,
+            participants: updatedParticipants
+          });
+        }
+      }
+      
+      // Delete playdates created by the user
+      const playdatesToDelete: number[] = [];
+      for (const [playdateId, playdate] of this.playdates.entries()) {
+        if (playdate.participants[0]?.id === id) {
+          // User is the creator (first participant), mark for deletion
+          playdatesToDelete.push(playdateId);
+        }
+      }
+      
+      // Delete the marked playdates
+      for (const playdateId of playdatesToDelete) {
+        this.playdates.delete(playdateId);
+      }
+      
+      // Remove user's favorite places
+      // Format of key is "${userId}-${placeId}"
+      for (const key of this.favorites.keys()) {
+        if (key.startsWith(`${id}-`)) {
+          this.favorites.delete(key);
+        }
+      }
+      
+      // Handle chats and messages
+      // Find all chats the user participates in
+      const userChats: number[] = [];
+      for (const [chatId, participants] of this.chatParticipants.entries()) {
+        if (participants.includes(id)) {
+          userChats.push(chatId);
+        }
+      }
+      
+      // For each chat, remove messages sent by the user and update participants
+      for (const chatId of userChats) {
+        // Update messages
+        const chatMessages = this.messages.get(chatId) || [];
+        const updatedMessages = chatMessages.filter(msg => msg.senderId !== id);
+        this.messages.set(chatId, updatedMessages);
+        
+        // Update participants
+        const participants = this.chatParticipants.get(chatId) || [];
+        const updatedParticipants = participants.filter(userId => userId !== id);
+        
+        if (updatedParticipants.length === 0) {
+          // No participants left, delete the chat entirely
+          this.chatParticipants.delete(chatId);
+          this.messages.delete(chatId);
+          this.chats.delete(chatId);
+        } else {
+          // Update with remaining participants
+          this.chatParticipants.set(chatId, updatedParticipants);
+        }
+      }
+      
+      // Finally delete the user
+      const result = this.users.delete(id);
+      console.log(`[MemStorage] User deletion result: ${result}`);
+      return result;
+    } catch (error) {
+      console.error(`[MemStorage] Error deleting user:`, error);
+      return false;
+    }
   }
   
   async joinPlaydate(userId: number, playdateId: number): Promise<boolean> {
