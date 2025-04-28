@@ -276,7 +276,21 @@
     "tip1": "Look for playgrounds in red areas for more options in close proximity",
     "tip2": "Click on a playground marker to see details and get directions",
     "tip3": "Use your current location to find playgrounds near you",
-    "tip4": "Arrange playdates at playgrounds with multiple options nearby in case one is too crowded"
+    "tip4": "Arrange playdates at playgrounds with multiple options nearby in case one is too crowded",
+    "addPlayground": "Add Playground",
+    "addNewPlayground": "Add New Playground",
+    "addPlaygroundInstructions": "Click on the map to add a new playground",
+    "addPlaygroundTip": "Select the exact location of the playground on the map",
+    "playgroundNamePlaceholder": "e.g. Central Park Playground",
+    "descriptionPlaceholder": "e.g. Playground with swings, slides, and climbing area",
+    "uploadImage": "Upload Photo",
+    "featuresHelp": "Select all features available at this playground",
+    "uploadImageHelp": "Upload a photo of the playground (Optional)",
+    "previewImage": "Preview",
+    "addSuccess": "Playground Added",
+    "addSuccessMessage": "Thank you for contributing to our community playground map!",
+    "addError": "Error Adding Playground",
+    "addErrorMessage": "There was an error adding the playground. Please try again."
   },
   "pwa": {
     "privacy": {
