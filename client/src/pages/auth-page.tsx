@@ -354,10 +354,10 @@ export default function AuthPage() {
                         const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            if (file.size > 5 * 1024 * 1024) {
+                            if (file.size > 8 * 1024 * 1024) {
                               toast({
                                 title: t("auth:errors.fileTooLarge", "File too large"),
-                                description: t("auth:errors.fileSizeLimit", "Maximum file size is 5MB"),
+                                description: t("auth:errors.fileSizeLimit", "Maximum file size is 8MB"),
                                 variant: "destructive"
                               });
                               return;
