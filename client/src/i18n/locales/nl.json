@@ -131,7 +131,39 @@
     "searchPlaceholder": "Zoek op naam, locatie of faciliteiten...",
     "noResultsFor": "Geen resultaten voor \"{{searchTerm}}\"",
     "noPlacesMatchingCriteria": "Er zijn geen locaties die aan je criteria voldoen.",
-    "clearSearch": "Zoekopdracht wissen"
+    "clearSearch": "Zoekopdracht wissen",
+    "addRestaurant": "Restaurant Toevoegen",
+    "addNewRestaurant": "Nieuw Restaurant Toevoegen",
+    "cancel": "Annuleren",
+    "restaurantNamePlaceholder": "bijv. Familie Keuken",
+    "restaurantDescriptionPlaceholder": "bijv. Gezinsvriendelijk restaurant met speelhoek",
+    "addressPlaceholder": "bijv. Hoofdstraat 123, Amsterdam",
+    "useMyLocation": "Gebruik Mijn Huidige Locatie",
+    "featuresHelp": "Selecteer alle beschikbare faciliteiten in dit restaurant",
+    "restaurantAdded": "Restaurant Toegevoegd",
+    "restaurantAddedMessage": "Het restaurant is succesvol toegevoegd.",
+    "addError": "Fout bij Toevoegen Restaurant",
+    "addErrorMessage": "Er is een fout opgetreden bij het toevoegen van het restaurant. Probeer het opnieuw.",
+    "locationUpdated": "Locatie Bijgewerkt",
+    "locationCoordinatesSet": "Locatiecoördinaten zijn ingesteld.",
+    "locationError": "Locatiefout",
+    "couldNotGetLocation": "Kon je huidige locatie niet ophalen.",
+    "browserNotSupported": "Browser Niet Ondersteund",
+    "geolocationNotSupported": "Geolocatie wordt niet ondersteund door deze browser.",
+    "restaurantFeatures": {
+      "kidsMenu": "Kindermenu",
+      "highChairs": "Kinderstoelen",
+      "changingTables": "Verschoonruimte",
+      "playCorner": "Speelhoek",
+      "strollerAccessible": "Kinderwagen toegankelijk"
+    },
+    "playgroundFeatures": {
+      "restrooms": "Toiletten",
+      "picnicTables": "Picknicktafels",
+      "benches": "Banken",
+      "sandbox": "Zandbak",
+      "waterGames": "Waterspellen"
+    }
   },
   "playdates": {
     "create": "Speelafspraak Maken",

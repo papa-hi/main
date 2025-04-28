@@ -126,7 +126,39 @@
     "searchPlaceholder": "Nach Name, Ort oder Eigenschaften suchen...",
     "noResultsFor": "Keine Ergebnisse für \"{{searchTerm}}\"",
     "noPlacesMatchingCriteria": "Es gibt keine Orte, die deinen Kriterien entsprechen.",
-    "clearSearch": "Suche löschen"
+    "clearSearch": "Suche löschen",
+    "addRestaurant": "Restaurant hinzufügen",
+    "addNewRestaurant": "Neues Restaurant hinzufügen",
+    "cancel": "Abbrechen",
+    "restaurantNamePlaceholder": "z.B. Familien Küche",
+    "restaurantDescriptionPlaceholder": "z.B. Familienfreundliches Restaurant mit Spielecke",
+    "addressPlaceholder": "z.B. Hauptstraße 123, Berlin",
+    "useMyLocation": "Meinen aktuellen Standort verwenden",
+    "featuresHelp": "Wähle alle verfügbaren Funktionen in diesem Restaurant aus",
+    "restaurantAdded": "Restaurant hinzugefügt",
+    "restaurantAddedMessage": "Das Restaurant wurde erfolgreich hinzugefügt.",
+    "addError": "Fehler beim Hinzufügen des Restaurants",
+    "addErrorMessage": "Beim Hinzufügen des Restaurants ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+    "locationUpdated": "Standort aktualisiert",
+    "locationCoordinatesSet": "Standortkoordinaten wurden festgelegt.",
+    "locationError": "Standortfehler",
+    "couldNotGetLocation": "Dein aktueller Standort konnte nicht ermittelt werden.",
+    "browserNotSupported": "Browser nicht unterstützt",
+    "geolocationNotSupported": "Geolokalisierung wird von diesem Browser nicht unterstützt.",
+    "restaurantFeatures": {
+      "kidsMenu": "Kindermenü",
+      "highChairs": "Hochstühle",
+      "changingTables": "Wickeltische",
+      "playCorner": "Spielecke",
+      "strollerAccessible": "Kinderwagen-zugänglich"
+    },
+    "playgroundFeatures": {
+      "restrooms": "Toiletten",
+      "picnicTables": "Picknicktische",
+      "benches": "Bänke",
+      "sandbox": "Sandkasten",
+      "waterGames": "Wasserspiele"
+    }
   },
   "playdates": {
     "create": "Spieltreffen erstellen",

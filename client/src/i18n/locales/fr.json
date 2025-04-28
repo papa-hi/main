@@ -126,7 +126,39 @@
     "searchPlaceholder": "Rechercher par nom, lieu ou caractéristiques...",
     "noResultsFor": "Aucun résultat pour \"{{searchTerm}}\"",
     "noPlacesMatchingCriteria": "Il n'y a aucun lieu correspondant à vos critères.",
-    "clearSearch": "Effacer la recherche"
+    "clearSearch": "Effacer la recherche",
+    "addRestaurant": "Ajouter un restaurant",
+    "addNewRestaurant": "Ajouter un nouveau restaurant",
+    "cancel": "Annuler",
+    "restaurantNamePlaceholder": "ex. Cuisine Familiale",
+    "restaurantDescriptionPlaceholder": "ex. Restaurant familial avec aire de jeux",
+    "addressPlaceholder": "ex. 123 Rue Principale, Paris",
+    "useMyLocation": "Utiliser ma position actuelle",
+    "featuresHelp": "Sélectionnez toutes les fonctionnalités disponibles dans ce restaurant",
+    "restaurantAdded": "Restaurant ajouté",
+    "restaurantAddedMessage": "Le restaurant a été ajouté avec succès.",
+    "addError": "Erreur lors de l'ajout du restaurant",
+    "addErrorMessage": "Une erreur s'est produite lors de l'ajout du restaurant. Veuillez réessayer.",
+    "locationUpdated": "Position mise à jour",
+    "locationCoordinatesSet": "Les coordonnées de position ont été définies.",
+    "locationError": "Erreur de localisation",
+    "couldNotGetLocation": "Impossible d'obtenir votre position actuelle.",
+    "browserNotSupported": "Navigateur non supporté",
+    "geolocationNotSupported": "La géolocalisation n'est pas prise en charge par ce navigateur.",
+    "restaurantFeatures": {
+      "kidsMenu": "Menu enfant",
+      "highChairs": "Chaises hautes",
+      "changingTables": "Tables à langer",
+      "playCorner": "Coin jeux",
+      "strollerAccessible": "Accessible aux poussettes"
+    },
+    "playgroundFeatures": {
+      "restrooms": "Toilettes",
+      "picnicTables": "Tables de pique-nique",
+      "benches": "Bancs",
+      "sandbox": "Bac à sable",
+      "waterGames": "Jeux d'eau"
+    }
   },
   "playdates": {
     "create": "Créer une rencontre",

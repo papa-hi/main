@@ -135,7 +135,39 @@
     "searchPlaceholder": "Search by name, location or features...",
     "noResultsFor": "No results for \"{{searchTerm}}\"",
     "noPlacesMatchingCriteria": "There are no places matching your criteria.",
-    "clearSearch": "Clear search"
+    "clearSearch": "Clear search",
+    "addRestaurant": "Add Restaurant",
+    "addNewRestaurant": "Add New Restaurant",
+    "cancel": "Cancel",
+    "restaurantNamePlaceholder": "e.g. Family Kitchen",
+    "restaurantDescriptionPlaceholder": "e.g. Family-friendly restaurant with play area",
+    "addressPlaceholder": "e.g. 123 Main St, Amsterdam",
+    "useMyLocation": "Use My Current Location",
+    "featuresHelp": "Select all features available at this restaurant",
+    "restaurantAdded": "Restaurant Added",
+    "restaurantAddedMessage": "The restaurant has been added successfully.",
+    "addError": "Error Adding Restaurant",
+    "addErrorMessage": "There was an error adding the restaurant. Please try again.",
+    "locationUpdated": "Location Updated",
+    "locationCoordinatesSet": "Location coordinates have been set.",
+    "locationError": "Location Error",
+    "couldNotGetLocation": "Could not get your current location.",
+    "browserNotSupported": "Browser Not Supported",
+    "geolocationNotSupported": "Geolocation is not supported by this browser.",
+    "restaurantFeatures": {
+      "kidsMenu": "Kids menu",
+      "highChairs": "High Chairs",
+      "changingTables": "Changing Tables",
+      "playCorner": "Play corner",
+      "strollerAccessible": "Stroller accessible"
+    },
+    "playgroundFeatures": {
+      "restrooms": "Restrooms",
+      "picnicTables": "Picnic tables",
+      "benches": "Benches",
+      "sandbox": "Sandbox",
+      "waterGames": "Water games"
+    }
   },
   "playdates": {
     "create": "Create Playdate",
