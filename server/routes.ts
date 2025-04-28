@@ -1266,6 +1266,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/test", (req, res) => {
     res.json({ message: "Test endpoint works!" });
   });
+  
+  // Endpoint to provide environment variables needed on the frontend
+  app.get("/api/env", (req, res) => {
+    res.json({
+      OPEN_WEATHER_API_KEY: process.env.OPEN_WEATHER_API_KEY
+    });
+  });
 
   // Create HTTP server
   const httpServer = createServer(app);

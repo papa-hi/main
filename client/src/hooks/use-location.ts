@@ -44,8 +44,11 @@ export function useLocation(): LocationHookReturn {
             const { latitude, longitude } = position.coords;
             
             try {
+              // Get API key from server
+              const keyResponse = await axios.get('/api/env');
+              const apiKey = keyResponse.data.OPEN_WEATHER_API_KEY;
+              
               // Use OpenWeatherMap reverse geocoding to get city name
-              const apiKey = process.env.OPEN_WEATHER_API_KEY;
               const response = await axios.get(
                 `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${apiKey}`
               );
