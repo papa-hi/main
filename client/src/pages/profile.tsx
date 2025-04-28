@@ -96,11 +96,17 @@ export default function ProfilePage() {
     try {
       const response = await fetch('/api/users/me', {
         method: 'DELETE',
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       
+      const data = await response.json().catch(() => null);
+      
       if (!response.ok) {
-        throw new Error('Failed to delete account');
+        console.error('Delete account response:', response.status, data);
+        throw new Error(data?.message || 'Failed to delete account');
       }
       
       toast({
@@ -113,11 +119,11 @@ export default function ProfilePage() {
       
       // Redirect to home page
       navigate('/');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting account:', error);
       toast({
         title: "Fout bij verwijderen",
-        description: "Er is iets misgegaan bij het verwijderen van je account.",
+        description: `Er is iets misgegaan bij het verwijderen van je account: ${error?.message || String(error)}`,
         variant: "destructive",
       });
     } finally {

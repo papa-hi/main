@@ -299,35 +299,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
       
+      console.log(`[DELETE USER] Attempting to delete user with ID ${userId}`);
+      
       // Get the current user to find the profile image (if any)
       const currentUser = await storage.getUserById(userId);
+      console.log(`[DELETE USER] Current user:`, currentUser);
+      
       if (currentUser?.profileImage) {
         // Extract filename from the URL if it exists
         const oldFilename = currentUser.profileImage.split('/').pop();
+        console.log(`[DELETE USER] Profile image filename:`, oldFilename);
+        
         if (oldFilename) {
           // Delete the profile image
-          deleteProfileImage(oldFilename);
+          try {
+            deleteProfileImage(oldFilename);
+            console.log(`[DELETE USER] Profile image deleted:`, oldFilename);
+          } catch (error) {
+            console.error(`[DELETE USER] Error deleting profile image:`, error);
+            // Continue with user deletion even if image deletion fails
+          }
         }
       }
       
       // Delete the user
+      console.log(`[DELETE USER] Calling storage.deleteUser(${userId})`);
       const deleted = await storage.deleteUser(userId);
+      console.log(`[DELETE USER] Result:`, deleted);
       
       if (!deleted) {
+        console.log(`[DELETE USER] Failed to delete user - returned false`);
         return res.status(500).json({ message: "Failed to delete user" });
       }
       
       // Log the user out
       req.logout((err) => {
         if (err) {
-          console.error("Error logging out:", err);
+          console.error("[DELETE USER] Error logging out:", err);
           return res.status(500).json({ message: "Failed to log out after deleting account" });
         }
+        console.log(`[DELETE USER] User ${userId} successfully deleted and logged out`);
         res.status(200).json({ message: "User account deleted successfully" });
       });
-    } catch (err) {
-      console.error("Error deleting user:", err);
-      res.status(500).json({ message: "Failed to delete user account" });
+    } catch (err: any) {
+      console.error("[DELETE USER] Error deleting user:", err);
+      res.status(500).json({ message: "Failed to delete user account", error: err?.message || String(err) });
     }
   });
   
