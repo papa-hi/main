@@ -549,25 +549,36 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                       <FormLabel>{t('common.features', 'Features')}</FormLabel>
                       <FormControl>
                         <div className="flex flex-wrap gap-2">
-                          {['Restrooms', 'Picnic tables', 'Benches', 'Sandbox', 'Water games'].map((feature) => (
-                            <Button
-                              key={feature}
-                              type="button"
-                              variant={field.value.includes(feature) ? "default" : "outline"}
-                              size="sm"
-                              className={field.value.includes(feature) ? "bg-primary text-white" : ""}
-                              onClick={() => {
-                                if (field.value.includes(feature)) {
-                                  field.onChange(field.value.filter(f => f !== feature));
-                                } else {
-                                  field.onChange([...field.value, feature]);
-                                }
-                              }}
-                            >
-                              {field.value.includes(feature) && <i className="fas fa-check mr-1"></i>}
-                              {feature}
-                            </Button>
-                          ))}
+                          {[
+                            { key: 'restrooms', defaultText: 'Restrooms' },
+                            { key: 'picnicTables', defaultText: 'Picnic tables' },
+                            { key: 'benches', defaultText: 'Benches' },
+                            { key: 'sandbox', defaultText: 'Sandbox' },
+                            { key: 'waterGames', defaultText: 'Water games' }
+                          ].map((featureObj) => {
+                            // Get the translated text for this feature
+                            const translatedText = t(`places.playgroundFeatures.${featureObj.key}`, featureObj.defaultText);
+                            
+                            return (
+                              <Button
+                                key={featureObj.key}
+                                type="button"
+                                variant={field.value.includes(featureObj.key) ? "default" : "outline"}
+                                size="sm"
+                                className={field.value.includes(featureObj.key) ? "bg-primary text-white" : ""}
+                                onClick={() => {
+                                  if (field.value.includes(featureObj.key)) {
+                                    field.onChange(field.value.filter(f => f !== featureObj.key));
+                                  } else {
+                                    field.onChange([...field.value, featureObj.key]);
+                                  }
+                                }}
+                              >
+                                {field.value.includes(featureObj.key) && <i className="fas fa-check mr-1"></i>}
+                                {translatedText}
+                              </Button>
+                            );
+                          })}
                         </div>
                       </FormControl>
                       <FormDescription>
