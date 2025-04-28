@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 interface LocationState {
   latitude?: number;
   longitude?: number;
   city?: string;
+  country?: string;
   error?: string;
   isLoading: boolean;
 }
@@ -12,6 +14,7 @@ interface LocationHookReturn {
   latitude?: number;
   longitude?: number;
   city?: string;
+  country?: string;
   error?: string;
   isLoading: boolean;
 }
@@ -40,18 +43,41 @@ export function useLocation(): LocationHookReturn {
           async (position) => {
             const { latitude, longitude } = position.coords;
             
-            // Reverse geocoding to get city name
-            // In a real app, this would call a geocoding API
-            // For demo purposes, we'll use Amsterdam
-            const city = "Amsterdam";
-            
-            if (isMounted) {
-              setLocationState({
-                latitude,
-                longitude,
-                city,
-                isLoading: false
-              });
+            try {
+              // Use OpenWeatherMap reverse geocoding to get city name
+              const apiKey = process.env.OPEN_WEATHER_API_KEY;
+              const response = await axios.get(
+                `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${apiKey}`
+              );
+              
+              let city = "Unknown";
+              let country = "";
+              
+              if (response.data && response.data.length > 0) {
+                city = response.data[0].name;
+                country = response.data[0].country;
+              }
+              
+              if (isMounted) {
+                setLocationState({
+                  latitude,
+                  longitude,
+                  city,
+                  country,
+                  isLoading: false
+                });
+              }
+            } catch (geocodeError) {
+              console.error("Geocoding error:", geocodeError);
+              // In case geocoding fails, we still return the coordinates
+              if (isMounted) {
+                setLocationState({
+                  latitude,
+                  longitude,
+                  city: "Unknown",
+                  isLoading: false
+                });
+              }
             }
           },
           (error) => {
