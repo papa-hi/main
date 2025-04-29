@@ -1,5 +1,5 @@
 import { Place } from "@shared/schema";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getFormattedDistance } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -14,7 +14,19 @@ export function PlaceCard({ place }: PlaceCardProps) {
   const { t } = useTranslation();
   const [isSaved, setIsSaved] = useState(place.isSaved);
   const [isToggling, setIsToggling] = useState(false);
+  const [animateHeart, setAnimateHeart] = useState(false);
   
+  // Effect to reset animation
+  useEffect(() => {
+    if (animateHeart) {
+      const timer = setTimeout(() => {
+        setAnimateHeart(false);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [animateHeart]);
+
   const toggleSave = async () => {
     if (isToggling) return;
     
@@ -30,6 +42,7 @@ export function PlaceCard({ place }: PlaceCardProps) {
       } else {
         await apiRequest('POST', `/api/places/${place.id}/favorite`);
         setIsSaved(true);
+        setAnimateHeart(true); // Trigger animation when saving
         toast({
           title: t('places.addedToFavorites', 'Added to favorites'),
           description: t('places.placeAddedToFavorites', '{{name}} has been added to your favorites.', {name: place.name}),
@@ -68,14 +81,20 @@ export function PlaceCard({ place }: PlaceCardProps) {
           )}
         </div>
         <button 
-          className={`absolute top-3 right-3 bg-white w-8 h-8 rounded-full flex items-center justify-center ${
-            isSaved ? 'text-accent' : 'text-dark hover:text-accent'
-          } transition`} 
+          className={`absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center shadow-md ${
+            isSaved 
+              ? 'bg-orange-500 text-white' 
+              : 'bg-white text-orange-500 hover:bg-orange-50'
+          } transition-all duration-200 transform hover:scale-110`} 
           aria-label={isSaved ? t('places.unsavePlace', 'Remove from saved') : t('places.savePlace', 'Save Place')}
           onClick={toggleSave}
           disabled={isToggling}
         >
-          <i className={isSaved ? "fas fa-heart" : "far fa-heart"}></i>
+          <i className={`
+            ${isSaved ? "fas fa-heart" : "far fa-heart"} 
+            text-lg
+            ${animateHeart ? 'animate-heartbeat' : ''}
+          `}></i>
         </button>
       </div>
       <div className="p-4">
