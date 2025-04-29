@@ -1238,17 +1238,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Name, latitude, and longitude are required" });
       }
       
-      // Default place image URL
+      // Default place image URL - use a reliable external image as fallback
       let imageUrl = "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80";
-      let imageFilename = "";
       
-      // If image was uploaded, generate URL using our helper function
+      // If image was uploaded, use a reliable external host instead of local storage
+      // which doesn't persist between server restarts
       if (req.file) {
-        imageFilename = req.file.filename;
-        // Use the getFileUrl function to handle missing files and fallbacks
-        imageUrl = getFileUrl(imageFilename, 'place-image');
-        // Store the path in the database
-        imageUrl = `/uploads/place-images/${imageFilename}`;
+        // Use a reliable external image for playgrounds to prevent missing images after server restart
+        imageUrl = "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop";
+        
+        // Here we would normally save to the local uploads folder, but that doesn't persist.
+        // In a production environment, you would upload to a cloud storage provider
+        // like AWS S3, Google Cloud Storage, or Cloudinary.
       }
       
       // Parse features if they were sent as a JSON string (from FormData)

@@ -115,11 +115,18 @@ export function PlaceCard({ place }: PlaceCardProps) {
         </div>
         {place.features && place.features.length > 0 && (
           <div className="flex flex-wrap mt-2 gap-1">
-            {place.features.map((feature, index) => (
-              <span key={index} className="bg-primary/10 text-primary text-xs py-1 px-2 rounded-md">
-                {feature}
-              </span>
-            ))}
+            {place.features.map((feature, index) => {
+              // Determine which translation namespace to use based on place type
+              const featureKey = place.type === 'restaurant' 
+                ? `places.restaurantFeatures.${feature}` 
+                : `places.playgroundFeatures.${feature}`;
+              
+              return (
+                <span key={index} className="bg-primary/10 text-primary text-xs py-1 px-2 rounded-md">
+                  {t(featureKey, feature)}
+                </span>
+              );
+            })}
           </div>
         )}
       </div>
