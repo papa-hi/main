@@ -22,11 +22,11 @@ type LoginFormValues = {
 };
 
 // Extend the insertUserSchema to add validation rules specific to registration
-const registerFormSchema = insertUserSchema.extend({
-  confirmPassword: z.string().min(1, "Confirm password is required"),
+const registerFormSchema = (t: any) => insertUserSchema.extend({
+  confirmPassword: z.string().min(1, t("auth:validation.confirmPasswordRequired", "Confirm password is required")),
   profileImageFile: z.any().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+  message: t("auth:validation.passwordsDoNotMatch", "Passwords don't match"),
   path: ["confirmPassword"],
 });
 
@@ -53,8 +53,8 @@ export default function AuthPage() {
     },
     resolver: zodResolver(
       z.object({
-        username: z.string().min(1, t("validation.usernameRequired", "Username is required")),
-        password: z.string().min(1, t("validation.passwordRequired", "Password is required")),
+        username: z.string().min(1, t("auth:validation.usernameRequired", "Username is required")),
+        password: z.string().min(1, t("auth:validation.passwordRequired", "Password is required")),
       })
     ),
   });

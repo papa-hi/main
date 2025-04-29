@@ -23,27 +23,37 @@ i18n
       en: {
         translation: enTranslations,
         errors: enTranslations.errors,
-        pwa: enTranslations.pwa
+        pwa: enTranslations.pwa,
+        auth: enTranslations.auth,
+        common: enTranslations.common
       },
       nl: {
         translation: nlTranslations,
         errors: nlTranslations.errors,
-        pwa: nlTranslations.pwa
+        pwa: nlTranslations.pwa,
+        auth: nlTranslations.auth,
+        common: nlTranslations.common
       },
       de: {
         translation: deTranslations,
         errors: deTranslations.errors,
-        pwa: deTranslations.pwa
+        pwa: deTranslations.pwa,
+        auth: deTranslations.auth,
+        common: deTranslations.common
       },
       fr: {
         translation: frTranslations,
         errors: frTranslations.errors,
-        pwa: frTranslations.pwa
+        pwa: frTranslations.pwa,
+        auth: frTranslations.auth,
+        common: frTranslations.common
       },
       es: {
         translation: esTranslations,
         errors: esTranslations.errors,
-        pwa: esTranslations.pwa
+        pwa: esTranslations.pwa,
+        auth: esTranslations.auth,
+        common: esTranslations.common
       }
     },
     lng: defaultLanguage,
