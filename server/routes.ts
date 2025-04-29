@@ -1238,19 +1238,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Name, latitude, and longitude are required" });
       }
       
-      // Default place image URL - use a reliable external image as fallback
-      let imageUrl = "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80";
+      // Use an unsplash image for playgrounds (reliable external image that won't disappear after server restart)
+      // Different playground images to provide variety
+      const playgroundImages = [
+        "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1679778162199-22a421833ef8?q=80&w=870&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80",
+        "https://images.unsplash.com/photo-1579795236542-b9086bed7b76?q=80&w=500&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1674554705063-9d217f4bb356?q=80&w=500&auto=format&fit=crop"
+      ];
       
-      // If image was uploaded, use a reliable external host instead of local storage
-      // which doesn't persist between server restarts
-      if (req.file) {
-        // Use a reliable external image for playgrounds to prevent missing images after server restart
-        imageUrl = "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop";
-        
-        // Here we would normally save to the local uploads folder, but that doesn't persist.
-        // In a production environment, you would upload to a cloud storage provider
-        // like AWS S3, Google Cloud Storage, or Cloudinary.
-      }
+      // Select a random image from the array
+      const randomIndex = Math.floor(Math.random() * playgroundImages.length);
+      let imageUrl = playgroundImages[randomIndex];
       
       // Parse features if they were sent as a JSON string (from FormData)
       let features = [];
