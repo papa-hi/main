@@ -21,16 +21,20 @@ type LoginFormValues = {
   password: string;
 };
 
-// Extend the insertUserSchema to add validation rules specific to registration
-const registerFormSchema = (t: any) => insertUserSchema.extend({
-  confirmPassword: z.string().min(1, t("auth:validation.confirmPasswordRequired", "Confirm password is required")),
-  profileImageFile: z.any().optional(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: t("auth:validation.passwordsDoNotMatch", "Passwords don't match"),
-  path: ["confirmPassword"],
-});
-
-type RegisterFormValues = z.infer<typeof registerFormSchema>;
+// Define the register form values type directly
+type RegisterFormValues = {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  firstName: string;
+  lastName: string;
+  bio?: string;
+  profileImage?: string;
+  profileImageFile?: File;
+  phoneNumber?: string;
+  city?: string;
+};
 
 export default function AuthPage() {
   const [_, navigate] = useLocation();
@@ -73,7 +77,24 @@ export default function AuthPage() {
       phoneNumber: "",
       city: "",
     },
-    resolver: zodResolver(registerFormSchema),
+    resolver: zodResolver(
+      z.object({
+        username: z.string().min(1, t("auth:validation.usernameRequired", "Username is required")),
+        email: z.string().email(t("auth:validation.invalidEmail", "Invalid email address")).min(1, t("auth:validation.emailRequired", "Email is required")),
+        password: z.string().min(6, t("auth:validation.passwordLength", "Password must be at least 6 characters")),
+        confirmPassword: z.string().min(1, t("auth:validation.confirmPasswordRequired", "Confirm password is required")),
+        firstName: z.string().min(1, t("auth:validation.firstNameRequired", "First name is required")),
+        lastName: z.string().min(1, t("auth:validation.lastNameRequired", "Last name is required")),
+        bio: z.string().optional(),
+        profileImage: z.string().optional(),
+        profileImageFile: z.any().optional(),
+        phoneNumber: z.string().optional(),
+        city: z.string().optional(),
+      }).refine((data) => data.password === data.confirmPassword, {
+        message: t("auth:validation.passwordsDoNotMatch", "Passwords don't match"),
+        path: ["confirmPassword"],
+      })
+    ),
   });
 
   const onLoginSubmit = async (data: LoginFormValues) => {
