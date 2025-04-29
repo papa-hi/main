@@ -776,7 +776,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const type = req.query.activeTab as string;
       
       const placesList = await storage.getPlaces({ latitude, longitude, type });
-      res.json(placesList);
+      
+      // Remove latitude and longitude from response to hide technical details
+      const placesWithoutCoordinates = placesList.map(place => {
+        const { latitude, longitude, ...placeWithoutCoordinates } = place;
+        return placeWithoutCoordinates;
+      });
+      
+      res.json(placesWithoutCoordinates);
     } catch (err) {
       console.error("Error fetching places:", err);
       res.status(500).json({ message: "Failed to fetch places" });
@@ -791,7 +798,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const type = req.query.activeFilter as string;
       
       const nearbyPlaces = await storage.getNearbyPlaces({ latitude, longitude, type });
-      res.json(nearbyPlaces);
+      
+      // Remove latitude and longitude from response to hide technical details
+      const placesWithoutCoordinates = nearbyPlaces.map(place => {
+        const { latitude, longitude, ...placeWithoutCoordinates } = place;
+        return placeWithoutCoordinates;
+      });
+      
+      res.json(placesWithoutCoordinates);
     } catch (err) {
       console.error("Error fetching nearby places:", err);
       res.status(500).json({ message: "Failed to fetch nearby places" });
