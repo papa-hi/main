@@ -17,12 +17,12 @@ function QuickActionButton({
   return (
     <Link href={href}>
       <a className="flex flex-col items-center bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition transform hover:scale-105">
-        <div className={`w-20 h-20 ${bgColor} rounded-full flex items-center justify-center mb-3 shadow-md overflow-hidden`}>
+        <div className={`w-24 h-24 ${bgColor} rounded-full flex items-center justify-center mb-3 shadow-md overflow-hidden`}>
           {customIcon && (
             <img 
               src={customIcon} 
               alt={label}
-              className="w-11 h-11 object-contain" 
+              className="w-20 h-20 object-contain p-1" 
             />
           )}
         </div>
