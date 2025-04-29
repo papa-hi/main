@@ -114,7 +114,47 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           try {
             const data = JSON.parse(event.data);
             
-            if (data.type === "message") {
+            if (data.type === "initial_messages") {
+              // Handle initial messages batch from server (after connecting or requesting messages)
+              setMessages((prevMessages) => {
+                // Get existing messages for this chat
+                const existingMessages = prevMessages[data.chatId] || [];
+                
+                // Check which messages are new
+                const newMessages = data.messages.filter(
+                  (newMsg: Message) => !existingMessages.some((existingMsg) => existingMsg.id === newMsg.id)
+                );
+                
+                // If no new messages, return existing state
+                if (newMessages.length === 0) {
+                  return prevMessages;
+                }
+                
+                // Combine existing and new messages
+                const combinedMessages = [...existingMessages, ...newMessages];
+                
+                // Sort by sent time
+                combinedMessages.sort((a, b) => 
+                  new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
+                );
+                
+                const updatedMessages = {
+                  ...prevMessages,
+                  [data.chatId]: combinedMessages
+                };
+                
+                // Store to localStorage with timestamp
+                localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
+                  messages: updatedMessages,
+                  timestamp: Date.now()
+                }));
+                
+                return updatedMessages;
+              });
+              
+              console.log(`Loaded ${data.messages.length} messages for chat ${data.chatId} from server`);
+            }
+            else if (data.type === "message") {
               const message = data.message;
               
               setMessages((prevMessages) => {
@@ -145,27 +185,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 
                 return updatedMessages;
               });
-            } else if (data.type === "initial_messages") {
-              const { chatId, messages: initialMessages } = data;
-              
-              setMessages((prevMessages) => {
-                const sortedMessages = initialMessages.sort((a: Message, b: Message) => {
-                  return new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime();
-                });
-                
-                const updatedMessages = {
-                  ...prevMessages,
-                  [chatId]: sortedMessages,
-                };
-                
-                // Store updated messages to localStorage with timestamp
-                localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
-                  messages: updatedMessages,
-                  timestamp: Date.now()
-                }));
-                
-                return updatedMessages;
-              });
+            // We already handle initial_messages above
             }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);

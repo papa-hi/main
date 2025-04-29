@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { playdates, places, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema } from "@shared/schema";
+import { playdates, places, users, chatMessages, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
@@ -10,6 +10,8 @@ import path from "path";
 import fs from "fs";
 import { WebSocketServer, WebSocket } from 'ws';
 import { fetchNearbyPlaygrounds } from "./maps-service";
+import { db } from "./db";
+import { eq, and, gte, asc, count } from "drizzle-orm";
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
@@ -1431,6 +1433,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ws.send(JSON.stringify({
               type: 'authenticated',
               success: true
+            }));
+          }
+        }
+        // Handle get_messages request
+        else if (data.type === 'get_messages') {
+          const clientInfo = clients.get(ws);
+          if (!clientInfo || !clientInfo.userId) {
+            ws.send(JSON.stringify({
+              type: 'error',
+              message: 'Not authenticated'
+            }));
+            return;
+          }
+          
+          try {
+            // Get the chat to verify the user is a participant
+            const chat = await storage.getChatById(data.chatId);
+            if (!chat || !chat.participants.some((p: any) => p.id === clientInfo.userId)) {
+              ws.send(JSON.stringify({
+                type: 'error',
+                message: 'You do not have access to this chat'
+              }));
+              return;
+            }
+            
+            // Calculate the date one week ago for message expiration
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            
+            // Get messages for this chat, limited to the last week
+            const messages = await db
+              .select()
+              .from(chatMessages)
+              .where(
+                and(
+                  eq(chatMessages.chatId, data.chatId),
+                  gte(chatMessages.sentAt, oneWeekAgo)
+                )
+              )
+              .orderBy(asc(chatMessages.sentAt));
+            
+            // Get sender details for all messages
+            const messagesWithSenders = await Promise.all(
+              messages.map(async (message) => {
+                const [sender] = await db
+                  .select({
+                    id: users.id,
+                    firstName: users.firstName,
+                    lastName: users.lastName,
+                    profileImage: users.profileImage
+                  })
+                  .from(users)
+                  .where(eq(users.id, message.senderId));
+                
+                return {
+                  ...message,
+                  sender
+                };
+              })
+            );
+            
+            // Send all messages to the client
+            ws.send(JSON.stringify({
+              type: 'initial_messages',
+              chatId: data.chatId,
+              messages: messagesWithSenders
+            }));
+          } catch (err) {
+            console.error('Error fetching chat messages:', err);
+            ws.send(JSON.stringify({
+              type: 'error',
+              message: 'Failed to fetch messages'
             }));
           }
         }
