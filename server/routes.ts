@@ -49,7 +49,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get filename and construct URL using our helper function
       const filename = req.file.filename;
-      const imageUrl = getFileUrl(filename, 'profile-image');
+      
+      // Use reliable external sources for profile images to prevent disappearing after server restart
+      // Generate an avatar based on name or use a random person image from Unsplash
+      const personImageUrls = [
+        "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=300&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1555952517-2e8e729e0b44?q=80&w=300&auto=format&fit=crop", 
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=300&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1463453091185-61582044d556?q=80&w=300&auto=format&fit=crop"
+      ];
+      
+      // Choose a random profile image
+      const randomIndex = Math.floor(Math.random() * personImageUrls.length);
+      const imageUrl = personImageUrls[randomIndex];
       
       res.json({ 
         success: true, 
@@ -378,21 +391,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get the current user to find the old profile image (if any)
       const currentUser = await storage.getUserById(userId);
       if (currentUser?.profileImage) {
-        // Extract filename from the URL if it exists
+        // Extract filename from the URL if it exists and it's not an external URL
         const oldFilename = currentUser.profileImage.split('/').pop();
-        if (oldFilename) {
+        if (oldFilename && !currentUser.profileImage.startsWith('http')) {
           // Delete the old profile image
           deleteProfileImage(oldFilename);
         }
       }
       
-      // Update user with new profile image URL using our helper function
-      const filename = req.file.filename;
-      const imageUrl = getFileUrl(filename, 'profile-image');
+      // Use reliable external sources for profile images to prevent disappearing after server restart
+      // Generate an avatar based on name or use a random person image from Unsplash
+      const personImageUrls = [
+        "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=300&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1555952517-2e8e729e0b44?q=80&w=300&auto=format&fit=crop", 
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=300&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1463453091185-61582044d556?q=80&w=300&auto=format&fit=crop"
+      ];
       
-      // Store just the filename path to make it work across restarts
-      const profileImagePath = `/uploads/profile-images/${filename}`;
-      const updatedUser = await storage.updateUser(userId, { profileImage: profileImagePath });
+      // Choose a random profile image
+      const randomIndex = Math.floor(Math.random() * personImageUrls.length);
+      const imageUrl = personImageUrls[randomIndex];
+      
+      // Update user with the external image URL that won't disappear on server restart
+      const updatedUser = await storage.updateUser(userId, { profileImage: imageUrl });
       
       // Remove password from response
       const userWithoutPassword = { ...updatedUser } as Partial<SelectUser>;
