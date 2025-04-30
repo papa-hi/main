@@ -52,23 +52,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get filename and construct URL using our helper function
       const filename = req.file.filename;
       
-      // Use reliable external sources for profile images to prevent disappearing after server restart
-      // Generate an avatar based on name or use a random person image from Unsplash
-      const personImageUrls = [
-        "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=300&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1555952517-2e8e729e0b44?q=80&w=300&auto=format&fit=crop", 
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=300&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1463453091185-61582044d556?q=80&w=300&auto=format&fit=crop"
-      ];
+      // Create a proper URL to the uploaded file
+      const baseUrl = process.env.BASE_URL || '';
+      const imageUrl = `${baseUrl}/uploads/profile-images/${filename}`;
       
-      // Choose a random profile image
-      const randomIndex = Math.floor(Math.random() * personImageUrls.length);
-      const imageUrl = personImageUrls[randomIndex];
+      console.log(`Profile image uploaded: ${filename}`);
+      console.log(`Image URL: ${imageUrl}`);
       
       res.json({ 
         success: true, 
-        filename, // Return filename separately
+        filename,
         imageUrl
       });
     } catch (err) {
@@ -401,19 +394,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Use reliable external sources for profile images to prevent disappearing after server restart
-      // Generate an avatar based on name or use a random person image from Unsplash
-      const personImageUrls = [
-        "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=300&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1555952517-2e8e729e0b44?q=80&w=300&auto=format&fit=crop", 
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=300&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1463453091185-61582044d556?q=80&w=300&auto=format&fit=crop"
-      ];
+      // Get filename and construct URL for the uploaded file
+      const filename = req.file.filename;
       
-      // Choose a random profile image
-      const randomIndex = Math.floor(Math.random() * personImageUrls.length);
-      const imageUrl = personImageUrls[randomIndex];
+      // Create a proper URL to the uploaded file
+      const baseUrl = process.env.BASE_URL || '';
+      const imageUrl = `${baseUrl}/uploads/profile-images/${filename}`;
+      
+      console.log(`Profile image updated: ${filename}`);
+      console.log(`Image URL: ${imageUrl}`);
       
       // Update user with the external image URL that won't disappear on server restart
       const updatedUser = await storage.updateUser(userId, { profileImage: imageUrl });
@@ -1276,19 +1265,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Name, latitude, and longitude are required" });
       }
       
-      // Use an unsplash image for playgrounds (reliable external image that won't disappear after server restart)
-      // Different playground images to provide variety
-      const playgroundImages = [
-        "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1679778162199-22a421833ef8?q=80&w=870&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80",
-        "https://images.unsplash.com/photo-1579795236542-b9086bed7b76?q=80&w=500&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1674554705063-9d217f4bb356?q=80&w=500&auto=format&fit=crop"
-      ];
+      // Get the uploaded image file, if any
+      let imageUrl = '';
       
-      // Select a random image from the array
-      const randomIndex = Math.floor(Math.random() * playgroundImages.length);
-      let imageUrl = playgroundImages[randomIndex];
+      if (req.file) {
+        // Create a proper URL to the uploaded file
+        const filename = req.file.filename;
+        const baseUrl = process.env.BASE_URL || '';
+        imageUrl = `${baseUrl}/uploads/place-images/${filename}`;
+        console.log(`Playground image uploaded: ${filename}`);
+        console.log(`Image URL: ${imageUrl}`);
+      } else {
+        // Fallback image if no file was uploaded
+        imageUrl = 'https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop';
+        console.log(`No image uploaded for playground, using fallback image`);
+      }
       
       // Parse features if they were sent as a JSON string (from FormData)
       let features = [];
