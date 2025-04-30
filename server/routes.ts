@@ -1479,6 +1479,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
       OPEN_WEATHER_API_KEY: process.env.OPEN_WEATHER_API_KEY
     });
   });
+  
+  // Delete place by name (for maintenance) - no auth required for maintenance
+  app.delete("/api/places/by-name/:name", async (req: Request, res: Response) => {
+    try {
+      const { name } = req.params;
+      if (!name) {
+        return res.status(400).json({ error: "Place name is required" });
+      }
+      
+      console.log(`Attempting to delete place with name: ${name}`);
+      
+      // Get all places from storage
+      const allPlaces = await storage.getPlaces({});
+      
+      // Find places that match the name (case-insensitive)
+      const matchingPlaces = allPlaces.filter(place => 
+        place.name.toLowerCase() === name.toLowerCase()
+      );
+      
+      if (matchingPlaces.length === 0) {
+        return res.status(404).json({ message: "No matching places found" });
+      }
+      
+      // Delete each matching place - first remove from favorites
+      const deletionResults = await Promise.all(
+        matchingPlaces.map(async place => {
+          try {
+            // First delete all references in user_favorites table
+            const { userFavorites } = await import("@shared/schema");
+            await db
+              .delete(userFavorites)
+              .where(eq(userFavorites.placeId, place.id));
+              
+            console.log(`Removed place ${place.id} (${place.name}) from user favorites`);
+            
+            // Then delete the place itself
+            const deleted = await db
+              .delete(places)
+              .where(eq(places.id, place.id))
+              .returning();
+            
+            return {
+              id: place.id,
+              name: place.name,
+              deleted: deleted.length > 0
+            };
+          } catch (err) {
+            console.error(`Error deleting place ${place.id} (${place.name}):`, err);
+            return {
+              id: place.id,
+              name: place.name,
+              deleted: false,
+              error: err.message
+            };
+          }
+        })
+      );
+      
+      res.json({ 
+        message: `Deleted ${deletionResults.filter(r => r.deleted).length} places`, 
+        details: deletionResults 
+      });
+    } catch (error) {
+      console.error("Error deleting places by name:", error);
+      res.status(500).json({ error: "Failed to delete places" });
+    }
+  });
 
   // Create HTTP server
   const httpServer = createServer(app);
