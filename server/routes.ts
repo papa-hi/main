@@ -1384,6 +1384,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Add a place with image upload (restaurant or playground)
+  app.post("/api/places/with-image", isAuthenticated, upload.single('placeImage'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      // Validate required fields
+      if (!req.body.name || !req.body.latitude || !req.body.longitude || !req.body.type) {
+        return res.status(400).json({ error: "Name, latitude, longitude, and type are required" });
+      }
+      
+      // Validate type is either restaurant or playground
+      if (req.body.type !== 'restaurant' && req.body.type !== 'playground') {
+        return res.status(400).json({ error: "Type must be either 'restaurant' or 'playground'" });
+      }
+      
+      // Get the uploaded image file, if any
+      let imageUrl = '';
+      
+      if (req.file) {
+        // Create a proper URL to the uploaded file
+        const filename = req.file.filename;
+        const baseUrl = process.env.BASE_URL || '';
+        imageUrl = `${baseUrl}/uploads/place-images/${filename}`;
+        console.log(`Place image uploaded: ${filename}`);
+        console.log(`Image URL: ${imageUrl}`);
+      } else {
+        // Fallback image if no file was uploaded
+        imageUrl = req.body.type === 'restaurant' 
+          ? "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80"
+          : "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80";
+        console.log(`No image uploaded for ${req.body.type}, using fallback image`);
+      }
+      
+      // Parse features if they were sent as a JSON string (from FormData)
+      let features = [];
+      if (req.body.features) {
+        try {
+          if (typeof req.body.features === 'string') {
+            features = JSON.parse(req.body.features);
+          } else if (Array.isArray(req.body.features)) {
+            features = req.body.features;
+          }
+        } catch (e) {
+          console.error("Error parsing features JSON:", e);
+        }
+      }
+      
+      // Create a new place object
+      const placeData = {
+        name: req.body.name,
+        type: req.body.type,
+        description: req.body.description || "",
+        address: req.body.address || "",
+        latitude: req.body.latitude.toString(),
+        longitude: req.body.longitude.toString(),
+        imageUrl: imageUrl,
+        features: features,
+      };
+      
+      try {
+        // Validate the place data against the schema
+        insertPlaceSchema.parse(placeData);
+      } catch (validationError) {
+        if (validationError instanceof ZodError) {
+          const readableError = fromZodError(validationError);
+          return res.status(400).json({ error: readableError.message });
+        }
+        throw validationError;
+      }
+      
+      // Save the place
+      const newPlace = await storage.createPlace(placeData);
+      
+      res.status(201).json(newPlace);
+    } catch (error) {
+      console.error("Error creating place with image:", error);
+      res.status(500).json({ error: "Failed to create place with image" });
+    }
+  });
+  
   // Simple test endpoint with no authentication
   app.get("/api/test", (req, res) => {
     res.json({ message: "Test endpoint works!" });
