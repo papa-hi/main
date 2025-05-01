@@ -1409,8 +1409,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.file) {
         // Create a proper URL to the uploaded file
         const filename = req.file.filename;
-        const baseUrl = process.env.BASE_URL || '';
-        imageUrl = `${baseUrl}/uploads/place-images/${filename}`;
+        imageUrl = `/place-images/${filename}`;
         console.log(`Place image uploaded: ${filename}`);
         console.log(`Image URL: ${imageUrl}`);
       } else {
@@ -1531,7 +1530,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               id: place.id,
               name: place.name,
               deleted: false,
-              error: err.message
+              error: (err as Error).message
             };
           }
         })
