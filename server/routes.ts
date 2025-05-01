@@ -1505,9 +1505,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.description) updateData.description = req.body.description;
       if (req.body.address) updateData.address = req.body.address;
       
-      // Handle latitude and longitude if provided
-      if (req.body.latitude) updateData.latitude = req.body.latitude;
-      if (req.body.longitude) updateData.longitude = req.body.longitude;
+      // Handle latitude and longitude if provided and not empty
+      if (req.body.latitude && req.body.latitude.trim() !== '') {
+        updateData.latitude = req.body.latitude;
+      }
+      
+      if (req.body.longitude && req.body.longitude.trim() !== '') {
+        updateData.longitude = req.body.longitude;
+      }
       
       // Handle features if provided
       if (req.body.features) {

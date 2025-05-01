@@ -1561,8 +1561,16 @@ export class DatabaseStorage implements IStorage {
     if (placeData.name !== undefined) updateData.name = placeData.name;
     if (placeData.description !== undefined) updateData.description = placeData.description;
     if (placeData.address !== undefined) updateData.address = placeData.address;
-    if (placeData.latitude !== undefined) updateData.latitude = placeData.latitude.toString();
-    if (placeData.longitude !== undefined) updateData.longitude = placeData.longitude.toString();
+    
+    // Only update latitude and longitude if they're not undefined and not empty strings
+    if (placeData.latitude !== undefined && placeData.latitude !== '') {
+      updateData.latitude = placeData.latitude.toString();
+    }
+    
+    if (placeData.longitude !== undefined && placeData.longitude !== '') {
+      updateData.longitude = placeData.longitude.toString();
+    }
+    
     if (placeData.imageUrl !== undefined) updateData.image_url = placeData.imageUrl;
     if (placeData.features !== undefined) updateData.features = placeData.features;
     

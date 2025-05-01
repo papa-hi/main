@@ -25,8 +25,8 @@ const playgroundEditSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
   description: z.string().optional(),
   address: z.string().optional().default(""),
-  latitude: z.string(),
-  longitude: z.string(),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
   image: z.instanceof(File).optional(),
   features: z.array(z.string()).default([]),
 });
@@ -85,9 +85,20 @@ export function EditPlaygroundForm({
       const formData = new FormData();
       formData.append('name', data.name);
       formData.append('description', data.description || '');
-      formData.append('address', data.address);
-      formData.append('latitude', data.latitude);
-      formData.append('longitude', data.longitude);
+      
+      // Only include address if it's provided
+      if (data.address) {
+        formData.append('address', data.address);
+      }
+      
+      // Only include latitude and longitude if they are provided as strings
+      if (data.latitude && typeof data.latitude === 'string') {
+        formData.append('latitude', data.latitude);
+      }
+      
+      if (data.longitude && typeof data.longitude === 'string') {
+        formData.append('longitude', data.longitude);
+      }
       
       // Add features as a JSON string
       if (data.features && data.features.length > 0) {
