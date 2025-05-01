@@ -4,14 +4,18 @@ import { getFormattedDistance } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useAuth } from "@/hooks/use-auth";
 
 interface PlaceCardProps {
   place: Place;
+  onEdit?: (place: Place) => void;
 }
 
-export function PlaceCard({ place }: PlaceCardProps) {
+export function PlaceCard({ place, onEdit }: PlaceCardProps) {
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [isSaved, setIsSaved] = useState(place.isSaved);
   const [isToggling, setIsToggling] = useState(false);
   const [animateHeart, setAnimateHeart] = useState(false);
@@ -98,7 +102,18 @@ export function PlaceCard({ place }: PlaceCardProps) {
         </button>
       </div>
       <div className="p-4">
-        <h3 className="font-heading font-medium text-base mb-1">{place.name}</h3>
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="font-heading font-medium text-base">{place.name}</h3>
+          {place.type === 'playground' && onEdit && user && (
+            <button 
+              onClick={() => onEdit(place)}
+              className="text-primary hover:text-primary/80 transition-colors"
+              aria-label={t('places.editPlace', 'Edit place')}
+            >
+              <i className="fas fa-edit text-sm"></i>
+            </button>
+          )}
+        </div>
         <div className="flex items-center text-sm text-dark/70 mb-2">
           <i className="fas fa-map-marker-alt mr-1 text-xs"></i>
           <span>{place.address}</span>
