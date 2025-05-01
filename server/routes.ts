@@ -1480,6 +1480,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Delete place by name (for maintenance) - no auth required for maintenance
+  // Update a place (playground or restaurant)
+  app.patch("/api/places/:id", isAuthenticated, upload.single('placeImage'), async (req: Request, res: Response) => {
+    try {
+      const placeId = parseInt(req.params.id);
+      if (isNaN(placeId)) {
+        return res.status(400).json({ error: "Invalid place ID" });
+      }
+      
+      // Get the existing place to ensure it exists
+      const existingPlace = await storage.getPlaces({ 
+        // Using empty filters to get all places
+      }).then(places => places.find(p => p.id === placeId));
+      
+      if (!existingPlace) {
+        return res.status(404).json({ error: "Place not found" });
+      }
+      
+      // Prepare the update data
+      const updateData: Partial<Place> = {};
+      
+      // Only update fields that are provided
+      if (req.body.name) updateData.name = req.body.name;
+      if (req.body.description) updateData.description = req.body.description;
+      if (req.body.address) updateData.address = req.body.address;
+      
+      // Handle latitude and longitude if provided
+      if (req.body.latitude) updateData.latitude = req.body.latitude;
+      if (req.body.longitude) updateData.longitude = req.body.longitude;
+      
+      // Handle features if provided
+      if (req.body.features) {
+        try {
+          if (typeof req.body.features === 'string') {
+            updateData.features = JSON.parse(req.body.features);
+          } else if (Array.isArray(req.body.features)) {
+            updateData.features = req.body.features;
+          }
+        } catch (e) {
+          console.error("Error parsing features JSON:", e);
+        }
+      }
+      
+      // Handle image upload if provided
+      if (req.file) {
+        const filename = req.file.filename;
+        updateData.imageUrl = `/place-images/${filename}`;
+        console.log(`Updated place image: ${filename}`);
+        console.log(`New image URL: ${updateData.imageUrl}`);
+      }
+      
+      // Update the place
+      const updatedPlace = await storage.updatePlace(placeId, updateData);
+      
+      res.json(updatedPlace);
+    } catch (error) {
+      console.error("Error updating place:", error);
+      res.status(500).json({ error: "Failed to update place" });
+    }
+  });
+
   app.delete("/api/places/by-name/:name", async (req: Request, res: Response) => {
     try {
       const { name } = req.params;

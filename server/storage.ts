@@ -547,6 +547,31 @@ export class MemStorage implements IStorage {
     return place;
   }
   
+  async updatePlace(id: number, placeData: Partial<Place>): Promise<Place> {
+    const place = this.places.get(id);
+    
+    if (!place) {
+      throw new Error(`Place with id ${id} not found`);
+    }
+    
+    // Update only the provided fields
+    const updatedPlace: Place = {
+      ...place,
+      ...placeData,
+      // Don't update these fields
+      id: place.id,
+      createdAt: place.createdAt,
+      // These fields might come from the request but should be preserved
+      distance: place.distance,
+      isSaved: place.isSaved
+    };
+    
+    // Update in storage
+    this.places.set(id, updatedPlace);
+    
+    return updatedPlace;
+  }
+  
   // Chat methods
   async getChats(userId: number): Promise<any[]> {
     const userChats: any[] = [];
