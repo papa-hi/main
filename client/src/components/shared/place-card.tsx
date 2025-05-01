@@ -104,15 +104,24 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-heading font-medium text-base">{place.name}</h3>
-          {place.type === 'playground' && onEdit && user && (
-            <button 
-              onClick={() => onEdit(place)}
-              className="text-primary hover:text-primary/80 transition-colors"
-              aria-label={t('places.editPlace', 'Edit place')}
-            >
-              <i className="fas fa-edit text-sm"></i>
-            </button>
-          )}
+          <div>
+            {/* Show debug info */}
+            <span className="text-xs text-gray-400 mr-2">
+              {place.type === 'playground' ? '(P)' : '(R)'}
+            </span>
+            
+            {/* Edit button */}
+            {place.type === 'playground' && onEdit && (
+              <button 
+                onClick={() => onEdit(place)}
+                className="bg-primary text-white px-2 py-1 rounded-md text-xs hover:bg-primary/80 transition-colors"
+                aria-label={t('places.editPlace', 'Edit place')}
+              >
+                <i className="fas fa-edit text-xs mr-1"></i>
+                Edit
+              </button>
+            )}
+          </div>
         </div>
         <div className="flex items-center text-sm text-dark/70 mb-2">
           <i className="fas fa-map-marker-alt mr-1 text-xs"></i>
