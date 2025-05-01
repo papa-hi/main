@@ -70,6 +70,11 @@ export default function ChatPage() {
   return (
     <div className="h-full">
       <div className="max-w-6xl mx-auto">
+        {/* Chat Expiration Notice */}
+        <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2 rounded-md text-sm">
+          <p>{t('chat.expirationNotice', 'Note: Chat messages are automatically deleted after one week for privacy.')}</p>
+        </div>
+        
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">{t('chat.title', 'Messages')}</h1>
           

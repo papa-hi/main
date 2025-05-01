@@ -175,10 +175,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                   [message.chatId]: chatMessages,
                 };
                 
-                // Store updated messages to localStorage with timestamp
+                // Store updated messages to localStorage with per-chat timestamps
                 localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
                   messages: updatedMessages,
-                  timestamp: Date.now()
+                  timestamps: {
+                    ...JSON.parse(localStorage.getItem('papa-hi-chat-messages') || '{"timestamps":{}}').timestamps,
+                    [message.chatId]: Date.now()
+                  }
                 }));
                 
                 return updatedMessages;
@@ -268,14 +271,48 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       try {
         const storedData = localStorage.getItem('papa-hi-chat-messages');
         if (storedData) {
-          const { timestamp } = JSON.parse(storedData);
+          const { messages: storedMessages, timestamps } = JSON.parse(storedData);
           const now = Date.now();
           
-          // If the stored timestamp is older than the expiration time, clear messages
-          if (now - timestamp >= MESSAGE_EXPIRATION_TIME) {
-            console.log('Chat messages have expired, clearing cache');
-            localStorage.removeItem('papa-hi-chat-messages');
-            setMessages({});
+          if (!timestamps) {
+            // If using old format, migrate to new format
+            localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
+              messages: storedMessages,
+              timestamps: Object.keys(storedMessages).reduce((acc, chatId) => {
+                acc[chatId] = now;
+                return acc;
+              }, {})
+            }));
+            return;
+          }
+          
+          // Check each chat's timestamp individually
+          let hasExpired = false;
+          const updatedMessages = { ...storedMessages };
+          const updatedTimestamps = { ...timestamps };
+          
+          Object.entries(timestamps).forEach(([chatId, timestamp]) => {
+            if (now - Number(timestamp) >= MESSAGE_EXPIRATION_TIME) {
+              console.log(`Chat ${chatId} messages have expired (older than 1 week), removing`);
+              delete updatedMessages[chatId];
+              delete updatedTimestamps[chatId];
+              hasExpired = true;
+            }
+          });
+          
+          // Update storage if any chats were expired
+          if (hasExpired) {
+            if (Object.keys(updatedMessages).length === 0) {
+              console.log('All chat messages expired, clearing cache');
+              localStorage.removeItem('papa-hi-chat-messages');
+              setMessages({});
+            } else {
+              localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
+                messages: updatedMessages,
+                timestamps: updatedTimestamps
+              }));
+              setMessages(updatedMessages);
+            }
           }
         }
       } catch (err) {
