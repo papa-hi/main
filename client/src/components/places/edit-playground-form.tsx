@@ -24,7 +24,7 @@ import { queryClient } from "@/lib/queryClient";
 const playgroundEditSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
   description: z.string().optional(),
-  address: z.string().min(3, { message: "Address is required" }),
+  address: z.string().optional().default(""),
   latitude: z.string(),
   longitude: z.string(),
   image: z.instanceof(File).optional(),
@@ -65,7 +65,7 @@ export function EditPlaygroundForm({
   });
 
   // Update the form when the playground changes
-  useState(() => {
+  useEffect(() => {
     if (playground) {
       form.reset({
         name: playground.name,
@@ -76,7 +76,7 @@ export function EditPlaygroundForm({
         features: playground.features || [],
       });
     }
-  });
+  }, [playground, form]);
   
   // Mutation for updating a playground
   const updatePlaygroundMutation = useMutation({

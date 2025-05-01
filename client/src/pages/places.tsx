@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation as useGeoLocation } from "@/hooks/use-location";
 import { useTranslation } from "react-i18next";
 import { AddRestaurantForm } from "@/components/places/add-restaurant-form";
+import { EditPlaygroundForm } from "@/components/places/edit-playground-form";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function PlacesPage() {
@@ -72,6 +73,15 @@ export default function PlacesPage() {
   
   // Define state for showing add restaurant form
   const [showAddRestaurantForm, setShowAddRestaurantForm] = useState(false);
+  // Define state for the edit playground dialog
+  const [editPlaygroundOpen, setEditPlaygroundOpen] = useState(false);
+  const [selectedPlayground, setSelectedPlayground] = useState<Place | null>(null);
+
+  // Handler for edit button click
+  const handleEditPlayground = (playground: Place) => {
+    setSelectedPlayground(playground);
+    setEditPlaygroundOpen(true);
+  };
   
   const renderPlaceGrid = () => {
     if (isLoading) {
@@ -115,7 +125,11 @@ export default function PlacesPage() {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
         {filteredPlaces.map(place => (
-          <PlaceCard key={place.id} place={place} />
+          <PlaceCard 
+            key={place.id} 
+            place={place} 
+            onEdit={place.type === 'playground' ? handleEditPlayground : undefined}
+          />
         ))}
       </div>
     );
@@ -185,6 +199,19 @@ export default function PlacesPage() {
       
       {/* Places Grid */}
       {renderPlaceGrid()}
+      
+      {/* Edit Playground Dialog */}
+      {selectedPlayground && (
+        <EditPlaygroundForm
+          playground={selectedPlayground}
+          open={editPlaygroundOpen}
+          onOpenChange={setEditPlaygroundOpen}
+          onSuccess={() => {
+            setEditPlaygroundOpen(false);
+            setSelectedPlayground(null);
+          }}
+        />
+      )}
     </div>
   );
 }
