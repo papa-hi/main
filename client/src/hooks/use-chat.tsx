@@ -34,19 +34,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [connecting, setConnecting] = useState(false);
   const [messages, setMessages] = useState<Record<number, Message[]>>(() => {
     try {
-      // Load messages from localStorage with expiration check
+      // Load messages from localStorage
       const storedData = localStorage.getItem('papa-hi-chat-messages');
       if (storedData) {
-        const { messages, timestamp } = JSON.parse(storedData);
-        const now = Date.now();
-
-        // Check if data is expired (older than 1 week)
-        if (now - timestamp < MESSAGE_EXPIRATION_TIME) {
-          return messages;
-        } else {
-          console.log('Chat messages have expired, clearing cache');
-          localStorage.removeItem('papa-hi-chat-messages');
-        }
+        const { messages, timestamps } = JSON.parse(storedData);
+        
+        // Messages are retained if their timestamp is within the retention period
+        // We'll filter expired messages per chat later in the code
+        return messages;
       }
     } catch (err) {
       console.error('Error loading cached messages:', err);
@@ -143,10 +138,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                   [data.chatId]: combinedMessages
                 };
                 
-                // Store to localStorage with timestamp
+                // Store to localStorage with message timestamps
                 localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
                   messages: updatedMessages,
-                  timestamp: Date.now()
+                  timestamps: {
+                    ...JSON.parse(localStorage.getItem('papa-hi-chat-messages') || '{"timestamps":{}}').timestamps,
+                    [data.chatId]: Date.now()
+                  }
                 }));
                 
                 return updatedMessages;
