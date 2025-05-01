@@ -40,6 +40,7 @@ export interface IStorage {
   addFavoritePlace(userId: number, placeId: number): Promise<any>;
   removeFavoritePlace(userId: number, placeId: number): Promise<boolean>;
   createPlace(place: any): Promise<Place>;
+  updatePlace(id: number, placeData: Partial<Place>): Promise<Place>;
   
   // Chat methods
   getChats(userId: number): Promise<Chat[]>;
@@ -1525,6 +1526,37 @@ export class DatabaseStorage implements IStorage {
       ...place,
       distance: 0, // This will be calculated when queried with coordinates
       isSaved: false
+    };
+  }
+  
+  async updatePlace(id: number, placeData: Partial<Place>): Promise<Place> {
+    // Prepare update data - only include fields that are provided
+    const updateData: any = {};
+    
+    if (placeData.name !== undefined) updateData.name = placeData.name;
+    if (placeData.description !== undefined) updateData.description = placeData.description;
+    if (placeData.address !== undefined) updateData.address = placeData.address;
+    if (placeData.latitude !== undefined) updateData.latitude = placeData.latitude.toString();
+    if (placeData.longitude !== undefined) updateData.longitude = placeData.longitude.toString();
+    if (placeData.imageUrl !== undefined) updateData.image_url = placeData.imageUrl;
+    if (placeData.features !== undefined) updateData.features = placeData.features;
+    
+    // Update the place
+    const [updatedPlace] = await db
+      .update(places)
+      .set(updateData)
+      .where(eq(places.id, id))
+      .returning();
+    
+    if (!updatedPlace) {
+      throw new Error(`Place with id ${id} not found`);
+    }
+    
+    // Return with distance and saved status (these are calculated per request)
+    return {
+      ...updatedPlace,
+      distance: placeData.distance ?? 0,
+      isSaved: placeData.isSaved ?? false
     };
   }
 
