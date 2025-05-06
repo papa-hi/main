@@ -1,6 +1,6 @@
 {
   "auth": {
-    "welcome": "Welcome to Papa-Hi",
+    "welcome": "Welcome to PaPa-Hi",
     "tagline": "Connect with fellow dads, find playdates, and discover family-friendly places",
     "login": "Login",
     "register": "Register",
@@ -45,7 +45,7 @@
       "lastNameRequired": "Last name is required"
     },
     "hero": {
-      "title": "Papa-Hi",
+      "title": "PaPa-Hi",
       "subtitle": "The social app for Dutch dads",
       "feature1": "Connect with other dads in your neighborhood",
       "feature2": "Find and organize playdates for your kids",
@@ -307,7 +307,7 @@
       "viewPrivacyPolicy": "View Privacy Policy"
     },
     "install": {
-      "title": "Install Papa-Hi",
+      "title": "Install PaPa-Hi",
       "description": "Get faster access and offline capabilities on your device!",
       "later": "Later",
       "install": "Install"

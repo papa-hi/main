@@ -10,7 +10,7 @@ const PaPaHiLogo = () => (
   <div className="flex items-center justify-center h-14 w-10 overflow-hidden rounded-[28px] bg-white">
     <img 
       src="/images/papa-hi.png" 
-      alt="Papa-Hi Logo" 
+      alt="PaPa-Hi Logo" 
       className="h-full w-full object-contain scale-150" 
     />
   </div>
