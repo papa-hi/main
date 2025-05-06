@@ -13,11 +13,11 @@ import {
 
 // Logo for Papa-Hi
 const PapaHiLogo = () => (
-  <div className="flex items-center justify-center h-14 w-14 rounded-full bg-white p-1">
+  <div className="flex items-center justify-center h-12 w-14 overflow-hidden rounded-lg">
     <img 
       src="/images/papa-hi.png" 
       alt="Papa-Hi Logo" 
-      className="h-12 w-12 object-contain" 
+      className="h-full w-full object-cover" 
     />
   </div>
 );
