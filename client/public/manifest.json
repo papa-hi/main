@@ -9,14 +9,14 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/icon-192x192.svg",
-      "type": "image/svg+xml",
+      "src": "/icons/icon-192x192.png",
+      "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512x512.svg",
-      "type": "image/svg+xml",
+      "src": "/icons/icon-512x512.png",
+      "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
     },
@@ -36,6 +36,12 @@
       "src": "/apple-touch-icon.png",
       "type": "image/png",
       "sizes": "180x180",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/papa-hi.png",
+      "type": "image/png",
+      "sizes": "512x512",
       "purpose": "any"
     }
   ],

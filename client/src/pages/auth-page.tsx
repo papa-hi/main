@@ -527,9 +527,16 @@ export default function AuthPage() {
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-foreground to-background">
         <div className="w-full h-full flex flex-col justify-center p-12">
           <div className="max-w-lg">
-            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-              {t("auth:hero.title", "Papa-Hi")}
-            </h1>
+            <div className="flex items-center mb-6">
+              <img 
+                src="/images/papa-hi.png" 
+                alt="Papa-Hi Logo" 
+                className="h-20 w-auto object-contain mr-4" 
+              />
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                {t("auth:hero.title", "Papa-Hi")}
+              </h1>
+            </div>
             <p className="text-3xl font-medium mb-8">
               {t("auth:hero.subtitle", "The social app for Dutch dads")}
             </p>
