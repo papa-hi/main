@@ -147,7 +147,7 @@ export default function AuthPage() {
       <div className="w-full lg:w-1/2 p-6 flex items-center justify-center">
         <Card className="w-full max-w-md shadow-lg border-primary/10">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">
+            <CardTitle className="text-2xl font-bold text-center font-['Varela_Round']">
               {t("auth:welcome", "Welcome to PaPa-Hi")}
             </CardTitle>
             <CardDescription className="text-center">
@@ -531,15 +531,15 @@ export default function AuthPage() {
               <div className="flex items-center justify-center h-[72px] w-12 overflow-hidden rounded-[36px] mr-4 bg-white">
                 <img 
                   src="/images/papa-hi.png" 
-                  alt="Papa-Hi Logo" 
+                  alt="PaPa-Hi Logo" 
                   className="h-full w-full object-contain scale-150" 
                 />
               </div>
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent font-['Varela_Round']">
                 {t("auth:hero.title", "PaPa-Hi")}
               </h1>
             </div>
-            <p className="text-3xl font-medium mb-8">
+            <p className="text-3xl font-medium mb-8 font-['Varela_Round']">
               {t("auth:hero.subtitle", "The social app for Dutch dads")}
             </p>
             <div className="space-y-6">
