@@ -13,14 +13,12 @@ import {
 
 // Logo for Papa-Hi
 const PapaHiLogo = () => (
-  <div className="flex items-center h-40">
-    <div className="h-16 w-16 rounded-full bg-white p-0 flex items-center justify-center overflow-hidden">
-      <img 
-        src="/images/papa-hi.png" 
-        alt="Papa-Hi Logo" 
-        className="h-full w-full object-cover" 
-      />
-    </div>
+  <div className="flex items-center h-14">
+    <img 
+      src="/images/papa-hi.png" 
+      alt="Papa-Hi Logo" 
+      className="h-full w-auto rounded-full" 
+    />
   </div>
 );
 
@@ -51,11 +49,11 @@ export function Header({ user }: HeaderProps) {
   };
 
   return (
-    <header className="bg-primary text-white py-1 px-4 shadow-md sticky top-0 z-50">
+    <header className="bg-primary text-white py-4 px-4 shadow-md sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
           <PapaHiLogo />
-          <h1 className="text-3xl font-heading font-bold ml-3">Papa-Hi</h1>
+          <h1 className="text-2xl font-heading font-bold ml-3">Papa-Hi</h1>
         </div>
         
         <div className="flex items-center space-x-3">
@@ -253,7 +251,7 @@ export function Header({ user }: HeaderProps) {
       
       {/* Mobile Menu Dropdown */}
       {menuOpen && (
-        <div className="md:hidden bg-primary/95 absolute top-[160px] left-0 right-0 p-4 shadow-lg z-50">
+        <div className="md:hidden bg-primary/95 absolute top-full left-0 right-0 p-4 shadow-lg z-50">
           <nav className="flex flex-col space-y-3 text-white">
             <Link href="/">
               <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.home', 'Home')}</a>
