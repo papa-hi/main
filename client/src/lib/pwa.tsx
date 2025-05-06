@@ -7,11 +7,11 @@ import { useTranslation } from "react-i18next";
 
 // Logo for Papa-Hi
 const PapaHiLogo = () => (
-  <div className="flex items-center h-14 bg-transparent">
+  <div className="flex items-center justify-center h-14 w-14 rounded-full bg-white p-1">
     <img 
       src="/images/papa-hi.png" 
       alt="Papa-Hi Logo" 
-      className="h-full w-auto object-contain" 
+      className="h-12 w-12 object-contain" 
     />
   </div>
 );
