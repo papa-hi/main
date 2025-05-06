@@ -148,7 +148,7 @@ export default function AuthPage() {
         <Card className="w-full max-w-md shadow-lg border-primary/10">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">
-              {t("auth:welcome", "Welcome to Papa-Hi")}
+              {t("auth:welcome", "Welcome to PaPa-Hi")}
             </CardTitle>
             <CardDescription className="text-center">
               {t("auth:tagline", "Connect with fellow dads, find playdates, and discover family-friendly places")}
