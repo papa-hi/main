@@ -532,7 +532,7 @@ export default function AuthPage() {
                 <img 
                   src="/images/papa-hi.png" 
                   alt="PaPa-Hi Logo" 
-                  className="h-full w-full object-contain scale-50" 
+                  className="h-full w-full object-contain scale-150" 
                 />
               </div>
               <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent font-['Varela_Round']">
