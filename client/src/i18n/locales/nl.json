@@ -1,6 +1,6 @@
 {
   "auth": {
-    "welcome": "Welkom bij Papa-Hi",
+    "welcome": "Welkom bij PaPa-Hi",
     "tagline": "Verbind met andere vaders, plan speelafspraken en ontdek kindvriendelijke plekken",
     "login": "Inloggen",
     "register": "Registreren",
@@ -44,7 +44,7 @@
       "lastNameRequired": "Achternaam is verplicht"
     },
     "hero": {
-      "title": "Papa-Hi",
+      "title": "PaPa-Hi",
       "subtitle": "De sociale app voor Nederlandse vaders",
       "feature1": "Verbind met andere vaders in je buurt",
       "feature2": "Vind en organiseer speelafspraken voor je kinderen",
@@ -282,7 +282,7 @@
       "viewPrivacyPolicy": "Privacybeleid bekijken"
     },
     "install": {
-      "title": "Installeer Papa-Hi",
+      "title": "Installeer PaPa-Hi",
       "description": "Krijg snellere toegang en offline mogelijkheden op je toestel!",
       "later": "Later",
       "install": "Installeren"
