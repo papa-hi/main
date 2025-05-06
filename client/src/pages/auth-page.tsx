@@ -528,7 +528,7 @@ export default function AuthPage() {
         <div className="w-full h-full flex flex-col justify-center p-12">
           <div className="max-w-lg">
             <div className="flex items-center mb-6">
-              <div className="flex items-center justify-center h-16 w-32 overflow-hidden rounded-xl mr-4 bg-white">
+              <div className="flex items-center justify-center h-14 w-36 overflow-hidden rounded-xl mr-4 bg-white">
                 <img 
                   src="/images/papa-hi.png" 
                   alt="Papa-Hi Logo" 
