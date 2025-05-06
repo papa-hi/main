@@ -536,7 +536,7 @@ export default function AuthPage() {
                 />
               </div>
               <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                {t("auth:hero.title", "Papa-Hi")}
+                {t("auth:hero.title", "PaPa-Hi")}
               </h1>
             </div>
             <p className="text-3xl font-medium mb-8">

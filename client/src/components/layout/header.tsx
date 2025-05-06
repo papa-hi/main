@@ -11,8 +11,8 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 
-// Logo for Papa-Hi
-const PapaHiLogo = () => (
+// Logo for PaPa-Hi
+const PaPaHiLogo = () => (
   <div className="flex items-center justify-center h-14 w-10 overflow-hidden rounded-[28px] bg-white">
     <img 
       src="/images/papa-hi.png" 
@@ -52,8 +52,8 @@ export function Header({ user }: HeaderProps) {
     <header className="bg-primary text-white py-4 px-4 shadow-md sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
-          <PapaHiLogo />
-          <h1 className="text-2xl font-heading font-bold ml-3">Papa-Hi</h1>
+          <PaPaHiLogo />
+          <h1 className="text-2xl font-heading font-bold ml-3">PaPa-Hi</h1>
         </div>
         
         <div className="flex items-center space-x-3">

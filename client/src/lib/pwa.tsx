@@ -5,8 +5,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "react-i18next";
 
-// Logo for Papa-Hi
-const PapaHiLogo = () => (
+// Logo for PaPa-Hi
+const PaPaHiLogo = () => (
   <div className="flex items-center justify-center h-14 w-10 overflow-hidden rounded-[28px] bg-white">
     <img 
       src="/images/papa-hi.png" 
@@ -101,10 +101,10 @@ export function InstallPWAPrompt({ onDismiss, onInstall }: InstallPWAPromptProps
   return (
     <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-4 md:bottom-4 md:w-80 bg-white rounded-xl shadow-lg p-4 z-50 transition-all duration-300">
       <div className="flex items-start">
-        <PapaHiLogo />
+        <PaPaHiLogo />
         <div className="flex-grow ml-3">
           <h3 className="font-heading font-bold text-base mb-1">
-            {t('install.title', 'Install Papa-Hi')}
+            {t('install.title', 'Install PaPa-Hi')}
           </h3>
           <p className="text-sm text-dark/70 mb-3">
             {t('install.description', 'Get faster access and offline capabilities on your device!')}
