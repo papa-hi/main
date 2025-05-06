@@ -13,12 +13,12 @@ import {
 
 // Logo for Papa-Hi
 const PapaHiLogo = () => (
-  <div className="flex items-center h-16">
+  <div className="flex items-center h-20">
     <div className="h-full aspect-square rounded-full bg-white p-1 flex items-center justify-center overflow-hidden">
       <img 
         src="/images/papa-hi.png" 
         alt="Papa-Hi Logo" 
-        className="h-[90%] w-[90%] object-contain rounded-full" 
+        className="h-[95%] w-[95%] object-contain rounded-full" 
       />
     </div>
   </div>
@@ -51,7 +51,7 @@ export function Header({ user }: HeaderProps) {
   };
 
   return (
-    <header className="bg-primary text-white py-4 px-4 shadow-md sticky top-0 z-50">
+    <header className="bg-primary text-white py-3 px-4 shadow-md sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
           <PapaHiLogo />
