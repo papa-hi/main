@@ -66,9 +66,9 @@ export function UpcomingPlaydates() {
         
         <div className="bg-white rounded-xl p-6 shadow-sm text-center">
           <img 
-            src="https://images.unsplash.com/photo-1534653299134-96a171b61581?ixlib=rb-4.0.3&auto=format&fit=crop&w=120&h=120&q=80" 
-            alt={t('playdates.emptyCalendarAlt', 'Empty calendar')} 
-            className="w-20 h-20 object-cover rounded-full mx-auto mb-4"
+            src="/images/father.png" 
+            alt={t('playdates.emptyCalendarAlt', 'Father with children')} 
+            className="w-28 h-28 object-cover rounded-full mx-auto mb-4"
           />
           <h3 className="font-heading font-medium text-lg mb-2">{t('playdates.noPlaydatesPlanned', 'No playdates planned')}</h3>
           <p className="text-dark/70 text-sm mb-4">{t('playdates.planNewMeetDads', 'Plan a new playdate to meet other fathers!')}</p>
