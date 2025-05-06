@@ -17,7 +17,7 @@ const PapaHiLogo = () => (
     <img 
       src="/images/papa-hi.png" 
       alt="Papa-Hi Logo" 
-      className="h-full w-full object-cover" 
+      className="h-full w-full object-contain scale-150" 
     />
   </div>
 );
