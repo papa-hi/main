@@ -1,6 +1,6 @@
 {
   "auth": {
-    "welcome": "Bienvenido a Papa-Hi",
+    "welcome": "Bienvenido a PaPa-Hi",
     "tagline": "Conéctate con otros padres, encuentra citas de juego y descubre lugares para familias",
     "login": "Iniciar sesión",
     "register": "Registrarse",
@@ -39,7 +39,7 @@
       "lastNameRequired": "El apellido es obligatorio"
     },
     "hero": {
-      "title": "Papa-Hi",
+      "title": "PaPa-Hi",
       "subtitle": "La app social para padres",
       "feature1": "Conéctate con otros padres de tu vecindario",
       "feature2": "Encuentra y organiza citas de juego para tus hijos",
@@ -252,7 +252,7 @@
       "viewPrivacyPolicy": "Ver política de privacidad"
     },
     "install": {
-      "title": "Instalar Papa-Hi",
+      "title": "Instalar PaPa-Hi",
       "description": "¡Obtén un acceso más rápido y capacidades offline en tu dispositivo!",
       "later": "Más tarde",
       "install": "Instalar"

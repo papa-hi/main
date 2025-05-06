@@ -39,7 +39,7 @@
       "lastNameRequired": "Le nom est requis"
     },
     "hero": {
-      "title": "Papa-Hi",
+      "title": "PaPa-Hi",
       "subtitle": "L'application sociale pour les pères",
       "feature1": "Connectez-vous avec d'autres pères dans votre quartier",
       "feature2": "Trouvez et organisez des rencontres de jeu pour vos enfants",
@@ -252,7 +252,7 @@
       "viewPrivacyPolicy": "Voir la politique de confidentialité"
     },
     "install": {
-      "title": "Installer Papa-Hi",
+      "title": "Installer PaPa-Hi",
       "description": "Obtenez un accès plus rapide et des fonctionnalités hors ligne sur votre appareil !",
       "later": "Plus tard",
       "install": "Installer"
