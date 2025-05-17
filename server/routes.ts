@@ -1271,8 +1271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.file) {
         // Create a proper URL to the uploaded file
         const filename = req.file.filename;
-        const baseUrl = process.env.BASE_URL || '';
-        imageUrl = `${baseUrl}/uploads/place-images/${filename}`;
+        imageUrl = `/uploads/place-images/${filename}`;
         console.log(`Playground image uploaded: ${filename}`);
         console.log(`Image URL: ${imageUrl}`);
       } else {
@@ -1409,7 +1408,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.file) {
         // Create a proper URL to the uploaded file
         const filename = req.file.filename;
-        imageUrl = `/place-images/${filename}`;
+        imageUrl = `/uploads/place-images/${filename}`;
         console.log(`Place image uploaded: ${filename}`);
         console.log(`Image URL: ${imageUrl}`);
       } else {
@@ -1498,7 +1497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Prepare the update data
-      const updateData: Partial<Place> = {};
+      const updateData: Partial<typeof existingPlace> = {};
       
       // Only update fields that are provided
       if (req.body.name) updateData.name = req.body.name;
@@ -1530,7 +1529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle image upload if provided
       if (req.file) {
         const filename = req.file.filename;
-        updateData.imageUrl = `/place-images/${filename}`;
+        updateData.imageUrl = `/uploads/place-images/${filename}`;
         console.log(`Updated place image: ${filename}`);
         console.log(`New image URL: ${updateData.imageUrl}`);
       }
