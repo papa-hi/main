@@ -147,18 +147,7 @@ export function EditPlaygroundForm({
   };
   
   // Handle image upload and preview
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      form.setValue('image', file);
-      
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // Image upload capability removed
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
