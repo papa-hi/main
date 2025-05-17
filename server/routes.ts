@@ -1578,6 +1578,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update all playgrounds to use random images
+  app.post("/api/playgrounds/update-all-images", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      // Get all playground places
+      const allPlaces = await storage.getPlaces({ type: 'playground' });
+      const playgrounds = allPlaces.filter(place => place.type === 'playground');
+      
+      if (!playgrounds.length) {
+        return res.status(404).json({ message: "No playgrounds found to update" });
+      }
+      
+      // Update each playground with a random image
+      const updateResults = await Promise.all(
+        playgrounds.map(async playground => {
+          const randomImageUrl = getRandomPlaygroundImage();
+          console.log(`Updating playground ${playground.id} (${playground.name}) with new image: ${randomImageUrl}`);
+          
+          return await storage.updatePlace(playground.id, {
+            imageUrl: randomImageUrl,
+          });
+        })
+      );
+      
+      res.status(200).json({ 
+        message: `Successfully updated ${updateResults.length} playgrounds with random images`,
+        updated: updateResults.length,
+        playgrounds: updateResults
+      });
+    } catch (error) {
+      console.error("Error updating playground images:", error);
+      res.status(500).json({ error: "Failed to update playground images" });
+    }
+  });
+
   app.delete("/api/places/by-name/:name", async (req: Request, res: Response) => {
     try {
       const { name } = req.params;
