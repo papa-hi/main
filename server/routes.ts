@@ -13,6 +13,18 @@ import { fetchNearbyPlaygrounds } from "./maps-service";
 import { db } from "./db";
 import { eq, and, gte, asc, count } from "drizzle-orm";
 
+// Helper function to get a random playground image
+function getRandomPlaygroundImage(): string {
+  const playgroundImages = [
+    "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    "https://images.unsplash.com/photo-1572571981886-11d52968eb11?q=80&w=500&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?q=80&w=500&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1596724878582-76f4a7a73e77?q=80&w=500&auto=format&fit=crop"
+  ];
+  return playgroundImages[Math.floor(Math.random() * playgroundImages.length)];
+}
+
 // Middleware to check if user is authenticated
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   // For search endpoints, we'll bypass authentication for testing purposes
@@ -1366,8 +1378,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         longitude: req.body.longitude.toString(),
         imageUrl: req.body.imageUrl || (
           req.body.type === 'restaurant' 
-            ? "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80"
-            : "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80"
+            ? "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+            : getRandomPlaygroundImage()
         ),
         features: req.body.features || [],
       };
@@ -1415,18 +1427,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get the uploaded image file, if any
       let imageUrl = '';
       
-      if (req.file) {
-        // Create a proper URL to the uploaded file
+      // For restaurants, we still accept file uploads
+      // For playgrounds, we use random images instead
+      if (req.body.type === 'playground') {
+        // Use a random playground image
+        imageUrl = getRandomPlaygroundImage();
+        console.log(`Using random playground image: ${imageUrl}`);
+      } else if (req.file) {
+        // Create a proper URL to the uploaded file (for restaurants)
         const filename = req.file.filename;
         imageUrl = `/uploads/place-images/${filename}`;
-        console.log(`Place image uploaded: ${filename}`);
+        console.log(`Restaurant image uploaded: ${filename}`);
         console.log(`Image URL: ${imageUrl}`);
       } else {
-        // Fallback image if no file was uploaded
-        imageUrl = req.body.type === 'restaurant' 
-          ? "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80"
-          : "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80";
-        console.log(`No image uploaded for ${req.body.type}, using fallback image`);
+        // Fallback image for restaurants if no file uploaded
+        imageUrl = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
+        console.log(`No image uploaded for restaurant, using fallback image`);
       }
       
       // Parse features if they were sent as a JSON string (from FormData)
