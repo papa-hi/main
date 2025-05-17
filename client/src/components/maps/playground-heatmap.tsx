@@ -155,46 +155,16 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
   // Mutation for adding a new playground
   const addPlaygroundMutation = useMutation({
     mutationFn: async (data: PlaygroundFormValues) => {
-      // If there's an image, use FormData to handle file upload
-      if (data.image) {
-        const formData = new FormData();
-        formData.append('name', data.name);
-        formData.append('description', data.description || '');
-        formData.append('address', data.address || '');
-        formData.append('latitude', data.latitude.toString());
-        formData.append('longitude', data.longitude.toString());
-        formData.append('placeImage', data.image);
-        
-        // Add features as a JSON string
-        if (data.features && data.features.length > 0) {
-          formData.append('features', JSON.stringify(data.features));
-        }
-        
-        // Use fetch directly for FormData
-        const response = await fetch('/api/playgrounds/with-image', {
-          method: 'POST',
-          body: formData,
-          credentials: 'include'
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to add playground');
-        }
-        
-        return await response.json();
-      } else {
-        // Use standard JSON request if no image
-        const response = await apiRequest('POST', '/api/playgrounds', {
-          name: data.name,
-          description: data.description,
-          address: data.address,
-          latitude: data.latitude,
-          longitude: data.longitude,
-          features: data.features
-        });
-        return await response.json();
-      }
+      // Simple JSON request for playground data (image upload removed)
+      const response = await apiRequest('POST', '/api/playgrounds', {
+        name: data.name,
+        description: data.description || '',
+        address: data.address || '',
+        latitude: data.latitude,
+        longitude: data.longitude,
+        features: data.features || []
+      });
+      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -589,84 +559,11 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
                   )}
                 />
                 
-                <FormField
-                  control={form.control}
-                  name="image"
-                  render={({ field }) => {
-                    const [previewImage, setPreviewImage] = useState<string | null>(null);
-                    return (
-                      <FormItem>
-                        <FormLabel>{t('playgroundMap.uploadImage', 'Upload Photo')}</FormLabel>
-                        <FormControl>
-                          <div className="flex flex-col gap-2">
-                            <div className="flex items-center gap-2">
-                              <Input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    if (file.size > 8 * 1024 * 1024) {
-                                      toast({
-                                        title: t("errors.fileTooLarge", "File too large"),
-                                        description: t("errors.fileSizeLimit", "Maximum file size is 8MB"),
-                                        variant: "destructive"
-                                      });
-                                      return;
-                                    }
-                                    
-                                    if (!file.type.startsWith('image/')) {
-                                      toast({
-                                        title: t("errors.invalidFileType", "Invalid file type"),
-                                        description: t("errors.imageFilesOnly", "Only image files are allowed"),
-                                        variant: "destructive"
-                                      });
-                                      return;
-                                    }
-                                    
-                                    const reader = new FileReader();
-                                    reader.onload = () => {
-                                      setPreviewImage(reader.result as string);
-                                    };
-                                    reader.readAsDataURL(file);
-                                    field.onChange(file);
-                                  }
-                                }}
-                              />
-                              {field.value && (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  type="button"
-                                  onClick={() => {
-                                    field.onChange(undefined);
-                                    setPreviewImage(null);
-                                  }}
-                                >
-                                  <i className="fas fa-times mr-1"></i>
-                                  {t("common.clear", "Clear")}
-                                </Button>
-                              )}
-                            </div>
-                            {previewImage && (
-                              <div className="mt-2">
-                                <img 
-                                  src={previewImage} 
-                                  alt={t("playgroundMap.previewImage", "Preview")} 
-                                  className="w-full max-h-40 object-cover rounded-md"
-                                />
-                              </div>
-                            )}
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {t('playgroundMap.uploadImageHelp', 'Upload a photo of the playground (Optional)')}
-                            </p>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />
+                {/* Image upload capability removed */}
+                <div className="text-sm italic text-muted-foreground mt-4 mb-2 p-2 bg-muted rounded-md">
+                  <p>{t('playgroundMap.imageUploadDisabled', 'Image uploads have been disabled')}</p>
+                  <p>{t('playgroundMap.defaultImageUsed', 'A default image will be used for all playgrounds')}</p>
+                </div>
                 
                 <div className="pt-4 flex justify-end gap-2">
                   <Button
