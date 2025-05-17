@@ -1218,6 +1218,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Name, latitude, and longitude are required" });
       }
       
+      // Define an array of high-quality playground images
+      const playgroundImages = [
+        "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        "https://images.unsplash.com/photo-1572571981886-11d52968eb11?q=80&w=500&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?q=80&w=500&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1596724878582-76f4a7a73e77?q=80&w=500&auto=format&fit=crop"
+      ];
+      
+      // Select a random image from the array
+      const randomImageUrl = playgroundImages[Math.floor(Math.random() * playgroundImages.length)];
+      
       // Create a new place object
       const playgroundData = {
         name: req.body.name,
@@ -1226,7 +1238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         address: req.body.address || "",
         latitude: req.body.latitude.toString(),
         longitude: req.body.longitude.toString(),
-        imageUrl: req.body.imageUrl || "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80",
+        imageUrl: randomImageUrl,
         features: req.body.features || [],
       };
       
@@ -1265,28 +1277,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Name, latitude, and longitude are required" });
       }
       
-      // Get the uploaded image file, if any
-      let imageUrl = '';
+      // Define an array of high-quality playground images
+      const playgroundImages = [
+        "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        "https://images.unsplash.com/photo-1572571981886-11d52968eb11?q=80&w=500&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?q=80&w=500&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1596724878582-76f4a7a73e77?q=80&w=500&auto=format&fit=crop"
+      ];
       
-      if (req.file) {
-        // Create a proper URL to the uploaded file with consistent path format
-        const filename = req.file.filename;
-        imageUrl = `/uploads/place-images/${filename}`;
-        
-        // Verify the file exists to prevent broken images
-        const fullPath = path.join(process.cwd(), 'uploads', 'place-images', filename);
-        if (fs.existsSync(fullPath)) {
-          console.log(`Playground image uploaded successfully: ${filename}`);
-          console.log(`Image URL set to: ${imageUrl}`);
-        } else {
-          console.error(`[ERROR] Upload failed - File not found at ${fullPath}`);
-          return res.status(500).json({ error: "Image upload failed - please try again" });
-        }
-      } else {
-        // Fallback image if no file was uploaded
-        imageUrl = 'https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop';
-        console.log(`No image uploaded for playground, using fallback image`);
-      }
+      // Select a random image from the array
+      const imageUrl = playgroundImages[Math.floor(Math.random() * playgroundImages.length)];
+      console.log(`Using random playground image: ${imageUrl}`)
       
       // Parse features if they were sent as a JSON string (from FormData)
       let features = [];
