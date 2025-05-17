@@ -13,7 +13,10 @@ import { fetchNearbyPlaygrounds } from "./maps-service";
 import { db } from "./db";
 import { eq, and, gte, asc, count } from "drizzle-orm";
 
-// Helper function to get a random playground image
+// Counter to track which playground image to use next
+let playgroundImageCounter = 0;
+
+// Helper function to get a playground image with variety
 function getRandomPlaygroundImage(): string {
   const playgroundImages = [
     "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop",
@@ -22,7 +25,12 @@ function getRandomPlaygroundImage(): string {
     "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?q=80&w=500&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1596724878582-76f4a7a73e77?q=80&w=500&auto=format&fit=crop"
   ];
-  return playgroundImages[Math.floor(Math.random() * playgroundImages.length)];
+  
+  // Cycle through images sequentially to ensure variety
+  const selectedImage = playgroundImages[playgroundImageCounter % playgroundImages.length];
+  playgroundImageCounter++;
+  
+  return selectedImage;
 }
 
 // Middleware to check if user is authenticated
