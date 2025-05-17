@@ -10,7 +10,8 @@ app.use(express.urlencoded({ extended: false }));
 // Serve files from the uploads directory
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// Serve place images separately
+// Serve place images in both formats for backward compatibility
+// This allows images saved with the old path format to still work
 app.use('/place-images', express.static(path.join(process.cwd(), 'uploads', 'place-images')));
 
 app.use((req, res, next) => {
