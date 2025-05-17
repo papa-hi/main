@@ -121,7 +121,7 @@ const playgroundFormSchema = z.object({
   address: z.string().optional(),
   latitude: z.number(),
   longitude: z.number(),
-  image: z.instanceof(File).optional(),
+  // Image field removed
   features: z.array(z.string()).default([]),
 });
 
