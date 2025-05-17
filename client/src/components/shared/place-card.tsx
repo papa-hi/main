@@ -67,8 +67,18 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
     <div className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64">
       <div className="relative">
         <img 
-          src={place.imageUrl} 
+          src={place.type === 'playground' && place.imageUrl?.includes('place-images') 
+            ? `/playground-image/${place.imageUrl.split('/').pop()}` 
+            : place.imageUrl} 
           alt={place.name} 
+          onError={(e) => {
+            // If image fails to load, fallback to a default image
+            const target = e.target as HTMLImageElement;
+            target.onerror = null; // Prevent infinite loop
+            target.src = place.type === 'playground' 
+              ? 'https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop'
+              : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80';
+          }}
           className="w-full h-40 object-cover rounded-t-xl" 
         />
         <div className="absolute top-3 left-3 bg-white py-1 px-3 rounded-full text-xs font-medium">

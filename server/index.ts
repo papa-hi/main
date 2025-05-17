@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
+import fs from "fs";
 
 const app = express();
 app.use(express.json());
@@ -10,9 +11,31 @@ app.use(express.urlencoded({ extended: false }));
 // Serve files from the uploads directory
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// Serve place images in both formats for backward compatibility
-// This allows images saved with the old path format to still work
+// Serve place images in multiple formats for maximum compatibility
+// This allows images saved with any path format to work
 app.use('/place-images', express.static(path.join(process.cwd(), 'uploads', 'place-images')));
+
+// Add special playground image handler that logs more information
+app.get('/playground-image/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const possiblePaths = [
+    path.join(process.cwd(), 'uploads', 'place-images', filename),
+    path.join(process.cwd(), 'uploads', filename),
+  ];
+
+  // Try each possible path
+  for (const filePath of possiblePaths) {
+    console.log(`[IMAGE_DEBUG] Checking for playground image at: ${filePath}`);
+    if (fs.existsSync(filePath)) {
+      console.log(`[IMAGE_DEBUG] Found playground image at: ${filePath}`);
+      return res.sendFile(filePath);
+    }
+  }
+
+  // If image not found, provide a fallback
+  console.log(`[IMAGE_DEBUG] Playground image not found: ${filename}`);
+  res.redirect('https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop');
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
