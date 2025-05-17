@@ -27,7 +27,7 @@ const playgroundEditSchema = z.object({
   address: z.string().optional().default(""),
   latitude: z.string().optional(),
   longitude: z.string().optional(),
-  image: z.instanceof(File).optional(),
+  // Image field removed
   features: z.array(z.string()).default([]),
 });
 
@@ -48,7 +48,6 @@ export function EditPlaygroundForm({
 }: EditPlaygroundFormProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   
   // Form definition
   const form = useForm<PlaygroundEditValues>({
@@ -105,10 +104,7 @@ export function EditPlaygroundForm({
         formData.append('features', JSON.stringify(data.features));
       }
       
-      // Add image if provided
-      if (data.image) {
-        formData.append('placeImage', data.image);
-      }
+      // Image upload removed
       
       // Use fetch for FormData
       const response = await fetch(`/api/places/${playground.id}`, {
@@ -295,6 +291,7 @@ export function EditPlaygroundForm({
               )}
             />
             
+            {/* Playground image preview only - no upload capability */}
             <FormItem>
               <FormLabel>{t('places.playgroundImage', 'Playground Image')}</FormLabel>
               <FormControl>
@@ -302,21 +299,13 @@ export function EditPlaygroundForm({
                   {/* Current image preview */}
                   <div className="w-full rounded-md overflow-hidden h-40 bg-muted mb-2">
                     <img 
-                      src={previewUrl || playground.imageUrl}
+                      src={playground.imageUrl}
                       alt={playground.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  
-                  {/* Image upload input */}
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="cursor-pointer"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {t('places.uploadNewImageHelp', 'Upload a new photo of the playground (Optional)')}
+                  <p className="text-xs text-muted-foreground italic">
+                    {t('places.imageUploadDisabled', 'Image uploads have been disabled')}
                   </p>
                 </div>
               </FormControl>
