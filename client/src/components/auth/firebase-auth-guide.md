@@ -1,25 +1,33 @@
-# Setting Up Firebase Authentication for PaPa-Hi
+# URGENT: Fixing the Domain Authorization Error for PaPa-Hi
 
-To properly enable Google Authentication, please follow these steps:
+## The Exact Error
+The current error you're seeing is:
+```
+The current domain is not authorized for OAuth operations. Add your domain (04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev) to the OAuth redirect domains list in the Firebase console -> Authentication -> Settings -> Authorized domains tab.
+```
 
-## Step 1: Firebase Console Setup
+## Quick Fix Steps
 
 1. Go to the [Firebase Console](https://console.firebase.google.com/)
 2. Select your project (the one matching your `VITE_FIREBASE_PROJECT_ID`)
-3. In the left sidebar, click on **Authentication**
-4. Click on the **Sign-in method** tab
-5. Find **Google** in the list of providers and click on it
-6. Toggle the **Enable** switch to the ON position
-7. Configure the **Project support email** (usually your email)
-8. Click **Save**
+3. Click on **Authentication** in the left sidebar
+4. Click on the **Settings** tab (not the Sign-in method tab)
+5. Scroll down to the **Authorized domains** section
+6. Click **Add domain**
+7. Add your specific Replit domain: `04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev`
+8. Click **Add**
 
-## Step 2: Add Your Domain to Authorized Domains
+After this change, refresh your app and try the Google Sign-In again.
 
-1. While still in the Authentication section, click on the **Settings** tab
-2. Scroll down to the **Authorized domains** section
-3. Click **Add domain**
-4. Add your Replit domain (e.g., `yourusername.replit.app`) and any other domains your app uses
-5. Click **Add**
+## If Google Sign-In is Not Enabled
+
+While fixing the domain issue, also check that Google Sign-In is properly enabled:
+
+1. In the Authentication section, click on the **Sign-in method** tab
+2. Find **Google** in the list of providers and click on it
+3. Toggle the **Enable** switch to the ON position
+4. Configure the **Project support email** (usually your email)
+5. Click **Save**
 
 ## Step 3: Ensure Your Project Settings Match
 
