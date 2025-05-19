@@ -169,7 +169,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
       {!playdatesLoading && randomPlaydate && (
         <div className="relative rounded-xl overflow-hidden mb-6">
           <img 
-            src={randomPlaydate.image || "https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=400&q=80"} 
+            src="https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=400&q=80" 
             alt={t('home.featuredAltText', 'Featured playdate')} 
             className="w-full h-52 object-cover"
           />
@@ -181,7 +181,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
               {randomPlaydate.title}
             </h3>
             <p className="text-white text-sm mb-3">
-              {formatPlaydateDate(new Date(randomPlaydate.startDate))} • {randomPlaydate.location}
+              {formatPlaydateDate(new Date(randomPlaydate.startTime))} • {randomPlaydate.location}
             </p>
             <Link to={`/playdates/${randomPlaydate.id}`}>
               <button className="bg-white text-primary hover:bg-accent hover:text-white transition py-2 px-4 rounded-lg font-medium text-sm w-fit">
@@ -209,7 +209,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
             <p className="text-white text-sm mb-3">
               {t('home.noPlaydatesDesc', 'Create a playdate to connect with other dads!')}
             </p>
-            <Link to="/create-playdate">
+            <Link to="/create">
               <button className="bg-white text-primary hover:bg-accent hover:text-white transition py-2 px-4 rounded-lg font-medium text-sm w-fit">
                 {t('home.createPlaydate', 'Create Playdate')}
               </button>
