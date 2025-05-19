@@ -13,6 +13,7 @@ export function AnimatedButton({
   className,
   animation = "ripple",
   successAnimation = false,
+  glowColor = "rgba(var(--primary), 0.5)",
   onClick,
   ...props
 }: AnimatedButtonProps) {
@@ -81,6 +82,14 @@ export function AnimatedButton({
     }
   };
   
+  // Set up glow effect style
+  React.useEffect(() => {
+    if (animation === "glow" && buttonRef.current) {
+      const button = buttonRef.current;
+      button.style.setProperty('--glow-color', glowColor);
+    }
+  }, [animation, glowColor]);
+
   return (
     <Button
       ref={buttonRef}
@@ -88,6 +97,7 @@ export function AnimatedButton({
         "button-animated relative overflow-hidden",
         animation === "bounce" && "hover:animate-bounce",
         animation === "pulse" && "hover:animate-pulse",
+        animation === "glow" && "glow-button",
         className
       )}
       onClick={handleClick}

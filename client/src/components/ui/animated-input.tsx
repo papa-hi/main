@@ -5,12 +5,16 @@ import { cn } from "@/lib/utils";
 interface AnimatedInputProps extends InputProps {
   animateOnFocus?: boolean;
   successIcon?: boolean;
+  highlightColor?: string;
+  animationStyle?: "scale" | "glow" | "border" | "bounce";
 }
 
 export function AnimatedInput({
   className,
   animateOnFocus = true,
   successIcon = false,
+  highlightColor = "rgba(var(--primary), 0.3)",
+  animationStyle = "scale",
   ...props
 }: AnimatedInputProps) {
   const [isFocused, setIsFocused] = React.useState(false);
@@ -24,6 +28,13 @@ export function AnimatedInput({
       setIsValid(false);
     }
   }, [props.value]);
+  
+  // Apply custom highlight color
+  React.useEffect(() => {
+    if (inputRef.current && animateOnFocus) {
+      inputRef.current.style.setProperty('--highlight-color', highlightColor);
+    }
+  }, [highlightColor, animateOnFocus]);
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(true);
@@ -48,6 +59,10 @@ export function AnimatedInput({
         ref={inputRef}
         className={cn(
           animateOnFocus && "input-focus-animation",
+          animateOnFocus && animationStyle === "scale" && "input-focus-scale",
+          animateOnFocus && animationStyle === "glow" && "input-focus-glow",
+          animateOnFocus && animationStyle === "border" && "input-focus-border",
+          animateOnFocus && animationStyle === "bounce" && "input-focus-bounce",
           isFocused && "shadow-input-focus",
           className
         )}
