@@ -3,6 +3,9 @@ import { useFirebaseAuth } from "@/hooks/use-firebase-auth";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 
 interface GoogleSignInButtonProps {
   onSuccess?: () => void;
@@ -13,14 +16,57 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
   const { signInWithGoogle } = useFirebaseAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
+  const { toast } = useToast();
 
   async function handleSignIn() {
     try {
       setIsLoading(true);
-      const user = await signInWithGoogle();
-      if (user && onSuccess) {
-        onSuccess();
+      const firebaseUser = await signInWithGoogle();
+      
+      if (firebaseUser) {
+        // Send Firebase user data to our server to authenticate in our system
+        try {
+          const response = await apiRequest("POST", "/api/firebase-auth", {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            photoURL: firebaseUser.photoURL
+          });
+          
+          if (response.ok) {
+            // Successfully authenticated with our server
+            const user = await response.json();
+            // Update the user data in the cache
+            queryClient.setQueryData(["/api/user"], user);
+            
+            if (onSuccess) {
+              onSuccess();
+            }
+          } else {
+            // Handle server authentication error
+            const errorData = await response.json();
+            toast({
+              title: t("auth:googleAuthError", "Google authentication error"),
+              description: errorData.error || t("auth:unknownError", "An unknown error occurred"),
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error("Server authentication error:", error);
+          toast({
+            title: t("auth:serverError", "Server error"),
+            description: t("auth:serverAuthError", "Could not authenticate with the server"),
+            variant: "destructive"
+          });
+        }
       }
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+      toast({
+        title: t("auth:googleSignInError", "Google sign-in error"),
+        description: error instanceof Error ? error.message : t("auth:unknownError", "An unknown error occurred"),
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
