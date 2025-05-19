@@ -212,8 +212,11 @@ export function Header({ user }: HeaderProps) {
           
           {isAuthenticated ? (
             <>
-              <button className="text-white hover:text-accent" aria-label="Notifications">
-                <i className="fas fa-bell"></i>
+              <button 
+                className="text-white hover:text-accent p-2 rounded-full hover:bg-white/10 transition-all duration-300 transform hover:scale-110" 
+                aria-label="Notifications"
+              >
+                <i className="fas fa-bell text-sm"></i>
               </button>
               <DropdownMenu>
                 <DropdownMenuTrigger className="focus:outline-none">
@@ -221,28 +224,40 @@ export function Header({ user }: HeaderProps) {
                     <img 
                       src={user.profileImage} 
                       alt="Profile picture" 
-                      className="w-8 h-8 rounded-full object-cover"
+                      className="w-8 h-8 rounded-full object-cover border-2 border-transparent hover:border-primary/30 transition-all duration-300 transform hover:scale-110"
                     />
                     <span className="text-sm font-medium">{user.firstName}</span>
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
                   <Link href="/profile">
-                    <DropdownMenuItem className="cursor-pointer">
-                      <span>{t('header.myProfile')}</span>
+                    <DropdownMenuItem className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
+                      <span className="flex items-center">
+                        <i className="fas fa-user mr-2 text-primary/80"></i>
+                        {t('header.myProfile')}
+                      </span>
                     </DropdownMenuItem>
                   </Link>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
-                    <span>{t('auth.logoutButton')}</span>
+                  <DropdownMenuItem 
+                    className="cursor-pointer transition-all duration-200 hover:bg-red-50 hover:text-red-600 hover:pl-3" 
+                    onClick={handleLogout}
+                  >
+                    <span className="flex items-center">
+                      <i className="fas fa-sign-out-alt mr-2"></i>
+                      {t('auth.logoutButton')}
+                    </span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
           ) : (
             <Link href="/auth">
-              <a className="bg-white text-primary hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                {t('auth.login')}
+              <a className="bg-white text-primary hover:bg-gray-100 hover:shadow-md px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 transform hover:scale-105 hover:translate-y-[-2px]">
+                <span className="flex items-center">
+                  <i className="fas fa-sign-in-alt mr-2"></i>
+                  {t('auth.login')}
+                </span>
               </a>
             </Link>
           )}
