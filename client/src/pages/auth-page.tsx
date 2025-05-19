@@ -15,6 +15,8 @@ import { Loader2, Upload, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { useFirebaseAuth } from "@/hooks/use-firebase-auth";
 
 type LoginFormValues = {
   username: string;
@@ -208,6 +210,22 @@ export default function AuthPage() {
                         t("auth:loginButton", "Login")
                       )}
                     </Button>
+                    
+                    <div className="relative my-4">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-gray-300"></span>
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-white text-gray-500">
+                          {t("auth:orContinueWith", "or continue with")}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <GoogleSignInButton 
+                      onSuccess={() => navigate("/")} 
+                      className="mt-2" 
+                    />
                   </form>
                 </Form>
               </TabsContent>

@@ -21,6 +21,7 @@ import { useState, useEffect } from "react";
 import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
 import ErrorBoundary from "./components/shared/error-boundary";
 import { AuthProvider } from "./hooks/use-auth";
+import { FirebaseAuthProvider } from "./hooks/use-firebase-auth";
 import { ChatProvider } from "./hooks/use-chat";
 import { ProtectedRoute } from "./lib/protected-route";
 
@@ -143,28 +144,30 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ChatProvider>
-            <AppShell>
-              <Router />
-            </AppShell>
-            <Toaster />
-            
-            {showPrivacyConsent && (
-              <PrivacyConsentDialog 
-                onAccept={handleAcceptPrivacy} 
-                onReject={handleRejectPrivacy} 
-              />
-            )}
-            
-            {showPWAPrompt && (
-              <InstallPWAPrompt 
-                onDismiss={handleDismissPWA} 
-                onInstall={handleInstallPWA} 
-              />
-            )}
-          </ChatProvider>
-        </AuthProvider>
+        <FirebaseAuthProvider>
+          <AuthProvider>
+            <ChatProvider>
+              <AppShell>
+                <Router />
+              </AppShell>
+              <Toaster />
+              
+              {showPrivacyConsent && (
+                <PrivacyConsentDialog 
+                  onAccept={handleAcceptPrivacy} 
+                  onReject={handleRejectPrivacy} 
+                />
+              )}
+              
+              {showPWAPrompt && (
+                <InstallPWAPrompt 
+                  onDismiss={handleDismissPWA} 
+                  onInstall={handleInstallPWA} 
+                />
+              )}
+            </ChatProvider>
+          </AuthProvider>
+        </FirebaseAuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );
