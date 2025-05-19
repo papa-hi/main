@@ -21,6 +21,15 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
   async function handleSignIn() {
     try {
       setIsLoading(true);
+      
+      // Display Firebase configuration for debugging
+      console.log("Using Firebase config:", {
+        apiKey: import.meta.env.VITE_FIREBASE_API_KEY ? "Set" : "Not set",
+        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ? "Set" : "Not set",
+        appId: import.meta.env.VITE_FIREBASE_APP_ID ? "Set" : "Not set"
+      });
+      
+      // Attempt Google sign-in
       const firebaseUser = await signInWithGoogle();
       
       if (firebaseUser) {
@@ -49,6 +58,12 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
             console.log("User authenticated with server:", user);
             // Update the user data in the cache
             queryClient.setQueryData(["/api/user"], user);
+            
+            toast({
+              title: t("auth:signInSuccess", "Sign-in successful"),
+              description: t("auth:welcomeMessage", "Welcome back!"),
+              variant: "default"
+            });
             
             if (onSuccess) {
               onSuccess();
