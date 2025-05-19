@@ -175,6 +175,7 @@ export function setupAuth(app: Express) {
           city: null,
           badge: null,
           favoriteLocations: null,
+          childrenInfo: [{ name: 'Child', age: 0 }] // Default child info
         };
         
         console.log("Creating new user:", newUser);
