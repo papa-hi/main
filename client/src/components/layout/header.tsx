@@ -83,7 +83,7 @@ export function Header({ user }: HeaderProps) {
                   <span className="mr-2">🇳🇱</span> Nederlands
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  className="cursor-pointer"
+                  className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3"
                   onClick={() => {
                     i18n.changeLanguage('en');
                     localStorage.setItem('language', 'en');
@@ -92,7 +92,7 @@ export function Header({ user }: HeaderProps) {
                   <span className="mr-2">🇬🇧</span> English
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  className="cursor-pointer"
+                  className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3"
                   onClick={() => {
                     i18n.changeLanguage('de');
                     localStorage.setItem('language', 'de');
@@ -101,7 +101,7 @@ export function Header({ user }: HeaderProps) {
                   <span className="mr-2">🇩🇪</span> Deutsch
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  className="cursor-pointer"
+                  className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3"
                   onClick={() => {
                     i18n.changeLanguage('fr');
                     localStorage.setItem('language', 'fr');
@@ -110,7 +110,7 @@ export function Header({ user }: HeaderProps) {
                   <span className="mr-2">🇫🇷</span> Français
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  className="cursor-pointer"
+                  className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3"
                   onClick={() => {
                     i18n.changeLanguage('es');
                     localStorage.setItem('language', 'es');
