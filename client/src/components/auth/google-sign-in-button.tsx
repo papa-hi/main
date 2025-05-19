@@ -29,8 +29,32 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
         appId: import.meta.env.VITE_FIREBASE_APP_ID ? "Set" : "Not set"
       });
       
-      // Attempt Google sign-in
-      const firebaseUser = await signInWithGoogle();
+      // Show a message to the user about the configuration status
+      toast({
+        title: "Google Sign-In",
+        description: "Attempting to sign in with Google...",
+        variant: "default"
+      });
+      
+      // Attempt Google sign-in with fallback to email/password authentication
+      const firebaseUser = await signInWithGoogle().catch((error) => {
+        console.error("Google sign-in error:", error);
+        // Provide better error message to user
+        if (error.code === 'auth/configuration-not-found') {
+          toast({
+            title: "Authentication Setup Required",
+            description: "Google Sign-in is not configured in Firebase. Please contact the administrator or use email/password login.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Google Sign-in Failed",
+            description: error.message || "Could not sign in with Google. Please try again or use email/password login.",
+            variant: "destructive"
+          });
+        }
+        return null;
+      });
       
       if (firebaseUser) {
         console.log("Firebase user authenticated:", firebaseUser.email);
