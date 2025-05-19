@@ -74,7 +74,7 @@ export function Header({ user }: HeaderProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="min-w-[120px]">
                 <DropdownMenuItem 
-                  className="cursor-pointer"
+                  className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3"
                   onClick={() => {
                     i18n.changeLanguage('nl');
                     localStorage.setItem('language', 'nl');

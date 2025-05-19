@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { AnimatedButton } from "@/components/ui/animated-button";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -177,12 +178,14 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
           {!isCreator && (
             <div className="mt-2">
               {isParticipating ? (
-                <Button 
+                <AnimatedButton 
                   variant="outline" 
                   size="sm" 
                   onClick={handleLeave}
                   disabled={isLeaving}
                   className="text-xs h-8"
+                  animation="pulse"
+                  successAnimation={true}
                 >
                   {isLeaving ? (
                     <i className="fas fa-spinner fa-spin mr-1"></i>
@@ -190,14 +193,17 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
                     <i className="fas fa-sign-out-alt mr-1"></i>
                   )}
                   {t('playdates.leave', 'Verlaten')}
-                </Button>
+                </AnimatedButton>
               ) : (
-                <Button 
+                <AnimatedButton 
                   variant="default" 
                   size="sm" 
                   onClick={handleJoin}
                   disabled={isJoining || isAtMaxCapacity}
                   className={`text-xs h-8 ${isAtMaxCapacity ? 'bg-gray-400 hover:bg-gray-400' : 'bg-primary hover:bg-accent'}`}
+                  animation={isAtMaxCapacity ? "none" : "glow"}
+                  successAnimation={!isAtMaxCapacity}
+                  glowColor="rgba(99, 102, 241, 0.4)"
                 >
                   {isJoining ? (
                     <i className="fas fa-spinner fa-spin mr-1"></i>
@@ -205,7 +211,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
                     <i className="fas fa-user-plus mr-1"></i>
                   )}
                   {isAtMaxCapacity ? t('playdates.full', 'Vol') : t('playdates.join', 'Deelnemen')}
-                </Button>
+                </AnimatedButton>
               )}
             </div>
           )}

@@ -136,9 +136,10 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
       variant="outline"
       type="button"
       disabled={isLoading}
-      className={`w-full flex items-center justify-center gap-2 ${className}`}
+      className={`w-full flex items-center justify-center gap-2 ${className} transition-all duration-300 border-gray-300 hover:border-gray-500`}
       onClick={handleSignIn}
-      animation="ripple"
+      animation="glow"
+      glowColor="rgba(66, 133, 244, 0.3)"
       successAnimation={true}
     >
       {isLoading ? (
