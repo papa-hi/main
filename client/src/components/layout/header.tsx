@@ -269,31 +269,53 @@ export function Header({ user }: HeaderProps) {
         <div className="md:hidden bg-primary/95 absolute top-full left-0 right-0 p-4 shadow-lg z-50">
           <nav className="flex flex-col space-y-3 text-white">
             <Link href="/">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.home', 'Home')}</a>
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+                <i className="fas fa-home mr-2"></i>
+                {t('nav.home', 'Home')}
+              </a>
             </Link>
             <Link href="/playdates">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.playdates', 'Speelafspraken')}</a>
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+                <i className="fas fa-calendar-alt mr-2"></i>
+                {t('nav.playdates', 'Speelafspraken')}
+              </a>
             </Link>
             <Link href="/places">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.places', 'Places')}</a>
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+                <i className="fas fa-map-marker-alt mr-2"></i>
+                {t('nav.places', 'Places')}
+              </a>
             </Link>
             <Link href="/playground-map">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.playgroundMap', 'Speeltuin Kaart')}</a>
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+                <i className="fas fa-map mr-2"></i>
+                {t('nav.playgroundMap', 'Speeltuin Kaart')}
+              </a>
             </Link>
             <Link href="/chat">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.chat', 'Berichten')}</a>
+              <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+                <i className="fas fa-comments mr-2"></i>
+                {t('nav.chat', 'Berichten')}
+              </a>
             </Link>
-            <a href="#" className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('nav.community', 'Community')}</a>
+            <a href="#" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+              <i className="fas fa-users mr-2"></i>
+              {t('nav.community', 'Community')}
+            </a>
             
             {isAuthenticated ? (
               <>
                 <Link href="/profile">
-                  <a className="py-2 px-4 hover:bg-primary/80 rounded-md">{t('header.myProfile', 'Mijn profiel')}</a>
+                  <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+                    <i className="fas fa-user mr-2"></i>
+                    {t('header.myProfile', 'Mijn profiel')}
+                  </a>
                 </Link>
                 <button 
                   onClick={handleLogout} 
-                  className="py-2 px-4 mt-2 bg-red-600/20 text-white hover:bg-red-600/30 rounded-md w-full text-left"
+                  className="py-2 px-4 mt-2 bg-red-600/20 text-white hover:bg-red-600/30 rounded-md w-full text-left transition-all duration-200 hover:pl-6 flex items-center"
                 >
+                  <i className="fas fa-sign-out-alt mr-2"></i>
                   {t('auth.logoutButton')}
                 </button>
               </>
