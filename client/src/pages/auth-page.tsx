@@ -516,6 +516,22 @@ export default function AuthPage() {
                         t("auth:registerButton", "Create Account")
                       )}
                     </Button>
+                    
+                    <div className="relative my-4">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-gray-300"></span>
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-white text-gray-500">
+                          {t("auth:orContinueWith", "or continue with")}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <GoogleSignInButton 
+                      onSuccess={() => navigate("/")} 
+                      className="mt-2" 
+                    />
                   </form>
                 </Form>
               </TabsContent>

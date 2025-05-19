@@ -135,4 +135,50 @@ export function setupAuth(app: Express) {
     delete userWithoutPassword.password;
     res.json(userWithoutPassword);
   });
+  
+  // Handle Firebase Google authentication
+  app.post("/api/firebase-auth", async (req, res, next) => {
+    try {
+      const { uid, email, displayName, photoURL } = req.body;
+      
+      if (!uid || !email) {
+        return res.status(400).json({ error: "Missing required Firebase user data" });
+      }
+      
+      // Check if user exists with this email
+      let user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        // Split display name into first and last name
+        const names = displayName ? displayName.split(' ') : ['Google', 'User'];
+        const firstName = names[0];
+        const lastName = names.length > 1 ? names.slice(1).join(' ') : '';
+        
+        // Generate random password for Firebase users (they'll login with Google, not password)
+        const randomPassword = randomBytes(16).toString('hex');
+        const hashedPassword = await hashPassword(randomPassword);
+        
+        // Create a new user
+        user = await storage.createUser({
+          username: `google_${uid.substring(0, 8)}`,
+          email,
+          password: hashedPassword,
+          firstName,
+          lastName,
+          profileImage: photoURL || '',
+        });
+      }
+      
+      // Log the user in
+      req.login(user, (err) => {
+        if (err) return next(err);
+        const userWithoutPassword = { ...user } as Partial<SelectUser>;
+        delete userWithoutPassword.password;
+        res.status(200).json(userWithoutPassword);
+      });
+    } catch (error) {
+      console.error("Firebase authentication error:", error);
+      next(error);
+    }
+  });
 }

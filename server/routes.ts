@@ -12,6 +12,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { fetchNearbyPlaygrounds } from "./maps-service";
 import { db } from "./db";
 import { eq, and, gte, asc, count } from "drizzle-orm";
+import crypto from "crypto";
 
 // Counter to track which playground image to use next
 let playgroundImageCounter = 0;
