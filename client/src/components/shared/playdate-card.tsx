@@ -132,10 +132,10 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm">
+    <div className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.01]">
       <div className="flex items-start">
-        <div className="flex-shrink-0 w-14 h-14 bg-accent/10 rounded-lg flex flex-col items-center justify-center mr-4">
-          <span className="text-accent font-bold text-lg">{getDay(startDate)}</span>
+        <div className="flex-shrink-0 w-14 h-14 bg-accent/10 rounded-lg flex flex-col items-center justify-center mr-4 transition-all duration-300 hover:bg-accent/20 hover:shadow-sm group">
+          <span className="text-accent font-bold text-lg group-hover:scale-110 transition-transform duration-300">{getDay(startDate)}</span>
           <span className="text-accent text-xs uppercase">{getMonthAbbreviation(startDate)}</span>
         </div>
         <div className="flex-grow">
@@ -155,14 +155,15 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
                       key={participant.id} 
                       src={participant.profileImage ? participant.profileImage : '/assets/default-avatar.png'} 
                       alt={`${participant.firstName} ${participant.lastName}`} 
-                      className="w-6 h-6 rounded-full object-cover border border-white" 
+                      className="w-6 h-6 rounded-full object-cover border border-white transform transition-transform duration-300 hover:scale-125 hover:z-10 relative" 
+                      title={`${participant.firstName} ${participant.lastName}`}
                     />
                   );
                 } 
                 return null;
               })}
               {playdate.participants.length > 2 && (
-                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs text-primary font-medium">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs text-primary font-medium cursor-pointer hover:bg-primary/20 transition-colors duration-300 hover:scale-110 transform">
                   +{playdate.participants.length - 2}
                 </div>
               )}
