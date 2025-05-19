@@ -139,16 +139,20 @@ export function setupAuth(app: Express) {
   // Handle Firebase Google authentication
   app.post("/api/firebase-auth", async (req, res, next) => {
     try {
+      console.log("Firebase auth request received:", req.body);
       const { uid, email, displayName, photoURL } = req.body;
       
       if (!uid || !email) {
+        console.log("Missing required Firebase data:", { uid, email });
         return res.status(400).json({ error: "Missing required Firebase user data" });
       }
       
       // Check if user exists with this email
+      console.log("Checking if user exists with email:", email);
       let user = await storage.getUserByEmail(email);
       
       if (!user) {
+        console.log("User not found, creating new user with email:", email);
         // Split display name into first and last name
         const names = displayName ? displayName.split(' ') : ['Google', 'User'];
         const firstName = names[0];
@@ -158,27 +162,50 @@ export function setupAuth(app: Express) {
         const randomPassword = randomBytes(16).toString('hex');
         const hashedPassword = await hashPassword(randomPassword);
         
-        // Create a new user
-        user = await storage.createUser({
+        // Create a new user with default values for required fields
+        const newUser = {
           username: `google_${uid.substring(0, 8)}`,
           email,
           password: hashedPassword,
           firstName,
           lastName,
-          profileImage: photoURL || '',
-        });
+          profileImage: photoURL || null,
+          phoneNumber: null,
+          bio: null,
+          city: null,
+          badge: null,
+          favoriteLocations: null,
+        };
+        
+        console.log("Creating new user:", newUser);
+        
+        // Create a new user
+        try {
+          user = await storage.createUser(newUser);
+          console.log("New user created successfully:", user.id);
+        } catch (createError) {
+          console.error("Error creating user:", createError);
+          return res.status(500).json({ error: "Failed to create user account" });
+        }
+      } else {
+        console.log("User found with email:", email);
       }
       
       // Log the user in
       req.login(user, (err) => {
-        if (err) return next(err);
+        if (err) {
+          console.error("Error logging in user:", err);
+          return res.status(500).json({ error: "Failed to log in" });
+        }
+        
+        console.log("User logged in successfully:", user.id);
         const userWithoutPassword = { ...user } as Partial<SelectUser>;
         delete userWithoutPassword.password;
         res.status(200).json(userWithoutPassword);
       });
     } catch (error) {
       console.error("Firebase authentication error:", error);
-      next(error);
+      res.status(500).json({ error: "Internal server error during authentication" });
     }
   });
 }

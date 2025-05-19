@@ -24,8 +24,16 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
       const firebaseUser = await signInWithGoogle();
       
       if (firebaseUser) {
+        console.log("Firebase user authenticated:", firebaseUser.email);
         // Send Firebase user data to our server to authenticate in our system
         try {
+          console.log("Sending data to server:", {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            photoURL: firebaseUser.photoURL
+          });
+          
           const response = await apiRequest("POST", "/api/firebase-auth", {
             uid: firebaseUser.uid,
             email: firebaseUser.email,
@@ -33,9 +41,12 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
             photoURL: firebaseUser.photoURL
           });
           
+          console.log("Server response status:", response.status);
+          
           if (response.ok) {
             // Successfully authenticated with our server
             const user = await response.json();
+            console.log("User authenticated with server:", user);
             // Update the user data in the cache
             queryClient.setQueryData(["/api/user"], user);
             
@@ -44,10 +55,18 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
             }
           } else {
             // Handle server authentication error
-            const errorData = await response.json();
+            let errorDetails = "Unknown error";
+            try {
+              const errorData = await response.json();
+              errorDetails = errorData.error || "Unknown error";
+              console.error("Server authentication error:", errorData);
+            } catch (e) {
+              console.error("Could not parse error response:", e);
+            }
+            
             toast({
               title: t("auth:googleAuthError", "Google authentication error"),
-              description: errorData.error || t("auth:unknownError", "An unknown error occurred"),
+              description: errorDetails,
               variant: "destructive"
             });
           }
