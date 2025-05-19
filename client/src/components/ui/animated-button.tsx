@@ -3,8 +3,9 @@ import { Button, ButtonProps } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface AnimatedButtonProps extends ButtonProps {
-  animation?: "ripple" | "bounce" | "pulse" | "none";
+  animation?: "ripple" | "bounce" | "pulse" | "glow" | "none";
   successAnimation?: boolean;
+  glowColor?: string;
 }
 
 export function AnimatedButton({

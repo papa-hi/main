@@ -64,7 +64,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64">
+    <div className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64 transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-md">
       <div className="relative">
         <img 
           src={place.type === 'playground' && place.imageUrl?.includes('place-images') 
@@ -156,7 +156,10 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
                 : `places.playgroundFeatures.${feature}`;
               
               return (
-                <span key={index} className="bg-primary/10 text-primary text-xs py-1 px-2 rounded-md">
+                <span 
+                  key={index} 
+                  className="bg-primary/10 text-primary text-xs py-1 px-2 rounded-md transform transition-all duration-200 hover:scale-105 hover:bg-primary/20 cursor-default"
+                >
                   {t(featureKey, feature)}
                 </span>
               );

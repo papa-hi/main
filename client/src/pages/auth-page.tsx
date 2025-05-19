@@ -398,8 +398,10 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>{t("auth:bio", "Bio")}</FormLabel>
                           <FormControl>
-                            <Input 
+                            <AnimatedInput 
                               placeholder={t("auth:bioPlaceholder", "Tell us a bit about yourself (optional)")} 
+                              animateOnFocus={true}
+                              successIcon={Boolean(field.value)}
                               {...field} 
                               value={field.value || ""}
                             />
@@ -518,8 +520,10 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>{t("auth:profileImageUrl", "Or use Profile Image URL (optional)")}</FormLabel>
                           <FormControl>
-                            <Input 
+                            <AnimatedInput 
                               placeholder={t("auth:profileImagePlaceholder", "URL to your profile image")} 
+                              animateOnFocus={true}
+                              successIcon={Boolean(field.value)}
                               {...field} 
                               value={field.value || ""}
                             />
@@ -529,9 +533,11 @@ export default function AuthPage() {
                       )}
                     />
                     
-                    <Button 
+                    <AnimatedButton 
                       type="submit" 
                       className="w-full" 
+                      animation="ripple"
+                      successAnimation={true}
                       disabled={registerMutation.isPending}
                     >
                       {registerMutation.isPending ? (
@@ -542,7 +548,7 @@ export default function AuthPage() {
                       ) : (
                         t("auth:registerButton", "Create Account")
                       )}
-                    </Button>
+                    </AnimatedButton>
                     
                     <div className="relative my-4">
                       <div className="absolute inset-0 flex items-center">
