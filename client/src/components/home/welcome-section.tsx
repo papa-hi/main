@@ -88,10 +88,10 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
         
         {/* Weather Widget */}
         {!weatherLoading && !weatherError && city && (
-          <div className="bg-white rounded-lg p-3 shadow-sm flex items-center space-x-3">
-            <i className={`fas ${getWeatherIcon()} text-accent text-lg`}></i>
+          <div className="bg-white rounded-lg p-3 shadow-sm flex items-center space-x-3 hover:shadow-md transition-all duration-300 transform hover:scale-105 cursor-pointer group">
+            <i className={`fas ${getWeatherIcon()} text-accent text-lg group-hover:animate-weather`}></i>
             <div>
-              <span className="text-sm font-medium">{temperature}°C</span>
+              <span className="text-sm font-medium group-hover:text-primary transition-colors duration-300">{temperature}°C</span>
               <p className="text-xs text-muted-foreground">{city}{country ? `, ${country}` : ''}</p>
             </div>
           </div>
