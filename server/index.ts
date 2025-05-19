@@ -15,6 +15,9 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 // This allows images saved with any path format to work
 app.use('/place-images', express.static(path.join(process.cwd(), 'uploads', 'place-images')));
 
+// Serve profile images specifically
+app.use('/profile-images', express.static(path.join(process.cwd(), 'uploads', 'profile-images')));
+
 // Add special playground image handler that logs more information
 app.get('/playground-image/:filename', (req, res) => {
   const filename = req.params.filename;
