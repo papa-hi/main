@@ -178,6 +178,8 @@ export default function AuthPage() {
                             <AnimatedInput 
                               placeholder={t("auth:usernamePlaceholder", "Enter your username")} 
                               animateOnFocus={true}
+                              animationStyle="glow"
+                              highlightColor="rgba(var(--primary), 0.4)"
                               successIcon={Boolean(field.value)}
                               {...field} 
                             />
@@ -197,6 +199,8 @@ export default function AuthPage() {
                               type="password" 
                               placeholder={t("auth:passwordPlaceholder", "Enter your password")} 
                               animateOnFocus={true}
+                              animationStyle="border"
+                              highlightColor="rgba(var(--primary), 0.7)"
                               successIcon={Boolean(field.value)}
                               {...field} 
                             />
@@ -252,7 +256,14 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>{t("auth:firstName", "First Name")}</FormLabel>
                             <FormControl>
-                              <Input placeholder={t("auth:firstNamePlaceholder", "Your first name")} {...field} />
+                              <AnimatedInput 
+                                placeholder={t("auth:firstNamePlaceholder", "Your first name")}
+                                animateOnFocus={true}
+                                animationStyle="scale"
+                                highlightColor="rgba(var(--primary), 0.3)"
+                                successIcon={Boolean(field.value)}
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -265,7 +276,14 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>{t("auth:lastName", "Last Name")}</FormLabel>
                             <FormControl>
-                              <Input placeholder={t("auth:lastNamePlaceholder", "Your last name")} {...field} />
+                              <AnimatedInput 
+                                placeholder={t("auth:lastNamePlaceholder", "Your last name")}
+                                animateOnFocus={true}
+                                animationStyle="scale"
+                                highlightColor="rgba(var(--primary), 0.3)"
+                                successIcon={Boolean(field.value)}
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
