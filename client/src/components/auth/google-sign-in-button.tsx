@@ -132,12 +132,14 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
   }
 
   return (
-    <Button
+    <AnimatedButton
       variant="outline"
       type="button"
       disabled={isLoading}
       className={`w-full flex items-center justify-center gap-2 ${className}`}
       onClick={handleSignIn}
+      animation="ripple"
+      successAnimation={true}
     >
       {isLoading ? (
         <Loader2 className="h-4 w-4 animate-spin" />
@@ -162,6 +164,6 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
         </svg>
       )}
       <span>{isLoading ? t('auth.signingIn', 'Signing in...') : t('auth.continueWithGoogle', 'Continue with Google')}</span>
-    </Button>
+    </AnimatedButton>
   );
 }

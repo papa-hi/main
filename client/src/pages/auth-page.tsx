@@ -280,7 +280,12 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>{t("auth:username", "Username")}</FormLabel>
                           <FormControl>
-                            <Input placeholder={t("auth:usernamePlaceholder", "Choose a username")} {...field} />
+                            <AnimatedInput 
+                              placeholder={t("auth:usernamePlaceholder", "Choose a username")} 
+                              animateOnFocus={true}
+                              successIcon={Boolean(field.value)}
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -294,7 +299,12 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>{t("auth:email", "Email")}</FormLabel>
                           <FormControl>
-                            <Input placeholder={t("auth:emailPlaceholder", "Your email address")} {...field} />
+                            <AnimatedInput 
+                              placeholder={t("auth:emailPlaceholder", "Your email address")} 
+                              animateOnFocus={true}
+                              successIcon={Boolean(field.value && field.value.includes('@'))}
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -308,9 +318,11 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>{t("auth:password", "Password")}</FormLabel>
                           <FormControl>
-                            <Input 
+                            <AnimatedInput 
                               type="password" 
                               placeholder={t("auth:passwordPlaceholder", "Create a password")} 
+                              animateOnFocus={true}
+                              successIcon={Boolean(field.value && field.value.length >= 6)}
                               {...field} 
                             />
                           </FormControl>
@@ -345,8 +357,10 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>{t("auth:phoneNumber", "Phone Number")}</FormLabel>
                             <FormControl>
-                              <Input 
+                              <AnimatedInput 
                                 placeholder={t("auth:phoneNumberPlaceholder", "Your phone number (optional)")} 
+                                animateOnFocus={true}
+                                successIcon={Boolean(field.value)}
                                 {...field} 
                                 value={field.value || ""}
                               />
@@ -363,8 +377,10 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>{t("auth:city", "City")}</FormLabel>
                             <FormControl>
-                              <Input 
+                              <AnimatedInput 
                                 placeholder={t("auth:cityPlaceholder", "Your city (optional)")} 
+                                animateOnFocus={true}
+                                successIcon={Boolean(field.value)}
                                 {...field} 
                                 value={field.value || ""}
                               />
