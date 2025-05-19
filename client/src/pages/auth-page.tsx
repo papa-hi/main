@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { insertUserSchema } from "@shared/schema";
 import { Button } from "@/components/ui/button";
+import { AnimatedButton } from "@/components/ui/animated-button";
+import { AnimatedInput } from "@/components/ui/animated-input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -173,7 +175,12 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>{t("auth:username", "Username")}</FormLabel>
                           <FormControl>
-                            <Input placeholder={t("auth:usernamePlaceholder", "Enter your username")} {...field} />
+                            <AnimatedInput 
+                              placeholder={t("auth:usernamePlaceholder", "Enter your username")} 
+                              animateOnFocus={true}
+                              successIcon={Boolean(field.value)}
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -186,9 +193,11 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>{t("auth:password", "Password")}</FormLabel>
                           <FormControl>
-                            <Input 
+                            <AnimatedInput 
                               type="password" 
                               placeholder={t("auth:passwordPlaceholder", "Enter your password")} 
+                              animateOnFocus={true}
+                              successIcon={Boolean(field.value)}
                               {...field} 
                             />
                           </FormControl>
@@ -196,9 +205,11 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
-                    <Button 
+                    <AnimatedButton 
                       type="submit" 
                       className="w-full" 
+                      animation="ripple"
+                      successAnimation={true}
                       disabled={loginMutation.isPending}
                     >
                       {loginMutation.isPending ? (
@@ -209,7 +220,7 @@ export default function AuthPage() {
                       ) : (
                         t("auth:loginButton", "Login")
                       )}
-                    </Button>
+                    </AnimatedButton>
                     
                     <div className="relative my-4">
                       <div className="absolute inset-0 flex items-center">

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { AnimatedButton } from "@/components/ui/animated-button";
 import { useFirebaseAuth } from "@/hooks/use-firebase-auth";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
