@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useWeather } from "@/hooks/use-weather";
+import { useQuery } from "@tanstack/react-query";
+import { Playdate } from "@shared/schema";
+import { Link } from "wouter";
+import { format } from "date-fns";
+import { nl, enUS } from "date-fns/locale";
 
 interface WelcomeSectionProps {
   userName: string;
@@ -8,8 +13,14 @@ interface WelcomeSectionProps {
 
 export function WelcomeSection({ userName }: WelcomeSectionProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [randomPlaydate, setRandomPlaydate] = useState<Playdate | null>(null);
   const { t, i18n } = useTranslation();
   const { temperature, condition, icon, city, country, isLoading: weatherLoading, error: weatherError } = useWeather();
+  
+  // Fetch upcoming playdates
+  const { data: playdates, isLoading: playdatesLoading } = useQuery<Playdate[]>({
+    queryKey: ['/api/playdates/upcoming'],
+  });
 
   useEffect(() => {
     // Update time every minute
@@ -19,6 +30,15 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
 
     return () => clearInterval(timer);
   }, []);
+  
+  // Select a random playdate when data is loaded
+  useEffect(() => {
+    if (playdates && playdates.length > 0) {
+      // Get a random playdate from the list
+      const randomIndex = Math.floor(Math.random() * playdates.length);
+      setRandomPlaydate(playdates[randomIndex]);
+    }
+  }, [playdates]);
 
   const getGreeting = () => {
     const hour = currentTime.getHours();
@@ -35,6 +55,19 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
     }
   };
 
+  // Format date for the playdate depending on language
+  const formatPlaydateDate = (date: Date) => {
+    const currentLang = i18n.language;
+    const locale = currentLang === 'nl' ? nl : enUS;
+    
+    return format(date, "EEEE, d MMMM • HH:mm", { locale });
+  };
+  
+  // Get location for the featured playdate
+  const getPlaydateLocation = (playdate: Playdate) => {
+    return playdate.location;
+  };
+  
   // Get weather icon based on condition and time
   const getWeatherIcon = () => {
     // If we have an icon code from the API, use it
@@ -121,27 +154,69 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
       </div>
       
       {/* Featured Section - Promoted Community Events */}
-      <div className="relative rounded-xl overflow-hidden mb-6">
-        <img 
-          src="https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=400&q=80" 
-          alt={t('home.featuredAltText', 'Dad and child at playground')} 
-          className="w-full h-52 object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent flex flex-col justify-end p-6">
-          <span className="text-white text-xs font-medium bg-accent py-1 px-3 rounded-full inline-block mb-2 w-fit">
-            {t('home.featured', 'Featured')}
-          </span>
-          <h3 className="text-white text-xl font-heading font-bold">
-            {t('home.featuredTitle', 'Dads Weekend in the Park')}
-          </h3>
-          <p className="text-white text-sm mb-3">
-            {t('home.featuredDate', 'Sunday, July 7 • Vondelpark • 10:00')}
-          </p>
-          <button className="bg-white text-primary hover:bg-accent hover:text-white transition py-2 px-4 rounded-lg font-medium text-sm w-fit">
-            {t('common.moreInfo', 'More Info')}
-          </button>
+      {playdatesLoading && (
+        <div className="relative rounded-xl overflow-hidden mb-6 animate-pulse">
+          <div className="w-full h-52 bg-slate-200"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent flex flex-col justify-end p-6">
+            <div className="bg-accent/80 h-6 w-24 rounded-full mb-2"></div>
+            <div className="bg-white/40 h-7 w-3/4 rounded mb-2"></div>
+            <div className="bg-white/40 h-5 w-1/2 rounded mb-3"></div>
+            <div className="bg-white/80 h-9 w-32 rounded-lg"></div>
+          </div>
         </div>
-      </div>
+      )}
+      
+      {!playdatesLoading && randomPlaydate && (
+        <div className="relative rounded-xl overflow-hidden mb-6">
+          <img 
+            src={randomPlaydate.image || "https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=400&q=80"} 
+            alt={t('home.featuredAltText', 'Featured playdate')} 
+            className="w-full h-52 object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent flex flex-col justify-end p-6">
+            <span className="text-white text-xs font-medium bg-accent py-1 px-3 rounded-full inline-block mb-2 w-fit">
+              {t('home.featured', 'Featured Playdate')}
+            </span>
+            <h3 className="text-white text-xl font-heading font-bold">
+              {randomPlaydate.title}
+            </h3>
+            <p className="text-white text-sm mb-3">
+              {formatPlaydateDate(new Date(randomPlaydate.startDate))} • {randomPlaydate.location}
+            </p>
+            <Link to={`/playdates/${randomPlaydate.id}`}>
+              <button className="bg-white text-primary hover:bg-accent hover:text-white transition py-2 px-4 rounded-lg font-medium text-sm w-fit">
+                {t('common.moreInfo', 'More Info')}
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
+      
+      {!playdatesLoading && !randomPlaydate && (
+        <div className="relative rounded-xl overflow-hidden mb-6">
+          <img 
+            src="https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=400&q=80" 
+            alt={t('home.featuredAltText', 'Dad and child at playground')} 
+            className="w-full h-52 object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent flex flex-col justify-end p-6">
+            <span className="text-white text-xs font-medium bg-accent py-1 px-3 rounded-full inline-block mb-2 w-fit">
+              {t('home.featured', 'Get Started')}
+            </span>
+            <h3 className="text-white text-xl font-heading font-bold">
+              {t('home.noPlaydatesTitle', 'No Upcoming Playdates')}
+            </h3>
+            <p className="text-white text-sm mb-3">
+              {t('home.noPlaydatesDesc', 'Create a playdate to connect with other dads!')}
+            </p>
+            <Link to="/create-playdate">
+              <button className="bg-white text-primary hover:bg-accent hover:text-white transition py-2 px-4 rounded-lg font-medium text-sm w-fit">
+                {t('home.createPlaydate', 'Create Playdate')}
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
