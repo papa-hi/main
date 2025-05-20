@@ -88,7 +88,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Serve uploaded files
+  // Serve profile images explicitly (to make consistent across environments)
+  app.use('/profile-images', (req, res, next) => {
+    // Security check to prevent directory traversal
+    if (req.path.includes('..')) {
+      return res.status(403).send('Forbidden');
+    }
+    next();
+  }, (req, res, next) => {
+    const profileImagesPath = path.join(process.cwd(), 'uploads', 'profile-images');
+    const filePath = path.join(profileImagesPath, req.path);
+    
+    // Add debug logging
+    console.log(`[PROFILE_IMAGE_SERVER] Request for: ${req.path}`);
+    console.log(`[PROFILE_IMAGE_SERVER] Full path: ${filePath}`);
+    
+    // Check if file exists before sending
+    if (fs.existsSync(filePath)) {
+      // Set cache control headers to prevent caching
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
+      res.sendFile(filePath, (err) => {
+        if (err) {
+          console.error(`[PROFILE_IMAGE_SERVER] Error sending file: ${err.message}`);
+          next(err);
+        }
+      });
+    } else {
+      console.error(`[PROFILE_IMAGE_SERVER] File not found: ${filePath}`);
+      
+      // Send a default placeholder image instead of 404
+      const placeholderPath = path.join(process.cwd(), 'client', 'src', 'assets', 'default-avatar.png');
+      if (fs.existsSync(placeholderPath)) {
+        res.sendFile(placeholderPath);
+      } else {
+        res.status(404).send('Profile image not found');
+      }
+    }
+  });
+  
+  // Serve other uploaded files
   app.use('/uploads', (req, res, next) => {
     // Security check to prevent directory traversal
     if (req.path.includes('..')) {
@@ -102,7 +143,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Add debug logging
     console.log(`[FILE_SERVER] Request for: ${req.path}`);
     console.log(`[FILE_SERVER] Full path: ${filePath}`);
-    console.log(`[FILE_SERVER] Process CWD: ${process.cwd()}`);
     
     // Check if file exists before sending
     if (fs.existsSync(filePath)) {
