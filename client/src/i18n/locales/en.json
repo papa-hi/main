@@ -110,7 +110,10 @@
     "featured": "Featured",
     "featuredTitle": "Dads Weekend in the Park",
     "featuredDate": "Sunday, July 7 • Vondelpark • 10:00",
-    "featuredAltText": "Dad and child at playground"
+    "featuredAltText": "Dad and child at playground",
+    "noPlaydatesTitle": "No Upcoming Playdates",
+    "noPlaydatesDesc": "Create a playdate to connect with other dads!",
+    "createPlaydate": "Create Playdate"
   },
   "quickActions": {
     "newPlaydate": "New Playdate"

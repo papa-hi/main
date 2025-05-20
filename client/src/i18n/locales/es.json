@@ -101,7 +101,10 @@
     "featured": "Destacado",
     "featuredTitle": "Fin de semana de padres en el parque",
     "featuredDate": "Domingo, 7 de julio • Vondelpark • 10:00",
-    "featuredAltText": "Padre e hijo en el parque infantil"
+    "featuredAltText": "Padre e hijo en el parque infantil",
+    "noPlaydatesTitle": "No hay próximas citas de juego",
+    "noPlaydatesDesc": "¡Crea una cita de juego para conectar con otros padres!",
+    "createPlaydate": "Crear cita de juego"
   },
   "quickActions": {
     "newPlaydate": "Nueva cita de juego"

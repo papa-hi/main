@@ -101,7 +101,10 @@
     "featured": "À la une",
     "featuredTitle": "Week-end des pères au parc",
     "featuredDate": "Dimanche 7 juillet • Vondelpark • 10:00",
-    "featuredAltText": "Père et enfant à l'aire de jeux"
+    "featuredAltText": "Père et enfant à l'aire de jeux",
+    "noPlaydatesTitle": "Aucune rencontre à venir",
+    "noPlaydatesDesc": "Créez une rencontre pour connecter avec d'autres pères !",
+    "createPlaydate": "Créer une rencontre"
   },
   "quickActions": {
     "newPlaydate": "Nouvelle rencontre"

@@ -101,7 +101,10 @@
     "featured": "Empfohlen",
     "featuredTitle": "Väter-Wochenende im Park",
     "featuredDate": "Sonntag, 7. Juli • Vondelpark • 10:00",
-    "featuredAltText": "Vater und Kind auf dem Spielplatz"
+    "featuredAltText": "Vater und Kind auf dem Spielplatz",
+    "noPlaydatesTitle": "Keine kommenden Spieltreffen",
+    "noPlaydatesDesc": "Erstelle ein Spieltreffen, um mit anderen Vätern in Kontakt zu treten!",
+    "createPlaydate": "Spieltreffen erstellen"
   },
   "quickActions": {
     "newPlaydate": "Neues Spieltreffen"
