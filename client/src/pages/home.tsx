@@ -54,7 +54,6 @@ export default function HomePage() {
       <WelcomeSection userName={user?.firstName || "Bezoeker"} />
       <QuickActions />
       <UpcomingPlaydates />
-      <ActivityRecommendations />
       <NearbyPlaces />
       <DadSpotlight />
     </div>

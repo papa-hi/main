@@ -29,17 +29,17 @@ export function MobileFooter() {
           </a>
         </Link>
         
+        <Link href="/community">
+          <a className={`flex flex-col items-center py-2 px-3 rounded-lg ${location === '/community' ? 'bg-primary/10 text-primary font-medium' : 'text-dark/70 hover:bg-gray-100'}`}>
+            <i className={`fas fa-users text-xl ${location === '/community' ? 'text-primary' : ''}`}></i>
+            <span className="text-xs mt-1 font-medium">{t('navigation.community', 'Community')}</span>
+          </a>
+        </Link>
+        
         <Link href="/playground-map">
           <a className={`flex flex-col items-center py-2 px-3 rounded-lg ${location === '/playground-map' ? 'bg-primary/10 text-primary font-medium' : 'text-dark/70 hover:bg-gray-100'}`}>
             <i className={`fas fa-map-marked-alt text-xl ${location === '/playground-map' ? 'text-primary' : ''}`}></i>
             <span className="text-xs mt-1 font-medium">{t('navigation.playground_map', 'Map')}</span>
-          </a>
-        </Link>
-        
-        <Link href="/discover">
-          <a className={`flex flex-col items-center py-2 px-3 rounded-lg ${location === '/discover' ? 'bg-primary/10 text-primary font-medium' : 'text-dark/70 hover:bg-gray-100'}`}>
-            <i className={`fas fa-users text-xl ${location === '/discover' ? 'text-primary' : ''}`}></i>
-            <span className="text-xs mt-1 font-medium">{t('navigation.discover', 'Discover')}</span>
           </a>
         </Link>
         
