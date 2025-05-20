@@ -146,7 +146,48 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen">
+      {/* Mobile hero section - Only visible on mobile at the top */}
+      <div className="block lg:hidden w-full bg-gradient-to-b from-primary/5 to-background py-6 px-4">
+        <div className="text-center">
+          <div className="flex items-center justify-center mb-4">
+            <div className="flex items-center justify-center h-[40px] w-8 overflow-hidden rounded-[20px] mr-2 bg-white">
+              <img 
+                src="/images/papa-hi.png" 
+                alt="PaPa-Hi Logo" 
+                className="h-full w-full object-contain scale-150" 
+              />
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent font-['Varela_Round']">
+              {t("auth:hero.title", "PaPa-Hi")}
+            </h1>
+          </div>
+          <p className="text-xl font-medium mb-6 font-['Varela_Round']">
+            {t("auth:hero.subtitle", "The social app for Dutch dads")}
+          </p>
+          <div className="space-y-4 text-left max-w-xs mx-auto">
+            <div className="flex items-start gap-2">
+              <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm shrink-0">1</div>
+              <p className="text-base">
+                {t("auth:hero.feature1", "Connect with other dads in your neighborhood")}
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm shrink-0">2</div>
+              <p className="text-base">
+                {t("auth:hero.feature2", "Find and organize playdates for your kids")}
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm shrink-0">3</div>
+              <p className="text-base">
+                {t("auth:hero.feature3", "Discover family-friendly locations and activities")}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       {/* Left side: Form */}
       <div className="w-full lg:w-1/2 p-6 flex items-center justify-center">
         <Card className="w-full max-w-md shadow-lg border-primary/10">
@@ -608,46 +649,7 @@ export default function AuthPage() {
         </Card>
       </div>
       
-      {/* Mobile hero section - Always visible on mobile */}
-      <div className="block lg:hidden w-full bg-gradient-to-b from-primary/5 to-background py-6 px-4 mb-2">
-        <div className="text-center">
-          <div className="flex items-center justify-center mb-4">
-            <div className="flex items-center justify-center h-[40px] w-8 overflow-hidden rounded-[20px] mr-2 bg-white">
-              <img 
-                src="/images/papa-hi.png" 
-                alt="PaPa-Hi Logo" 
-                className="h-full w-full object-contain scale-150" 
-              />
-            </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent font-['Varela_Round']">
-              {t("auth:hero.title", "PaPa-Hi")}
-            </h1>
-          </div>
-          <p className="text-xl font-medium mb-6 font-['Varela_Round']">
-            {t("auth:hero.subtitle", "The social app for Dutch dads")}
-          </p>
-          <div className="space-y-4 text-left max-w-xs mx-auto">
-            <div className="flex items-start gap-2">
-              <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm shrink-0">1</div>
-              <p className="text-base">
-                {t("auth:hero.feature1", "Connect with other dads in your neighborhood")}
-              </p>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm shrink-0">2</div>
-              <p className="text-base">
-                {t("auth:hero.feature2", "Find and organize playdates for your kids")}
-              </p>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm shrink-0">3</div>
-              <p className="text-base">
-                {t("auth:hero.feature3", "Discover family-friendly locations and activities")}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+
       
       {/* Desktop hero section - Only visible on desktop */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-foreground to-background">
