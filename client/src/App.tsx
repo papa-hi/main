@@ -43,6 +43,7 @@ function Router() {
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
       <ProtectedRoute path="/playground-map" component={PlaygroundMapPage} />
       <ProtectedRoute path="/admin" component={AdminDashboard} />
+      <Route path="/admin-check" component={AdminCheck} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/test-create" component={TestCreatePlaydate} />
       <Route path="/simple-test" component={SimpleTestPage} />
