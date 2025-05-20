@@ -27,6 +27,82 @@ interface ActivityRecommendation {
   reasons: string[];
 }
 
+// Helper function to determine if a place is likely indoor based on type and features
+function isLikelyIndoor(place: Place): boolean {
+  // Check place type
+  if (place.type === 'restaurant' || place.type === 'museum' || place.type === 'cafe') {
+    return true;
+  }
+  
+  // Check features for indoor indicators
+  const features = place.features || [];
+  return features.some(feature => 
+    feature.toLowerCase().includes('indoor') || 
+    feature.toLowerCase().includes('air conditioning') ||
+    feature.toLowerCase().includes('heated')
+  );
+}
+
+// Helper function to determine if a place is kid-friendly
+function isKidFriendly(place: Place): boolean {
+  // Playgrounds are always kid-friendly
+  if (place.type === 'playground') {
+    return true;
+  }
+  
+  // Check features for kid-friendly indicators
+  const features = place.features || [];
+  return features.some(feature => 
+    feature.toLowerCase().includes('kids') || 
+    feature.toLowerCase().includes('children') ||
+    feature.toLowerCase().includes('playground') ||
+    feature.toLowerCase().includes('family')
+  );
+}
+
+// Helper to extract tags from place data
+function getPlaceTags(place: Place): string[] {
+  const tags: string[] = [];
+  
+  // Base tags on type
+  if (place.type === 'restaurant') {
+    tags.push('food', 'dining');
+    
+    // Special tags for times of day
+    if (place.name.toLowerCase().includes('breakfast') || 
+        place.description?.toLowerCase().includes('breakfast')) {
+      tags.push('breakfast');
+    }
+    
+    if (place.name.toLowerCase().includes('lunch') || 
+        place.description?.toLowerCase().includes('lunch')) {
+      tags.push('lunch');
+    }
+    
+    if (place.name.toLowerCase().includes('dinner') || 
+        place.description?.toLowerCase().includes('dinner')) {
+      tags.push('dinner');
+    }
+  }
+  
+  if (place.type === 'playground') {
+    tags.push('outdoor', 'active', 'play');
+  }
+  
+  // Extract tags from features
+  (place.features || []).forEach(feature => {
+    const f = feature.toLowerCase();
+    
+    if (f.includes('quiet') || f.includes('peace')) tags.push('quiet');
+    if (f.includes('popular') || f.includes('busy')) tags.push('popular');
+    if (f.includes('edu') || f.includes('learn')) tags.push('educational');
+    if (f.includes('toddler')) tags.push('toddler-friendly');
+    if (f.includes('teen')) tags.push('teen-friendly');
+  });
+  
+  return tags;
+}
+
 export async function getRecommendations(
   places: Place[],
   query: RecommendationQuery
@@ -54,23 +130,34 @@ export async function getRecommendations(
   const recommendations = places.map(place => {
     let score = 50; // Base score
     const reasons: string[] = [];
+    
+    // Determine place properties from existing data
+    const isIndoor = isLikelyIndoor(place);
+    const kidFriendly = isKidFriendly(place);
+    const tags = getPlaceTags(place);
 
     // Distance factor (if coordinates provided)
     if (query.latitude && query.longitude && place.latitude && place.longitude) {
-      const distance = calculateDistance(
-        query.latitude,
-        query.longitude,
-        place.latitude,
-        place.longitude
-      );
+      // Convert coordinates from string to number if needed
+      const placeLat = typeof place.latitude === 'string' ? parseFloat(place.latitude) : place.latitude;
+      const placeLon = typeof place.longitude === 'string' ? parseFloat(place.longitude) : place.longitude;
       
-      // Reduce score for places far away
-      if (distance > (query.maxDistance || 10)) {
-        score -= Math.min(30, distance / 2);
-        reasons.push(`Further away (${distance.toFixed(1)}km)`);
-      } else {
-        score += Math.max(10, 30 - distance * 2);
-        reasons.push(`Close by (${distance.toFixed(1)}km)`);
+      if (!isNaN(placeLat) && !isNaN(placeLon)) {
+        const distance = calculateDistance(
+          query.latitude,
+          query.longitude,
+          placeLat,
+          placeLon
+        );
+        
+        // Reduce score for places far away
+        if (distance > (query.maxDistance || 10)) {
+          score -= Math.min(30, distance / 2);
+          reasons.push(`Further away (${distance.toFixed(1)}km)`);
+        } else {
+          score += Math.max(10, 30 - distance * 2);
+          reasons.push(`Close by (${distance.toFixed(1)}km)`);
+        }
       }
     }
 
@@ -84,7 +171,7 @@ export async function getRecommendations(
       const isClear = weatherType.includes('clear');
       
       // Indoor place bonus during bad weather
-      if (place.isIndoor) {
+      if (isIndoor) {
         if (isRainy || isSnowy || temp < 5) {
           score += 25;
           reasons.push('Indoor activity perfect for current weather');
@@ -108,14 +195,8 @@ export async function getRecommendations(
       }
     }
 
-    // Family-friendly bonus
-    if (place.familyFriendly) {
-      score += 15;
-      reasons.push('Family-friendly');
-    }
-
     // Kid-friendly bonus
-    if (place.kidFriendly && query.withChildren) {
+    if (kidFriendly && query.withChildren) {
       score += 20;
       reasons.push('Great for children');
     }
@@ -124,15 +205,15 @@ export async function getRecommendations(
     if (query.timeOfDay) {
       // Restaurants get bonus in meal times
       if (place.type === 'restaurant') {
-        if (query.timeOfDay === 'morning' && place.tags?.includes('breakfast')) {
+        if (query.timeOfDay === 'morning' && tags.includes('breakfast')) {
           score += 15;
           reasons.push('Great for breakfast');
         }
-        if (query.timeOfDay === 'afternoon' && place.tags?.includes('lunch')) {
+        if (query.timeOfDay === 'afternoon' && tags.includes('lunch')) {
           score += 15;
           reasons.push('Great for lunch');
         }
-        if (query.timeOfDay === 'evening' && place.tags?.includes('dinner')) {
+        if (query.timeOfDay === 'evening' && tags.includes('dinner')) {
           score += 15;
           reasons.push('Great for dinner');
         }
@@ -146,21 +227,19 @@ export async function getRecommendations(
     }
 
     // Tags-based scoring
-    if (place.tags) {
-      if (place.tags.includes('popular')) {
-        score += 10;
-        reasons.push('Popular destination');
-      }
-      
-      if (place.tags.includes('quiet') && query.withChildren) {
-        score += 5;
-        reasons.push('Quiet environment good for families');
-      }
-      
-      if (place.tags.includes('educational') && query.withChildren) {
-        score += 10;
-        reasons.push('Educational activity for children');
-      }
+    if (tags.includes('popular')) {
+      score += 10;
+      reasons.push('Popular destination');
+    }
+    
+    if (tags.includes('quiet') && query.withChildren) {
+      score += 5;
+      reasons.push('Quiet environment good for families');
+    }
+    
+    if (tags.includes('educational') && query.withChildren) {
+      score += 10;
+      reasons.push('Educational activity for children');
     }
     
     return {

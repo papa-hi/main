@@ -4,6 +4,7 @@ import { QuickActions } from "../components/home/quick-actions";
 import { UpcomingPlaydates } from "../components/home/upcoming-playdates";
 import { NearbyPlaces } from "../components/home/nearby-places";
 import { DadSpotlight } from "../components/home/dad-spotlight";
+import { ActivityRecommendations } from "../components/home/activity-recommendations";
 import { useLocation } from "@/hooks/use-location";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";

@@ -981,16 +981,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const nearbyPlaces = await storage.getNearbyPlaces({ latitude, longitude, type });
       
-      // Remove latitude and longitude from response to hide technical details
-      const placesWithoutCoordinates = nearbyPlaces.map(place => {
-        const { latitude, longitude, ...placeWithoutCoordinates } = place;
-        return placeWithoutCoordinates;
-      });
-      
-      res.json(placesWithoutCoordinates);
+      // Don't remove coordinates as they're needed for recommendations
+      res.json(nearbyPlaces);
     } catch (err) {
       console.error("Error fetching nearby places:", err);
       res.status(500).json({ message: "Failed to fetch nearby places" });
+    }
+  });
+  
+  // Smart recommendation engine for family activities
+  app.get("/api/recommendations", async (req, res) => {
+    try {
+      // Parse query parameters
+      const latitude = req.query.latitude ? parseFloat(req.query.latitude as string) : undefined;
+      const longitude = req.query.longitude ? parseFloat(req.query.longitude as string) : undefined;
+      const userId = req.query.userId ? parseInt(req.query.userId as string) : (req.user?.id || undefined);
+      const withChildren = req.query.withChildren === 'true';
+      const maxDistance = req.query.maxDistance ? parseFloat(req.query.maxDistance as string) : 10;
+      const preferIndoor = req.query.preferIndoor === 'true';
+      
+      // Get time of day if not specified
+      const timeOfDay = (req.query.timeOfDay as 'morning' | 'afternoon' | 'evening') || getCurrentTimeOfDay();
+      
+      console.log(`Generating recommendations: lat=${latitude}, lon=${longitude}, time=${timeOfDay}, withChildren=${withChildren}`);
+      
+      // First, get nearby places
+      const places = await storage.getNearbyPlaces({ latitude, longitude });
+      
+      // Generate personalized recommendations
+      const recommendations = await getRecommendations(places, {
+        latitude,
+        longitude,
+        userId,
+        withChildren,
+        maxDistance,
+        preferIndoor,
+        timeOfDay
+      });
+      
+      res.json(recommendations);
+    } catch (err) {
+      console.error("Error generating recommendations:", err);
+      res.status(500).json({ message: "Failed to generate recommendations" });
     }
   });
 
