@@ -70,11 +70,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No file uploaded" });
       }
       
-      // Get filename and use our helper function to get a consistent URL
+      // Get filename and create a simple consistent URL
       const filename = req.file.filename;
-      const imageUrl = getFileUrl(filename, 'profile-image');
+      const imageUrl = `/profile-images/${filename}`;
       
-      console.log(`Profile image uploaded: ${filename}`);
+      console.log(`Profile image uploaded during registration: ${filename}`);
       console.log(`Image URL: ${imageUrl}`);
       
       res.json({ 
@@ -412,16 +412,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Get filename and use our helper function to get a consistent URL
+      // Get filename for the uploaded file
       const filename = req.file.filename;
-      const imageUrl = getFileUrl(filename, 'profile-image');
+      
+      // Use a simple, consistent format that will work across environments
+      // Just store the filename directly - simplest approach
+      const profileImageUrl = `/profile-images/${filename}`;
       
       console.log(`Profile image updated: ${filename}`);
-      console.log(`Image URL: ${imageUrl}`);
+      console.log(`Image stored at: ${profileImageUrl}`);
       
-      // Store just the filename in the database to ensure it works across environments
+      // Update the user's profile with just the relative URL to the image
       const updatedUser = await storage.updateUser(userId, { 
-        profileImage: filename.includes('/') ? filename : imageUrl 
+        profileImage: profileImageUrl
       });
       
       // Remove password from response
@@ -431,7 +434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         success: true, 
         user: userWithoutPassword,
-        imageUrl
+        imageUrl: profileImageUrl
       });
     } catch (err) {
       console.error("Error uploading profile image:", err);
