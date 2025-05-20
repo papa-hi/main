@@ -42,8 +42,8 @@
       "title": "PaPa-Hi",
       "subtitle": "L'application sociale pour les pères",
       "feature1": "Connectez-vous avec d'autres pères dans votre quartier",
-      "feature2": "Trouvez et organisez des rencontres de jeu pour vos enfants",
-      "feature3": "Découvrez des lieux et des activités adaptés aux familles"
+      "feature2": "Organisez et trouvez des rencontres de jeu pour vos enfants",
+      "feature3": "Découvrez des lieux et des activités adaptés aux enfants"
     },
     "errors": {
       "loginFailed": "Nom d'utilisateur ou mot de passe invalide",

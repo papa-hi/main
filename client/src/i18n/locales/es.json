@@ -42,8 +42,8 @@
       "title": "PaPa-Hi",
       "subtitle": "La app social para padres",
       "feature1": "Conéctate con otros padres de tu vecindario",
-      "feature2": "Encuentra y organiza citas de juego para tus hijos",
-      "feature3": "Descubre lugares y actividades adecuados para familias"
+      "feature2": "Organiza y encuentra citas de juego para tus hijos",
+      "feature3": "Descubre lugares y actividades adecuados para niños"
     },
     "errors": {
       "loginFailed": "Nombre de usuario o contraseña inválidos",
