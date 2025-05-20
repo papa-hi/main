@@ -105,6 +105,10 @@ export const places = pgTable("places", {
   rating: integer("rating").default(0).notNull(),
   reviewCount: integer("review_count").default(0).notNull(),
   features: text("features").array(),
+  isIndoor: boolean("is_indoor").default(false), // For recommendation based on weather
+  familyFriendly: boolean("family_friendly").default(true), // For family recommendations
+  kidFriendly: boolean("kid_friendly").default(true), // For recommendations with children
+  tags: text("tags").array(), // Tags like "popular", "quiet", "educational", "breakfast", "lunch", "dinner"
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -159,6 +163,10 @@ export type InsertPlace = z.infer<typeof insertPlaceSchema>;
 export type Place = typeof places.$inferSelect & {
   distance: number;
   isSaved: boolean;
+  isIndoor?: boolean; 
+  familyFriendly?: boolean;
+  kidFriendly?: boolean;
+  tags?: string[];
 };
 
 // Chat schema
