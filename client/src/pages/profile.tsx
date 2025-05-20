@@ -277,10 +277,17 @@ export default function ProfilePage() {
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
       <div className="md:flex">
         <div className="md:w-1/3">
+          {/* Use a direct image with cache-busting parameter to avoid caching issues */}
           <img 
-            src={user.profileImage || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80"} 
+            src={`${user.profileImage}?t=${new Date().getTime()}`} 
             alt={`${user.firstName} ${user.lastName}`} 
             className="w-full h-64 md:h-full object-cover"
+            onError={(e) => {
+              // On error, replace with a default image
+              const target = e.target as HTMLImageElement;
+              target.onerror = null; // Prevent infinite loop
+              target.src = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80";
+            }}
           />
         </div>
         <div className="p-6 md:w-2/3">

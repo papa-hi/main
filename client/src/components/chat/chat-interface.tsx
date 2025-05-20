@@ -149,7 +149,7 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarImage 
-                      src={sender?.profileImage ? sender.profileImage : undefined} 
+                      src={sender?.profileImage ? `${sender.profileImage}?t=${new Date().getTime()}` : undefined} 
                       alt={sender?.firstName || 'User'} 
                     />
                     <AvatarFallback>
