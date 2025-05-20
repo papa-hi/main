@@ -48,8 +48,8 @@
       "title": "PaPa-Hi",
       "subtitle": "The social app for Dutch dads",
       "feature1": "Connect with other dads in your neighborhood",
-      "feature2": "Find and organize playdates for your kids",
-      "feature3": "Discover family-friendly locations and activities"
+      "feature2": "Organize and find playdates for your kids",
+      "feature3": "Discover kids-friendly locations and activities"
     },
     "errors": {
       "loginFailed": "Invalid username or password",
