@@ -217,23 +217,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get featured user
+  // Get featured user - random dad from the database
   app.get("/api/users/featured", isAuthenticated, async (req, res) => {
     try {
-      const featuredUser = await storage.getFeaturedUser();
-      if (!featuredUser) {
+      // Get all users to select a random one
+      const allUsers = await storage.getAllUsers();
+      
+      // Filter out the current logged-in user
+      const otherUsers = allUsers.filter(user => user.id !== req.user.id);
+      
+      if (!otherUsers || otherUsers.length === 0) {
         return res.status(404).json({ message: "No featured user found" });
       }
       
-      // Add some additional details
+      // Select a random user as the featured dad
+      const randomIndex = Math.floor(Math.random() * otherUsers.length);
+      const featuredUser = otherUsers[randomIndex];
+      
+      // Define possible favorite locations
+      const possibleLocations = [
+        "Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht",
+        "TunFun Speelpark", "Amstelpark", "Amsterdamse Bos", "Kinderkookcafé",
+        "BloemendaalSeaBeach", "Muiderslot Castle", "Pancake Farm", "Keukenhof Gardens"
+      ];
+      
+      // Randomly select 2-4 favorite locations
+      const numLocations = Math.floor(Math.random() * 3) + 2; // 2 to 4 locations
+      const shuffledLocations = [...possibleLocations].sort(() => 0.5 - Math.random());
+      const selectedLocations = shuffledLocations.slice(0, numLocations);
+      
+      // Add some additional randomized details
       const userWithDetails = {
         ...featuredUser,
         badge: "Actieve Papa",
-        childrenInfo: [
-          { name: "Noah", age: 6 },
-          { name: "Eva", age: 4 }
+        childrenInfo: featuredUser.childrenInfo || [
+          { name: "Noah", age: Math.floor(Math.random() * 6) + 3 }
         ],
-        favoriteLocations: ["Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht"]
+        favoriteLocations: selectedLocations
       };
       
       res.json(userWithDetails);
