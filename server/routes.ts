@@ -288,14 +288,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get featured user - random dad from the database
   app.get("/api/users/featured", isAuthenticated, async (req, res) => {
     try {
+      console.log("Fetching featured user");
+      
       // Get all users to select a random one
       const allUsers = await storage.getAllUsers();
       
-      // Filter out the current logged-in user (if authenticated)
-      const otherUsers = allUsers.filter(user => !req.user || user.id !== req.user.id);
+      // Check if we have users to feature
+      if (!allUsers || allUsers.length === 0) {
+        return res.status(404).json({ message: "No users found" });
+      }
       
-      if (!otherUsers || otherUsers.length === 0) {
-        return res.status(404).json({ message: "No featured user found" });
+      // Filter out the current logged-in user (if authenticated)
+      let otherUsers = allUsers;
+      if (req.user && req.user.id) {
+        otherUsers = allUsers.filter(user => user.id !== req.user?.id);
+      }
+      
+      if (otherUsers.length === 0) {
+        // If there are no other users, just return a random user anyway
+        otherUsers = allUsers;
       }
       
       // Select a random user as the featured dad
@@ -324,6 +335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         favoriteLocations: selectedLocations
       };
       
+      console.log(`Selected featured user: ${featuredUser.firstName} ${featuredUser.lastName}`);
       res.json(userWithDetails);
     } catch (err) {
       console.error("Error fetching featured user:", err);
