@@ -216,6 +216,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch users" });
     }
   });
+  
+  // Get a specific user's profile by ID
+  app.get("/api/users/:id", isAuthenticated, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Filter out sensitive information
+      const userWithoutSensitive = { ...user } as Partial<SelectUser>;
+      delete userWithoutSensitive.password;
+      
+      // Add some additional details if it's not already there
+      if (!userWithoutSensitive.childrenInfo) {
+        userWithoutSensitive.childrenInfo = [];
+      }
+      
+      // Return user data
+      res.json(userWithoutSensitive);
+    } catch (err) {
+      console.error("Error fetching user:", err);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+  
+  // Get a user's favorite places
+  app.get("/api/users/:id/favorite-places", isAuthenticated, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      const places = await storage.getUserFavoritePlaces(userId);
+      res.json(places);
+    } catch (err) {
+      console.error("Error fetching user's favorite places:", err);
+      res.status(500).json({ message: "Failed to fetch favorite places" });
+    }
+  });
+  
+  // Get a user's upcoming playdates
+  app.get("/api/users/:id/playdates", isAuthenticated, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      const playdates = await storage.getUserPlaydates(userId);
+      
+      // Only return playdates that haven't happened yet
+      const upcomingPlaydates = playdates.filter(playdate => 
+        new Date(playdate.startTime) > new Date()
+      );
+      
+      res.json(upcomingPlaydates);
+    } catch (err) {
+      console.error("Error fetching user's playdates:", err);
+      res.status(500).json({ message: "Failed to fetch playdates" });
+    }
+  });
 
   // Get featured user - random dad from the database
   app.get("/api/users/featured", isAuthenticated, async (req, res) => {
@@ -223,8 +291,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all users to select a random one
       const allUsers = await storage.getAllUsers();
       
-      // Filter out the current logged-in user
-      const otherUsers = allUsers.filter(user => user.id !== req.user.id);
+      // Filter out the current logged-in user (if authenticated)
+      const otherUsers = allUsers.filter(user => !req.user || user.id !== req.user.id);
       
       if (!otherUsers || otherUsers.length === 0) {
         return res.status(404).json({ message: "No featured user found" });
