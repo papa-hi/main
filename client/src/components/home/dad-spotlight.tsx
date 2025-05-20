@@ -76,7 +76,7 @@ export function DadSpotlight() {
   // Navigate to the user's profile page, which will have a contact/messaging option
   const handleContactClick = () => {
     if (featuredDad && featuredDad.id) {
-      navigate(`/profile/${featuredDad.id}`);
+      navigate(`/users/${featuredDad.id}`);
     }
   };
 
