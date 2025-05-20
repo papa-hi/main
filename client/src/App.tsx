@@ -16,6 +16,7 @@ import ChatPage from "./pages/chat";
 import AuthPage from "./pages/auth-page";
 import PlaygroundMapPage from "./pages/playground-map";
 import AdminDashboard from "./pages/admin";
+import AdminCheck from "./pages/admin-check";
 import TestCreatePlaydate from "./pages/test-create-playdate";
 import SimpleTestPage from "./pages/simple-test";
 import { useState, useEffect } from "react";
