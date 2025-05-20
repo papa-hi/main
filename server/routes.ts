@@ -10,7 +10,6 @@ import path from "path";
 import fs from "fs";
 import { WebSocketServer, WebSocket } from 'ws';
 import { fetchNearbyPlaygrounds } from "./maps-service";
-import { getRecommendations, getCurrentTimeOfDay } from "./recommendation-service";
 import { db } from "./db";
 import { eq, and, gte, asc, count } from "drizzle-orm";
 import crypto from "crypto";
@@ -981,150 +980,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const nearbyPlaces = await storage.getNearbyPlaces({ latitude, longitude, type });
       
-      // Don't remove coordinates as they're needed for recommendations
-      res.json(nearbyPlaces);
+      // Remove latitude and longitude from response to hide technical details
+      const placesWithoutCoordinates = nearbyPlaces.map(place => {
+        const { latitude, longitude, ...placeWithoutCoordinates } = place;
+        return placeWithoutCoordinates;
+      });
+      
+      res.json(placesWithoutCoordinates);
     } catch (err) {
       console.error("Error fetching nearby places:", err);
       res.status(500).json({ message: "Failed to fetch nearby places" });
-    }
-  });
-  
-  // Smart recommendation engine for family activities
-  app.get("/api/recommendations", async (req, res) => {
-    try {
-      // Parse query parameters
-      const latitude = req.query.latitude ? parseFloat(req.query.latitude as string) : undefined;
-      const longitude = req.query.longitude ? parseFloat(req.query.longitude as string) : undefined;
-      const userId = req.query.userId ? parseInt(req.query.userId as string) : (req.user?.id || undefined);
-      const withChildren = req.query.withChildren === 'true';
-      const maxDistance = req.query.maxDistance ? parseFloat(req.query.maxDistance as string) : 10;
-      const preferIndoor = req.query.preferIndoor === 'true';
-      
-      // Get time of day if not specified
-      const timeOfDay = (req.query.timeOfDay as 'morning' | 'afternoon' | 'evening') || getCurrentTimeOfDay();
-      
-      console.log(`Generating recommendations: lat=${latitude}, lon=${longitude}, time=${timeOfDay}, withChildren=${withChildren}`);
-      
-      // Use some sample places data for recommendations instead of querying the database
-      // This avoids database schema issues until we can properly update the schema
-      const samplePlaces = [
-        {
-          id: 1,
-          name: "Vondelpark Speelplaats",
-          description: "Een prachtige speeltuin in het hart van Amsterdam met moderne speeltoestellen.",
-          type: "playground",
-          address: "Vondelpark 7, 1071 AA Amsterdam",
-          latitude: latitude ? (latitude + 0.01).toString() : "52.364",
-          longitude: longitude ? (longitude - 0.01).toString() : "4.878",
-          features: ["schommels", "glijbanen", "klimrekken", "picknickplek"],
-          imageUrl: "/uploads/place-images/playground1.jpg",
-          distance: 1.2,
-          createdAt: new Date(),
-          rating: 4.7,
-          reviewCount: 56,
-          userId: 1,
-          familyFriendly: true,
-          kidFriendly: true,
-          tags: ["outdoor", "playground", "family-friendly"],
-          isIndoor: false
-        },
-        {
-          id: 2,
-          name: "Pannenkoekenhuisje De Carrousel",
-          description: "Gezellig pannenkoekenrestaurant met kindermenu en speelhoek.",
-          type: "restaurant",
-          address: "Prinsengracht 560, 1017 KK Amsterdam",
-          latitude: latitude ? (latitude - 0.005).toString() : "52.368",
-          longitude: longitude ? (longitude + 0.01).toString() : "4.884",
-          features: ["kindermenu", "speelhoek", "kinderstoelen", "verschoontafels"],
-          imageUrl: "/uploads/place-images/restaurant1.jpg",
-          distance: 0.9,
-          createdAt: new Date(),
-          rating: 4.4,
-          reviewCount: 127,
-          userId: 2,
-          familyFriendly: true,
-          kidFriendly: true,
-          tags: ["restaurant", "indoor", "kids-menu"],
-          isIndoor: true
-        },
-        {
-          id: 3,
-          name: "TunFun Speelpark",
-          description: "Groot indoor speelparadijs, perfect voor regenachtige dagen.",
-          type: "playground",
-          address: "Mr. Visserplein 7, 1011 RD Amsterdam",
-          latitude: latitude ? (latitude + 0.005).toString() : "52.370",
-          longitude: longitude ? (longitude + 0.008).toString() : "4.901",
-          features: ["indoor", "ballenbak", "klimrekken", "cafe"],
-          imageUrl: "/uploads/place-images/indoor-playground.jpg",
-          distance: 1.8,
-          createdAt: new Date(),
-          rating: 4.6,
-          reviewCount: 212,
-          userId: 1,
-          familyFriendly: true,
-          kidFriendly: true,
-          tags: ["indoor", "playground", "rainy-day"],
-          isIndoor: true
-        },
-        {
-          id: 4,
-          name: "De Bakkerswinkel",
-          description: "Beste ontbijt in de stad met familie-zitplaatsen.",
-          type: "restaurant",
-          address: "Warmoesstraat 69, 1012 HX Amsterdam",
-          latitude: latitude ? (latitude - 0.007).toString() : "52.372",
-          longitude: longitude ? (longitude - 0.009).toString() : "4.895",
-          features: ["ontbijt", "familie-zitplaatsen", "buitenterras"],
-          imageUrl: "/uploads/place-images/cafe.jpg",
-          distance: 0.7,
-          createdAt: new Date(),
-          rating: 4.3,
-          reviewCount: 89,
-          userId: 3,
-          familyFriendly: true,
-          kidFriendly: true,
-          tags: ["breakfast", "cafe", "outdoor-seating"],
-          isIndoor: false
-        },
-        {
-          id: 5,
-          name: "NEMO Science Museum",
-          description: "Interactief museum met tentoonstellingen voor alle leeftijden.",
-          type: "museum",
-          address: "Oosterdok 2, 1011 VX Amsterdam",
-          latitude: latitude ? (latitude + 0.01).toString() : "52.374",
-          longitude: longitude ? (longitude - 0.004).toString() : "4.912",
-          features: ["interactieve tentoonstellingen", "kinderhoek", "educatief", "indoor"],
-          imageUrl: "/uploads/place-images/museum.jpg",
-          distance: 2.1,
-          createdAt: new Date(),
-          rating: 4.8,
-          reviewCount: 342,
-          userId: 2,
-          familyFriendly: true,
-          kidFriendly: true,
-          tags: ["museum", "educational", "indoor", "cultural"],
-          isIndoor: true
-        }
-      ];
-      
-      // Generate personalized recommendations
-      const recommendations = await getRecommendations(samplePlaces, {
-        latitude,
-        longitude,
-        userId,
-        withChildren,
-        maxDistance,
-        preferIndoor,
-        timeOfDay
-      });
-      
-      res.json(recommendations);
-    } catch (err) {
-      console.error("Error generating recommendations:", err);
-      res.status(500).json({ message: "Failed to generate recommendations" });
     }
   });
 

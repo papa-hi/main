@@ -4,14 +4,13 @@ import { QuickActions } from "../components/home/quick-actions";
 import { UpcomingPlaydates } from "../components/home/upcoming-playdates";
 import { NearbyPlaces } from "../components/home/nearby-places";
 import { DadSpotlight } from "../components/home/dad-spotlight";
-import { ActivityRecommendations } from "../components/home/activity-recommendations";
 import { useLocation } from "@/hooks/use-location";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function HomePage() {
   const { toast } = useToast();
-  const { latitude, longitude, error: locationError, isLoading } = useLocation();
+  const { location, error: locationError, isLoading } = useLocation();
   const { user } = useAuth();
   
   // Request location permission if not already granted
@@ -19,7 +18,7 @@ export default function HomePage() {
     // Only ask for location permission if the user hasn't seen this toast
     const hasAskedForLocation = localStorage.getItem('location_permission_asked');
     
-    if (!hasAskedForLocation && !latitude && !isLoading) {
+    if (!hasAskedForLocation && !location && !isLoading) {
       localStorage.setItem('location_permission_asked', 'true');
       
       toast({
@@ -28,7 +27,7 @@ export default function HomePage() {
         action: (
           <button 
             className="bg-primary text-white hover:bg-secondary py-1 px-3 rounded text-xs font-medium"
-            onClick={() => navigator.geolocation.getCurrentPosition(() => {})}
+            onClick={() => location}
           >
             Toestaan
           </button>
@@ -36,7 +35,7 @@ export default function HomePage() {
         duration: 10000, // 10 seconds
       });
     }
-  }, [latitude, isLoading, toast]);
+  }, [location, isLoading, toast]);
 
   // Show an error toast if location access was denied
   useEffect(() => {
