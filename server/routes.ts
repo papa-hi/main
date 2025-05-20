@@ -246,33 +246,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const randomIndex = Math.floor(Math.random() * otherUsers.length);
       const featuredUser = otherUsers[randomIndex];
       
-      // Get user's favorite places
-      let userFavoritePlaces = [];
+      // Generate consistent favorite places based on user ID
+      const cityBasedLocations = {
+        'Amsterdam': ["Vondelpark", "NEMO Science Museum", "Artis Zoo"],
+        'Rotterdam': ["Plaswijckpark", "Maritiem Museum", "Euromast Park"],
+        'Utrecht': ["Griftpark", "TivoliVredenburg", "Wilhelminapark"],
+        'Den Haag': ["Madurodam", "Scheveningen Beach", "Zuiderpark"],
+        'Eindhoven': ["Genneper Parken", "Philips Museum", "Stadswandelpark"]
+      };
+      
+      // Use the user's city or default to Amsterdam
+      const userCity = featuredUser.city || 'Amsterdam';
+      const defaultLocations = cityBasedLocations[userCity as keyof typeof cityBasedLocations] || 
+                              cityBasedLocations['Amsterdam'];
+      
+      // Get user's real favorite places
+      let userFavoritePlaces: string[] = [];
       try {
         const favoritePlaces = await storage.getUserFavoritePlaces(featuredUser.id);
-        userFavoritePlaces = favoritePlaces.map(place => place.name).slice(0, 4);
+        if (favoritePlaces && favoritePlaces.length > 0) {
+          userFavoritePlaces = favoritePlaces.map(place => place.name).slice(0, 3);
+        }
       } catch (error) {
         console.log(`Could not fetch favorite places for user ${featuredUser.id}: ${error}`);
       }
       
-      // If user has no favorite places, use some defaults
+      // If no favorites found, use city-based defaults
       if (userFavoritePlaces.length === 0) {
-        const possibleLocations = [
-          "Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht",
-          "TunFun Speelpark", "Amstelpark", "Amsterdamse Bos"
-        ];
-        const numLocations = Math.min(3, possibleLocations.length);
-        userFavoritePlaces = possibleLocations.slice(0, numLocations);
+        userFavoritePlaces = defaultLocations;
+        console.log(`Using default locations for ${featuredUser.firstName}: ${userFavoritePlaces.join(', ')}`);
+      } else {
+        console.log(`Using user's actual favorite places: ${userFavoritePlaces.join(', ')}`);
       }
       
       // Use actual user data for badge and children
       const userWithDetails = {
         ...featuredUser,
         badge: featuredUser.badge || "Actieve Papa",
-        // Only create fictional children if the user doesn't have any
-        childrenInfo: featuredUser.childrenInfo?.length ? featuredUser.childrenInfo : [
-          { name: "Noah", age: 4 }
-        ],
+        // Use real children data or create a plausible fictional child
+        childrenInfo: featuredUser.childrenInfo && 
+                     Array.isArray(featuredUser.childrenInfo) && 
+                     featuredUser.childrenInfo.length > 0 
+                        ? featuredUser.childrenInfo 
+                        : [{ name: featuredUser.firstName === "Thomas" ? "Noah" : "Emma", age: Math.floor(Math.random() * 4) + 3 }],
         favoriteLocations: userFavoritePlaces
       };
       
