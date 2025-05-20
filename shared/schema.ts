@@ -19,6 +19,8 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   favoriteLocations: text("favorite_locations").array(),
   childrenInfo: jsonb("children_info"),
+  role: text("role").default('user').notNull(), // 'user', 'admin'
+  lastLogin: timestamp("last_login"),
 });
 
 // Define user relations
@@ -259,3 +261,84 @@ export type ChatMessage = typeof chatMessages.$inferSelect & {
     profileImage: string | null;
   };
 };
+
+// Analytics tables for admin dashboard
+export const userActivity = pgTable("user_activity", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "set null" }),
+  action: text("action").notNull(), // login, logout, view_profile, create_playdate, etc.
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  details: jsonb("details"), // Additional data specific to the action
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+});
+
+export const pageViews = pgTable("page_views", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "set null" }),
+  path: text("path").notNull(),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  duration: integer("duration"), // Time spent on page in seconds
+  referrer: text("referrer"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+});
+
+export const featureUsage = pgTable("feature_usage", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "set null" }),
+  feature: text("feature").notNull(), // chat, map, playdates, etc.
+  action: text("action").notNull(), // view, create, update, delete
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  details: jsonb("details"),
+});
+
+export const adminLogs = pgTable("admin_logs", {
+  id: serial("id").primaryKey(),
+  adminId: integer("admin_id").references(() => users.id, { onDelete: "set null" }),
+  action: text("action").notNull(), // user_edit, user_delete, etc.
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  details: jsonb("details"),
+  ipAddress: text("ip_address"),
+});
+
+export const userActivitySchema = createInsertSchema(userActivity).pick({
+  userId: true,
+  action: true,
+  details: true,
+  ipAddress: true,
+  userAgent: true,
+});
+
+export const pageViewsSchema = createInsertSchema(pageViews).pick({
+  userId: true,
+  path: true,
+  duration: true,
+  referrer: true,
+  ipAddress: true,
+  userAgent: true,
+});
+
+export const featureUsageSchema = createInsertSchema(featureUsage).pick({
+  userId: true,
+  feature: true,
+  action: true,
+  details: true,
+});
+
+export const adminLogsSchema = createInsertSchema(adminLogs).pick({
+  adminId: true,
+  action: true,
+  details: true,
+  ipAddress: true,
+});
+
+export type InsertUserActivity = z.infer<typeof userActivitySchema>;
+export type InsertPageView = z.infer<typeof pageViewsSchema>;
+export type InsertFeatureUsage = z.infer<typeof featureUsageSchema>;
+export type InsertAdminLog = z.infer<typeof adminLogsSchema>;
+
+export type UserActivity = typeof userActivity.$inferSelect;
+export type PageView = typeof pageViews.$inferSelect;
+export type FeatureUsage = typeof featureUsage.$inferSelect;
+export type AdminLog = typeof adminLogs.$inferSelect;

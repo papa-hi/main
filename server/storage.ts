@@ -23,6 +23,22 @@ export interface IStorage {
   deleteUser(id: number): Promise<boolean>;
   getFeaturedUser(): Promise<User | undefined>;
   
+  // Admin methods
+  getAdminUsers(): Promise<User[]>;
+  setUserRole(userId: number, role: string): Promise<User>;
+  getUsersByRole(role: string): Promise<User[]>;
+  getUserStats(): Promise<{ total: number, newLastWeek: number, activeLastMonth: number }>;
+  
+  // Analytics methods
+  logUserActivity(activity: InsertUserActivity): Promise<UserActivity>;
+  logPageView(pageView: InsertPageView): Promise<PageView>;
+  logFeatureUsage(usage: InsertFeatureUsage): Promise<FeatureUsage>;
+  logAdminAction(log: InsertAdminLog): Promise<AdminLog>;
+  getRecentUserActivity(limit?: number): Promise<UserActivity[]>;
+  getTopPages(days?: number): Promise<{ path: string, count: number }[]>;
+  getFeatureUsageStats(days?: number): Promise<{ feature: string, count: number }[]>;
+  getAdminLogs(limit?: number): Promise<AdminLog[]>;
+  
   // Playdate methods
   getUpcomingPlaydates(): Promise<Playdate[]>;
   getPastPlaydates(): Promise<Playdate[]>;
