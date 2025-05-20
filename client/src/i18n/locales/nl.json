@@ -106,7 +106,10 @@
     "featured": "Uitgelicht",
     "featuredTitle": "Vaders Weekend in het Park",
     "featuredDate": "Zondag 7 juli • Vondelpark • 10:00",
-    "featuredAltText": "Vader en kind in speeltuin"
+    "featuredAltText": "Vader en kind in speeltuin",
+    "noPlaydatesTitle": "Geen Aankomende Speelafspraken",
+    "noPlaydatesDesc": "Maak een speelafspraak om met andere vaders te verbinden!",
+    "createPlaydate": "Speelafspraak Maken"
   },
   "quickActions": {
     "newPlaydate": "Nieuwe Afspraak"
