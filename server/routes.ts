@@ -260,23 +260,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const defaultLocations = cityBasedLocations[userCity as keyof typeof cityBasedLocations] || 
                               cityBasedLocations['Amsterdam'];
       
-      // Get user's real favorite places
+      // Get user's real favorite places and track if they have actually set them
       let userFavoritePlaces: string[] = [];
+      let hasSetFavorites = false;
+      
       try {
         const favoritePlaces = await storage.getUserFavoritePlaces(featuredUser.id);
         if (favoritePlaces && favoritePlaces.length > 0) {
           userFavoritePlaces = favoritePlaces.map(place => place.name).slice(0, 3);
+          hasSetFavorites = true;
+          console.log(`Using user's actual favorite places: ${userFavoritePlaces.join(', ')}`);
+        } else {
+          console.log(`No favorite places found for ${featuredUser.firstName}`);
         }
       } catch (error) {
         console.log(`Could not fetch favorite places for user ${featuredUser.id}: ${error}`);
-      }
-      
-      // If no favorites found, use city-based defaults
-      if (userFavoritePlaces.length === 0) {
-        userFavoritePlaces = defaultLocations;
-        console.log(`Using default locations for ${featuredUser.firstName}: ${userFavoritePlaces.join(', ')}`);
-      } else {
-        console.log(`Using user's actual favorite places: ${userFavoritePlaces.join(', ')}`);
       }
       
       // Use actual user data for badge and children
@@ -289,7 +287,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                      featuredUser.childrenInfo.length > 0 
                         ? featuredUser.childrenInfo 
                         : [{ name: featuredUser.firstName === "Thomas" ? "Noah" : "Emma", age: Math.floor(Math.random() * 4) + 3 }],
-        favoriteLocations: userFavoritePlaces
+        favoriteLocations: userFavoritePlaces,
+        hasSetFavorites: hasSetFavorites
       };
       
       console.log(`Selected featured user: ${featuredUser.firstName} ${featuredUser.lastName}`);

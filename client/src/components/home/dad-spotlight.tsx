@@ -7,13 +7,19 @@ import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 
+// Type for featured user response
+interface FeaturedUserResponse extends User {
+  favoriteLocations: string[];
+  hasSetFavorites: boolean;
+}
+
 export function DadSpotlight() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [, navigate] = useLocation();
   
   // Query featured dad from the API with refetch interval for rotating dads
-  const { data: featuredDad, isLoading, error, refetch } = useQuery<User>({
+  const { data: featuredDad, isLoading, error, refetch } = useQuery<FeaturedUserResponse>({
     queryKey: ['/api/users/featured'],
     refetchInterval: 300000, // Refetch every 5 minutes for variety
   });
@@ -124,8 +130,8 @@ export function DadSpotlight() {
               </div>
             )}
             
-            {/* Favorite locations */}
-            {featuredDad.favoriteLocations && featuredDad.favoriteLocations.length > 0 && (
+            {/* Favorite locations - only show if user has explicitly set favorites */}
+            {featuredDad.hasSetFavorites && featuredDad.favoriteLocations && featuredDad.favoriteLocations.length > 0 ? (
               <div className="bg-primary/5 p-3 rounded-lg mb-4">
                 <h4 className="font-heading font-medium text-sm mb-2">{t('dads.favoriteLocations', 'Favorite locations:')}</h4>
                 <div className="flex flex-wrap gap-2">
@@ -136,7 +142,7 @@ export function DadSpotlight() {
                   ))}
                 </div>
               </div>
-            )}
+            ) : null}
             
             <Button 
               className="bg-primary text-white hover:bg-accent transition-all duration-300 py-2 px-6 rounded-lg font-medium text-sm hover:scale-105"
