@@ -17,12 +17,21 @@ interface UserProfileParams {
   id: string;
 }
 
-export default function UserProfilePage({ params }: { params: UserProfileParams }) {
+export default function UserProfilePage({ params }: { params?: UserProfileParams }) {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const { user: currentUser } = useAuth();
-  const userId = parseInt(params.id);
+  
+  // If params is undefined, extract ID from URL path
+  let userId: number;
+  if (params && params.id) {
+    userId = parseInt(params.id);
+  } else {
+    // Extract ID from the URL path as fallback
+    const pathMatch = location.match(/\/users\/(\d+)/);
+    userId = pathMatch ? parseInt(pathMatch[1]) : NaN;
+  }
 
   // Fetch the user's profile data
   const { data: user, isLoading: userLoading, error: userError } = useQuery<User>({
