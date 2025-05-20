@@ -217,8 +217,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get a specific user's profile by ID
-  app.get("/api/users/:id", isAuthenticated, async (req, res) => {
+  // Get featured user - random dad from the database
+  // IMPORTANT: This route MUST come before /api/users/:id to avoid conflicts!
+  app.get("/api/users/featured", isAuthenticated, async (req, res) => {
+    try {
+      console.log("Fetching featured user");
+      
+      // Get all users to select a random one
+      const allUsers = await storage.getAllUsers();
+      
+      // Check if we have users to feature
+      if (!allUsers || allUsers.length === 0) {
+        return res.status(404).json({ message: "No users found" });
+      }
+      
+      // Filter out the current logged-in user (if authenticated)
+      let otherUsers = allUsers;
+      if (req.user && req.user.id) {
+        otherUsers = allUsers.filter(user => user.id !== req.user?.id);
+      }
+      
+      if (otherUsers.length === 0) {
+        // If there are no other users, just return a random user anyway
+        otherUsers = allUsers;
+      }
+      
+      // Select a random user as the featured dad
+      const randomIndex = Math.floor(Math.random() * otherUsers.length);
+      const featuredUser = otherUsers[randomIndex];
+      
+      // Define possible favorite locations
+      const possibleLocations = [
+        "Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht",
+        "TunFun Speelpark", "Amstelpark", "Amsterdamse Bos", "Kinderkookcafé",
+        "BloemendaalSeaBeach", "Muiderslot Castle", "Pancake Farm", "Keukenhof Gardens"
+      ];
+      
+      // Randomly select 2-4 favorite locations
+      const numLocations = Math.floor(Math.random() * 3) + 2; // 2 to 4 locations
+      const shuffledLocations = [...possibleLocations].sort(() => 0.5 - Math.random());
+      const selectedLocations = shuffledLocations.slice(0, numLocations);
+      
+      // Add some additional randomized details
+      const userWithDetails = {
+        ...featuredUser,
+        badge: "Actieve Papa",
+        childrenInfo: featuredUser.childrenInfo || [
+          { name: "Noah", age: Math.floor(Math.random() * 6) + 3 }
+        ],
+        favoriteLocations: selectedLocations
+      };
+      
+      console.log(`Selected featured user: ${featuredUser.firstName} ${featuredUser.lastName}`);
+      res.json(userWithDetails);
+    } catch (err) {
+      console.error("Error fetching featured user:", err);
+      res.status(500).json({ message: "Failed to fetch featured user" });
+    }
+  });
+  
+  // This must come AFTER specific routes like /api/users/featured to avoid conflicts
+  app.get("/api/users/:id([0-9]+)", isAuthenticated, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
       if (isNaN(userId)) {
@@ -285,63 +344,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get featured user - random dad from the database
-  app.get("/api/users/featured", isAuthenticated, async (req, res) => {
-    try {
-      console.log("Fetching featured user");
-      
-      // Get all users to select a random one
-      const allUsers = await storage.getAllUsers();
-      
-      // Check if we have users to feature
-      if (!allUsers || allUsers.length === 0) {
-        return res.status(404).json({ message: "No users found" });
-      }
-      
-      // Filter out the current logged-in user (if authenticated)
-      let otherUsers = allUsers;
-      if (req.user && req.user.id) {
-        otherUsers = allUsers.filter(user => user.id !== req.user?.id);
-      }
-      
-      if (otherUsers.length === 0) {
-        // If there are no other users, just return a random user anyway
-        otherUsers = allUsers;
-      }
-      
-      // Select a random user as the featured dad
-      const randomIndex = Math.floor(Math.random() * otherUsers.length);
-      const featuredUser = otherUsers[randomIndex];
-      
-      // Define possible favorite locations
-      const possibleLocations = [
-        "Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht",
-        "TunFun Speelpark", "Amstelpark", "Amsterdamse Bos", "Kinderkookcafé",
-        "BloemendaalSeaBeach", "Muiderslot Castle", "Pancake Farm", "Keukenhof Gardens"
-      ];
-      
-      // Randomly select 2-4 favorite locations
-      const numLocations = Math.floor(Math.random() * 3) + 2; // 2 to 4 locations
-      const shuffledLocations = [...possibleLocations].sort(() => 0.5 - Math.random());
-      const selectedLocations = shuffledLocations.slice(0, numLocations);
-      
-      // Add some additional randomized details
-      const userWithDetails = {
-        ...featuredUser,
-        badge: "Actieve Papa",
-        childrenInfo: featuredUser.childrenInfo || [
-          { name: "Noah", age: Math.floor(Math.random() * 6) + 3 }
-        ],
-        favoriteLocations: selectedLocations
-      };
-      
-      console.log(`Selected featured user: ${featuredUser.firstName} ${featuredUser.lastName}`);
-      res.json(userWithDetails);
-    } catch (err) {
-      console.error("Error fetching featured user:", err);
-      res.status(500).json({ message: "Failed to fetch featured user" });
-    }
-  });
+
 
   // Advanced search endpoint - Allow without authentication for testing
   app.get("/api/users/search", async (req: Request, res: Response) => {
