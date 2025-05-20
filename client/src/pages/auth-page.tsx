@@ -169,19 +169,19 @@ export default function AuthPage() {
             <div className="flex items-start gap-2">
               <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm shrink-0">1</div>
               <p className="text-base">
-                {t("auth:hero.feature1", "Connect with other dads in your neighborhood")}
+                {t("auth:hero.feature2", "Organize and find playdates for your kids")}
               </p>
             </div>
             <div className="flex items-start gap-2">
               <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm shrink-0">2</div>
               <p className="text-base">
-                {t("auth:hero.feature2", "Find and organize playdates for your kids")}
+                {t("auth:hero.feature1", "Connect with other dads in your neighborhood")}
               </p>
             </div>
             <div className="flex items-start gap-2">
               <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm shrink-0">3</div>
               <p className="text-base">
-                {t("auth:hero.feature3", "Discover family-friendly locations and activities")}
+                {t("auth:hero.feature3", "Discover kids-friendly locations and activities")}
               </p>
             </div>
           </div>
@@ -674,19 +674,19 @@ export default function AuthPage() {
               <div className="flex items-start gap-3">
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">1</div>
                 <p className="text-lg">
-                  {t("auth:hero.feature1", "Connect with other dads in your neighborhood")}
+                  {t("auth:hero.feature2", "Organize and find playdates for your kids")}
                 </p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">2</div>
                 <p className="text-lg">
-                  {t("auth:hero.feature2", "Find and organize playdates for your kids")}
+                  {t("auth:hero.feature1", "Connect with other dads in your neighborhood")}
                 </p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">3</div>
                 <p className="text-lg">
-                  {t("auth:hero.feature3", "Discover family-friendly locations and activities")}
+                  {t("auth:hero.feature3", "Discover kids-friendly locations and activities")}
                 </p>
               </div>
             </div>
