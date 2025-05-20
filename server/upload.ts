@@ -66,34 +66,33 @@ export const getFileUrl = (filename: string, type: 'profile-image' | 'place-imag
     return filename;
   }
   
-  const baseUrl = process.env.BASE_URL || '';
-  let filepath = '';
+  // Just use the filename without path if it's already a filename only
+  const justFilename = path.basename(filename);
   
+  // Create a consistent path format that will work in all environments
   if (type === 'profile-image') {
-    filepath = `${baseUrl}/uploads/profile-images/${filename}`;
-    
     // Check if file exists (for profile images)
-    const fullPath = path.join(process.cwd(), 'uploads', 'profile-images', path.basename(filename));
-    if (!fs.existsSync(fullPath)) {
-      console.log(`[FILE_SERVER] File not found: ${fullPath}, using default image`);
+    const fullPath = path.join(process.cwd(), 'uploads', 'profile-images', justFilename);
+    if (fs.existsSync(fullPath)) {
+      return `/profile-images/${justFilename}`;
+    } else {
+      console.log(`[FILE_SERVER] Profile image not found: ${fullPath}, using default image`);
       // Return a default profile image
-      return `https://ui-avatars.com/api/?name=${encodeURIComponent(path.basename(filename, path.extname(filename)))}&background=random`;
+      return `https://ui-avatars.com/api/?name=${encodeURIComponent(path.basename(justFilename, path.extname(justFilename)))}&background=random`;
     }
   } else if (type === 'place-image') {
-    filepath = `${baseUrl}/uploads/place-images/${filename}`;
-    
     // Check if file exists (for place images)
-    const fullPath = path.join(process.cwd(), 'uploads', 'place-images', path.basename(filename));
-    if (!fs.existsSync(fullPath)) {
-      console.log(`[FILE_SERVER] File not found: ${fullPath}, using default image`);
+    const fullPath = path.join(process.cwd(), 'uploads', 'place-images', justFilename);
+    if (fs.existsSync(fullPath)) {
+      return `/place-images/${justFilename}`;
+    } else {
+      console.log(`[FILE_SERVER] Place image not found: ${fullPath}, using default image`);
       // Return a default place image
       return 'https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop';
     }
   } else {
-    filepath = `${baseUrl}/uploads/${filename}`;
+    return `/uploads/${justFilename}`;
   }
-  
-  return filepath;
 };
 
 // Utility function to delete old profile image

@@ -70,12 +70,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No file uploaded" });
       }
       
-      // Get filename and construct URL using our helper function
+      // Get filename and use our helper function to get a consistent URL
       const filename = req.file.filename;
-      
-      // Create a proper URL to the uploaded file
-      const baseUrl = process.env.BASE_URL || '';
-      const imageUrl = `${baseUrl}/uploads/profile-images/${filename}`;
+      const imageUrl = getFileUrl(filename, 'profile-image');
       
       console.log(`Profile image uploaded: ${filename}`);
       console.log(`Image URL: ${imageUrl}`);
@@ -415,18 +412,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Get filename and construct URL for the uploaded file
+      // Get filename and use our helper function to get a consistent URL
       const filename = req.file.filename;
-      
-      // Create a proper URL to the uploaded file
-      const baseUrl = process.env.BASE_URL || '';
-      const imageUrl = `${baseUrl}/uploads/profile-images/${filename}`;
+      const imageUrl = getFileUrl(filename, 'profile-image');
       
       console.log(`Profile image updated: ${filename}`);
       console.log(`Image URL: ${imageUrl}`);
       
-      // Update user with the external image URL that won't disappear on server restart
-      const updatedUser = await storage.updateUser(userId, { profileImage: imageUrl });
+      // Store just the filename in the database to ensure it works across environments
+      const updatedUser = await storage.updateUser(userId, { 
+        profileImage: filename.includes('/') ? filename : imageUrl 
+      });
       
       // Remove password from response
       const userWithoutPassword = { ...updatedUser } as Partial<SelectUser>;
