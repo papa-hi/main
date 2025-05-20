@@ -238,6 +238,16 @@ export function Header({ user }: HeaderProps) {
                       </span>
                     </DropdownMenuItem>
                   </Link>
+                  {authUser?.role === 'admin' && (
+                    <Link href="/admin">
+                      <DropdownMenuItem className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
+                        <span className="flex items-center">
+                          <i className="fas fa-user-shield mr-2 text-primary/80"></i>
+                          Admin Dashboard
+                        </span>
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     className="cursor-pointer transition-all duration-200 hover:bg-red-50 hover:text-red-600 hover:pl-3" 
@@ -311,6 +321,14 @@ export function Header({ user }: HeaderProps) {
                     {t('header.myProfile', 'Mijn profiel')}
                   </a>
                 </Link>
+                {authUser?.role === 'admin' && (
+                  <Link href="/admin">
+                    <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+                      <i className="fas fa-user-shield mr-2"></i>
+                      Admin Dashboard
+                    </a>
+                  </Link>
+                )}
                 <button 
                   onClick={handleLogout} 
                   className="py-2 px-4 mt-2 bg-red-600/20 text-white hover:bg-red-600/30 rounded-md w-full text-left transition-all duration-200 hover:pl-6 flex items-center"
