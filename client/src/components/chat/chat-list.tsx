@@ -70,11 +70,13 @@ export function ChatList({ onSelectChat, selectedChatId }: ChatListProps) {
       .join(", ");
   };
   
-  const getProfileImage = (chat: Chat) => {
+  const getProfileImage = (chat: Chat): string => {
     // Get profile image of the first participant who is not the current user
     const otherParticipant = chat.participants.find(p => p.id !== user?.id);
     
-    if (!otherParticipant) return null;
+    if (!otherParticipant) {
+      return `https://placehold.co/36x36/4F6F52/white?text=?`;
+    }
     
     // Add cache-busting parameter to prevent stale images when switching environments
     return otherParticipant.profileImage 

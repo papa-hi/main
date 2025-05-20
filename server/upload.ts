@@ -68,22 +68,29 @@ export const getFileUrl = (filename: string, type: 'profile-image' | 'place-imag
     return filename;
   }
   
-  // If the filename already starts with a slash, assume it's a complete path
-  if (filename.startsWith('/')) {
-    return filename;
-  }
+  // Add cache-busting query parameter
+  const timestamp = new Date().getTime();
   
   // Just use the filename without path if it's already a filename only
   const justFilename = path.basename(filename);
   
   // Create a consistent path format that will work in all environments
+  let url = '';
   if (type === 'profile-image') {
-    return `/profile-images/${justFilename}`;
+    url = `/profile-images/${justFilename}`;
   } else if (type === 'place-image') {
-    return `/place-images/${justFilename}`;
+    url = `/place-images/${justFilename}`;
   } else {
-    return `/uploads/${justFilename}`;
+    url = `/uploads/${justFilename}`;
   }
+  
+  // If the filename already starts with a slash but is not a full URL, use the path as is
+  if (filename.startsWith('/')) {
+    url = filename;
+  }
+  
+  // Add timestamp for cache-busting
+  return `${url}?t=${timestamp}`;
 };
 
 // Utility function to delete old profile image
