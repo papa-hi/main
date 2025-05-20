@@ -246,26 +246,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const randomIndex = Math.floor(Math.random() * otherUsers.length);
       const featuredUser = otherUsers[randomIndex];
       
-      // Define possible favorite locations
-      const possibleLocations = [
-        "Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht",
-        "TunFun Speelpark", "Amstelpark", "Amsterdamse Bos", "Kinderkookcafé",
-        "BloemendaalSeaBeach", "Muiderslot Castle", "Pancake Farm", "Keukenhof Gardens"
-      ];
+      // Get user's favorite places
+      let userFavoritePlaces = [];
+      try {
+        const favoritePlaces = await storage.getUserFavoritePlaces(featuredUser.id);
+        userFavoritePlaces = favoritePlaces.map(place => place.name).slice(0, 4);
+      } catch (error) {
+        console.log(`Could not fetch favorite places for user ${featuredUser.id}: ${error}`);
+      }
       
-      // Randomly select 2-4 favorite locations
-      const numLocations = Math.floor(Math.random() * 3) + 2; // 2 to 4 locations
-      const shuffledLocations = [...possibleLocations].sort(() => 0.5 - Math.random());
-      const selectedLocations = shuffledLocations.slice(0, numLocations);
+      // If user has no favorite places, use some defaults
+      if (userFavoritePlaces.length === 0) {
+        const possibleLocations = [
+          "Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht",
+          "TunFun Speelpark", "Amstelpark", "Amsterdamse Bos"
+        ];
+        const numLocations = Math.min(3, possibleLocations.length);
+        userFavoritePlaces = possibleLocations.slice(0, numLocations);
+      }
       
-      // Add some additional randomized details
+      // Use actual user data for badge and children
       const userWithDetails = {
         ...featuredUser,
-        badge: "Actieve Papa",
-        childrenInfo: featuredUser.childrenInfo || [
-          { name: "Noah", age: Math.floor(Math.random() * 6) + 3 }
+        badge: featuredUser.badge || "Actieve Papa",
+        // Only create fictional children if the user doesn't have any
+        childrenInfo: featuredUser.childrenInfo?.length ? featuredUser.childrenInfo : [
+          { name: "Noah", age: 4 }
         ],
-        favoriteLocations: selectedLocations
+        favoriteLocations: userFavoritePlaces
       };
       
       console.log(`Selected featured user: ${featuredUser.firstName} ${featuredUser.lastName}`);
