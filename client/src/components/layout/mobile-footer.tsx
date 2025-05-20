@@ -1,9 +1,11 @@
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/hooks/use-auth";
 
 export function MobileFooter() {
   const [location] = useLocation();
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   return (
     <footer className="md:hidden fixed bottom-0 w-full bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-40">
@@ -49,6 +51,15 @@ export function MobileFooter() {
             <span className="text-xs mt-1 font-medium">{t('navigation.chat', 'Messages')}</span>
           </a>
         </Link>
+        
+        {user?.role === 'admin' && (
+          <Link href="/admin">
+            <a className={`flex flex-col items-center py-2 px-3 rounded-lg ${location.includes('/admin') ? 'bg-primary/10 text-primary font-medium' : 'text-dark/70 hover:bg-gray-100'}`}>
+              <i className={`fas fa-user-shield text-xl ${location.includes('/admin') ? 'text-primary' : ''}`}></i>
+              <span className="text-xs mt-1 font-medium">Admin</span>
+            </a>
+          </Link>
+        )}
       </nav>
     </footer>
   );
