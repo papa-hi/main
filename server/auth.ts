@@ -92,9 +92,19 @@ export function setupAuth(app: Express) {
       // Hash the password before storing
       const hashedPassword = await hashPassword(req.body.password);
       
+      // Set default role to user if not provided
+      const role = req.body.role || 'user';
+      
+      // For security, only allow admin role if it's specifically for the admin user
+      // or in development environment
+      const finalRole = (req.body.username === 'admin' || process.env.NODE_ENV === 'development') 
+                      ? role 
+                      : 'user';
+      
       const user = await storage.createUser({
         ...req.body,
         password: hashedPassword,
+        role: finalRole
       });
 
       req.login(user, (err) => {
