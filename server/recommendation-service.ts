@@ -120,7 +120,9 @@ export async function getRecommendations(
         `https://api.openweathermap.org/data/2.5/weather?lat=${query.latitude}&lon=${query.longitude}&units=metric&appid=${apiKey}`
       );
       weatherData = response.data;
-      console.log('Weather data retrieved:', weatherData.weather[0].main);
+      if (weatherData && weatherData.weather && weatherData.weather.length > 0) {
+        console.log('Weather data retrieved:', weatherData.weather[0].main);
+      }
     } catch (error) {
       console.error('Error fetching weather data:', error);
     }
