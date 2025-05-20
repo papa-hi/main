@@ -76,8 +76,10 @@ export function ChatList({ onSelectChat, selectedChatId }: ChatListProps) {
     
     if (!otherParticipant) return null;
     
-    return otherParticipant.profileImage || 
-      `https://placehold.co/36x36/4F6F52/white?text=${otherParticipant.firstName[0]}`;
+    // Add cache-busting parameter to prevent stale images when switching environments
+    return otherParticipant.profileImage 
+      ? `${otherParticipant.profileImage}?t=${new Date().getTime()}`
+      : `https://placehold.co/36x36/4F6F52/white?text=${otherParticipant.firstName[0]}`;
   };
   
   if (isLoading) {

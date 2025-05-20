@@ -106,7 +106,7 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
         {otherParticipant && (
           <>
             <Avatar className="h-10 w-10">
-              <AvatarImage src={otherParticipant.profileImage ? otherParticipant.profileImage : undefined} alt={otherParticipant.firstName} />
+              <AvatarImage src={otherParticipant.profileImage ? `${otherParticipant.profileImage}?t=${new Date().getTime()}` : undefined} alt={otherParticipant.firstName} />
               <AvatarFallback>{otherParticipant.firstName[0]}</AvatarFallback>
             </Avatar>
             <div>

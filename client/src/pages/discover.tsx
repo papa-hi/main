@@ -123,7 +123,7 @@ export default function DiscoverPage() {
                 <div className="flex items-center gap-4 -mt-12">
                   <Avatar className="h-16 w-16 border-4 border-white">
                     <AvatarImage 
-                      src={user.profileImage || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`} 
+                      src={user.profileImage ? `${user.profileImage}?t=${new Date().getTime()}` : `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`} 
                       alt={`${user.firstName} ${user.lastName}`} 
                     />
                     <AvatarFallback>{`${user.firstName.charAt(0)}${user.lastName.charAt(0)}`}</AvatarFallback>
