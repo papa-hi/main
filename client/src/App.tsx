@@ -13,6 +13,7 @@ import DiscoverPage from "./pages/discover";
 import CreatePage from "./pages/create";
 import EditPlaydatePage from "./pages/edit-playdate";
 import ChatPage from "./pages/chat";
+import CommunityPage from "./pages/community";
 import AuthPage from "./pages/auth-page";
 import PlaygroundMapPage from "./pages/playground-map";
 import TestCreatePlaydate from "./pages/test-create-playdate";
@@ -39,6 +40,7 @@ function Router() {
       <ProtectedRoute path="/discover" component={DiscoverPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
       <ProtectedRoute path="/playground-map" component={PlaygroundMapPage} />
+      <ProtectedRoute path="/community" component={CommunityPage} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/test-create" component={TestCreatePlaydate} />
       <Route path="/simple-test" component={SimpleTestPage} />
