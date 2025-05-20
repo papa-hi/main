@@ -277,16 +277,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Could not fetch favorite places for user ${featuredUser.id}: ${error}`);
       }
       
+      // Check if the user has actual children data
+      const hasChildrenInfo = featuredUser.childrenInfo && 
+                           Array.isArray(featuredUser.childrenInfo) && 
+                           featuredUser.childrenInfo.length > 0;
+      
+      console.log(`Children info for ${featuredUser.firstName}: ${hasChildrenInfo ? 'Available' : 'Not available'}`);
+                           
       // Use actual user data for badge and children
       const userWithDetails = {
         ...featuredUser,
         badge: featuredUser.badge || "Actieve Papa",
-        // Use real children data or create a plausible fictional child
-        childrenInfo: featuredUser.childrenInfo && 
-                     Array.isArray(featuredUser.childrenInfo) && 
-                     featuredUser.childrenInfo.length > 0 
-                        ? featuredUser.childrenInfo 
-                        : [{ name: featuredUser.firstName === "Thomas" ? "Noah" : "Emma", age: Math.floor(Math.random() * 4) + 3 }],
+        // Only include real children data, no fictional data
+        childrenInfo: hasChildrenInfo ? featuredUser.childrenInfo : [],
+        hasChildrenInfo: hasChildrenInfo,
         favoriteLocations: userFavoritePlaces,
         hasSetFavorites: hasSetFavorites
       };

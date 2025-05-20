@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/use-auth";
 interface FeaturedUserResponse extends User {
   favoriteLocations: string[];
   hasSetFavorites: boolean;
+  hasChildrenInfo: boolean;
 }
 
 export function DadSpotlight() {
@@ -116,8 +117,8 @@ export function DadSpotlight() {
             </div>
             <p className="text-dark/80 mb-4 line-clamp-3">{featuredDad.bio || t('profile.noBio', 'This dad has not added a bio yet.')}</p>
             
-            {/* Children information if available */}
-            {featuredDad.childrenInfo && featuredDad.childrenInfo.length > 0 && (
+            {/* Children information only if user has real children data */}
+            {featuredDad.hasChildrenInfo && featuredDad.childrenInfo && featuredDad.childrenInfo.length > 0 && (
               <div className="bg-primary/5 p-3 rounded-lg mb-4">
                 <h4 className="font-heading font-medium text-sm mb-2">{t('profile.children', 'Children:')}</h4>
                 <div className="flex flex-wrap gap-2">
