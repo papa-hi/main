@@ -5,6 +5,7 @@ import { playdates, places, users, chatMessages, insertPlaydateSchema, insertPla
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
+import { setupAdminRoutes } from "./admin";
 import { upload, getFileUrl, deleteProfileImage } from "./upload";
 import path from "path";
 import fs from "fs";
@@ -62,6 +63,9 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupAuth(app);
+  
+  // Setup admin routes
+  setupAdminRoutes(app);
   
   // Handle profile image upload during registration (no auth required)
   app.post("/api/upload/profile-image", upload.single('profileImage'), async (req: Request, res: Response) => {

@@ -5,7 +5,11 @@ import {
   userFavorites,
   playdateParticipants,
   Chat, ChatMessage, InsertChat, InsertChatMessage,
-  chats, chatParticipants, chatMessages
+  chats, chatParticipants, chatMessages,
+  UserActivity, InsertUserActivity, userActivity,
+  PageView, InsertPageView, pageViews,
+  FeatureUsage, InsertFeatureUsage, featureUsage,
+  AdminLog, InsertAdminLog, adminLogs
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not, inArray } from "drizzle-orm";
@@ -940,6 +944,170 @@ export class MemStorage implements IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Admin methods
+  async getAdminUsers(): Promise<User[]> {
+    const result = await db.select().from(users);
+    return result.map(user => ({
+      ...user,
+      childrenInfo: user.childrenInfo as { name: string; age: number }[] | undefined,
+    }));
+  }
+  
+  async setUserRole(userId: number, role: string): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ role })
+      .where(eq(users.id, userId))
+      .returning();
+      
+    return {
+      ...updatedUser,
+      childrenInfo: updatedUser.childrenInfo as { name: string; age: number }[] | undefined,
+    };
+  }
+  
+  async getUsersByRole(role: string): Promise<User[]> {
+    const result = await db
+      .select()
+      .from(users)
+      .where(eq(users.role, role));
+      
+    return result.map(user => ({
+      ...user,
+      childrenInfo: user.childrenInfo as { name: string; age: number }[] | undefined,
+    }));
+  }
+  
+  async getUserStats(): Promise<{ total: number, newLastWeek: number, activeLastMonth: number }> {
+    // Get total users
+    const [{ count: total }] = await db
+      .select({ count: count() })
+      .from(users);
+      
+    // Get users created in the last week
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const [{ count: newLastWeek }] = await db
+      .select({ count: count() })
+      .from(users)
+      .where(gte(users.createdAt, oneWeekAgo));
+      
+    // Get users who logged in in the last month
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    
+    const [{ count: activeLastMonth }] = await db
+      .select({ count: count() })
+      .from(users)
+      .where(gte(users.lastLogin, oneMonthAgo));
+      
+    return {
+      total: Number(total) || 0,
+      newLastWeek: Number(newLastWeek) || 0,
+      activeLastMonth: Number(activeLastMonth) || 0
+    };
+  }
+  
+  // Analytics methods
+  async logUserActivity(activity: InsertUserActivity): Promise<UserActivity> {
+    const [result] = await db
+      .insert(userActivity)
+      .values(activity)
+      .returning();
+      
+    return result;
+  }
+  
+  async logPageView(pageView: InsertPageView): Promise<PageView> {
+    const [result] = await db
+      .insert(pageViews)
+      .values(pageView)
+      .returning();
+      
+    return result;
+  }
+  
+  async logFeatureUsage(usage: InsertFeatureUsage): Promise<FeatureUsage> {
+    const [result] = await db
+      .insert(featureUsage)
+      .values(usage)
+      .returning();
+      
+    return result;
+  }
+  
+  async logAdminAction(log: InsertAdminLog): Promise<AdminLog> {
+    const [result] = await db
+      .insert(adminLogs)
+      .values(log)
+      .returning();
+      
+    return result;
+  }
+  
+  async getRecentUserActivity(limit: number = 100): Promise<UserActivity[]> {
+    const result = await db
+      .select()
+      .from(userActivity)
+      .orderBy(desc(userActivity.timestamp))
+      .limit(limit);
+      
+    return result;
+  }
+  
+  async getTopPages(days: number = 7): Promise<{ path: string, count: number }[]> {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    
+    const result = await db
+      .select({
+        path: pageViews.path,
+        count: count()
+      })
+      .from(pageViews)
+      .where(gte(pageViews.timestamp, startDate))
+      .groupBy(pageViews.path)
+      .orderBy(desc(sql`count(*)`))
+      .limit(10);
+      
+    return result.map(item => ({
+      path: item.path,
+      count: Number(item.count) || 0
+    }));
+  }
+  
+  async getFeatureUsageStats(days: number = 7): Promise<{ feature: string, count: number }[]> {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    
+    const result = await db
+      .select({
+        feature: featureUsage.feature,
+        count: count()
+      })
+      .from(featureUsage)
+      .where(gte(featureUsage.timestamp, startDate))
+      .groupBy(featureUsage.feature)
+      .orderBy(desc(sql`count(*)`))
+      .limit(10);
+      
+    return result.map(item => ({
+      feature: item.feature,
+      count: Number(item.count) || 0
+    }));
+  }
+  
+  async getAdminLogs(limit: number = 100): Promise<AdminLog[]> {
+    const result = await db
+      .select()
+      .from(adminLogs)
+      .orderBy(desc(adminLogs.timestamp))
+      .limit(limit);
+      
+    return result;
+  }
+  
   // User methods
   async getUserById(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));

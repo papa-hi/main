@@ -15,6 +15,7 @@ import EditPlaydatePage from "./pages/edit-playdate";
 import ChatPage from "./pages/chat";
 import AuthPage from "./pages/auth-page";
 import PlaygroundMapPage from "./pages/playground-map";
+import AdminDashboard from "./pages/admin";
 import TestCreatePlaydate from "./pages/test-create-playdate";
 import SimpleTestPage from "./pages/simple-test";
 import { useState, useEffect } from "react";
@@ -23,6 +24,7 @@ import ErrorBoundary from "./components/shared/error-boundary";
 import { AuthProvider } from "./hooks/use-auth";
 import { FirebaseAuthProvider } from "./hooks/use-firebase-auth";
 import { ChatProvider } from "./hooks/use-chat";
+import { AdminProvider } from "./hooks/use-admin";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -39,6 +41,7 @@ function Router() {
       <ProtectedRoute path="/discover" component={DiscoverPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
       <ProtectedRoute path="/playground-map" component={PlaygroundMapPage} />
+      <ProtectedRoute path="/admin" component={AdminDashboard} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/test-create" component={TestCreatePlaydate} />
       <Route path="/simple-test" component={SimpleTestPage} />
@@ -146,26 +149,28 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <FirebaseAuthProvider>
           <AuthProvider>
-            <ChatProvider>
-              <AppShell>
-                <Router />
-              </AppShell>
-              <Toaster />
-              
-              {showPrivacyConsent && (
-                <PrivacyConsentDialog 
-                  onAccept={handleAcceptPrivacy} 
-                  onReject={handleRejectPrivacy} 
-                />
-              )}
-              
-              {showPWAPrompt && (
-                <InstallPWAPrompt 
-                  onDismiss={handleDismissPWA} 
-                  onInstall={handleInstallPWA} 
-                />
-              )}
-            </ChatProvider>
+            <AdminProvider>
+              <ChatProvider>
+                <AppShell>
+                  <Router />
+                </AppShell>
+                <Toaster />
+                
+                {showPrivacyConsent && (
+                  <PrivacyConsentDialog 
+                    onAccept={handleAcceptPrivacy} 
+                    onReject={handleRejectPrivacy} 
+                  />
+                )}
+                
+                {showPWAPrompt && (
+                  <InstallPWAPrompt 
+                    onDismiss={handleDismissPWA} 
+                    onInstall={handleInstallPWA} 
+                  />
+                )}
+              </ChatProvider>
+            </AdminProvider>
           </AuthProvider>
         </FirebaseAuthProvider>
       </QueryClientProvider>
