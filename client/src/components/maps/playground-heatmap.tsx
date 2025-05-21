@@ -74,20 +74,26 @@ const highlightedRestaurantIcon = L.icon({
   className: 'highlighted-marker'
 });
 
-// Component to update map center when user location changes
+// Component to update map center and handle highlighted place
 function SetViewOnLocationChange({ 
   coords,
-  initialCoords
+  initialCoords,
+  highlightedPlaceId,
+  places
 }: { 
   coords: [number, number] | null,
-  initialCoords?: { lat: number, lng: number, zoom: number } | null
+  initialCoords?: { lat: number, lng: number, zoom: number } | null,
+  highlightedPlaceId?: number | null,
+  places: Place[]
 }) {
   const map = useMap();
   const initialCoordsApplied = useRef(false);
+  const highlightedMarkerRef = useRef<L.Marker | null>(null);
   
   // First priority: use initial coordinates from URL if available
   useEffect(() => {
     if (initialCoords && !initialCoordsApplied.current) {
+      console.log("Setting map view to initial coordinates:", initialCoords);
       map.setView([initialCoords.lat, initialCoords.lng], initialCoords.zoom);
       initialCoordsApplied.current = true;
     }
@@ -99,6 +105,67 @@ function SetViewOnLocationChange({
       map.setView(coords, map.getZoom());
     }
   }, [coords, map, initialCoordsApplied]);
+  
+  // Handle highlighted place
+  useEffect(() => {
+    // Clean up previous marker
+    if (highlightedMarkerRef.current) {
+      map.removeLayer(highlightedMarkerRef.current);
+      highlightedMarkerRef.current = null;
+    }
+    
+    // If we have a highlighted place ID, find it and add a special marker
+    if (highlightedPlaceId) {
+      console.log("Looking for highlighted place with ID:", highlightedPlaceId);
+      
+      const highlightedPlace = places.find(p => p.id === highlightedPlaceId);
+      
+      if (highlightedPlace) {
+        console.log("Found highlighted place:", highlightedPlace.name);
+        
+        const lat = typeof highlightedPlace.latitude === 'string' 
+          ? parseFloat(highlightedPlace.latitude) 
+          : highlightedPlace.latitude;
+          
+        const lng = typeof highlightedPlace.longitude === 'string' 
+          ? parseFloat(highlightedPlace.longitude) 
+          : highlightedPlace.longitude;
+        
+        if (lat && lng) {
+          // Use appropriate icon based on place type
+          const icon = highlightedPlace.type === 'playground' 
+            ? highlightedPlaygroundIcon 
+            : highlightedRestaurantIcon;
+            
+          // Create the marker
+          const marker = L.marker([lat, lng], { icon }).addTo(map);
+          
+          // Store in ref for later cleanup
+          highlightedMarkerRef.current = marker;
+          
+          // Add popup
+          marker.bindPopup(`
+            <div style="padding: 10px; text-align: center;">
+              <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">${highlightedPlace.name}</h3>
+              <p style="margin-bottom: 8px;">${highlightedPlace.address || 'No address available'}</p>
+              <p style="margin-bottom: 8px;">${highlightedPlace.description || 'No description available'}</p>
+              <div style="margin-top: 10px; color: #FF4500; font-weight: bold;">★ Selected Location ★</div>
+            </div>
+          `).openPopup();
+          
+          // Make sure the map is centered on this place
+          map.setView([lat, lng], initialCoords?.zoom || 17);
+        }
+      }
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      if (highlightedMarkerRef.current) {
+        map.removeLayer(highlightedMarkerRef.current);
+      }
+    };
+  }, [highlightedPlaceId, map, places, initialCoords]);
   
   return null;
 }
@@ -362,10 +429,15 @@ export function PlaygroundHeatmap({
           />
           
           {/* Update map center when user location changes */}
-          <SetViewOnLocationChange 
-            coords={latitude && longitude ? [latitude, longitude] : null}
-            initialCoords={initialCoords}
-          />
+          {/* Pass data to SetViewOnLocationChange */}
+          {places && (
+            <SetViewOnLocationChange 
+              coords={latitude && longitude ? [latitude, longitude] : null}
+              initialCoords={initialCoords}
+              highlightedPlaceId={highlightedPlaceId}
+              places={places}
+            />
+          )}
           
           {/* Add heatmap layer */}
           <HeatmapLayer points={heatmapPoints} />
