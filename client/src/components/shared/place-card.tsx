@@ -71,30 +71,18 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
     // Use a timestamp to ensure the URL is always unique to force a refresh
     const timestamp = new Date().getTime();
     
-    // Create URL with all place details encoded to avoid API dependency
-    const url = new URL('/playground-map', window.location.origin);
-    const params = new URLSearchParams();
+    // Directly construct the URL to avoid any possible issues
+    const path = `/playground-map?lat=${place.latitude}&lng=${place.longitude}&zoom=18&placeId=${place.id}&name=${encodeURIComponent(place.name)}&showTooltip=true&ts=${timestamp}`;
     
-    // Core parameters
-    params.set('lat', place.latitude.toString());
-    params.set('lng', place.longitude.toString());
-    params.set('zoom', '18');
-    params.set('placeId', place.id.toString());
-    params.set('name', place.name);
-    params.set('showTooltip', 'true');
-    params.set('ts', timestamp.toString());
+    // Add type information
+    const fullPath = `${path}&type=${place.type}`;
     
-    // Additional details for rich display
-    params.set('type', place.type);
-    if (place.description) params.set('description', place.description);
-    if (place.address) params.set('address', place.address);
-    if (place.rating) params.set('rating', place.rating.toString());
-    if (place.distance) params.set('distance', place.distance.toString());
-    if (place.features && place.features.length > 0) {
-      params.set('features', place.features.join(','));
-    }
+    // Log what we're doing to help with debugging
+    console.log("Redirecting to map with place:", place);
+    console.log("Navigation path:", fullPath);
     
-    setLocation(`/playground-map?${params.toString()}`);
+    // Navigate to the map page
+    window.location.href = fullPath;
     
     // Show a toast notification to confirm the action
     toast({
