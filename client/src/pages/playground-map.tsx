@@ -32,7 +32,13 @@ export default function PlaygroundMapPage() {
     const lng = searchParams.get('lng');
     const zoom = searchParams.get('zoom');
     const name = searchParams.get('name');
+    const type = searchParams.get('type') || 'playground';
+    const description = searchParams.get('description');
+    const address = searchParams.get('address');
     const shouldShowTooltip = searchParams.get('showTooltip') === 'true';
+    const rating = searchParams.get('rating');
+    const distance = searchParams.get('distance');
+    const features = searchParams.get('features');
     
     // Debug logs
     console.log("URL Parameters:", {
@@ -41,7 +47,13 @@ export default function PlaygroundMapPage() {
       lng,
       zoom,
       name,
+      type,
+      description,
+      address,
       showTooltip: shouldShowTooltip,
+      rating,
+      distance,
+      features,
       fullLocation: location
     });
     
@@ -50,40 +62,51 @@ export default function PlaygroundMapPage() {
       console.log("Setting highlighted place ID:", id);
       setHighlightedPlaceId(id);
       
-      // Fetch place details
-      fetch(`/api/places/${id}`)
-        .then(response => {
-          if (!response.ok) {
-            // If specific place endpoint fails, try the search endpoint
-            return fetch(`/api/places/search?type=all`);
-          }
-          return response;
-        })
-        .then(response => response.json())
-        .then(data => {
-          // If we got an array from search, find the place by ID
-          if (Array.isArray(data)) {
-            const place = data.find(p => p.id === id);
-            if (place) {
-              setPlaceInfo(place);
-              console.log("Found place in search results:", place);
-              setShowPlaceDetails(true);
+      // Show place details directly from URL parameters
+      if (name && lat && lng) {
+        const placeData = {
+          id,
+          name: decodeURIComponent(name),
+          type: type || 'playground',
+          description: description ? decodeURIComponent(description) : 'No description available',
+          address: address ? decodeURIComponent(address) : 'No address available',
+          latitude: parseFloat(lat),
+          longitude: parseFloat(lng),
+          rating: rating ? parseFloat(rating) : 4.5,
+          reviewCount: 10,
+          distance: distance ? parseFloat(distance) : 1000,
+          features: features ? decodeURIComponent(features).split(',') : [],
+          imageUrl: type === 'restaurant' 
+            ? 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80'
+            : 'https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop'
+        };
+        
+        setPlaceInfo(placeData);
+        console.log("Using place data from URL parameters:", placeData);
+        setShowPlaceDetails(true);
+      } else {
+        // Fall back to fetching all places and finding by ID
+        fetch(`/api/places/search?type=all`)
+          .then(response => response.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              const place = data.find(p => p.id === id);
+              if (place) {
+                setPlaceInfo(place);
+                console.log("Found place in search results:", place);
+                setShowPlaceDetails(true);
+              }
             }
-          } else {
-            // If we got a direct result
-            setPlaceInfo(data);
-            console.log("Found place details:", data);
-            setShowPlaceDetails(true);
-          }
-        })
-        .catch(error => {
-          console.error("Error fetching place details:", error);
-          toast({
-            title: t('places.error', 'Error'),
-            description: t('places.errorFetchingDetails', 'Could not fetch place details.'),
-            variant: "destructive"
+          })
+          .catch(error => {
+            console.error("Error fetching place details:", error);
+            toast({
+              title: t('places.error', 'Error'),
+              description: t('places.errorFetchingDetails', 'Could not fetch place details.'),
+              variant: "destructive"
+            });
           });
-        });
+      }
     }
     
     if (name) {

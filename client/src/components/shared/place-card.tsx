@@ -70,7 +70,31 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
     // Add more information to the URL to ensure the place details are shown
     // Use a timestamp to ensure the URL is always unique to force a refresh
     const timestamp = new Date().getTime();
-    setLocation(`/playground-map?lat=${place.latitude}&lng=${place.longitude}&zoom=18&placeId=${place.id}&name=${encodeURIComponent(place.name)}&showTooltip=true&ts=${timestamp}`);
+    
+    // Create URL with all place details encoded to avoid API dependency
+    const url = new URL('/playground-map', window.location.origin);
+    const params = new URLSearchParams();
+    
+    // Core parameters
+    params.set('lat', place.latitude.toString());
+    params.set('lng', place.longitude.toString());
+    params.set('zoom', '18');
+    params.set('placeId', place.id.toString());
+    params.set('name', place.name);
+    params.set('showTooltip', 'true');
+    params.set('ts', timestamp.toString());
+    
+    // Additional details for rich display
+    params.set('type', place.type);
+    if (place.description) params.set('description', place.description);
+    if (place.address) params.set('address', place.address);
+    if (place.rating) params.set('rating', place.rating.toString());
+    if (place.distance) params.set('distance', place.distance.toString());
+    if (place.features && place.features.length > 0) {
+      params.set('features', place.features.join(','));
+    }
+    
+    setLocation(`/playground-map?${params.toString()}`);
     
     // Show a toast notification to confirm the action
     toast({
