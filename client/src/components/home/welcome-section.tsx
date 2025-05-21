@@ -183,7 +183,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
             <p className="text-white text-sm mb-3">
               {formatPlaydateDate(new Date(randomPlaydate.startTime))} • {t(`playdate.location.${randomPlaydate.id}`, randomPlaydate.location)}
             </p>
-            <Link to={`/playdates/${randomPlaydate.id}`}>
+            <Link href={`/playdates`}>
               <button className="bg-white text-primary hover:bg-accent hover:text-white transition py-2 px-4 rounded-lg font-medium text-sm w-fit">
                 {t('common.moreInfo', 'More Info')}
               </button>
