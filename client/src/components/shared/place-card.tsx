@@ -6,6 +6,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { useLocation } from "wouter";
 
 interface PlaceCardProps {
   place: Place;
@@ -16,6 +17,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
   const { toast } = useToast();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [_, setLocation] = useLocation();
   const [isSaved, setIsSaved] = useState(place.isSaved);
   const [isToggling, setIsToggling] = useState(false);
   const [animateHeart, setAnimateHeart] = useState(false);
@@ -63,8 +65,17 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
     }
   };
 
+  // Function to handle redirecting to map with location focus
+  const handleViewOnMap = () => {
+    // Navigate to the playground map page with coordinates from the place
+    setLocation(`/playground-map?lat=${place.latitude}&lng=${place.longitude}&zoom=18&placeId=${place.id}`);
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64 transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-md">
+    <div 
+      className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64 transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-md cursor-pointer"
+      onClick={handleViewOnMap}
+    >
       <div className="relative">
         <img 
           src={place.type === 'playground' && place.imageUrl?.includes('place-images') 
