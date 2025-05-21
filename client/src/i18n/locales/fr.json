@@ -83,7 +83,10 @@
     "playdates": "Rencontres",
     "new": "Nouveau",
     "places": "Lieux",
-    "profile": "Profil"
+    "profile": "Profil",
+    "playground_map": "Carte",
+    "chat": "Messages",
+    "discover": "Découvrir"
   },
   "header": {
     "myProfile": "Mon profil",

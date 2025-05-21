@@ -88,7 +88,10 @@
     "playdates": "Speelafspraken",
     "new": "Nieuw",
     "places": "Plekken",
-    "profile": "Profiel"
+    "profile": "Profiel",
+    "playground_map": "Kaart",
+    "chat": "Berichten",
+    "discover": "Ontdekken"
   },
   "header": {
     "myProfile": "Mijn Profiel",

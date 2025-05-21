@@ -83,7 +83,10 @@
     "playdates": "Spieltreffen",
     "new": "Neu",
     "places": "Orte",
-    "profile": "Profil"
+    "profile": "Profil",
+    "playground_map": "Karte",
+    "chat": "Nachrichten",
+    "discover": "Entdecken"
   },
   "header": {
     "myProfile": "Mein Profil",
