@@ -189,6 +189,16 @@ export function PlaygroundHeatmap({
   // Reference to track if highlighted place has been found and popup opened
   const highlightedPlaceRef = useRef<number | null>(null);
   
+  // For debugging
+  useEffect(() => {
+    if (highlightedPlaceId) {
+      console.log("Highlighted place ID:", highlightedPlaceId);
+    }
+    if (initialCoords) {
+      console.log("Initial coordinates:", initialCoords);
+    }
+  }, [highlightedPlaceId, initialCoords]);
+  
   // Form definition
   const form = useForm<PlaygroundFormValues>({
     resolver: zodResolver(playgroundFormSchema),
@@ -384,7 +394,7 @@ export function PlaygroundHeatmap({
             const lng = typeof place.longitude === 'string' ? parseFloat(place.longitude) : place.longitude;
             
             // Determine if this place should be highlighted
-            const isHighlighted = place.id === highlightedPlaceId;
+            const isHighlighted = highlightedPlaceId !== null && place.id === highlightedPlaceId;
             
             // Select appropriate icon based on place type and highlighted status
             let markerIcon;

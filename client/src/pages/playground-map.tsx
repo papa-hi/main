@@ -11,22 +11,35 @@ export default function PlaygroundMapPage() {
   
   // Parse URL parameters
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.split('?')[1]);
+    const searchParams = new URLSearchParams(location.split('?')[1] || '');
     const placeId = searchParams.get('placeId');
     const lat = searchParams.get('lat');
     const lng = searchParams.get('lng');
     const zoom = searchParams.get('zoom');
     
+    // Debug logs
+    console.log("URL Parameters:", {
+      placeId,
+      lat,
+      lng,
+      zoom,
+      fullLocation: location
+    });
+    
     if (placeId) {
-      setHighlightedPlaceId(parseInt(placeId));
+      const id = parseInt(placeId);
+      console.log("Setting highlighted place ID:", id);
+      setHighlightedPlaceId(id);
     }
     
     if (lat && lng) {
-      setInitialCoords({
+      const coords = {
         lat: parseFloat(lat),
         lng: parseFloat(lng),
         zoom: zoom ? parseInt(zoom) : 16
-      });
+      };
+      console.log("Setting initial coords:", coords);
+      setInitialCoords(coords);
     }
   }, [location]);
   
