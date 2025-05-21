@@ -211,7 +211,9 @@
     "cancel": "Annuleren",
     "delete": "Verwijderen",
     "edit": "Bewerken",
-    "moreInfo": "Meer Info"
+    "moreInfo": "Meer Info",
+    "search": "Zoeken",
+    "map": "Kaart"
   },
   "dads": {
     "moreDads": "Meer Papa's",
