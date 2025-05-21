@@ -48,15 +48,57 @@ const playgroundIcon = L.icon({
   popupAnchor: [0, -30]
 });
 
+// Highlighted playground icon (larger and with different color)
+const highlightedPlaygroundIcon = L.icon({
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/5264/5264078.png',
+  iconSize: [45, 45],
+  iconAnchor: [22, 45],
+  popupAnchor: [0, -45],
+  className: 'highlighted-marker'
+});
+
+// Restaurant icon
+const restaurantIcon = L.icon({
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448636.png',
+  iconSize: [30, 30],
+  iconAnchor: [15, 30],
+  popupAnchor: [0, -30]
+});
+
+// Highlighted restaurant icon
+const highlightedRestaurantIcon = L.icon({
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448636.png',
+  iconSize: [45, 45],
+  iconAnchor: [22, 45],
+  popupAnchor: [0, -45],
+  className: 'highlighted-marker'
+});
+
 // Component to update map center when user location changes
-function SetViewOnLocationChange({ coords }: { coords: [number, number] | null }) {
+function SetViewOnLocationChange({ 
+  coords,
+  initialCoords
+}: { 
+  coords: [number, number] | null,
+  initialCoords?: { lat: number, lng: number, zoom: number } | null
+}) {
   const map = useMap();
+  const initialCoordsApplied = useRef(false);
   
+  // First priority: use initial coordinates from URL if available
   useEffect(() => {
-    if (coords) {
+    if (initialCoords && !initialCoordsApplied.current) {
+      map.setView([initialCoords.lat, initialCoords.lng], initialCoords.zoom);
+      initialCoordsApplied.current = true;
+    }
+  }, [initialCoords, map]);
+  
+  // Second priority: use user's location if available and initial coords not set
+  useEffect(() => {
+    if (coords && !initialCoordsApplied.current) {
       map.setView(coords, map.getZoom());
     }
-  }, [coords, map]);
+  }, [coords, map, initialCoordsApplied]);
   
   return null;
 }
@@ -97,6 +139,8 @@ function HeatmapLayer({ points }: { points: number[][] }) {
 
 interface PlaygroundHeatmapProps {
   className?: string;
+  highlightedPlaceId?: number | null;
+  initialCoords?: { lat: number, lng: number, zoom: number } | null;
 }
 
 // Component to handle click on map for adding a new playground

@@ -1,9 +1,34 @@
 import { useTranslation } from 'react-i18next';
 import { PlaygroundHeatmap } from '@/components/maps/playground-heatmap';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation } from 'wouter';
 
 export default function PlaygroundMapPage() {
   const { t } = useTranslation();
+  const [location] = useLocation();
+  const [highlightedPlaceId, setHighlightedPlaceId] = useState<number | null>(null);
+  const [initialCoords, setInitialCoords] = useState<{lat: number, lng: number, zoom: number} | null>(null);
+  
+  // Parse URL parameters
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.split('?')[1]);
+    const placeId = searchParams.get('placeId');
+    const lat = searchParams.get('lat');
+    const lng = searchParams.get('lng');
+    const zoom = searchParams.get('zoom');
+    
+    if (placeId) {
+      setHighlightedPlaceId(parseInt(placeId));
+    }
+    
+    if (lat && lng) {
+      setInitialCoords({
+        lat: parseFloat(lat),
+        lng: parseFloat(lng),
+        zoom: zoom ? parseInt(zoom) : 16
+      });
+    }
+  }, [location]);
   
   // Ensure leaflet CSS is properly loaded
   useEffect(() => {
@@ -29,7 +54,11 @@ export default function PlaygroundMapPage() {
         </p>
       </div>
       
-      <PlaygroundHeatmap className="mb-8" />
+      <PlaygroundHeatmap 
+        className="mb-8"
+        highlightedPlaceId={highlightedPlaceId}
+        initialCoords={initialCoords}
+      />
       
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-sm p-6">
