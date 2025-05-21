@@ -48,12 +48,12 @@ const playgroundIcon = L.icon({
   popupAnchor: [0, -30]
 });
 
-// Highlighted playground icon (larger and with different color)
+// Highlighted playground icon (larger with animation and glow effect)
 const highlightedPlaygroundIcon = L.icon({
   iconUrl: 'https://cdn-icons-png.flaticon.com/512/5264/5264078.png',
-  iconSize: [45, 45],
-  iconAnchor: [22, 45],
-  popupAnchor: [0, -45],
+  iconSize: [60, 60],
+  iconAnchor: [30, 60],
+  popupAnchor: [0, -60],
   className: 'highlighted-marker'
 });
 
@@ -65,12 +65,12 @@ const restaurantIcon = L.icon({
   popupAnchor: [0, -30]
 });
 
-// Highlighted restaurant icon
+// Highlighted restaurant icon (larger with animation and glow effect)
 const highlightedRestaurantIcon = L.icon({
   iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448636.png',
-  iconSize: [45, 45],
-  iconAnchor: [22, 45],
-  popupAnchor: [0, -45],
+  iconSize: [60, 60],
+  iconAnchor: [30, 60],
+  popupAnchor: [0, -60],
   className: 'highlighted-marker'
 });
 
@@ -412,13 +412,16 @@ export function PlaygroundHeatmap({
                 key={place.id} 
                 position={[lat, lng]}
                 icon={markerIcon}
-                ref={markerRef => {
-                  // Automatically open popup for highlighted place
-                  if (isHighlighted && markerRef && highlightedPlaceRef.current !== place.id) {
-                    setTimeout(() => {
-                      markerRef.openPopup();
-                      highlightedPlaceRef.current = place.id;
-                    }, 500);
+                eventHandlers={{
+                  add: (e) => {
+                    // Automatically open popup for highlighted place
+                    if (isHighlighted && highlightedPlaceRef.current !== place.id) {
+                      setTimeout(() => {
+                        e.target.openPopup();
+                        console.log("Opening popup for highlighted place:", place.id);
+                        highlightedPlaceRef.current = place.id;
+                      }, 500);
+                    }
                   }
                 }}
               >
