@@ -48,9 +48,9 @@ const playgroundIcon = L.icon({
   popupAnchor: [0, -30]
 });
 
-// Highlighted playground icon (larger with animation and glow effect)
+// Highlighted playground icon (using a completely different eye-catching icon)
 const highlightedPlaygroundIcon = L.icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/5264/5264078.png',
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/2529/2529521.png', // Using a location pin icon
   iconSize: [60, 60],
   iconAnchor: [30, 60],
   popupAnchor: [0, -60],
@@ -65,9 +65,9 @@ const restaurantIcon = L.icon({
   popupAnchor: [0, -30]
 });
 
-// Highlighted restaurant icon (larger with animation and glow effect)
+// Highlighted restaurant icon (using a bright location marker for better visibility)
 const highlightedRestaurantIcon = L.icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448636.png',
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/2529/2529522.png', // Using a different colored pin
   iconSize: [60, 60],
   iconAnchor: [30, 60],
   popupAnchor: [0, -60],
@@ -188,16 +188,6 @@ export function PlaygroundHeatmap({
   
   // Reference to track if highlighted place has been found and popup opened
   const highlightedPlaceRef = useRef<number | null>(null);
-  
-  // For debugging
-  useEffect(() => {
-    if (highlightedPlaceId) {
-      console.log("Highlighted place ID:", highlightedPlaceId);
-    }
-    if (initialCoords) {
-      console.log("Initial coordinates:", initialCoords);
-    }
-  }, [highlightedPlaceId, initialCoords]);
   
   // Form definition
   const form = useForm<PlaygroundFormValues>({
