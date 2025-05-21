@@ -171,7 +171,11 @@ const playgroundFormSchema = z.object({
 
 type PlaygroundFormValues = z.infer<typeof playgroundFormSchema>;
 
-export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
+export function PlaygroundHeatmap({ 
+  className = '', 
+  highlightedPlaceId = null,
+  initialCoords = null
+}: PlaygroundHeatmapProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -181,6 +185,9 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<[number, number] | null>(null);
   const [addMode, setAddMode] = useState(false);
+  
+  // Reference to track if highlighted place has been found and popup opened
+  const highlightedPlaceRef = useRef<number | null>(null);
   
   // Form definition
   const form = useForm<PlaygroundFormValues>({
@@ -355,7 +362,10 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
           />
           
           {/* Update map center when user location changes */}
-          <SetViewOnLocationChange coords={latitude && longitude ? [latitude, longitude] : null} />
+          <SetViewOnLocationChange 
+            coords={latitude && longitude ? [latitude, longitude] : null}
+            initialCoords={initialCoords}
+          />
           
           {/* Add heatmap layer */}
           <HeatmapLayer points={heatmapPoints} />
@@ -367,62 +377,84 @@ export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
             />
           )}
           
-          {/* Add markers for each playground */}
-          {places
-            .filter(place => place.type === 'playground')
-            .map(place => {
-              // Ensure latitude and longitude are numbers
-              const lat = typeof place.latitude === 'string' ? parseFloat(place.latitude) : place.latitude;
-              const lng = typeof place.longitude === 'string' ? parseFloat(place.longitude) : place.longitude;
-              
-              // Only render markers with valid coordinates
-              return (lat && lng) ? (
-                <Marker 
-                  key={place.id} 
-                  position={[lat, lng]}
-                  icon={playgroundIcon}
-                >
-                  <Popup>
-                    <div className="p-1">
-                      <h3 className="font-medium text-base">{place.name}</h3>
-                      
-                      {place.imageUrl && (
-                        <div className="my-2">
-                          <img
-                            src={place.imageUrl}
-                            alt={place.name}
-                            className="w-full h-32 object-cover rounded"
-                            onError={(e) => {
-                              // Fallback if image fails to load
-                              e.currentTarget.src = "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80";
-                            }}
-                          />
-                        </div>
-                      )}
-                      
-                      <p className="text-sm text-muted-foreground">
-                        {place.description ? place.description.substring(0, 100) + (place.description.length > 100 ? '...' : '') : t('common.noDescription', 'No description available.')}
-                      </p>
-                      <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-                        <i className="fas fa-map-marker-alt text-primary"></i>
-                        <span>{place.address || t('common.noAddress', 'No address')}</span>
+          {/* Add markers for all places (playgrounds and restaurants) */}
+          {places.map(place => {
+            // Ensure latitude and longitude are numbers
+            const lat = typeof place.latitude === 'string' ? parseFloat(place.latitude) : place.latitude;
+            const lng = typeof place.longitude === 'string' ? parseFloat(place.longitude) : place.longitude;
+            
+            // Determine if this place should be highlighted
+            const isHighlighted = place.id === highlightedPlaceId;
+            
+            // Select appropriate icon based on place type and highlighted status
+            let markerIcon;
+            if (place.type === 'playground') {
+              markerIcon = isHighlighted ? highlightedPlaygroundIcon : playgroundIcon;
+            } else if (place.type === 'restaurant') {
+              markerIcon = isHighlighted ? highlightedRestaurantIcon : restaurantIcon;
+            } else {
+              markerIcon = playgroundIcon; // Default fallback
+            }
+            
+            // Only render markers with valid coordinates
+            return (lat && lng) ? (
+              <Marker 
+                key={place.id} 
+                position={[lat, lng]}
+                icon={markerIcon}
+                ref={markerRef => {
+                  // Automatically open popup for highlighted place
+                  if (isHighlighted && markerRef && highlightedPlaceRef.current !== place.id) {
+                    setTimeout(() => {
+                      markerRef.openPopup();
+                      highlightedPlaceRef.current = place.id;
+                    }, 500);
+                  }
+                }}
+              >
+                <Popup>
+                  <div className="p-1">
+                    <h3 className="font-medium text-base">{place.name}</h3>
+                    
+                    {place.imageUrl && (
+                      <div className="my-2">
+                        <img
+                          src={place.imageUrl}
+                          alt={place.name}
+                          className="w-full h-32 object-cover rounded"
+                          onError={(e) => {
+                            // Fallback if image fails to load
+                            e.currentTarget.src = place.type === 'playground'
+                              ? "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop"
+                              : "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80";
+                          }}
+                        />
                       </div>
-                      <Button 
-                        className="mt-2 w-full text-xs"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
-                        }}
-                      >
-                        <i className="fas fa-directions mr-1"></i>
-                        {t('common.directions', 'Directions')}
-                      </Button>
+                    )}
+                    
+                    <p className="text-sm text-muted-foreground">
+                      {place.description ? place.description.substring(0, 100) + (place.description.length > 100 ? '...' : '') : t('common.noDescription', 'No description available.')}
+                    </p>
+                    <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+                      <i className="fas fa-map-marker-alt text-primary"></i>
+                      <span>{place.address || t('common.noAddress', 'No address')}</span>
                     </div>
-                  </Popup>
-                </Marker>
-              ) : null;
-            })}
+                    <Button 
+                      className="mt-2 w-full text-xs"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
+                      }}
+                    >
+                      <i className="fas fa-directions mr-1"></i>
+                      {t('common.directions', 'Directions')}
+                    </Button>
+                  </div>
+                </Popup>
+              </Marker>
+            ) : null;
+          })}
           
           {/* Add marker for user location */}
           {latitude && longitude && (
