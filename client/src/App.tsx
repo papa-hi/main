@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import AppShell from "./components/layout/app-shell";
 import HomePage from "./pages/home";
 import PlaydatesPage from "./pages/playdates";
+import PlaydateDetailPage from "./pages/playdate-detail";
 import PlacesPage from "./pages/places";
 import ProfilePage from "./pages/profile";
 import UserProfilePage from "./pages/user-profile";
@@ -32,6 +33,7 @@ function Router() {
   return (
     <Switch>
       <ProtectedRoute path="/" component={HomePage} />
+      <ProtectedRoute path="/playdates/:id" component={PlaydateDetailPage} />
       <ProtectedRoute path="/playdates" component={PlaydatesPage} />
       <ProtectedRoute path="/places" component={PlacesPage} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
