@@ -271,7 +271,17 @@
     "tip1": "Zoek naar speeltuinen in rode gebieden voor meer opties dicht bij elkaar",
     "tip2": "Klik op een speeltuin marker om details te zien en een routebeschrijving te krijgen",
     "tip3": "Gebruik je huidige locatie om speeltuinen in je buurt te vinden",
-    "tip4": "Plan speelafspraken bij speeltuinen met meerdere opties in de buurt voor het geval een te druk is"
+    "tip4": "Plan speelafspraken bij speeltuinen met meerdere opties in de buurt voor het geval een te druk is",
+    "addPlayground": "Speeltuin Toevoegen",
+    "addPlaygroundInstructions": "Klik op de kaart om een nieuwe speeltuin toe te voegen",
+    "addPlaygroundTip": "Selecteer de exacte locatie van de speeltuin op de kaart",
+    "contributeTitle": "Draag bij aan de Community",
+    "contributeExplanation": "Onze speeltuin data komt zowel van OpenStreetMap als van bijdragen uit de community. Help andere ouders door speeltuinen toe te voegen die je kent.",
+    "contributeHowTo": "Om een speeltuin toe te voegen, klik op de \"Speeltuin Toevoegen\" knop in de kaart en selecteer de exacte locatie. Vul de details in zoals naam en beschrijving om andere ouders te helpen goede speeltuinen te vinden.",
+    "contributeNote": "Let op: Je moet ingelogd zijn om bij te dragen. Alle bijdragen worden gecontroleerd op kwaliteit.",
+    "dataSourcesTitle": "Gegevensbronnen",
+    "osmSource": "Speeltuingegevens zijn afkomstig van OpenStreetMap, een gezamenlijk mapping project. Dit geeft ons up-to-date informatie over openbaar bekende speeltuinen.",
+    "userSource": "Aanvullende speeltuingegevens komen van onze community die speeltuinen toevoegen die nog niet op openbare kaarten staan."
   },
   "pwa": {
     "privacy": {
