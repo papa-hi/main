@@ -2,12 +2,16 @@ import { useTranslation } from 'react-i18next';
 import { PlaygroundHeatmap } from '@/components/maps/playground-heatmap';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
+import { useToast } from '@/hooks/use-toast';
 
 export default function PlaygroundMapPage() {
   const { t } = useTranslation();
   const [location] = useLocation();
+  const { toast } = useToast();
   const [highlightedPlaceId, setHighlightedPlaceId] = useState<number | null>(null);
   const [initialCoords, setInitialCoords] = useState<{lat: number, lng: number, zoom: number} | null>(null);
+  const [placeName, setPlaceName] = useState<string | null>(null);
+  const [showTooltip, setShowTooltip] = useState<boolean>(false);
   
   // Parse URL parameters
   useEffect(() => {
@@ -16,6 +20,8 @@ export default function PlaygroundMapPage() {
     const lat = searchParams.get('lat');
     const lng = searchParams.get('lng');
     const zoom = searchParams.get('zoom');
+    const name = searchParams.get('name');
+    const shouldShowTooltip = searchParams.get('showTooltip') === 'true';
     
     // Debug logs
     console.log("URL Parameters:", {
@@ -23,6 +29,8 @@ export default function PlaygroundMapPage() {
       lat,
       lng,
       zoom,
+      name,
+      showTooltip: shouldShowTooltip,
       fullLocation: location
     });
     
@@ -30,6 +38,14 @@ export default function PlaygroundMapPage() {
       const id = parseInt(placeId);
       console.log("Setting highlighted place ID:", id);
       setHighlightedPlaceId(id);
+    }
+    
+    if (name) {
+      setPlaceName(decodeURIComponent(name));
+    }
+    
+    if (shouldShowTooltip) {
+      setShowTooltip(true);
     }
     
     if (lat && lng) {
@@ -42,6 +58,18 @@ export default function PlaygroundMapPage() {
       setInitialCoords(coords);
     }
   }, [location]);
+  
+  // Show a welcome tooltip when a place is selected
+  useEffect(() => {
+    if (showTooltip && placeName) {
+      toast({
+        title: `${t('places.viewingOnMap', 'Viewing on Map')}: ${placeName}`,
+        description: t('places.locationDetailsOnMap', 'You can now see the selected location highlighted on the map with a special pin marker'),
+        variant: "default",
+        duration: 5000,
+      });
+    }
+  }, [showTooltip, placeName, toast, t]);
   
   // Ensure leaflet CSS is properly loaded
   useEffect(() => {

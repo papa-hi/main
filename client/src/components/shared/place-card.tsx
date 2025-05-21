@@ -67,8 +67,17 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
 
   // Function to handle redirecting to map with location focus
   const handleViewOnMap = () => {
-    // Navigate to the playground map page with coordinates from the place
-    setLocation(`/playground-map?lat=${place.latitude}&lng=${place.longitude}&zoom=18&placeId=${place.id}`);
+    // Add more information to the URL to ensure the place details are shown
+    // Use a timestamp to ensure the URL is always unique to force a refresh
+    const timestamp = new Date().getTime();
+    setLocation(`/playground-map?lat=${place.latitude}&lng=${place.longitude}&zoom=18&placeId=${place.id}&name=${encodeURIComponent(place.name)}&showTooltip=true&ts=${timestamp}`);
+    
+    // Show a toast notification to confirm the action
+    toast({
+      title: t('places.viewingOnMap', 'Viewing on Map'),
+      description: t('places.redirectingToMap', 'Taking you to {{name}} on the map', {name: place.name}),
+      duration: 3000,
+    });
   };
 
   return (

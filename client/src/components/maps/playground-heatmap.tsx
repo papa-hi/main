@@ -143,13 +143,33 @@ function SetViewOnLocationChange({
           // Store in ref for later cleanup
           highlightedMarkerRef.current = marker;
           
-          // Add popup
+          // Add popup with enhanced styling and more details
           marker.bindPopup(`
-            <div style="padding: 10px; text-align: center;">
-              <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">${highlightedPlace.name}</h3>
-              <p style="margin-bottom: 8px;">${highlightedPlace.address || 'No address available'}</p>
-              <p style="margin-bottom: 8px;">${highlightedPlace.description || 'No description available'}</p>
-              <div style="margin-top: 10px; color: #FF4500; font-weight: bold;">★ Selected Location ★</div>
+            <div style="padding: 15px; text-align: center; max-width: 300px;">
+              <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #FF4500;">${highlightedPlace.name}</h3>
+              ${highlightedPlace.imageUrl ? 
+                `<img src="${highlightedPlace.imageUrl}" 
+                    style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;"
+                    onerror="this.src='https://images.unsplash.com/photo-${highlightedPlace.type === 'playground' ? '1551966775-a4ddc8df052b' : '1517248135467-4c7edcad34c4'}?w=500&q=80'; this.onerror=null;"
+                />` : ''}
+              <p style="margin-bottom: 8px; font-weight: bold;">${highlightedPlace.type === 'playground' ? '🛝 Playground' : '🍽️ Restaurant'}</p>
+              <p style="margin-bottom: 12px; font-style: italic;">${highlightedPlace.address || 'No address available'}</p>
+              <p style="margin-bottom: 12px; text-align: left;">${highlightedPlace.description || 'No description available'}</p>
+              ${highlightedPlace.rating ? 
+                `<div style="margin-bottom: 8px;">
+                  <span style="color: gold;">${'★'.repeat(Math.round(highlightedPlace.rating))}</span>
+                  <span style="color: #ccc;">${'★'.repeat(5-Math.round(highlightedPlace.rating))}</span>
+                  <span style="margin-left: 5px;">${highlightedPlace.rating.toFixed(1)} (${highlightedPlace.reviewCount || 0})</span>
+                </div>` : ''}
+              ${highlightedPlace.features && highlightedPlace.features.length > 0 ? 
+                `<div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; justify-content: center;">
+                  ${highlightedPlace.features.map(feature => 
+                    `<span style="background: #f0f0f0; padding: 3px 8px; border-radius: 12px; font-size: 12px;">${feature}</span>`
+                  ).join('')}
+                </div>` : ''}
+              <div style="margin-top: 15px; color: #FF4500; font-weight: bold; background: #FFF5E6; padding: 8px; border-radius: 8px; border: 1px dashed #FF4500;">
+                ★ Selected Location ★
+              </div>
             </div>
           `).openPopup();
           
