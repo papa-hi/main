@@ -48,144 +48,15 @@ const playgroundIcon = L.icon({
   popupAnchor: [0, -30]
 });
 
-// Highlighted playground icon (using a completely different eye-catching icon)
-const highlightedPlaygroundIcon = L.icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/2529/2529521.png', // Using a location pin icon
-  iconSize: [60, 60],
-  iconAnchor: [30, 60],
-  popupAnchor: [0, -60],
-  className: 'highlighted-marker'
-});
-
-// Restaurant icon
-const restaurantIcon = L.icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448636.png',
-  iconSize: [30, 30],
-  iconAnchor: [15, 30],
-  popupAnchor: [0, -30]
-});
-
-// Highlighted restaurant icon (using a bright location marker for better visibility)
-const highlightedRestaurantIcon = L.icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/2529/2529522.png', // Using a different colored pin
-  iconSize: [60, 60],
-  iconAnchor: [30, 60],
-  popupAnchor: [0, -60],
-  className: 'highlighted-marker'
-});
-
-// Component to update map center and handle highlighted place
-function SetViewOnLocationChange({ 
-  coords,
-  initialCoords,
-  highlightedPlaceId,
-  places
-}: { 
-  coords: [number, number] | null,
-  initialCoords?: { lat: number, lng: number, zoom: number } | null,
-  highlightedPlaceId?: number | null,
-  places: Place[]
-}) {
+// Component to update map center when user location changes
+function SetViewOnLocationChange({ coords }: { coords: [number, number] | null }) {
   const map = useMap();
-  const initialCoordsApplied = useRef(false);
-  const highlightedMarkerRef = useRef<L.Marker | null>(null);
   
-  // First priority: use initial coordinates from URL if available
   useEffect(() => {
-    if (initialCoords && !initialCoordsApplied.current) {
-      console.log("Setting map view to initial coordinates:", initialCoords);
-      map.setView([initialCoords.lat, initialCoords.lng], initialCoords.zoom);
-      initialCoordsApplied.current = true;
-    }
-  }, [initialCoords, map]);
-  
-  // Second priority: use user's location if available and initial coords not set
-  useEffect(() => {
-    if (coords && !initialCoordsApplied.current) {
+    if (coords) {
       map.setView(coords, map.getZoom());
     }
-  }, [coords, map, initialCoordsApplied]);
-  
-  // Handle highlighted place
-  useEffect(() => {
-    // Clean up previous marker
-    if (highlightedMarkerRef.current) {
-      map.removeLayer(highlightedMarkerRef.current);
-      highlightedMarkerRef.current = null;
-    }
-    
-    // If we have a highlighted place ID, find it and add a special marker
-    if (highlightedPlaceId) {
-      console.log("Looking for highlighted place with ID:", highlightedPlaceId);
-      
-      const highlightedPlace = places.find(p => p.id === highlightedPlaceId);
-      
-      if (highlightedPlace) {
-        console.log("Found highlighted place:", highlightedPlace.name);
-        
-        const lat = typeof highlightedPlace.latitude === 'string' 
-          ? parseFloat(highlightedPlace.latitude) 
-          : highlightedPlace.latitude;
-          
-        const lng = typeof highlightedPlace.longitude === 'string' 
-          ? parseFloat(highlightedPlace.longitude) 
-          : highlightedPlace.longitude;
-        
-        if (lat && lng) {
-          // Use appropriate icon based on place type
-          const icon = highlightedPlace.type === 'playground' 
-            ? highlightedPlaygroundIcon 
-            : highlightedRestaurantIcon;
-            
-          // Create the marker
-          const marker = L.marker([lat, lng], { icon }).addTo(map);
-          
-          // Store in ref for later cleanup
-          highlightedMarkerRef.current = marker;
-          
-          // Add popup with enhanced styling and more details
-          marker.bindPopup(`
-            <div style="padding: 15px; text-align: center; max-width: 300px;">
-              <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #FF4500;">${highlightedPlace.name}</h3>
-              ${highlightedPlace.imageUrl ? 
-                `<img src="${highlightedPlace.imageUrl}" 
-                    style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;"
-                    onerror="this.src='https://images.unsplash.com/photo-${highlightedPlace.type === 'playground' ? '1551966775-a4ddc8df052b' : '1517248135467-4c7edcad34c4'}?w=500&q=80'; this.onerror=null;"
-                />` : ''}
-              <p style="margin-bottom: 8px; font-weight: bold;">${highlightedPlace.type === 'playground' ? '🛝 Playground' : '🍽️ Restaurant'}</p>
-              <p style="margin-bottom: 12px; font-style: italic;">${highlightedPlace.address || 'No address available'}</p>
-              <p style="margin-bottom: 12px; text-align: left;">${highlightedPlace.description || 'No description available'}</p>
-              ${highlightedPlace.rating ? 
-                `<div style="margin-bottom: 8px;">
-                  <span style="color: gold;">${'★'.repeat(Math.round(highlightedPlace.rating))}</span>
-                  <span style="color: #ccc;">${'★'.repeat(5-Math.round(highlightedPlace.rating))}</span>
-                  <span style="margin-left: 5px;">${highlightedPlace.rating.toFixed(1)} (${highlightedPlace.reviewCount || 0})</span>
-                </div>` : ''}
-              ${highlightedPlace.features && highlightedPlace.features.length > 0 ? 
-                `<div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; justify-content: center;">
-                  ${highlightedPlace.features.map(feature => 
-                    `<span style="background: #f0f0f0; padding: 3px 8px; border-radius: 12px; font-size: 12px;">${feature}</span>`
-                  ).join('')}
-                </div>` : ''}
-              <div style="margin-top: 15px; color: #FF4500; font-weight: bold; background: #FFF5E6; padding: 8px; border-radius: 8px; border: 1px dashed #FF4500;">
-                ★ Selected Location ★
-              </div>
-            </div>
-          `).openPopup();
-          
-          // Make sure the map is centered on this place
-          map.setView([lat, lng], initialCoords?.zoom || 17);
-        }
-      }
-    }
-    
-    // Cleanup on unmount
-    return () => {
-      if (highlightedMarkerRef.current) {
-        map.removeLayer(highlightedMarkerRef.current);
-      }
-    };
-  }, [highlightedPlaceId, map, places, initialCoords]);
+  }, [coords, map]);
   
   return null;
 }
@@ -226,8 +97,6 @@ function HeatmapLayer({ points }: { points: number[][] }) {
 
 interface PlaygroundHeatmapProps {
   className?: string;
-  highlightedPlaceId?: number | null;
-  initialCoords?: { lat: number, lng: number, zoom: number } | null;
 }
 
 // Component to handle click on map for adding a new playground
@@ -258,11 +127,7 @@ const playgroundFormSchema = z.object({
 
 type PlaygroundFormValues = z.infer<typeof playgroundFormSchema>;
 
-export function PlaygroundHeatmap({ 
-  className = '', 
-  highlightedPlaceId = null,
-  initialCoords = null
-}: PlaygroundHeatmapProps) {
+export function PlaygroundHeatmap({ className = '' }: PlaygroundHeatmapProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -272,9 +137,6 @@ export function PlaygroundHeatmap({
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<[number, number] | null>(null);
   const [addMode, setAddMode] = useState(false);
-  
-  // Reference to track if highlighted place has been found and popup opened
-  const highlightedPlaceRef = useRef<number | null>(null);
   
   // Form definition
   const form = useForm<PlaygroundFormValues>({
@@ -449,15 +311,7 @@ export function PlaygroundHeatmap({
           />
           
           {/* Update map center when user location changes */}
-          {/* Pass data to SetViewOnLocationChange */}
-          {places && (
-            <SetViewOnLocationChange 
-              coords={latitude && longitude ? [latitude, longitude] : null}
-              initialCoords={initialCoords}
-              highlightedPlaceId={highlightedPlaceId}
-              places={places}
-            />
-          )}
+          <SetViewOnLocationChange coords={latitude && longitude ? [latitude, longitude] : null} />
           
           {/* Add heatmap layer */}
           <HeatmapLayer points={heatmapPoints} />
@@ -469,87 +323,62 @@ export function PlaygroundHeatmap({
             />
           )}
           
-          {/* Add markers for all places (playgrounds and restaurants) */}
-          {places.map(place => {
-            // Ensure latitude and longitude are numbers
-            const lat = typeof place.latitude === 'string' ? parseFloat(place.latitude) : place.latitude;
-            const lng = typeof place.longitude === 'string' ? parseFloat(place.longitude) : place.longitude;
-            
-            // Determine if this place should be highlighted
-            const isHighlighted = highlightedPlaceId !== null && place.id === highlightedPlaceId;
-            
-            // Select appropriate icon based on place type and highlighted status
-            let markerIcon;
-            if (place.type === 'playground') {
-              markerIcon = isHighlighted ? highlightedPlaygroundIcon : playgroundIcon;
-            } else if (place.type === 'restaurant') {
-              markerIcon = isHighlighted ? highlightedRestaurantIcon : restaurantIcon;
-            } else {
-              markerIcon = playgroundIcon; // Default fallback
-            }
-            
-            // Only render markers with valid coordinates
-            return (lat && lng) ? (
-              <Marker 
-                key={place.id} 
-                position={[lat, lng]}
-                icon={markerIcon}
-                eventHandlers={{
-                  add: (e) => {
-                    // Automatically open popup for highlighted place
-                    if (isHighlighted && highlightedPlaceRef.current !== place.id) {
-                      setTimeout(() => {
-                        e.target.openPopup();
-                        console.log("Opening popup for highlighted place:", place.id);
-                        highlightedPlaceRef.current = place.id;
-                      }, 500);
-                    }
-                  }
-                }}
-              >
-                <Popup>
-                  <div className="p-1">
-                    <h3 className="font-medium text-base">{place.name}</h3>
-                    
-                    {place.imageUrl && (
-                      <div className="my-2">
-                        <img
-                          src={place.imageUrl}
-                          alt={place.name}
-                          className="w-full h-32 object-cover rounded"
-                          onError={(e) => {
-                            // Fallback if image fails to load
-                            e.currentTarget.src = place.type === 'playground'
-                              ? "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop"
-                              : "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80";
-                          }}
-                        />
+          {/* Add markers for each playground */}
+          {places
+            .filter(place => place.type === 'playground')
+            .map(place => {
+              // Ensure latitude and longitude are numbers
+              const lat = typeof place.latitude === 'string' ? parseFloat(place.latitude) : place.latitude;
+              const lng = typeof place.longitude === 'string' ? parseFloat(place.longitude) : place.longitude;
+              
+              // Only render markers with valid coordinates
+              return (lat && lng) ? (
+                <Marker 
+                  key={place.id} 
+                  position={[lat, lng]}
+                  icon={playgroundIcon}
+                >
+                  <Popup>
+                    <div className="p-1">
+                      <h3 className="font-medium text-base">{place.name}</h3>
+                      
+                      {place.imageUrl && (
+                        <div className="my-2">
+                          <img
+                            src={place.imageUrl}
+                            alt={place.name}
+                            className="w-full h-32 object-cover rounded"
+                            onError={(e) => {
+                              // Fallback if image fails to load
+                              e.currentTarget.src = "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80";
+                            }}
+                          />
+                        </div>
+                      )}
+                      
+                      <p className="text-sm text-muted-foreground">
+                        {place.description ? place.description.substring(0, 100) + (place.description.length > 100 ? '...' : '') : t('common.noDescription', 'No description available.')}
+                      </p>
+                      <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+                        <i className="fas fa-map-marker-alt text-primary"></i>
+                        <span>{place.address || t('common.noAddress', 'No address')}</span>
                       </div>
-                    )}
-                    
-                    <p className="text-sm text-muted-foreground">
-                      {place.description ? place.description.substring(0, 100) + (place.description.length > 100 ? '...' : '') : t('common.noDescription', 'No description available.')}
-                    </p>
-                    <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-                      <i className="fas fa-map-marker-alt text-primary"></i>
-                      <span>{place.address || t('common.noAddress', 'No address')}</span>
+                      <Button 
+                        className="mt-2 w-full text-xs"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
+                        }}
+                      >
+                        <i className="fas fa-directions mr-1"></i>
+                        {t('common.directions', 'Directions')}
+                      </Button>
                     </div>
-                    <Button 
-                      className="mt-2 w-full text-xs"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
-                      }}
-                    >
-                      <i className="fas fa-directions mr-1"></i>
-                      {t('common.directions', 'Directions')}
-                    </Button>
-                  </div>
-                </Popup>
-              </Marker>
-            ) : null;
-          })}
+                  </Popup>
+                </Marker>
+              ) : null;
+            })}
           
           {/* Add marker for user location */}
           {latitude && longitude && (

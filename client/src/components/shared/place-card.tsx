@@ -6,7 +6,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
-import { useLocation } from "wouter";
 
 interface PlaceCardProps {
   place: Place;
@@ -17,7 +16,6 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
   const { toast } = useToast();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [_, setLocation] = useLocation();
   const [isSaved, setIsSaved] = useState(place.isSaved);
   const [isToggling, setIsToggling] = useState(false);
   const [animateHeart, setAnimateHeart] = useState(false);
@@ -65,38 +63,8 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
     }
   };
 
-  // Function to handle redirecting to map with location focus
-  const handleViewOnMap = () => {
-    // Add more information to the URL to ensure the place details are shown
-    // Use a timestamp to ensure the URL is always unique to force a refresh
-    const timestamp = new Date().getTime();
-    
-    // Directly construct the URL to avoid any possible issues
-    const path = `/playground-map?lat=${place.latitude}&lng=${place.longitude}&zoom=18&placeId=${place.id}&name=${encodeURIComponent(place.name)}&showTooltip=true&ts=${timestamp}`;
-    
-    // Add type information
-    const fullPath = `${path}&type=${place.type}`;
-    
-    // Log what we're doing to help with debugging
-    console.log("Redirecting to map with place:", place);
-    console.log("Navigation path:", fullPath);
-    
-    // Navigate to the map page
-    window.location.href = fullPath;
-    
-    // Show a toast notification to confirm the action
-    toast({
-      title: t('places.viewingOnMap', 'Viewing on Map'),
-      description: t('places.redirectingToMap', 'Taking you to {{name}} on the map', {name: place.name}),
-      duration: 3000,
-    });
-  };
-
   return (
-    <div 
-      className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64 transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-md cursor-pointer"
-      onClick={handleViewOnMap}
-    >
+    <div className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64 transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-md">
       <div className="relative">
         <img 
           src={place.type === 'playground' && place.imageUrl?.includes('place-images') 
