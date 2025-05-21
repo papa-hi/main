@@ -240,6 +240,31 @@
       "retry": "Wiederholen"
     }
   },
+  "playgroundMap": {
+    "title": "Spielplatz Karte",
+    "description": "Entdecke Spielplätze und ihre Beliebtheit in deiner Umgebung",
+    "aboutHeatmap": "Über die Heatmap",
+    "heatmapExplanation": "Die Spielplatz-Heatmap zeigt Gebiete mit hoher Konzentration von Spielplätzen. Rote Bereiche zeigen mehr Spielplätze in unmittelbarer Nähe, während blaue Bereiche weniger Spielplätze aufweisen.",
+    "heatmapUsage": "Nutze diese Karte, um Gegenden mit vielen Spielplätzen zu finden, die ideal für die Planung von Spieltreffen mit mehreren Optionen in der Nähe sind.",
+    "lowDensity": "Niedrigere Dichte",
+    "mediumDensity": "Mittlere Dichte",
+    "highDensity": "Höhere Dichte",
+    "tips": "Tipps zum Finden toller Spielplätze",
+    "tip1": "Suche nach Spielplätzen in roten Bereichen für mehr Optionen in unmittelbarer Nähe",
+    "tip2": "Klicke auf einen Spielplatz-Marker, um Details zu sehen und eine Wegbeschreibung zu erhalten",
+    "tip3": "Nutze deinen aktuellen Standort, um Spielplätze in deiner Nähe zu finden",
+    "tip4": "Plane Spieltreffen bei Spielplätzen mit mehreren Optionen in der Nähe, falls einer zu voll ist",
+    "addPlayground": "Spielplatz hinzufügen",
+    "addPlaygroundInstructions": "Klicke auf die Karte, um einen neuen Spielplatz hinzuzufügen",
+    "addPlaygroundTip": "Wähle die genaue Position des Spielplatzes auf der Karte aus",
+    "contributeTitle": "Trage zur Community bei",
+    "contributeExplanation": "Unsere Spielplatzdaten stammen sowohl aus OpenStreetMap als auch aus Community-Beiträgen. Hilf anderen Eltern, indem du Spielplätze hinzufügst, die du kennst.",
+    "contributeHowTo": "Um einen Spielplatz hinzuzufügen, klicke auf die \"Spielplatz hinzufügen\"-Schaltfläche in der Karte und wähle den genauen Standort aus. Fülle die Details wie Name und Beschreibung aus, um anderen Eltern zu helfen, tolle Spielplätze zu finden.",
+    "contributeNote": "Hinweis: Du musst angemeldet sein, um beizutragen. Alle Beiträge werden auf Qualität überprüft.",
+    "dataSourcesTitle": "Datenquellen",
+    "osmSource": "Spielplatzdaten stammen aus OpenStreetMap, einem kollaborativen Mapping-Projekt. Dies liefert uns aktuelle Informationen über öffentlich bekannte Spielplätze.",
+    "userSource": "Zusätzliche Spielplatzdaten kommen von unserer Community, die Spielplätze hinzufügt, die möglicherweise noch nicht auf öffentlichen Karten zu finden sind."
+  },
   "pwa": {
     "privacy": {
       "title": "Datenschutzeinstellungen",

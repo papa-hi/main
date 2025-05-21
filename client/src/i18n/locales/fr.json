@@ -240,6 +240,31 @@
       "retry": "Réessayer"
     }
   },
+  "playgroundMap": {
+    "title": "Carte des aires de jeux",
+    "description": "Découvrez les aires de jeux et leur popularité dans votre région",
+    "aboutHeatmap": "À propos de la carte de chaleur",
+    "heatmapExplanation": "La carte de chaleur des aires de jeux montre les zones à forte concentration d'aires de jeux. Les zones rouges indiquent plus d'aires de jeux proches les unes des autres, tandis que les zones bleues en ont moins.",
+    "heatmapUsage": "Utilisez cette carte pour trouver des zones avec de nombreuses aires de jeux, idéales pour planifier des rencontres avec plusieurs options à proximité.",
+    "lowDensity": "Densité faible",
+    "mediumDensity": "Densité moyenne",
+    "highDensity": "Densité élevée",
+    "tips": "Conseils pour trouver d'excellentes aires de jeux",
+    "tip1": "Recherchez des aires de jeux dans les zones rouges pour plus d'options à proximité",
+    "tip2": "Cliquez sur un marqueur d'aire de jeux pour voir les détails et obtenir un itinéraire",
+    "tip3": "Utilisez votre position actuelle pour trouver des aires de jeux près de chez vous",
+    "tip4": "Organisez des rencontres dans des aires de jeux avec plusieurs options à proximité au cas où l'une serait trop fréquentée",
+    "addPlayground": "Ajouter une aire de jeux",
+    "addPlaygroundInstructions": "Cliquez sur la carte pour ajouter une nouvelle aire de jeux",
+    "addPlaygroundTip": "Sélectionnez l'emplacement exact de l'aire de jeux sur la carte",
+    "contributeTitle": "Contribuer à la communauté",
+    "contributeExplanation": "Nos données sur les aires de jeux proviennent à la fois d'OpenStreetMap et des contributions de la communauté. Aidez les autres parents en ajoutant les aires de jeux que vous connaissez.",
+    "contributeHowTo": "Pour ajouter une aire de jeux, cliquez sur le bouton \"Ajouter une aire de jeux\" sur la carte et sélectionnez l'emplacement exact. Remplissez les détails comme le nom et la description pour aider d'autres parents à trouver d'excellentes aires de jeux.",
+    "contributeNote": "Remarque : Vous devez être connecté pour contribuer. Toutes les contributions sont examinées pour en garantir la qualité.",
+    "dataSourcesTitle": "Sources de données",
+    "osmSource": "Les données des aires de jeux proviennent d'OpenStreetMap, un projet de cartographie collaborative. Cela nous fournit des informations à jour sur les aires de jeux connues du public.",
+    "userSource": "Des données supplémentaires sur les aires de jeux proviennent de notre communauté d'utilisateurs qui contribuent en ajoutant des aires de jeux qu'ils connaissent et qui pourraient ne pas encore figurer sur les cartes publiques."
+  },
   "pwa": {
     "privacy": {
       "title": "Paramètres de confidentialité",

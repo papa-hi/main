@@ -240,6 +240,31 @@
       "retry": "Reintentar"
     }
   },
+  "playgroundMap": {
+    "title": "Mapa de parques infantiles",
+    "description": "Descubre parques infantiles y su popularidad en tu área",
+    "aboutHeatmap": "Acerca del mapa de calor",
+    "heatmapExplanation": "El mapa de calor de parques infantiles muestra áreas con alta concentración de parques. Las zonas rojas indican más parques cercanos entre sí, mientras que las zonas azules tienen menos parques.",
+    "heatmapUsage": "Usa este mapa para encontrar áreas con muchos parques infantiles, ideales para planificar citas de juego con múltiples opciones cercanas.",
+    "lowDensity": "Menor densidad",
+    "mediumDensity": "Densidad media",
+    "highDensity": "Mayor densidad",
+    "tips": "Consejos para encontrar excelentes parques infantiles",
+    "tip1": "Busca parques infantiles en áreas rojas para más opciones en proximidad",
+    "tip2": "Haz clic en un marcador de parque para ver detalles y obtener indicaciones",
+    "tip3": "Usa tu ubicación actual para encontrar parques cercanos a ti",
+    "tip4": "Organiza citas de juego en parques con múltiples opciones cercanas por si uno está demasiado lleno",
+    "addPlayground": "Añadir parque infantil",
+    "addPlaygroundInstructions": "Haz clic en el mapa para añadir un nuevo parque infantil",
+    "addPlaygroundTip": "Selecciona la ubicación exacta del parque infantil en el mapa",
+    "contributeTitle": "Contribuye a la comunidad",
+    "contributeExplanation": "Nuestros datos de parques infantiles provienen tanto de OpenStreetMap como de contribuciones de la comunidad. Ayuda a otros padres añadiendo parques que conozcas.",
+    "contributeHowTo": "Para añadir un parque infantil, haz clic en el botón \"Añadir parque infantil\" en el mapa y selecciona la ubicación exacta. Completa los detalles como nombre y descripción para ayudar a otros padres a encontrar excelentes parques infantiles.",
+    "contributeNote": "Nota: Debes iniciar sesión para contribuir. Todas las contribuciones son revisadas por calidad.",
+    "dataSourcesTitle": "Fuentes de datos",
+    "osmSource": "Los datos de parques infantiles provienen de OpenStreetMap, un proyecto de mapeo colaborativo. Esto nos proporciona información actualizada sobre parques infantiles conocidos públicamente.",
+    "userSource": "Datos adicionales de parques infantiles provienen de nuestra comunidad de usuarios que contribuyen con parques que conocen y que podrían no estar en mapas públicos todavía."
+  },
   "pwa": {
     "privacy": {
       "title": "Configuración de privacidad",
