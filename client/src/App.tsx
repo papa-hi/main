@@ -32,6 +32,19 @@ import { useWelcome } from "./hooks/use-welcome";
 import AnimatedWelcome from "./components/welcome/animated-welcome";
 
 function Router() {
+  const { user } = useAuth();
+  const { showWelcome, completeWelcome } = useWelcome();
+
+  // Show welcome screen for authenticated users who haven't seen it
+  if (showWelcome && user) {
+    return (
+      <AnimatedWelcome 
+        onComplete={completeWelcome}
+        userName={user.firstName}
+      />
+    );
+  }
+
   return (
     <Switch>
       <ProtectedRoute path="/" component={HomePage} />
