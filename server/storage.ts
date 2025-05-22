@@ -9,7 +9,8 @@ import {
   UserActivity, InsertUserActivity, userActivity,
   PageView, InsertPageView, pageViews,
   FeatureUsage, InsertFeatureUsage, featureUsage,
-  AdminLog, InsertAdminLog, adminLogs
+  AdminLog, InsertAdminLog, adminLogs,
+  Review, InsertReview, reviews
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not, inArray } from "drizzle-orm";
@@ -63,6 +64,13 @@ export interface IStorage {
   createPlace(place: any): Promise<Place>;
   updatePlace(id: number, placeData: Partial<Place>): Promise<Place>;
   deletePlace(id: number): Promise<boolean>;
+  
+  // Review methods
+  getPlaceReviews(placeId: number): Promise<Review[]>;
+  createReview(review: InsertReview, userId: number): Promise<Review>;
+  updateReview(id: number, reviewData: Partial<Review>, userId: number): Promise<Review>;
+  deleteReview(id: number, userId: number): Promise<boolean>;
+  getAverageRating(placeId: number): Promise<{ averageRating: number; totalReviews: number }>;
   
   // Chat methods
   getChats(userId: number): Promise<Chat[]>;
@@ -1819,6 +1827,171 @@ export class DatabaseStorage implements IStorage {
       console.error('Error deleting place:', error);
       return false;
     }
+  }
+
+  // Review methods implementation
+  async getPlaceReviews(placeId: number): Promise<Review[]> {
+    const reviewsData = await db
+      .select({
+        id: reviews.id,
+        userId: reviews.userId,
+        placeId: reviews.placeId,
+        rating: reviews.rating,
+        title: reviews.title,
+        content: reviews.content,
+        visitDate: reviews.visitDate,
+        kidsFriendlyRating: reviews.kidsFriendlyRating,
+        createdAt: reviews.createdAt,
+        updatedAt: reviews.updatedAt,
+        userFirstName: users.firstName,
+        userLastName: users.lastName,
+        userProfileImage: users.profileImage,
+      })
+      .from(reviews)
+      .innerJoin(users, eq(reviews.userId, users.id))
+      .where(eq(reviews.placeId, placeId))
+      .orderBy(desc(reviews.createdAt));
+
+    return reviewsData.map(review => ({
+      id: review.id,
+      userId: review.userId,
+      placeId: review.placeId,
+      rating: review.rating,
+      title: review.title,
+      content: review.content,
+      visitDate: review.visitDate,
+      kidsFriendlyRating: review.kidsFriendlyRating,
+      createdAt: review.createdAt,
+      updatedAt: review.updatedAt,
+      user: {
+        id: review.userId,
+        firstName: review.userFirstName,
+        lastName: review.userLastName,
+        profileImage: review.userProfileImage,
+      }
+    }));
+  }
+
+  async createReview(reviewData: InsertReview, userId: number): Promise<Review> {
+    // Insert the review
+    const [newReview] = await db
+      .insert(reviews)
+      .values({
+        ...reviewData,
+        userId,
+      })
+      .returning();
+
+    // Get the user data
+    const [user] = await db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImage: users.profileImage,
+      })
+      .from(users)
+      .where(eq(users.id, userId));
+
+    // Update place rating and review count
+    await this.updatePlaceRating(reviewData.placeId);
+
+    return {
+      ...newReview,
+      user
+    };
+  }
+
+  async updateReview(id: number, reviewData: Partial<Review>, userId: number): Promise<Review> {
+    // First check if the review belongs to the user
+    const [existingReview] = await db
+      .select()
+      .from(reviews)
+      .where(and(eq(reviews.id, id), eq(reviews.userId, userId)));
+
+    if (!existingReview) {
+      throw new Error("Review not found or you don't have permission to edit it");
+    }
+
+    // Update the review
+    const [updatedReview] = await db
+      .update(reviews)
+      .set({
+        ...reviewData,
+        updatedAt: new Date(),
+      })
+      .where(eq(reviews.id, id))
+      .returning();
+
+    // Get the user data
+    const [user] = await db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImage: users.profileImage,
+      })
+      .from(users)
+      .where(eq(users.id, userId));
+
+    // Update place rating and review count
+    await this.updatePlaceRating(existingReview.placeId);
+
+    return {
+      ...updatedReview,
+      user
+    };
+  }
+
+  async deleteReview(id: number, userId: number): Promise<boolean> {
+    // First check if the review belongs to the user
+    const [existingReview] = await db
+      .select()
+      .from(reviews)
+      .where(and(eq(reviews.id, id), eq(reviews.userId, userId)));
+
+    if (!existingReview) {
+      return false;
+    }
+
+    // Delete the review
+    await db
+      .delete(reviews)
+      .where(eq(reviews.id, id));
+
+    // Update place rating and review count
+    await this.updatePlaceRating(existingReview.placeId);
+
+    return true;
+  }
+
+  async getAverageRating(placeId: number): Promise<{ averageRating: number; totalReviews: number }> {
+    const result = await db
+      .select({
+        avgRating: sql<number>`AVG(${reviews.rating})`,
+        totalReviews: sql<number>`COUNT(*)`,
+      })
+      .from(reviews)
+      .where(eq(reviews.placeId, placeId));
+
+    const data = result[0];
+    return {
+      averageRating: data?.avgRating ? Math.round(data.avgRating * 20) : 0, // Convert 1-5 to 0-100 scale
+      totalReviews: data?.totalReviews || 0,
+    };
+  }
+
+  // Helper method to update place rating based on reviews
+  private async updatePlaceRating(placeId: number): Promise<void> {
+    const { averageRating, totalReviews } = await this.getAverageRating(placeId);
+    
+    await db
+      .update(places)
+      .set({
+        rating: averageRating,
+        reviewCount: totalReviews,
+      })
+      .where(eq(places.id, placeId));
   }
 
   // Chat methods
