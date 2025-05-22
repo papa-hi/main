@@ -268,4 +268,44 @@ export function setupAdminRoutes(app: Express) {
       res.status(500).json({ error: "Failed to fetch admin logs" });
     }
   });
+
+  // Places management routes
+  app.get('/api/admin/places', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const places = await storage.getPlaces({});
+      await logAdminAction("View places list", { count: places.length }, req);
+      res.json(places);
+    } catch (error) {
+      console.error("Error fetching places:", error);
+      res.status(500).json({ error: "Failed to fetch places" });
+    }
+  });
+
+  app.patch('/api/admin/places/:placeId', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const placeId = parseInt(req.params.placeId);
+      const updatedPlace = await storage.updatePlace(placeId, req.body);
+      await logAdminAction("Edit place", { placeId, placeName: updatedPlace.name }, req);
+      res.json(updatedPlace);
+    } catch (error) {
+      console.error("Error updating place:", error);
+      res.status(500).json({ error: "Failed to update place" });
+    }
+  });
+
+  app.delete('/api/admin/places/:placeId', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const placeId = parseInt(req.params.placeId);
+      const success = await storage.deletePlace(placeId);
+      if (success) {
+        await logAdminAction("Delete place", { placeId }, req);
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: "Place not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting place:", error);
+      res.status(500).json({ error: "Failed to delete place" });
+    }
+  });
 }
