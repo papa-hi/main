@@ -20,17 +20,31 @@ import AdminDashboard from "./pages/admin";
 import AdminCheck from "./pages/admin-check";
 import TestCreatePlaydate from "./pages/test-create-playdate";
 import SimpleTestPage from "./pages/simple-test";
-import OnboardingPage from "./pages/onboarding";
 import { useState, useEffect } from "react";
 import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
 import ErrorBoundary from "./components/shared/error-boundary";
-import { AuthProvider } from "./hooks/use-auth";
+import { AuthProvider, useAuth } from "./hooks/use-auth";
 import { FirebaseAuthProvider } from "./hooks/use-firebase-auth";
 import { ChatProvider } from "./hooks/use-chat";
 import { AdminProvider } from "./hooks/use-admin";
 import { ProtectedRoute } from "./lib/protected-route";
+import { useWelcome } from "./hooks/use-welcome";
+import AnimatedWelcome from "./components/welcome/animated-welcome";
 
 function Router() {
+  const { user } = useAuth();
+  const { showWelcome, completeWelcome } = useWelcome();
+
+  // Show welcome screen for authenticated users who haven't seen it
+  if (showWelcome && user) {
+    return (
+      <AnimatedWelcome 
+        onComplete={completeWelcome}
+        userName={user.firstName}
+      />
+    );
+  }
+
   return (
     <Switch>
       <ProtectedRoute path="/" component={HomePage} />
@@ -48,7 +62,6 @@ function Router() {
       <ProtectedRoute path="/admin" component={AdminDashboard} />
       <Route path="/admin-check" component={AdminCheck} />
       <Route path="/auth" component={AuthPage} />
-      <ProtectedRoute path="/onboarding" component={OnboardingPage} />
       <Route path="/test-create" component={TestCreatePlaydate} />
       <Route path="/simple-test" component={SimpleTestPage} />
       {/* Fallback to 404 */}
