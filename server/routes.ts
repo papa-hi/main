@@ -960,12 +960,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const longitude = req.query.longitude ? parseFloat(req.query.longitude as string) : undefined;
       const type = req.query.activeTab as string;
       
-      console.log(`[PLACES API] Received coordinates: lat=${latitude}, lng=${longitude}, type=${type}`);
-      
       const placesList = await storage.getPlaces({ latitude, longitude, type });
-      
-      console.log(`[PLACES API] Found ${placesList.length} places with distances:`, 
-        placesList.map(p => `${p.name}: ${p.distance}m`));
       
       // Remove latitude and longitude from response to hide technical details
       const placesWithoutCoordinates = placesList.map(place => {
