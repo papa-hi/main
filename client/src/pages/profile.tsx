@@ -360,13 +360,13 @@ export default function ProfilePage() {
   const renderProfileEditForm = () => (
     <div className="bg-white rounded-xl shadow-sm p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="font-heading font-bold text-xl">Profiel Bewerken</h2>
+        <h2 className="font-heading font-bold text-xl">{t('profile.editProfile', 'Edit Profile')}</h2>
         <Button 
           variant="outline" 
           onClick={() => setIsEditing(false)}
           disabled={isSubmitting}
         >
-          Annuleren
+          {t('profile.cancel', 'Cancel')}
         </Button>
       </div>
       
@@ -403,9 +403,9 @@ export default function ProfilePage() {
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Voornaam</FormLabel>
+                  <FormLabel>{t('profile.firstName', 'First Name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Voornaam" {...field} />
+                    <Input placeholder={t('profile.firstName', 'First Name')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -417,9 +417,9 @@ export default function ProfilePage() {
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Achternaam</FormLabel>
+                  <FormLabel>{t('profile.lastName', 'Last Name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Achternaam" {...field} />
+                    <Input placeholder={t('profile.lastName', 'Last Name')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -432,10 +432,10 @@ export default function ProfilePage() {
             name="bio"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bio</FormLabel>
+                <FormLabel>{t('profile.bio', 'Bio')}</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Vertel iets over jezelf en je kinderen..."
+                    placeholder={t('profile.bioPlaceholder', 'Tell something about yourself and your children...')}
                     className="min-h-[100px]"
                     {...field}
                   />
@@ -454,9 +454,9 @@ export default function ProfilePage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>E-mail</FormLabel>
+                  <FormLabel>{t('profile.email', 'Email')}</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="E-mailadres" {...field} />
+                    <Input type="email" placeholder={t('profile.emailAddress', 'Email address')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -468,9 +468,9 @@ export default function ProfilePage() {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Telefoonnummer (optioneel)</FormLabel>
+                  <FormLabel>{t('profile.phoneNumber', 'Phone Number')} ({t('profile.optional', 'optional')})</FormLabel>
                   <FormControl>
-                    <Input placeholder="Telefoonnummer" {...field} />
+                    <Input placeholder={t('profile.phoneNumber', 'Phone Number')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -483,9 +483,9 @@ export default function ProfilePage() {
             name="city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Woonplaats</FormLabel>
+                <FormLabel>{t('profile.city', 'City')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Bijv. 'Amsterdam'" {...field} />
+                  <Input placeholder={t('profile.cityPlaceholder', 'e.g. Amsterdam')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
