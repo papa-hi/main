@@ -1638,14 +1638,18 @@ export class DatabaseStorage implements IStorage {
           const lon2 = options.longitude;
           
           // FIRST: Try geocoding the place address for exact coordinates
+          console.log(`[DEBUG] Processing ${place.name} with address: ${place.address}`);
           if (place.address) {
             try {
+              console.log(`[DEBUG] Calling geocodeAddress for: ${place.address}`);
               const placeCoords = await geocodeAddress(place.address);
               if (placeCoords) {
                 // Calculate exact distance using geocoded coordinates
                 distance = calculateDistance(placeCoords.latitude, placeCoords.longitude, lat2, lon2);
                 console.log(`[GEOCODING] Success for ${place.name}: ${distance}m from geocoded coords`);
               } else {
+                console.log(`[DEBUG] No geocoding result for ${place.name}`);
+                
                 // Fallback to address-based approximations
                 if (place.address.includes('Haarlem')) {
                   if (place.address.includes('Schagchelstraat')) {
