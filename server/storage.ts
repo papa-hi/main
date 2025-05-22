@@ -14,6 +14,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not, inArray } from "drizzle-orm";
+import { geocodeAddress, calculateDistance } from "./geocoding";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -1656,8 +1657,26 @@ export class DatabaseStorage implements IStorage {
 
             distance = Math.round(R * c); // Distance in meters
           } else {
-            // Invalid coordinates - set a high distance to sort these last
-            distance = 999999;
+            // Invalid coordinates - try to use address-based geocoding
+            try {
+              if (place.address) {
+                console.log(`[GEOCODING] Trying to geocode address: ${place.address}`);
+                const placeCoords = await geocodeAddress(place.address);
+                if (placeCoords) {
+                  distance = calculateDistance(placeCoords.latitude, placeCoords.longitude, lat2, lon2);
+                  console.log(`[GEOCODING] Success for ${place.name}: ${distance}m`);
+                } else {
+                  distance = 15000; // 15km fallback if geocoding fails
+                  console.log(`[GEOCODING] Failed for ${place.name}, using fallback`);
+                }
+              } else {
+                distance = 15000; // 15km fallback if no address
+                console.log(`[GEOCODING] No address for ${place.name}, using fallback`);
+              }
+            } catch (error) {
+              console.error(`[GEOCODING] Error for ${place.name}:`, error);
+              distance = 15000; // 15km fallback
+            }
           }
         }
         
