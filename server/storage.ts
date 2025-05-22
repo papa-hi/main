@@ -62,6 +62,7 @@ export interface IStorage {
   removeFavoritePlace(userId: number, placeId: number): Promise<boolean>;
   createPlace(place: any): Promise<Place>;
   updatePlace(id: number, placeData: Partial<Place>): Promise<Place>;
+  deletePlace(id: number): Promise<boolean>;
   
   // Chat methods
   getChats(userId: number): Promise<Chat[]>;
@@ -597,6 +598,18 @@ export class MemStorage implements IStorage {
     this.places.set(id, updatedPlace);
     
     return updatedPlace;
+  }
+
+  async deletePlace(id: number): Promise<boolean> {
+    // Remove any favorites for this place
+    for (const [key] of this.favorites) {
+      if (key.endsWith(`-${id}`)) {
+        this.favorites.delete(key);
+      }
+    }
+    
+    // Delete the place
+    return this.places.delete(id);
   }
   
   // Chat methods
