@@ -344,6 +344,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
+
+  // IMPORTANT: /me routes must come BEFORE /:id routes to avoid conflicts
+  app.get("/api/users/me/favorite-places", async (req, res) => {
+    console.log("🔍 FAVORITES ENDPOINT - User ID:", req.user?.id, "Auth:", req.isAuthenticated());
+    try {
+      if (!req.isAuthenticated()) return res.sendStatus(401);
+      
+      const userId = req.user?.id;
+      if (!userId) return res.sendStatus(401);
+      
+      console.log("✅ Fetching favorites for user:", userId);
+      const favoritePlaces = await storage.getUserFavoritePlaces(userId);
+      console.log("📍 Found", favoritePlaces.length, "favorite places");
+      res.json(favoritePlaces);
+    } catch (err) {
+      console.error("❌ Error fetching favorite places:", err);
+      res.status(500).json({ message: "Failed to fetch favorite places" });
+    }
+  });
+
+  app.get("/api/users/me/playdates", async (req, res) => {
+    console.log("🎯 PLAYDATES ENDPOINT - User ID:", req.user?.id, "Auth:", req.isAuthenticated());
+    try {
+      if (!req.isAuthenticated()) return res.sendStatus(401);
+      
+      const userId = req.user?.id;
+      if (!userId) return res.sendStatus(401);
+      
+      console.log("✅ Fetching playdates for user:", userId);
+      const userPlaydates = await storage.getUserPlaydates(userId);
+      console.log("🎈 Found", userPlaydates.length, "playdates");
+      res.json(userPlaydates);
+    } catch (err) {
+      console.error("❌ Error fetching user playdates:", err);
+      res.status(500).json({ message: "Failed to fetch user playdates" });
+    }
+  });
   
   // Get a user's favorite places
   app.get("/api/users/:id/favorite-places", isAuthenticated, async (req, res) => {
@@ -621,42 +658,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (err) {
       console.error("Error uploading profile image:", err);
       res.status(500).json({ message: "Failed to upload profile image" });
-    }
-  });
-
-  app.get("/api/users/me/favorite-places", async (req, res) => {
-    console.log("🔍 FAVORITES ENDPOINT - User ID:", req.user?.id, "Auth:", req.isAuthenticated());
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-      
-      const userId = req.user?.id;
-      if (!userId) return res.sendStatus(401);
-      
-      console.log("✅ Fetching favorites for user:", userId);
-      const favoritePlaces = await storage.getUserFavoritePlaces(userId);
-      console.log("📍 Found", favoritePlaces.length, "favorite places");
-      res.json(favoritePlaces);
-    } catch (err) {
-      console.error("❌ Error fetching favorite places:", err);
-      res.status(500).json({ message: "Failed to fetch favorite places" });
-    }
-  });
-
-  app.get("/api/users/me/playdates", async (req, res) => {
-    console.log("🎯 PLAYDATES ENDPOINT - User ID:", req.user?.id, "Auth:", req.isAuthenticated());
-    try {
-      if (!req.isAuthenticated()) return res.sendStatus(401);
-      
-      const userId = req.user?.id;
-      if (!userId) return res.sendStatus(401);
-      
-      console.log("✅ Fetching playdates for user:", userId);
-      const userPlaydates = await storage.getUserPlaydates(userId);
-      console.log("🎈 Found", userPlaydates.length, "playdates");
-      res.json(userPlaydates);
-    } catch (err) {
-      console.error("❌ Error fetching user playdates:", err);
-      res.status(500).json({ message: "Failed to fetch user playdates" });
     }
   });
 
