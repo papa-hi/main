@@ -132,8 +132,19 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on buttons or dropdowns
+    if ((e.target as HTMLElement).closest('button, [role="menuitem"]')) {
+      return;
+    }
+    navigate(`/playdates/${playdate.id}`);
+  };
+
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.01]">
+    <div 
+      className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.01] cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="flex items-start">
         <div className="flex-shrink-0 w-14 h-14 bg-accent/10 rounded-lg flex flex-col items-center justify-center mr-4 transition-all duration-300 hover:bg-accent/20 hover:shadow-sm group">
           <span className="text-accent font-bold text-lg group-hover:scale-110 transition-transform duration-300">{getDay(startDate)}</span>
