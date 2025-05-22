@@ -20,6 +20,7 @@ import AdminDashboard from "./pages/admin";
 import AdminCheck from "./pages/admin-check";
 import TestCreatePlaydate from "./pages/test-create-playdate";
 import SimpleTestPage from "./pages/simple-test";
+import OnboardingPage from "./pages/onboarding";
 import { useState, useEffect } from "react";
 import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
 import ErrorBoundary from "./components/shared/error-boundary";
@@ -47,6 +48,7 @@ function Router() {
       <ProtectedRoute path="/admin" component={AdminDashboard} />
       <Route path="/admin-check" component={AdminCheck} />
       <Route path="/auth" component={AuthPage} />
+      <ProtectedRoute path="/onboarding" component={OnboardingPage} />
       <Route path="/test-create" component={TestCreatePlaydate} />
       <Route path="/simple-test" component={SimpleTestPage} />
       {/* Fallback to 404 */}
