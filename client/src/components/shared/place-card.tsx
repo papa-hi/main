@@ -134,19 +134,14 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
             )}
           </div>
         </div>
-        <div className="flex items-center justify-between text-sm text-dark/70 mb-2">
-          <div className="flex items-center flex-1">
-            <i className="fas fa-map-marker-alt mr-1 text-xs"></i>
-            <span className="truncate">{place.address}</span>
-          </div>
-          {place.distance !== undefined && (
-            <div className="flex items-center ml-2 bg-gray-100 px-2 py-1 rounded-full text-xs font-medium">
-              <i className="fas fa-walking mr-1 text-primary"></i>
-              <span>{getFormattedDistance(place.distance)}</span>
-            </div>
-          )}
+        <div className="flex items-center text-sm text-dark/70 mb-2">
+          <i className="fas fa-map-marker-alt mr-1 text-xs"></i>
+          <span>{place.address}</span>
         </div>
         <div className="flex items-center justify-between mb-2">
+          <span className="text-sm text-primary font-medium">
+            {getFormattedDistance(place.distance)}
+          </span>
         </div>
         {place.features && place.features.length > 0 && (
           <div className="flex flex-wrap mb-3 gap-1">
