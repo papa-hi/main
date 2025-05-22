@@ -173,7 +173,9 @@
     "favoritePlaces": "Lieblingsorte",
     "noPlaydates": "Keine Spieltermine",
     "noPlaydatesDescription": "Du hast noch keine Spieltermine geplant.",
-    "createPlaydates": "Spieltermine Erstellen"
+    "createPlaydates": "Spieltermine Erstellen",
+    "edit": "Bearbeiten",
+    "newPlaydate": "Neuer Termin"
   },
   "playdates": {
     "create": "Spieltreffen erstellen",

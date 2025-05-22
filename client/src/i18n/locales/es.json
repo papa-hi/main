@@ -173,7 +173,9 @@
     "favoritePlaces": "Lugares Favoritos",
     "noPlaydates": "Sin citas de juego",
     "noPlaydatesDescription": "Aún no has planificado ninguna cita de juego.",
-    "createPlaydates": "Crear Citas de Juego"
+    "createPlaydates": "Crear Citas de Juego",
+    "edit": "Editar",
+    "newPlaydate": "Nueva Cita"
   },
   "playdates": {
     "create": "Crear cita de juego",

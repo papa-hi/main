@@ -173,7 +173,9 @@
     "favoritePlaces": "Lieux Favoris",
     "noPlaydates": "Aucune rencontre",
     "noPlaydatesDescription": "Vous n'avez pas encore planifié de rencontres.",
-    "createPlaydates": "Créer des Rencontres"
+    "createPlaydates": "Créer des Rencontres",
+    "edit": "Modifier",
+    "newPlaydate": "Nouvelle Rencontre"
   },
   "playdates": {
     "create": "Créer une rencontre",
