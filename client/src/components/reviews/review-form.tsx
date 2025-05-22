@@ -96,7 +96,7 @@ export function StarRating({ placeId, size = "md", showCount = true }: StarRatin
               <Star
                 className={`${sizeClasses[size]} transition-colors ${
                   star <= (hoverRating || currentUserRating)
-                    ? "fill-blue-400 text-blue-400"
+                    ? "fill-orange-400 text-orange-400"
                     : "text-gray-300"
                 }`}
               />
