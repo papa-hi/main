@@ -625,65 +625,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/users/me/favorite-places", async (req, res) => {
-    console.log("=== FAVORITES ENDPOINT HIT ===");
-    console.log("Session ID:", req.sessionID);
-    console.log("Is Authenticated:", req.isAuthenticated());
-    console.log("User from req.user:", req.user);
-    
     try {
-      // Check if session contains user
-      if (!req.isAuthenticated()) {
-        console.log("User not authenticated - session might be invalid");
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      if (!req.user || !req.user.id) {
-        console.log("No user found in session");
-        return res.status(401).json({ message: "User not found in session" });
-      }
-
-      const userId = req.user.id;
-      console.log("Found user ID:", userId);
+      // Use the same authentication pattern as /api/user
+      if (!req.isAuthenticated()) return res.sendStatus(401);
+      
+      const userId = req.user?.id;
+      if (!userId) return res.sendStatus(401);
       
       const favoritePlaces = await storage.getUserFavoritePlaces(userId);
-      console.log("Successfully fetched", favoritePlaces.length, "favorite places");
       res.json(favoritePlaces);
     } catch (err) {
-      console.error("Error in favorite places endpoint:", err);
+      console.error("Error fetching favorite places:", err);
       res.status(500).json({ message: "Failed to fetch favorite places" });
     }
   });
 
   app.get("/api/users/me/playdates", async (req, res) => {
     try {
-      // Check authentication
-      if (!req.isAuthenticated() || !req.user) {
-        console.log("Authentication failed for playdates");
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      // Get the authenticated user ID
-      const userId = req.user.id;
+      // Use the same authentication pattern as /api/user
+      if (!req.isAuthenticated()) return res.sendStatus(401);
       
-      console.log("User object for playdates:", JSON.stringify(req.user, null, 2));
-      console.log("User ID for playdates:", userId, "Type:", typeof userId);
+      const userId = req.user?.id;
+      if (!userId) return res.sendStatus(401);
       
-      if (!userId) {
-        console.log("No user ID found for playdates");
-        return res.status(400).json({ message: "Invalid user ID" });
-      }
-      
-      // Convert to number if it's a string
-      const numericUserId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
-      
-      if (isNaN(numericUserId)) {
-        console.log("Could not convert user ID to number for playdates:", userId);
-        return res.status(400).json({ message: "Invalid user ID" });
-      }
-      
-      console.log("Fetching playdates for user ID:", numericUserId);
-      const userPlaydates = await storage.getUserPlaydates(numericUserId);
-      console.log("Found user playdates:", userPlaydates.length);
+      const userPlaydates = await storage.getUserPlaydates(userId);
       res.json(userPlaydates);
     } catch (err) {
       console.error("Error fetching user playdates:", err);
