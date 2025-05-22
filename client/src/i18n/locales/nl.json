@@ -172,6 +172,8 @@
     }
   },
   "profile": {
+    "myProfile": "Mijn Profiel",
+    "manageInfo": "Beheer je persoonlijke informatie",
     "myPlaydates": "Mijn Speelafspraken",
     "favoritePlaces": "Favoriete Plekken",
     "noPlaydates": "Geen speelafspraken",

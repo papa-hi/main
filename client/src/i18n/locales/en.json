@@ -173,6 +173,8 @@
     }
   },
   "profile": {
+    "myProfile": "My Profile",
+    "manageInfo": "Manage your personal information",
     "myPlaydates": "My Playdates",
     "favoritePlaces": "Favorite Places",
     "noPlaydates": "No playdates",

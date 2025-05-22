@@ -515,8 +515,8 @@ export default function ProfilePage() {
   return (
     <div className="py-2">
       <div className="mb-6">
-        <h1 className="text-2xl font-heading font-bold">Mijn Profiel</h1>
-        <p className="text-muted-foreground">Beheer je persoonlijke informatie</p>
+        <h1 className="text-2xl font-heading font-bold">{t('profile.myProfile', 'My Profile')}</h1>
+        <p className="text-muted-foreground">{t('profile.manageInfo', 'Manage your personal information')}</p>
       </div>
       
       {isEditing ? renderProfileEditForm() : renderProfileView()}

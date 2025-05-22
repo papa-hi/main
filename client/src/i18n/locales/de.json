@@ -167,6 +167,8 @@
     }
   },
   "profile": {
+    "myProfile": "Mein Profil",
+    "manageInfo": "Verwalte deine persönlichen Informationen",
     "myPlaydates": "Meine Spieltermine",
     "favoritePlaces": "Lieblingsorte",
     "noPlaydates": "Keine Spieltermine",

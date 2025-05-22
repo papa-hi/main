@@ -167,6 +167,8 @@
     }
   },
   "profile": {
+    "myProfile": "Mi Perfil",
+    "manageInfo": "Gestiona tu información personal",
     "myPlaydates": "Mis Citas de Juego",
     "favoritePlaces": "Lugares Favoritos",
     "noPlaydates": "Sin citas de juego",
