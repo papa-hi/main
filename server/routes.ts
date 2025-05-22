@@ -625,38 +625,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/users/me/favorite-places", async (req, res) => {
+    console.log("=== FAVORITES ENDPOINT HIT ===");
+    console.log("Session ID:", req.sessionID);
+    console.log("Is Authenticated:", req.isAuthenticated());
+    console.log("User from req.user:", req.user);
+    
     try {
-      // Check authentication
-      if (!req.isAuthenticated() || !req.user) {
-        console.log("Authentication failed for favorite places");
+      // Check if session contains user
+      if (!req.isAuthenticated()) {
+        console.log("User not authenticated - session might be invalid");
         return res.status(401).json({ message: "User not authenticated" });
       }
 
-      // Get the authenticated user ID
+      if (!req.user || !req.user.id) {
+        console.log("No user found in session");
+        return res.status(401).json({ message: "User not found in session" });
+      }
+
       const userId = req.user.id;
+      console.log("Found user ID:", userId);
       
-      console.log("User object for favorites:", JSON.stringify(req.user, null, 2));
-      console.log("User ID for favorite places:", userId, "Type:", typeof userId);
-      
-      if (!userId) {
-        console.log("No user ID found");
-        return res.status(400).json({ message: "Invalid user ID" });
-      }
-      
-      // Convert to number if it's a string
-      const numericUserId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
-      
-      if (isNaN(numericUserId)) {
-        console.log("Could not convert user ID to number:", userId);
-        return res.status(400).json({ message: "Invalid user ID" });
-      }
-      
-      console.log("Fetching favorites for user ID:", numericUserId);
-      const favoritePlaces = await storage.getUserFavoritePlaces(numericUserId);
-      console.log("Found favorite places:", favoritePlaces.length);
+      const favoritePlaces = await storage.getUserFavoritePlaces(userId);
+      console.log("Successfully fetched", favoritePlaces.length, "favorite places");
       res.json(favoritePlaces);
     } catch (err) {
-      console.error("Error fetching favorite places:", err);
+      console.error("Error in favorite places endpoint:", err);
       res.status(500).json({ message: "Failed to fetch favorite places" });
     }
   });
