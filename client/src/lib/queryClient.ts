@@ -29,7 +29,32 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    let url = queryKey[0] as string;
+    
+    // Build query parameters from queryKey array
+    if (queryKey.length > 1) {
+      const params = new URLSearchParams();
+      
+      // Handle different query key patterns
+      if (url.includes('/api/places')) {
+        const [, latitude, longitude, activeTab] = queryKey;
+        if (latitude !== undefined && latitude !== null) params.append('latitude', latitude.toString());
+        if (longitude !== undefined && longitude !== null) params.append('longitude', longitude.toString());
+        if (activeTab && activeTab !== 'all') params.append('activeTab', activeTab.toString());
+      } else if (url.includes('/api/places/nearby')) {
+        const [, latitude, longitude, activeFilter] = queryKey;
+        if (latitude !== undefined && latitude !== null) params.append('latitude', latitude.toString());
+        if (longitude !== undefined && longitude !== null) params.append('longitude', longitude.toString());
+        if (activeFilter && activeFilter !== 'all') params.append('activeFilter', activeFilter.toString());
+      }
+      
+      // Add query parameters to URL if any exist
+      if (params.toString()) {
+        url += (url.includes('?') ? '&' : '?') + params.toString();
+      }
+    }
+
+    const res = await fetch(url, {
       credentials: "include",
     });
 
