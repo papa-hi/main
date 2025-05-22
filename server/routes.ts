@@ -628,20 +628,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Check authentication
       if (!req.isAuthenticated() || !req.user) {
+        console.log("Authentication failed for favorite places");
         return res.status(401).json({ message: "User not authenticated" });
       }
 
       // Get the authenticated user ID
       const userId = req.user.id;
       
-      console.log("User object for favorites:", req.user);
-      console.log("User ID for favorite places:", userId);
+      console.log("User object for favorites:", JSON.stringify(req.user, null, 2));
+      console.log("User ID for favorite places:", userId, "Type:", typeof userId);
       
-      if (!userId || typeof userId !== 'number') {
+      if (!userId) {
+        console.log("No user ID found");
         return res.status(400).json({ message: "Invalid user ID" });
       }
       
-      const favoritePlaces = await storage.getUserFavoritePlaces(userId);
+      // Convert to number if it's a string
+      const numericUserId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+      
+      if (isNaN(numericUserId)) {
+        console.log("Could not convert user ID to number:", userId);
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      console.log("Fetching favorites for user ID:", numericUserId);
+      const favoritePlaces = await storage.getUserFavoritePlaces(numericUserId);
+      console.log("Found favorite places:", favoritePlaces.length);
       res.json(favoritePlaces);
     } catch (err) {
       console.error("Error fetching favorite places:", err);
@@ -653,20 +665,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Check authentication
       if (!req.isAuthenticated() || !req.user) {
+        console.log("Authentication failed for playdates");
         return res.status(401).json({ message: "User not authenticated" });
       }
 
       // Get the authenticated user ID
       const userId = req.user.id;
       
-      console.log("User object for playdates:", req.user);
-      console.log("User ID for playdates:", userId);
+      console.log("User object for playdates:", JSON.stringify(req.user, null, 2));
+      console.log("User ID for playdates:", userId, "Type:", typeof userId);
       
-      if (!userId || typeof userId !== 'number') {
+      if (!userId) {
+        console.log("No user ID found for playdates");
         return res.status(400).json({ message: "Invalid user ID" });
       }
       
-      const userPlaydates = await storage.getUserPlaydates(userId);
+      // Convert to number if it's a string
+      const numericUserId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+      
+      if (isNaN(numericUserId)) {
+        console.log("Could not convert user ID to number for playdates:", userId);
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      console.log("Fetching playdates for user ID:", numericUserId);
+      const userPlaydates = await storage.getUserPlaydates(numericUserId);
+      console.log("Found user playdates:", userPlaydates.length);
       res.json(userPlaydates);
     } catch (err) {
       console.error("Error fetching user playdates:", err);
