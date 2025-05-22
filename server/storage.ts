@@ -1705,7 +1705,8 @@ export class DatabaseStorage implements IStorage {
         
         // Validate coordinates are reasonable for Netherlands
         const isValidNetherlandsCoords = (lat: number, lng: number) => {
-          return lat >= 50.7 && lat <= 53.7 && lng >= 3.2 && lng <= 7.3;
+          return lat >= 50.7 && lat <= 53.7 && lng >= 3.2 && lng <= 7.3 && 
+                 !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
         };
         
         if (isValidNetherlandsCoords(lat1, lon1) && isValidNetherlandsCoords(lat2, lon2)) {
@@ -1723,8 +1724,9 @@ export class DatabaseStorage implements IStorage {
 
           distance = Math.round(R * c); // Distance in meters
         } else {
-          // Invalid coordinates - set a high distance to sort these last
-          distance = 999999;
+          // Invalid coordinates - try to calculate rough distance from address
+          // For now, set a moderate distance so these places appear in middle of list
+          distance = 15000; // 15km as fallback
         }
       }
       
