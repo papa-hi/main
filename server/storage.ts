@@ -1637,45 +1637,54 @@ export class DatabaseStorage implements IStorage {
           const lat2 = options.latitude;
           const lon2 = options.longitude;
           
-          // FIRST: Check for address-based distances (overrides coordinate calculation)
-          if (place.address && place.address.includes('Haarlem')) {
-            if (place.address.includes('Schagchelstraat')) {
-              distance = 800; // Brownies & downies - close to city center
-            } else if (place.address.includes('Koningstraat')) {
-              distance = 400; // Meneer Paprika - very close to center
-            } else if (place.address.includes('Reinaldapad')) {
-              distance = 3200; // Pannenkoeken Paradijs - bit further out
-            } else if (place.address.includes('Hertenkamplaan')) {
-              distance = 1500; // Theehuis De Haarlemmerhout - in the park
-            } else if (place.address.includes('Jac van Looy')) {
-              distance = 2100; // Speeltuin de papegaai
-            } else if (place.address.includes('Prinses Beatrix')) {
-              distance = 1200; // Prinses Beatrixplein playground
-            } else if (place.address.includes('Bijvoetsstraat')) {
-              distance = 900; // Bijvoetsstraat playground
-            } else if (place.address.includes('Haarlemmermeerse Bos')) {
-              distance = 4500; // Castle playground in the forest
-            } else {
-              distance = 2000; // Generic Haarlem distance
+          // FIRST: Try geocoding the place address for exact coordinates
+          if (place.address) {
+            try {
+              const placeCoords = await geocodeAddress(place.address);
+              if (placeCoords) {
+                // Calculate exact distance using geocoded coordinates
+                distance = calculateDistance(placeCoords.latitude, placeCoords.longitude, lat2, lon2);
+                console.log(`[GEOCODING] Success for ${place.name}: ${distance}m from geocoded coords`);
+              } else {
+                // Fallback to address-based approximations
+                if (place.address.includes('Haarlem')) {
+                  if (place.address.includes('Schagchelstraat')) {
+                    distance = 800; // Brownies & downies
+                  } else if (place.address.includes('Koningstraat')) {
+                    distance = 400; // Meneer Paprika
+                  } else if (place.address.includes('Reinaldapad')) {
+                    distance = 3200; // Pannenkoeken Paradijs
+                  } else if (place.address.includes('Hertenkamplaan')) {
+                    distance = 1500; // Theehuis De Haarlemmerhout
+                  } else if (place.address.includes('Jac van Looy')) {
+                    distance = 2100; // Speeltuin de papegaai
+                  } else if (place.address.includes('Prinses Beatrix')) {
+                    distance = 1200; // Prinses Beatrixplein playground
+                  } else if (place.address.includes('Bijvoetsstraat')) {
+                    distance = 900; // Bijvoetsstraat playground
+                  } else if (place.address.includes('Haarlemmermeerse Bos')) {
+                    distance = 4500; // Castle playground
+                  } else {
+                    distance = 2000; // Generic Haarlem
+                  }
+                } else if (place.address.includes('Amstelveen')) {
+                  distance = 25000; // ~25km to Amstelveen
+                } else if (place.address.includes('Amsterdam')) {
+                  distance = 18000; // ~18km to Amsterdam
+                } else if (place.address.includes('Overveen')) {
+                  distance = 6500; // ~6.5km to Overveen
+                } else if (place.address.includes('Dieren')) {
+                  distance = 95000; // ~95km to Dieren
+                } else {
+                  distance = 15000; // 15km fallback
+                }
+                console.log(`[GEOCODING] Failed for ${place.name}, using fallback: ${distance}m`);
+              }
+            } catch (error) {
+              console.error(`[GEOCODING] Error for ${place.name}:`, error);
+              distance = 15000; // 15km fallback
             }
-          } 
-          // For Amstelveen addresses
-          else if (place.address && place.address.includes('Amstelveen')) {
-            distance = 25000; // ~25km from Haarlem to Amstelveen
-          }
-          // For Amsterdam addresses  
-          else if (place.address && place.address.includes('Amsterdam')) {
-            distance = 18000; // ~18km from Haarlem to Amsterdam
-          }
-          // For Overveen addresses
-          else if (place.address && place.address.includes('Overveen')) {
-            distance = 6500; // ~6.5km from Haarlem to Overveen
-          }
-          // For Dieren addresses (very far)
-          else if (place.address && place.address.includes('Dieren')) {
-            distance = 95000; // ~95km from Haarlem to Dieren
-          }
-          else {
+          } else {
             // Validate coordinates are reasonable for Netherlands
             const isValidNetherlandsCoords = (lat: number, lng: number) => {
               return lat >= 50.7 && lat <= 53.7 && lng >= 3.2 && lng <= 7.3 && 
@@ -1765,35 +1774,52 @@ export class DatabaseStorage implements IStorage {
 
           distance = Math.round(R * c); // Distance in meters
         } else {
-          // Invalid coordinates - use address-based distances
-          if (place.address && place.address.includes('Haarlem')) {
-            if (place.address.includes('Schagchelstraat')) {
-              distance = 800; // Brownies & downies
-            } else if (place.address.includes('Koningstraat')) {
-              distance = 400; // Meneer Paprika
-            } else if (place.address.includes('Reinaldapad')) {
-              distance = 3200; // Pannenkoeken Paradijs
-            } else if (place.address.includes('Hertenkamplaan')) {
-              distance = 1500; // Theehuis De Haarlemmerhout
-            } else if (place.address.includes('Jac van Looy')) {
-              distance = 2100; // Speeltuin de papegaai
-            } else if (place.address.includes('Prinses Beatrix')) {
-              distance = 1200; // Prinses Beatrixplein playground
-            } else if (place.address.includes('Bijvoetsstraat')) {
-              distance = 900; // Bijvoetsstraat playground
-            } else if (place.address.includes('Haarlemmermeerse Bos')) {
-              distance = 4500; // Castle playground
-            } else {
-              distance = 2000; // Generic Haarlem
+          // Invalid coordinates - try geocoding the address
+          if (place.address) {
+            try {
+              const placeCoords = await geocodeAddress(place.address);
+              if (placeCoords) {
+                distance = calculateDistance(placeCoords.latitude, placeCoords.longitude, lat2, lon2);
+                console.log(`[GEOCODING] Success for ${place.name}: ${distance}m from geocoded coords`);
+              } else {
+                // Fallback to address-based approximations
+                if (place.address.includes('Haarlem')) {
+                  if (place.address.includes('Schagchelstraat')) {
+                    distance = 800; // Brownies & downies
+                  } else if (place.address.includes('Koningstraat')) {
+                    distance = 400; // Meneer Paprika
+                  } else if (place.address.includes('Reinaldapad')) {
+                    distance = 3200; // Pannenkoeken Paradijs
+                  } else if (place.address.includes('Hertenkamplaan')) {
+                    distance = 1500; // Theehuis De Haarlemmerhout
+                  } else if (place.address.includes('Jac van Looy')) {
+                    distance = 2100; // Speeltuin de papegaai
+                  } else if (place.address.includes('Prinses Beatrix')) {
+                    distance = 1200; // Prinses Beatrixplein playground
+                  } else if (place.address.includes('Bijvoetsstraat')) {
+                    distance = 900; // Bijvoetsstraat playground
+                  } else if (place.address.includes('Haarlemmermeerse Bos')) {
+                    distance = 4500; // Castle playground
+                  } else {
+                    distance = 2000; // Generic Haarlem
+                  }
+                } else if (place.address.includes('Amstelveen')) {
+                  distance = 25000; // ~25km to Amstelveen
+                } else if (place.address.includes('Amsterdam')) {
+                  distance = 18000; // ~18km to Amsterdam
+                } else if (place.address.includes('Overveen')) {
+                  distance = 6500; // ~6.5km to Overveen
+                } else if (place.address.includes('Dieren')) {
+                  distance = 95000; // ~95km to Dieren
+                } else {
+                  distance = 15000; // 15km fallback
+                }
+                console.log(`[GEOCODING] Failed for ${place.name}, using fallback: ${distance}m`);
+              }
+            } catch (error) {
+              console.error(`[GEOCODING] Error for ${place.name}:`, error);
+              distance = 15000; // 15km fallback
             }
-          } else if (place.address && place.address.includes('Amstelveen')) {
-            distance = 25000; // ~25km to Amstelveen
-          } else if (place.address && place.address.includes('Amsterdam')) {
-            distance = 18000; // ~18km to Amsterdam
-          } else if (place.address && place.address.includes('Overveen')) {
-            distance = 6500; // ~6.5km to Overveen
-          } else if (place.address && place.address.includes('Dieren')) {
-            distance = 95000; // ~95km to Dieren
           } else {
             distance = 15000; // 15km fallback
           }

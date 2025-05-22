@@ -10,6 +10,7 @@ const geocodeCache = new Map<string, GeocodeResult>();
 export async function geocodeAddress(address: string): Promise<GeocodeResult | null> {
   // Check cache first
   if (geocodeCache.has(address)) {
+    console.log(`[GEOCODING] Cache hit for: ${address}`);
     return geocodeCache.get(address)!;
   }
 
@@ -17,13 +18,15 @@ export async function geocodeAddress(address: string): Promise<GeocodeResult | n
     // Use OpenWeatherMap's geocoding API
     const apiKey = process.env.OPEN_WEATHER_API_KEY;
     if (!apiKey) {
-      console.warn('OPEN_WEATHER_API_KEY not available for geocoding');
+      console.warn('[GEOCODING] OPEN_WEATHER_API_KEY not available for geocoding');
       return null;
     }
 
-    const response = await axios.get(
-      `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(address + ', Netherlands')}&limit=1&appid=${apiKey}`
-    );
+    const query = `${address}, Netherlands`;
+    const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=1&appid=${apiKey}`;
+    console.log(`[GEOCODING] Requesting: ${address} -> ${query}`);
+    
+    const response = await axios.get(url, { timeout: 5000 });
 
     if (response.data && response.data.length > 0) {
       const result = {
@@ -31,12 +34,16 @@ export async function geocodeAddress(address: string): Promise<GeocodeResult | n
         longitude: response.data[0].lon
       };
       
+      console.log(`[GEOCODING] Success: ${address} -> (${result.latitude}, ${result.longitude})`);
+      
       // Cache the result
       geocodeCache.set(address, result);
       return result;
+    } else {
+      console.log(`[GEOCODING] No results for: ${address}`);
     }
   } catch (error) {
-    console.error('Geocoding error for address:', address, error);
+    console.error(`[GEOCODING] Error for ${address}:`, error.message);
   }
 
   return null;
