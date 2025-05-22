@@ -175,7 +175,11 @@
     "noPlaydatesDescription": "Vous n'avez pas encore planifié de rencontres.",
     "createPlaydates": "Créer des Rencontres",
     "edit": "Modifier",
-    "newPlaydate": "Nouvelle Rencontre"
+    "newPlaydate": "Nouvelle Rencontre",
+    "aboutMe": "À propos de moi",
+    "noBio": "Aucune biographie définie. Cliquez sur modifier pour ajouter des informations vous concernant.",
+    "myChildren": "Mes enfants",
+    "yearsOld": "ans"
   },
   "playdates": {
     "create": "Créer une rencontre",

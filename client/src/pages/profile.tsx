@@ -313,19 +313,19 @@ export default function ProfilePage() {
             </Button>
           </div>
           
-          <h3 className="font-heading font-medium text-lg mb-2">Over mij</h3>
+          <h3 className="font-heading font-medium text-lg mb-2">{t('profile.aboutMe', 'About me')}</h3>
           <p className="text-dark/80 mb-4">
-            {user.bio || "Geen bio ingesteld. Klik op bewerken om informatie over jezelf toe te voegen."}
+            {user.bio || t('profile.noBio', 'No bio set. Click edit to add information about yourself.')}
           </p>
           
           {user.childrenInfo && user.childrenInfo.length > 0 && (
             <div className="mb-4">
-              <h3 className="font-heading font-medium text-lg mb-2">Mijn kinderen</h3>
+              <h3 className="font-heading font-medium text-lg mb-2">{t('profile.myChildren', 'My children')}</h3>
               <div className="flex flex-wrap gap-2">
                 {user.childrenInfo.map((child, index) => (
                   <div key={index} className="bg-primary/5 p-2 rounded-lg flex items-center">
                     <i className="fas fa-child text-primary mr-2"></i>
-                    <span>{child.name} ({child.age} jaar)</span>
+                    <span>{child.name} ({child.age} {t('profile.yearsOld', 'years old')})</span>
                   </div>
                 ))}
               </div>

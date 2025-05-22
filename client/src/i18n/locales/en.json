@@ -181,7 +181,11 @@
     "noPlaydatesDescription": "You haven't planned any playdates yet.",
     "createPlaydates": "Create Playdates",
     "edit": "Edit",
-    "newPlaydate": "New Playdate"
+    "newPlaydate": "New Playdate",
+    "aboutMe": "About me",
+    "noBio": "No bio set. Click edit to add information about yourself.",
+    "myChildren": "My children",
+    "yearsOld": "years old"
   },
   "playdates": {
     "create": "Create Playdate",

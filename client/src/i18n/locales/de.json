@@ -175,7 +175,11 @@
     "noPlaydatesDescription": "Du hast noch keine Spieltermine geplant.",
     "createPlaydates": "Spieltermine Erstellen",
     "edit": "Bearbeiten",
-    "newPlaydate": "Neuer Termin"
+    "newPlaydate": "Neuer Termin",
+    "aboutMe": "Über mich",
+    "noBio": "Keine Biografie gesetzt. Klicke auf bearbeiten, um Informationen über dich hinzuzufügen.",
+    "myChildren": "Meine Kinder",
+    "yearsOld": "Jahre alt"
   },
   "playdates": {
     "create": "Spieltreffen erstellen",

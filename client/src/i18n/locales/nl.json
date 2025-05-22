@@ -180,7 +180,11 @@
     "noPlaydatesDescription": "Je hebt nog geen speelafspraken gepland.",
     "createPlaydates": "Speelafspraken Maken",
     "edit": "Bewerken",
-    "newPlaydate": "Nieuwe Afspraak"
+    "newPlaydate": "Nieuwe Afspraak",
+    "aboutMe": "Over mij",
+    "noBio": "Geen bio ingesteld. Klik op bewerken om informatie over jezelf toe te voegen.",
+    "myChildren": "Mijn kinderen",
+    "yearsOld": "jaar"
   },
   "playdates": {
     "create": "Speelafspraak Maken",
