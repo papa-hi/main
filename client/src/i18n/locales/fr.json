@@ -166,6 +166,13 @@
       "waterGames": "Jeux d'eau"
     }
   },
+  "profile": {
+    "myPlaydates": "Mes Rencontres",
+    "favoritePlaces": "Lieux Favoris",
+    "noPlaydates": "Aucune rencontre",
+    "noPlaydatesDescription": "Vous n'avez pas encore planifié de rencontres.",
+    "createPlaydates": "Créer des Rencontres"
+  },
   "playdates": {
     "create": "Créer une rencontre",
     "upcoming": "Prochaines rencontres",
