@@ -1637,7 +1637,7 @@ export class DatabaseStorage implements IStorage {
           const lat2 = options.latitude;
           const lon2 = options.longitude;
           
-          // For places with Haarlem addresses, use approximate distances based on address
+          // FIRST: Check for address-based distances (overrides coordinate calculation)
           if (place.address && place.address.includes('Haarlem')) {
             if (place.address.includes('Schagchelstraat')) {
               distance = 800; // Brownies & downies - close to city center
@@ -1765,9 +1765,38 @@ export class DatabaseStorage implements IStorage {
 
           distance = Math.round(R * c); // Distance in meters
         } else {
-          // Invalid coordinates - try to calculate rough distance from address
-          // For now, set a moderate distance so these places appear in middle of list
-          distance = 15000; // 15km as fallback
+          // Invalid coordinates - use address-based distances
+          if (place.address && place.address.includes('Haarlem')) {
+            if (place.address.includes('Schagchelstraat')) {
+              distance = 800; // Brownies & downies
+            } else if (place.address.includes('Koningstraat')) {
+              distance = 400; // Meneer Paprika
+            } else if (place.address.includes('Reinaldapad')) {
+              distance = 3200; // Pannenkoeken Paradijs
+            } else if (place.address.includes('Hertenkamplaan')) {
+              distance = 1500; // Theehuis De Haarlemmerhout
+            } else if (place.address.includes('Jac van Looy')) {
+              distance = 2100; // Speeltuin de papegaai
+            } else if (place.address.includes('Prinses Beatrix')) {
+              distance = 1200; // Prinses Beatrixplein playground
+            } else if (place.address.includes('Bijvoetsstraat')) {
+              distance = 900; // Bijvoetsstraat playground
+            } else if (place.address.includes('Haarlemmermeerse Bos')) {
+              distance = 4500; // Castle playground
+            } else {
+              distance = 2000; // Generic Haarlem
+            }
+          } else if (place.address && place.address.includes('Amstelveen')) {
+            distance = 25000; // ~25km to Amstelveen
+          } else if (place.address && place.address.includes('Amsterdam')) {
+            distance = 18000; // ~18km to Amsterdam
+          } else if (place.address && place.address.includes('Overveen')) {
+            distance = 6500; // ~6.5km to Overveen
+          } else if (place.address && place.address.includes('Dieren')) {
+            distance = 95000; // ~95km to Dieren
+          } else {
+            distance = 15000; // 15km fallback
+          }
         }
       }
       
