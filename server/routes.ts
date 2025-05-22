@@ -43,6 +43,14 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     return next();
   }
   
+  // Debug authentication for profile endpoints
+  if (req.path.includes("/api/users/me/")) {
+    console.log("Auth check for profile endpoint:", req.path);
+    console.log("Is authenticated:", req.isAuthenticated());
+    console.log("User object:", req.user);
+    console.log("Session:", req.session);
+  }
+  
   // For request debugging, log headers
   if (req.method === 'GET' && req.path === '/api/user' && !req.isAuthenticated()) {
     console.log("ERROR HEADERS for GET /api/user:", JSON.stringify(req.headers));
