@@ -1802,6 +1802,25 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
+  async deletePlace(id: number): Promise<boolean> {
+    try {
+      // First remove any user favorites for this place
+      await db
+        .delete(userFavorites)
+        .where(eq(userFavorites.placeId, id));
+      
+      // Then delete the place
+      const result = await db
+        .delete(places)
+        .where(eq(places.id, id));
+      
+      return true;
+    } catch (error) {
+      console.error('Error deleting place:', error);
+      return false;
+    }
+  }
+
   // Chat methods
   async getChats(userId: number): Promise<Chat[]> {
     // Get all chats where the user is a participant

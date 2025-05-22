@@ -3,11 +3,12 @@ import { Link, useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { ChevronLeft, Users, BarChart, ClipboardList } from "lucide-react";
+import { ChevronLeft, Users, BarChart, ClipboardList, MapPin } from "lucide-react";
 
 import UsersManagement from "@/components/admin/users-management";
 import DashboardStats from "@/components/admin/dashboard-stats";
 import ActivityLogs from "@/components/admin/activity-logs";
+import { PlacesManagement } from "@/components/admin/places-management";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -35,7 +36,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-3 max-w-md">
+        <TabsList className="grid grid-cols-4 max-w-2xl">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <BarChart className="h-4 w-4" />
             <span className="hidden sm:inline">Dashboard</span>
@@ -43,6 +44,10 @@ export default function AdminPage() {
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Users</span>
+          </TabsTrigger>
+          <TabsTrigger value="places" className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            <span className="hidden sm:inline">Places</span>
           </TabsTrigger>
           <TabsTrigger value="activity" className="flex items-center gap-2">
             <ClipboardList className="h-4 w-4" />
@@ -56,6 +61,10 @@ export default function AdminPage() {
 
         <TabsContent value="users" className="space-y-6">
           <UsersManagement />
+        </TabsContent>
+
+        <TabsContent value="places" className="space-y-6">
+          <PlacesManagement />
         </TabsContent>
 
         <TabsContent value="activity" className="space-y-6">
