@@ -624,12 +624,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/users/me/favorite-places", isAuthenticated, async (req, res) => {
+  app.get("/api/users/me/favorite-places", async (req, res) => {
     try {
+      // Check authentication
+      if (!req.isAuthenticated() || !req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
       // Get the authenticated user ID
-      const userId = req.user?.id;
+      const userId = req.user.id;
       
-      console.log("User object:", req.user);
+      console.log("User object for favorites:", req.user);
       console.log("User ID for favorite places:", userId);
       
       if (!userId || typeof userId !== 'number') {
@@ -644,10 +649,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/users/me/playdates", isAuthenticated, async (req, res) => {
+  app.get("/api/users/me/playdates", async (req, res) => {
     try {
+      // Check authentication
+      if (!req.isAuthenticated() || !req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
       // Get the authenticated user ID
-      const userId = req.user?.id;
+      const userId = req.user.id;
       
       console.log("User object for playdates:", req.user);
       console.log("User ID for playdates:", userId);
