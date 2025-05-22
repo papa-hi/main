@@ -198,7 +198,7 @@
     "deleteError": "Er is iets misgegaan bij het verwijderen van de speelafspraak.",
     "share": "Delen"
   },
-  "profile": {
+  "profileEdit": {
     "editProfile": "Profiel Bewerken",
     "firstName": "Voornaam",
     "lastName": "Achternaam",
