@@ -192,7 +192,7 @@
     "deleteError": "Beim Löschen des Spieltreffens ist ein Fehler aufgetreten.",
     "share": "Teilen"
   },
-  "profile": {
+  "profileEdit": {
     "editProfile": "Profil bearbeiten",
     "firstName": "Vorname",
     "lastName": "Nachname",

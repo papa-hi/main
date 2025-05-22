@@ -192,7 +192,7 @@
     "deleteError": "Une erreur s'est produite lors de la suppression de la rencontre.",
     "share": "Partager"
   },
-  "profile": {
+  "profileEdit": {
     "editProfile": "Modifier le profil",
     "firstName": "Prénom",
     "lastName": "Nom",

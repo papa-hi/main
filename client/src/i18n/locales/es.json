@@ -192,7 +192,7 @@
     "deleteError": "Ocurrió un error al eliminar la cita de juego.",
     "share": "Compartir"
   },
-  "profile": {
+  "profileEdit": {
     "editProfile": "Editar perfil",
     "firstName": "Nombre",
     "lastName": "Apellido",
