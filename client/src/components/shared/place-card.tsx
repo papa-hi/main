@@ -1,12 +1,12 @@
 import { Place } from "@shared/schema";
 import { useState, useEffect } from "react";
-import { getFormattedDistance } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { StarRating } from "@/components/reviews/review-form";
+import { useDistance } from "@/hooks/use-distance";
 
 interface PlaceCardProps {
   place: Place;
@@ -20,6 +20,12 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
   const [isSaved, setIsSaved] = useState(place.isSaved);
   const [isToggling, setIsToggling] = useState(false);
   const [animateHeart, setAnimateHeart] = useState(false);
+  
+  // Calculate real distance from device location to place
+  const { distance, isLoading: distanceLoading } = useDistance({
+    latitude: place.latitude,
+    longitude: place.longitude
+  });
   
   // Effect to reset animation
   useEffect(() => {
@@ -140,7 +146,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
         </div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-primary font-medium">
-            {getFormattedDistance(place.distance)}
+            {distanceLoading ? '...' : distance}
           </span>
         </div>
         {place.features && place.features.length > 0 && (
