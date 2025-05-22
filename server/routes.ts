@@ -621,8 +621,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get the authenticated user ID
       const userId = req.user?.id;
       
-      if (!userId) {
-        return res.status(401).json({ message: "User not authenticated" });
+      console.log("User object:", req.user);
+      console.log("User ID for favorite places:", userId);
+      
+      if (!userId || typeof userId !== 'number') {
+        return res.status(400).json({ message: "Invalid user ID" });
       }
       
       const favoritePlaces = await storage.getUserFavoritePlaces(userId);
@@ -638,8 +641,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get the authenticated user ID
       const userId = req.user?.id;
       
-      if (!userId) {
-        return res.status(401).json({ message: "User not authenticated" });
+      console.log("User object for playdates:", req.user);
+      console.log("User ID for playdates:", userId);
+      
+      if (!userId || typeof userId !== 'number') {
+        return res.status(400).json({ message: "Invalid user ID" });
       }
       
       const userPlaydates = await storage.getUserPlaydates(userId);
