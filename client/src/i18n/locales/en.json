@@ -179,7 +179,9 @@
     "favoritePlaces": "Favorite Places",
     "noPlaydates": "No playdates",
     "noPlaydatesDescription": "You haven't planned any playdates yet.",
-    "createPlaydates": "Create Playdates"
+    "createPlaydates": "Create Playdates",
+    "edit": "Edit",
+    "newPlaydate": "New Playdate"
   },
   "playdates": {
     "create": "Create Playdate",

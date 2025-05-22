@@ -178,7 +178,9 @@
     "favoritePlaces": "Favoriete Plekken",
     "noPlaydates": "Geen speelafspraken",
     "noPlaydatesDescription": "Je hebt nog geen speelafspraken gepland.",
-    "createPlaydates": "Speelafspraken Maken"
+    "createPlaydates": "Speelafspraken Maken",
+    "edit": "Bewerken",
+    "newPlaydate": "Nieuwe Afspraak"
   },
   "playdates": {
     "create": "Speelafspraak Maken",

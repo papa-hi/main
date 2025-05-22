@@ -309,7 +309,7 @@ export default function ProfilePage() {
               onClick={() => setIsEditing(true)}
               className="flex items-center gap-1"
             >
-              <i className="fas fa-edit"></i> Bewerken
+              <i className="fas fa-edit"></i> {t('profile.edit', 'Edit')}
             </Button>
           </div>
           
@@ -652,7 +652,7 @@ export default function ProfilePage() {
                   className="bg-primary text-white hover:bg-accent transition"
                   onClick={() => navigate("/create")}
                 >
-                  Nieuwe Afspraak
+                  {t('profile.newPlaydate', 'New Playdate')}
                 </Button>
               </div>
             )}
