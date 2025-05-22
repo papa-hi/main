@@ -74,32 +74,15 @@ export function StarRating({ placeId, size = "md", showCount = true }: StarRatin
   const currentUserRating = userRating || 0;
 
   return (
-    <div className="flex items-center gap-2">
-      {/* Display average rating (read-only stars) */}
-      <div className="flex items-center gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={`avg-${star}`}
-            className={`${sizeClasses[size]} ${
-              star <= averageRating
-                ? "fill-yellow-400 text-yellow-400"
-                : "text-gray-300"
-            }`}
-          />
-        ))}
-      </div>
-
-      {/* Show rating count */}
-      {showCount && (
-        <span className="text-sm text-gray-600">
-          {averageRating.toFixed(1)} ({totalRatings})
-        </span>
-      )}
+    <div className="flex items-center justify-between">
+      {/* Show just the numeric rating */}
+      <span className="text-sm font-medium text-gray-600">
+        {totalRatings > 0 ? averageRating.toFixed(1) : "No ratings"}
+      </span>
 
       {/* Interactive rating for logged-in users */}
       {user && (
-        <div className="flex items-center gap-1 ml-4">
-          <span className="text-sm text-gray-500">Rate:</span>
+        <div className="flex items-center gap-1">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
               key={`rate-${star}`}
@@ -119,11 +102,6 @@ export function StarRating({ placeId, size = "md", showCount = true }: StarRatin
               />
             </button>
           ))}
-          {currentUserRating > 0 && (
-            <span className="text-xs text-blue-600 ml-1">
-              Your rating: {currentUserRating}
-            </span>
-          )}
         </div>
       )}
     </div>

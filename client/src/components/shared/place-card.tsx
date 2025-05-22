@@ -138,14 +138,13 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
           <i className="fas fa-map-marker-alt mr-1 text-xs"></i>
           <span>{place.address}</span>
         </div>
-        <div className="flex items-center justify-between">
-          <StarRating placeId={place.id} size="sm" showCount={true} />
+        <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-primary font-medium">
             {getFormattedDistance(place.distance)}
           </span>
         </div>
         {place.features && place.features.length > 0 && (
-          <div className="flex flex-wrap mt-2 gap-1">
+          <div className="flex flex-wrap mb-3 gap-1">
             {place.features.map((feature, index) => {
               // Determine which translation namespace to use based on place type
               const featureKey = place.type === 'restaurant' 
@@ -163,6 +162,10 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
             })}
           </div>
         )}
+        {/* Rating moved to bottom */}
+        <div className="mt-auto pt-2 border-t border-gray-100">
+          <StarRating placeId={place.id} size="sm" showCount={true} />
+        </div>
       </div>
     </div>
   );
