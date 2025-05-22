@@ -1629,10 +1629,10 @@ export class DatabaseStorage implements IStorage {
       });
     
     if (options.limit) {
-      filteredPlaces = filteredPlaces.slice(0, options.limit);
+      return result.slice(0, options.limit);
     }
     
-    return filteredPlaces;
+    return result;
   }
   
   async getNearbyPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]> {
