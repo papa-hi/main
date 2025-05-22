@@ -499,7 +499,7 @@ export default function ProfilePage() {
               onClick={handleDeleteAccount}
               disabled={isSubmitting}
             >
-              <i className="fas fa-trash-alt mr-2"></i> Account Verwijderen
+              <i className="fas fa-trash-alt mr-2"></i> {t('profile.deleteAccount', 'Delete Account')}
             </Button>
             
             <Button 
@@ -508,9 +508,9 @@ export default function ProfilePage() {
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <><i className="fas fa-spinner fa-spin mr-2"></i> Opslaan...</>
+                <><i className="fas fa-spinner fa-spin mr-2"></i> {t('profile.saving', 'Saving...')}</>
               ) : (
-                <>Profiel Opslaan</>
+                <>{t('profile.saveProfile', 'Save Profile')}</>
               )}
             </Button>
           </div>
@@ -532,14 +532,13 @@ export default function ProfilePage() {
       <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Account verwijderen?</AlertDialogTitle>
+            <AlertDialogTitle>{t('profile.deleteAccountTitle', 'Delete Account?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Weet je zeker dat je je account wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-              Al je gegevens, inclusief je speelafspraken en berichten, worden permanent verwijderd.
+              {t('profile.deleteAccountWarning', 'Are you sure you want to delete your account? This action cannot be undone. All your data, including your playdates and messages, will be permanently deleted.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Annuleren</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{t('profile.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -549,9 +548,9 @@ export default function ProfilePage() {
               disabled={isDeleting}
             >
               {isDeleting ? (
-                <><i className="fas fa-spinner fa-spin mr-2"></i> Verwijderen...</>
+                <><i className="fas fa-spinner fa-spin mr-2"></i> {t('profile.deleting', 'Deleting...')}</>
               ) : (
-                <>Account Verwijderen</>
+                <>{t('profile.deleteAccount', 'Delete Account')}</>
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
