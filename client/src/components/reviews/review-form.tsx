@@ -1,180 +1,131 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 
-interface ReviewFormProps {
+interface StarRatingProps {
   placeId: number;
-  onSuccess?: () => void;
+  size?: "sm" | "md" | "lg";
+  showCount?: boolean;
 }
 
-export function ReviewForm({ placeId, onSuccess }: ReviewFormProps) {
-  const [rating, setRating] = useState(0);
+export function StarRating({ placeId, size = "md", showCount = true }: StarRatingProps) {
   const [hoverRating, setHoverRating] = useState(0);
-  const [kidsFriendlyRating, setKidsFriendlyRating] = useState(0);
-  const [hoverKidsRating, setHoverKidsRating] = useState(0);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [visitDate, setVisitDate] = useState("");
-  
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
-  const createReviewMutation = useMutation({
-    mutationFn: async (reviewData: any) => {
-      const res = await apiRequest("POST", `/api/places/${placeId}/reviews`, reviewData);
+  // Get current user's rating for this place
+  const { data: userRating } = useQuery({
+    queryKey: [`/api/places/${placeId}/user-rating`],
+    enabled: !!user,
+  });
+
+  // Get place rating statistics
+  const { data: placeRating } = useQuery({
+    queryKey: [`/api/places/${placeId}/rating`],
+  });
+
+  const ratePlaceMutation = useMutation({
+    mutationFn: async (rating: number) => {
+      const res = await apiRequest("POST", `/api/places/${placeId}/rate`, { rating });
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/places/${placeId}/reviews`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/places/${placeId}/rating`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/places/${placeId}/user-rating`] });
       queryClient.invalidateQueries({ queryKey: ["/api/places"] });
       toast({
-        title: "Review submitted!",
-        description: "Thank you for sharing your experience with other dads.",
+        title: "Rating submitted!",
+        description: "Thank you for rating this place.",
       });
-      // Reset form
-      setRating(0);
-      setKidsFriendlyRating(0);
-      setTitle("");
-      setContent("");
-      setVisitDate("");
-      onSuccess?.();
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to submit review",
+        title: "Failed to submit rating",
         description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!rating || !kidsFriendlyRating || !title || !content) {
+  const handleRating = (rating: number) => {
+    if (!user) {
       toast({
-        title: "Please fill all fields",
-        description: "All fields including ratings are required.",
+        title: "Please log in",
+        description: "You need to be logged in to rate places.",
         variant: "destructive",
       });
       return;
     }
-
-    createReviewMutation.mutate({
-      rating,
-      kidsFriendlyRating,
-      title,
-      content,
-      visitDate: visitDate ? new Date(visitDate) : null,
-    });
+    ratePlaceMutation.mutate(rating);
   };
 
-  const renderStars = (
-    currentRating: number,
-    hoverValue: number,
-    onChange: (rating: number) => void,
-    onHover: (rating: number) => void,
-    label: string
-  ) => (
-    <div className="space-y-2">
-      <Label className="text-sm font-medium">{label}</Label>
-      <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            className="p-1 rounded transition-colors hover:bg-gray-100"
-            onClick={() => onChange(star)}
-            onMouseEnter={() => onHover(star)}
-            onMouseLeave={() => onHover(0)}
-          >
-            <Star
-              className={`w-6 h-6 transition-colors ${
-                star <= (hoverValue || currentRating)
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-gray-300"
-              }`}
-            />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+  const sizeClasses = {
+    sm: "w-4 h-4",
+    md: "w-5 h-5",
+    lg: "w-6 h-6",
+  };
+
+  const averageRating = placeRating?.averageRating ? placeRating.averageRating / 20 : 0; // Convert 0-100 to 0-5
+  const totalRatings = placeRating?.totalRatings || 0;
+  const currentUserRating = userRating || 0;
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold">Share Your Experience</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {renderStars(
-              rating,
-              hoverRating,
-              setRating,
-              setHoverRating,
-              "Overall Rating"
-            )}
-            
-            {renderStars(
-              kidsFriendlyRating,
-              hoverKidsRating,
-              setKidsFriendlyRating,
-              setHoverKidsRating,
-              "Kid-Friendly Rating"
-            )}
-          </div>
+    <div className="flex items-center gap-2">
+      {/* Display average rating (read-only stars) */}
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={`avg-${star}`}
+            className={`${sizeClasses[size]} ${
+              star <= averageRating
+                ? "fill-yellow-400 text-yellow-400"
+                : "text-gray-300"
+            }`}
+          />
+        ))}
+      </div>
 
-          <div>
-            <Label htmlFor="title">Review Title</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Great place for families!"
-              required
-            />
-          </div>
+      {/* Show rating count */}
+      {showCount && (
+        <span className="text-sm text-gray-600">
+          {averageRating.toFixed(1)} ({totalRatings})
+        </span>
+      )}
 
-          <div>
-            <Label htmlFor="content">Your Review</Label>
-            <Textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Tell other dads about your experience..."
-              rows={4}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="visitDate">When did you visit? (optional)</Label>
-            <Input
-              id="visitDate"
-              type="date"
-              value={visitDate}
-              onChange={(e) => setVisitDate(e.target.value)}
-            />
-          </div>
-
-          <Button 
-            type="submit" 
-            className="w-full"
-            disabled={createReviewMutation.isPending}
-          >
-            {createReviewMutation.isPending ? "Submitting..." : "Submit Review"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+      {/* Interactive rating for logged-in users */}
+      {user && (
+        <div className="flex items-center gap-1 ml-4">
+          <span className="text-sm text-gray-500">Rate:</span>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={`rate-${star}`}
+              type="button"
+              className="p-1 rounded transition-colors hover:bg-gray-100"
+              onClick={() => handleRating(star)}
+              onMouseEnter={() => setHoverRating(star)}
+              onMouseLeave={() => setHoverRating(0)}
+              disabled={ratePlaceMutation.isPending}
+            >
+              <Star
+                className={`${sizeClasses[size]} transition-colors ${
+                  star <= (hoverRating || currentUserRating)
+                    ? "fill-blue-400 text-blue-400"
+                    : "text-gray-300"
+                }`}
+              />
+            </button>
+          ))}
+          {currentUserRating > 0 && (
+            <span className="text-xs text-blue-600 ml-1">
+              Your rating: {currentUserRating}
+            </span>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

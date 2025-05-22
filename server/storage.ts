@@ -1827,167 +1827,63 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Review methods implementation
-  async getPlaceReviews(placeId: number): Promise<Review[]> {
-    const reviewsData = await db
-      .select({
-        id: reviews.id,
-        userId: reviews.userId,
-        placeId: reviews.placeId,
-        rating: reviews.rating,
-        title: reviews.title,
-        content: reviews.content,
-        visitDate: reviews.visitDate,
-        kidsFriendlyRating: reviews.kidsFriendlyRating,
-        createdAt: reviews.createdAt,
-        updatedAt: reviews.updatedAt,
-        userFirstName: users.firstName,
-        userLastName: users.lastName,
-        userProfileImage: users.profileImage,
-      })
-      .from(reviews)
-      .innerJoin(users, eq(reviews.userId, users.id))
-      .where(eq(reviews.placeId, placeId))
-      .orderBy(desc(reviews.createdAt));
-
-    return reviewsData.map(review => ({
-      id: review.id,
-      userId: review.userId,
-      placeId: review.placeId,
-      rating: review.rating,
-      title: review.title,
-      content: review.content,
-      visitDate: review.visitDate,
-      kidsFriendlyRating: review.kidsFriendlyRating,
-      createdAt: review.createdAt,
-      updatedAt: review.updatedAt,
-      user: {
-        id: review.userId,
-        firstName: review.userFirstName,
-        lastName: review.userLastName,
-        profileImage: review.userProfileImage,
-      }
-    }));
-  }
-
-  async createReview(reviewData: InsertReview, userId: number): Promise<Review> {
-    // Insert the review
-    const [newReview] = await db
-      .insert(reviews)
-      .values({
-        ...reviewData,
-        userId,
-      })
-      .returning();
-
-    // Get the user data
-    const [user] = await db
-      .select({
-        id: users.id,
-        firstName: users.firstName,
-        lastName: users.lastName,
-        profileImage: users.profileImage,
-      })
-      .from(users)
-      .where(eq(users.id, userId));
-
-    // Update place rating and review count
-    await this.updatePlaceRating(reviewData.placeId);
-
-    return {
-      ...newReview,
-      user
-    };
-  }
-
-  async updateReview(id: number, reviewData: Partial<Review>, userId: number): Promise<Review> {
-    // First check if the review belongs to the user
-    const [existingReview] = await db
-      .select()
-      .from(reviews)
-      .where(and(eq(reviews.id, id), eq(reviews.userId, userId)));
-
-    if (!existingReview) {
-      throw new Error("Review not found or you don't have permission to edit it");
-    }
-
-    // Update the review
-    const [updatedReview] = await db
-      .update(reviews)
-      .set({
-        ...reviewData,
-        updatedAt: new Date(),
-      })
-      .where(eq(reviews.id, id))
-      .returning();
-
-    // Get the user data
-    const [user] = await db
-      .select({
-        id: users.id,
-        firstName: users.firstName,
-        lastName: users.lastName,
-        profileImage: users.profileImage,
-      })
-      .from(users)
-      .where(eq(users.id, userId));
-
-    // Update place rating and review count
-    await this.updatePlaceRating(existingReview.placeId);
-
-    return {
-      ...updatedReview,
-      user
-    };
-  }
-
-  async deleteReview(id: number, userId: number): Promise<boolean> {
-    // First check if the review belongs to the user
-    const [existingReview] = await db
-      .select()
-      .from(reviews)
-      .where(and(eq(reviews.id, id), eq(reviews.userId, userId)));
-
-    if (!existingReview) {
-      return false;
-    }
-
-    // Delete the review
+  // Simple rating methods implementation
+  async ratePlace(placeId: number, userId: number, rating: number): Promise<void> {
+    // Use upsert logic - insert or update if already exists
     await db
-      .delete(reviews)
-      .where(eq(reviews.id, id));
+      .insert(ratings)
+      .values({
+        placeId,
+        userId,
+        rating,
+      })
+      .onConflictDoUpdate({
+        target: [ratings.userId, ratings.placeId],
+        set: {
+          rating,
+        },
+      });
 
-    // Update place rating and review count
-    await this.updatePlaceRating(existingReview.placeId);
-
-    return true;
+    // Update place rating and count
+    await this.updatePlaceRatingFromRatings(placeId);
   }
 
-  async getAverageRating(placeId: number): Promise<{ averageRating: number; totalReviews: number }> {
+  async getPlaceRating(placeId: number): Promise<{ averageRating: number; totalRatings: number }> {
     const result = await db
       .select({
-        avgRating: sql<number>`AVG(${reviews.rating})`,
-        totalReviews: sql<number>`COUNT(*)`,
+        avgRating: sql<number>`AVG(${ratings.rating})`,
+        totalRatings: sql<number>`COUNT(*)`,
       })
-      .from(reviews)
-      .where(eq(reviews.placeId, placeId));
+      .from(ratings)
+      .where(eq(ratings.placeId, placeId));
 
     const data = result[0];
     return {
       averageRating: data?.avgRating ? Math.round(data.avgRating * 20) : 0, // Convert 1-5 to 0-100 scale
-      totalReviews: data?.totalReviews || 0,
+      totalRatings: data?.totalRatings || 0,
     };
   }
 
-  // Helper method to update place rating based on reviews
-  private async updatePlaceRating(placeId: number): Promise<void> {
-    const { averageRating, totalReviews } = await this.getAverageRating(placeId);
+  async getUserRating(placeId: number, userId: number): Promise<number | null> {
+    const [result] = await db
+      .select({
+        rating: ratings.rating,
+      })
+      .from(ratings)
+      .where(and(eq(ratings.placeId, placeId), eq(ratings.userId, userId)));
+
+    return result?.rating || null;
+  }
+
+  // Helper method to update place rating based on ratings
+  private async updatePlaceRatingFromRatings(placeId: number): Promise<void> {
+    const { averageRating, totalRatings } = await this.getPlaceRating(placeId);
     
     await db
       .update(places)
       .set({
         rating: averageRating,
-        reviewCount: totalReviews,
+        reviewCount: totalRatings,
       })
       .where(eq(places.id, placeId));
   }

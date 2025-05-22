@@ -1674,6 +1674,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Rate a place
+  app.post("/api/places/:id/rate", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const placeId = parseInt(req.params.id);
+      const { rating } = req.body;
+      const userId = req.user!.id;
+
+      if (!rating || rating < 1 || rating > 5) {
+        return res.status(400).json({ error: "Rating must be between 1 and 5" });
+      }
+
+      await storage.ratePlace(placeId, userId, rating);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error rating place:", error);
+      res.status(500).json({ error: "Failed to rate place" });
+    }
+  });
+
+  // Get place rating statistics
+  app.get("/api/places/:id/rating", async (req: Request, res: Response) => {
+    try {
+      const placeId = parseInt(req.params.id);
+      const rating = await storage.getPlaceRating(placeId);
+      res.json(rating);
+    } catch (error) {
+      console.error("Error fetching place rating:", error);
+      res.status(500).json({ error: "Failed to fetch place rating" });
+    }
+  });
+
+  // Get user's rating for a specific place
+  app.get("/api/places/:id/user-rating", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const placeId = parseInt(req.params.id);
+      const userId = req.user!.id;
+      const userRating = await storage.getUserRating(placeId, userId);
+      res.json(userRating);
+    } catch (error) {
+      console.error("Error fetching user rating:", error);
+      res.status(500).json({ error: "Failed to fetch user rating" });
+    }
+  });
+
   // Simple test endpoint with no authentication
   app.get("/api/test", (req, res) => {
     res.json({ message: "Test endpoint works!" });
