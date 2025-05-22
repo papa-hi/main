@@ -185,7 +185,9 @@
     "aboutMe": "About me",
     "noBio": "No bio set. Click edit to add information about yourself.",
     "myChildren": "My children",
-    "yearsOld": "years old"
+    "yearsOld": "years old",
+    "noPlaydatesPlanned": "No playdates planned",
+    "noPlaydatesMade": "You haven't made any playdates yet."
   },
   "playdates": {
     "create": "Create Playdate",

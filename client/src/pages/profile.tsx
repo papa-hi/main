@@ -646,8 +646,8 @@ export default function ProfilePage() {
               </div>
             ) : (
               <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-                <h3 className="font-heading font-medium text-lg mb-2">Geen speelafspraken gepland</h3>
-                <p className="text-dark/70 text-sm mb-4">Je hebt nog geen speelafspraken gemaakt.</p>
+                <h3 className="font-heading font-medium text-lg mb-2">{t('profile.noPlaydatesPlanned', 'No playdates planned')}</h3>
+                <p className="text-dark/70 text-sm mb-4">{t('profile.noPlaydatesMade', 'You haven\'t made any playdates yet.')}</p>
                 <Button 
                   className="bg-primary text-white hover:bg-accent transition"
                   onClick={() => navigate("/create")}

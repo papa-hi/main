@@ -179,7 +179,9 @@
     "aboutMe": "Über mich",
     "noBio": "Keine Biografie gesetzt. Klicke auf bearbeiten, um Informationen über dich hinzuzufügen.",
     "myChildren": "Meine Kinder",
-    "yearsOld": "Jahre alt"
+    "yearsOld": "Jahre alt",
+    "noPlaydatesPlanned": "Keine Spieltermine geplant",
+    "noPlaydatesMade": "Du hast noch keine Spieltermine gemacht."
   },
   "playdates": {
     "create": "Spieltreffen erstellen",

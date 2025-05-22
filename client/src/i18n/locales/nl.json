@@ -184,7 +184,9 @@
     "aboutMe": "Over mij",
     "noBio": "Geen bio ingesteld. Klik op bewerken om informatie over jezelf toe te voegen.",
     "myChildren": "Mijn kinderen",
-    "yearsOld": "jaar"
+    "yearsOld": "jaar",
+    "noPlaydatesPlanned": "Geen speelafspraken gepland",
+    "noPlaydatesMade": "Je hebt nog geen speelafspraken gemaakt."
   },
   "playdates": {
     "create": "Speelafspraak Maken",
