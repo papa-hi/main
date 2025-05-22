@@ -37,27 +37,14 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { useTranslation } from "react-i18next";
 
-// Profile editing form schema
-const editProfileSchema = z.object({
-  firstName: z.string().min(2, {
-    message: "Voornaam moet minimaal 2 tekens bevatten",
-  }),
-  lastName: z.string().min(2, {
-    message: "Achternaam moet minimaal 2 tekens bevatten",
-  }),
-  bio: z.string().max(500, {
-    message: "Bio mag maximaal 500 tekens bevatten",
-  }),
-  email: z.string().email({
-    message: "Voer een geldig e-mailadres in",
-  }),
-  phoneNumber: z.string().optional(),
-  city: z.string().min(2, {
-    message: "Stad moet minimaal 2 tekens bevatten",
-  }),
-});
-
-type EditProfileFormValues = z.infer<typeof editProfileSchema>;
+type EditProfileFormValues = {
+  firstName: string;
+  lastName: string;
+  bio: string;
+  email: string;
+  phoneNumber?: string;
+  city: string;
+};
 
 export default function ProfilePage() {
   const { t } = useTranslation();
@@ -70,6 +57,26 @@ export default function ProfilePage() {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { logoutMutation } = useAuth();
+  
+  // Profile editing form schema with translations
+  const editProfileSchema = z.object({
+    firstName: z.string().min(2, {
+      message: t('profile.firstNameMinLength', 'First name must contain at least 2 characters'),
+    }),
+    lastName: z.string().min(2, {
+      message: t('profile.lastNameMinLength', 'Last name must contain at least 2 characters'),
+    }),
+    bio: z.string().max(500, {
+      message: t('profile.bioMaxLength', 'Bio may contain at most 500 characters'),
+    }),
+    email: z.string().email({
+      message: t('profile.validEmail', 'Please enter a valid email address'),
+    }),
+    phoneNumber: z.string().optional(),
+    city: z.string().min(2, {
+      message: t('profile.cityMinLength', 'City must contain at least 2 characters'),
+    }),
+  });
   
   // Fetch user profile data
   const { data: user, isLoading: userLoading } = useQuery<User>({
@@ -112,8 +119,8 @@ export default function ProfilePage() {
       }
       
       toast({
-        title: "Account verwijderd",
-        description: "Je account is succesvol verwijderd.",
+        title: t('profile.accountDeleted', 'Account deleted'),
+        description: t('profile.accountDeletedDesc', 'Your account has been successfully deleted.'),
       });
       
       // Logout the user
