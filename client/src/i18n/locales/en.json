@@ -172,6 +172,13 @@
       "waterGames": "Water games"
     }
   },
+  "profile": {
+    "myPlaydates": "My Playdates",
+    "favoritePlaces": "Favorite Places",
+    "noPlaydates": "No playdates",
+    "noPlaydatesDescription": "You haven't planned any playdates yet.",
+    "createPlaydates": "Create Playdates"
+  },
   "playdates": {
     "create": "Create Playdate",
     "upcoming": "Upcoming Playdates",

@@ -171,6 +171,13 @@
       "waterGames": "Waterspellen"
     }
   },
+  "profile": {
+    "myPlaydates": "Mijn Speelafspraken",
+    "favoritePlaces": "Favoriete Plekken",
+    "noPlaydates": "Geen speelafspraken",
+    "noPlaydatesDescription": "Je hebt nog geen speelafspraken gepland.",
+    "createPlaydates": "Speelafspraken Maken"
+  },
   "playdates": {
     "create": "Speelafspraak Maken",
     "upcoming": "Aankomende Speelafspraken",
