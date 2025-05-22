@@ -35,6 +35,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { useTranslation } from "react-i18next";
 
 // Profile editing form schema
 const editProfileSchema = z.object({
@@ -59,6 +60,7 @@ const editProfileSchema = z.object({
 type EditProfileFormValues = z.infer<typeof editProfileSchema>;
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [_, navigate] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
@@ -553,8 +555,8 @@ export default function ProfilePage() {
       <div className="mt-8">
         <Tabs defaultValue="playdates">
           <TabsList className="w-full grid grid-cols-2">
-            <TabsTrigger value="playdates">Mijn Speelafspraken</TabsTrigger>
-            <TabsTrigger value="places">Favoriete Plekken</TabsTrigger>
+            <TabsTrigger value="playdates">{t('profile.myPlaydates', 'My Playdates')}</TabsTrigger>
+            <TabsTrigger value="places">{t('profile.favoritePlaces', 'Favorite Places')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="playdates" className="mt-4">
