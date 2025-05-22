@@ -1629,20 +1629,26 @@ export class DatabaseStorage implements IStorage {
       .map(place => {
         let distance = 0;
         
-        // Calculate distance if coordinates are provided
+        // Calculate actual distance if coordinates are provided
         if (options.latitude && options.longitude) {
-          // For demonstration, we'll use a simplified calculation
-          // In a real app, use a proper haversine formula or PostGIS
           const lat1 = parseFloat(place.latitude);
           const lon1 = parseFloat(place.longitude);
           const lat2 = options.latitude;
           const lon2 = options.longitude;
           
-          // Simple Euclidean distance (for demo only - not accurate for Earth distances)
-          distance = Math.sqrt(
-            Math.pow((lat2 - lat1) * 111.32, 2) + 
-            Math.pow((lon2 - lon1) * 111.32 * Math.cos(lat1 * (Math.PI / 180)), 2)
-          ) * 1000; // Convert to meters
+          // Haversine formula for accurate distance calculation
+          const R = 6371e3; // Earth's radius in meters
+          const φ1 = lat1 * Math.PI / 180;
+          const φ2 = lat2 * Math.PI / 180;
+          const Δφ = (lat2 - lat1) * Math.PI / 180;
+          const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+          const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                    Math.cos(φ1) * Math.cos(φ2) *
+                    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+          distance = Math.round(R * c); // Distance in meters
         }
         
         return {
@@ -1665,8 +1671,6 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getNearbyPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]> {
-    // In a real app, you'd use PostGIS or similar to calculate distances
-    // For this demo, we'll just return places sorted by rating
     let query = db
       .select()
       .from(places);
@@ -1676,17 +1680,44 @@ export class DatabaseStorage implements IStorage {
       query = query.where(eq(places.type, options.type));
     }
     
-    // For now, we'll just use the rating for ordering
-    query = query.orderBy(desc(places.rating)).limit(4);
-    
     const placesData = await query;
     
-    // Add placeholder distance and isSaved properties
-    return placesData.map(place => ({
-      ...place,
-      distance: Math.floor(Math.random() * 5000), // Random distance for demo
-      isSaved: Math.random() > 0.5 // Random saved status for demo
-    }));
+    // Calculate real distances from user location
+    const placesWithDistance = placesData.map(place => {
+      let distance = 0;
+      
+      // Calculate actual distance if user coordinates are provided
+      if (options.latitude && options.longitude) {
+        const lat1 = parseFloat(place.latitude);
+        const lon1 = parseFloat(place.longitude);
+        const lat2 = options.latitude;
+        const lon2 = options.longitude;
+        
+        // Haversine formula for accurate distance calculation
+        const R = 6371e3; // Earth's radius in meters
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δφ = (lat2 - lat1) * Math.PI / 180;
+        const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+        const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                  Math.cos(φ1) * Math.cos(φ2) *
+                  Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        distance = Math.round(R * c); // Distance in meters
+      }
+      
+      return {
+        ...place,
+        distance,
+        isSaved: false // Would check user favorites in real implementation
+      };
+    });
+    
+    // Sort by distance and limit to 4 nearest places
+    placesWithDistance.sort((a, b) => a.distance - b.distance);
+    return placesWithDistance.slice(0, 4);
   }
   
   async getUserFavoritePlaces(userId: number): Promise<Place[]> {
