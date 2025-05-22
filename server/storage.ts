@@ -1626,78 +1626,13 @@ export class DatabaseStorage implements IStorage {
         return options.features.every(feature => 
           place.features?.includes(feature)
         );
-      })
-      .map(place => {
-        let distance = 0;
-        
-        // Calculate actual distance if coordinates are provided
-        if (options.latitude && options.longitude) {
-          const lat1 = parseFloat(place.latitude);
-          const lon1 = parseFloat(place.longitude);
-          const lat2 = options.latitude;
-          const lon2 = options.longitude;
-          
-          // Use geocoding for exact distance calculation based on user's real location
-          if (place.address) {
-            try {
-              const placeCoords = await geocodeAddress(place.address);
-              if (placeCoords) {
-                // Calculate exact distance using geocoded coordinates and user's GPS location
-                distance = calculateDistance(placeCoords.latitude, placeCoords.longitude, lat2, lon2);
-                console.log(`[GEOCODING] ${place.name}: ${distance}m from user location`);
-              } else {
-                // If geocoding fails, set a reasonable default distance
-                distance = 10000; // 10km default
-                console.log(`[GEOCODING] Failed for ${place.name}, using default: ${distance}m`);
-              }
-            } catch (error) {
-              console.error(`[GEOCODING] Error for ${place.name}:`, error);
-              distance = 10000; // 10km fallback
-            }
-          } else {
-            // Validate coordinates are reasonable for Netherlands
-            const isValidNetherlandsCoords = (lat: number, lng: number) => {
-              return lat >= 50.7 && lat <= 53.7 && lng >= 3.2 && lng <= 7.3 && 
-                     !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
-            };
-            
-            if (isValidNetherlandsCoords(lat1, lon1) && isValidNetherlandsCoords(lat2, lon2)) {
-              // Haversine formula for accurate distance calculation
-              const R = 6371e3; // Earth's radius in meters
-              const φ1 = lat1 * Math.PI / 180;
-              const φ2 = lat2 * Math.PI / 180;
-              const Δφ = (lat2 - lat1) * Math.PI / 180;
-              const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-              const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                        Math.cos(φ1) * Math.cos(φ2) *
-                        Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-              const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-              distance = Math.round(R * c); // Distance in meters
-            } else {
-              distance = 15000; // 15km fallback
-            }
-          }
-        }
-        
-        return {
-          ...place,
-          distance,
-          isSaved: favoritePlaces[place.id] || false
-        };
       });
     
-    // Sort by distance if needed (this must be done after the distance calculation)
-    if (options.sortBy === 'distance') {
-      result.sort((a, b) => {
-        return options.sortOrder === 'desc' 
-          ? b.distance - a.distance 
-          : a.distance - b.distance;
-      });
+    if (options.limit) {
+      filteredPlaces = filteredPlaces.slice(0, options.limit);
     }
     
-    return result;
+    return filteredPlaces;
   }
   
   async getNearbyPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]> {
@@ -1712,69 +1647,7 @@ export class DatabaseStorage implements IStorage {
     
     const placesData = await query;
     
-    // Calculate real distances from user location
-    const placesWithDistance = placesData.map(place => {
-      let distance = 0;
-      
-      // Calculate actual distance if user coordinates are provided
-      if (options.latitude && options.longitude) {
-        const lat1 = parseFloat(place.latitude);
-        const lon1 = parseFloat(place.longitude);
-        const lat2 = options.latitude;
-        const lon2 = options.longitude;
-        
-        // Validate coordinates are reasonable for Netherlands
-        const isValidNetherlandsCoords = (lat: number, lng: number) => {
-          return lat >= 50.7 && lat <= 53.7 && lng >= 3.2 && lng <= 7.3 && 
-                 !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
-        };
-        
-        if (isValidNetherlandsCoords(lat1, lon1) && isValidNetherlandsCoords(lat2, lon2)) {
-          // Haversine formula for accurate distance calculation
-          const R = 6371e3; // Earth's radius in meters
-          const φ1 = lat1 * Math.PI / 180;
-          const φ2 = lat2 * Math.PI / 180;
-          const Δφ = (lat2 - lat1) * Math.PI / 180;
-          const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-          const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                    Math.cos(φ1) * Math.cos(φ2) *
-                    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-          distance = Math.round(R * c); // Distance in meters
-        } else {
-          // Invalid coordinates - use geocoding for exact distance calculation
-          if (place.address) {
-            try {
-              const placeCoords = await geocodeAddress(place.address);
-              if (placeCoords) {
-                distance = calculateDistance(placeCoords.latitude, placeCoords.longitude, lat2, lon2);
-                console.log(`[GEOCODING] ${place.name}: ${distance}m from user location`);
-              } else {
-                distance = 10000; // 10km default
-                console.log(`[GEOCODING] Failed for ${place.name}, using default: ${distance}m`);
-              }
-            } catch (error) {
-              console.error(`[GEOCODING] Error for ${place.name}:`, error);
-              distance = 10000; // 10km fallback
-            }
-          } else {
-            distance = 10000; // 10km fallback
-          }
-        }
-      }
-      
-      return {
-        ...place,
-        distance,
-        isSaved: false // Would check user favorites in real implementation
-      };
-    });
-    
-    // Sort by distance and limit to 4 nearest places
-    placesWithDistance.sort((a, b) => a.distance - b.distance);
-    return placesWithDistance.slice(0, 4);
+    return placesData;
   }
   
   async getUserFavoritePlaces(userId: number): Promise<Place[]> {
