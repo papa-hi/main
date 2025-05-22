@@ -6,6 +6,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { StarRating } from "@/components/reviews/review-form";
 
 interface PlaceCardProps {
   place: Place;
@@ -138,11 +139,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
           <span>{place.address}</span>
         </div>
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <i className="fas fa-star text-accent text-xs mr-1"></i>
-            <span className="text-sm font-medium">{place.rating.toFixed(1)}</span>
-            <span className="text-sm text-dark/70 ml-1">({place.reviewCount})</span>
-          </div>
+          <StarRating placeId={place.id} size="sm" showCount={true} />
           <span className="text-sm text-primary font-medium">
             {getFormattedDistance(place.distance)}
           </span>
