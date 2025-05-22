@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar, unique } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -343,55 +343,42 @@ export type PageView = typeof pageViews.$inferSelect;
 export type FeatureUsage = typeof featureUsage.$inferSelect;
 export type AdminLog = typeof adminLogs.$inferSelect;
 
-// Reviews schema
-export const reviews = pgTable("reviews", {
+// Simple ratings schema - just ratings, no reviews
+export const ratings = pgTable("ratings", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
   placeId: integer("place_id").notNull().references(() => places.id),
   rating: integer("rating").notNull(), // 1-5 stars
-  title: text("title").notNull(),
-  content: text("content").notNull(),
-  visitDate: timestamp("visit_date"),
-  kidsFriendlyRating: integer("kids_friendly_rating").notNull(), // 1-5 for how kid-friendly
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  // Ensure one rating per user per place
+  uniqueUserPlace: unique().on(table.userId, table.placeId),
+}));
 
-// Define reviews relations
-export const reviewsRelations = relations(reviews, ({ one }) => ({
+// Define ratings relations
+export const ratingsRelations = relations(ratings, ({ one }) => ({
   user: one(users, {
-    fields: [reviews.userId],
+    fields: [ratings.userId],
     references: [users.id],
   }),
   place: one(places, {
-    fields: [reviews.placeId],
+    fields: [ratings.placeId],
     references: [places.id],
   }),
 }));
 
-// Update places relations to include reviews
-export const placesRelationsWithReviews = relations(places, ({ many }) => ({
+// Update places relations to include ratings
+export const placesRelationsWithRatings = relations(places, ({ many }) => ({
   favorites: many(userFavorites),
-  reviews: many(reviews),
+  ratings: many(ratings),
 }));
 
-// Create insert schema for reviews
-export const insertReviewSchema = createInsertSchema(reviews).pick({
+// Create insert schema for ratings
+export const insertRatingSchema = createInsertSchema(ratings).pick({
   placeId: true,
   rating: true,
-  title: true,
-  content: true,
-  visitDate: true,
-  kidsFriendlyRating: true,
 });
 
-// Review type definitions
-export type InsertReview = z.infer<typeof insertReviewSchema>;
-export type Review = typeof reviews.$inferSelect & {
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    profileImage: string | null;
-  };
-};
+// Rating type definitions
+export type InsertRating = z.infer<typeof insertRatingSchema>;
+export type Rating = typeof ratings.$inferSelect;

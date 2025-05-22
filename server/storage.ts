@@ -10,7 +10,7 @@ import {
   PageView, InsertPageView, pageViews,
   FeatureUsage, InsertFeatureUsage, featureUsage,
   AdminLog, InsertAdminLog, adminLogs,
-  Review, InsertReview, reviews
+  Rating, InsertRating, ratings
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not, inArray } from "drizzle-orm";
@@ -65,12 +65,10 @@ export interface IStorage {
   updatePlace(id: number, placeData: Partial<Place>): Promise<Place>;
   deletePlace(id: number): Promise<boolean>;
   
-  // Review methods
-  getPlaceReviews(placeId: number): Promise<Review[]>;
-  createReview(review: InsertReview, userId: number): Promise<Review>;
-  updateReview(id: number, reviewData: Partial<Review>, userId: number): Promise<Review>;
-  deleteReview(id: number, userId: number): Promise<boolean>;
-  getAverageRating(placeId: number): Promise<{ averageRating: number; totalReviews: number }>;
+  // Rating methods
+  ratePlace(placeId: number, userId: number, rating: number): Promise<void>;
+  getPlaceRating(placeId: number): Promise<{ averageRating: number; totalRatings: number }>;
+  getUserRating(placeId: number, userId: number): Promise<number | null>;
   
   // Chat methods
   getChats(userId: number): Promise<Chat[]>;
