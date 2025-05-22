@@ -14,6 +14,29 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Edit, Trash2, MapPin, Star, Users } from "lucide-react";
 
+// Component to show real rating data for each place
+function PlaceRatingDisplay({ placeId }: { placeId: number }) {
+  const { data: ratingData } = useQuery({
+    queryKey: [`/api/places/${placeId}/rating`],
+  });
+
+  const averageRating = ratingData?.averageRating ? (ratingData.averageRating / 20).toFixed(1) : "0.0";
+  const totalRatings = ratingData?.totalRatings || 0;
+
+  return (
+    <div className="flex items-center gap-4 text-sm">
+      <div className="flex items-center gap-1">
+        <Star className="h-4 w-4 text-orange-400" />
+        {averageRating}/5.0
+      </div>
+      <div className="flex items-center gap-1">
+        <Users className="h-4 w-4" />
+        {totalRatings} ratings
+      </div>
+    </div>
+  );
+}
+
 export function PlacesManagement() {
   const { toast } = useToast();
   const [editingPlace, setEditingPlace] = useState<Place | null>(null);
@@ -149,16 +172,7 @@ export function PlacesManagement() {
                     <MapPin className="h-4 w-4" />
                     {place.address}
                   </div>
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 text-yellow-500" />
-                      {place.rating}/100
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      {place.reviewCount} reviews
-                    </div>
-                  </div>
+                  <PlaceRatingDisplay placeId={place.id} />
                 </div>
                 <div className="flex gap-2">
                   <Dialog>
