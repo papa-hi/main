@@ -76,23 +76,80 @@ export function getCurrentLocation(): Promise<Location> {
 }
 
 /**
- * Calculate distance from user's location to a place
+ * Geocode an address to get latitude and longitude coordinates
+ */
+export async function geocodeAddress(address: string): Promise<Location | null> {
+  try {
+    // Using OpenStreetMap Nominatim API for free geocoding
+    const encodedAddress = encodeURIComponent(address);
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1&addressdetails=1`
+    );
+    
+    if (!response.ok) {
+      throw new Error('Geocoding request failed');
+    }
+    
+    const data = await response.json();
+    
+    if (data && data.length > 0) {
+      const result = data[0];
+      return {
+        latitude: parseFloat(result.lat),
+        longitude: parseFloat(result.lon),
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn('Geocoding failed for address:', address, error);
+    return null;
+  }
+}
+
+/**
+ * Calculate distance from user's location to a place using address
  */
 export async function calculateDistanceToPlace(place: {
-  latitude: string;
-  longitude: string;
+  latitude?: string;
+  longitude?: string;
+  address: string;
 }): Promise<number> {
   try {
     const userLocation = await getCurrentLocation();
-    const placeLocation: Location = {
-      latitude: parseFloat(place.latitude),
-      longitude: parseFloat(place.longitude),
-    };
+    let placeLocation: Location | null = null;
     
-    return calculateDistance(userLocation, placeLocation);
+    // First try to use existing coordinates if they exist and are valid
+    if (place.latitude && place.longitude) {
+      const lat = parseFloat(place.latitude);
+      const lon = parseFloat(place.longitude);
+      
+      if (!isNaN(lat) && !isNaN(lon)) {
+        placeLocation = { latitude: lat, longitude: lon };
+      }
+    }
+    
+    // If no valid coordinates, geocode the address
+    if (!placeLocation && place.address) {
+      placeLocation = await geocodeAddress(place.address);
+    }
+    
+    if (!placeLocation) {
+      console.warn('Could not get coordinates for place:', place);
+      return 0;
+    }
+    
+    const distance = calculateDistance(userLocation, placeLocation);
+    
+    // Check if calculated distance is valid
+    if (isNaN(distance)) {
+      console.warn('Distance calculation returned NaN:', { userLocation, placeLocation });
+      return 0;
+    }
+    
+    return distance;
   } catch (error) {
-    console.warn('Could not get user location for distance calculation:', error);
-    // Return a fallback distance if location access fails
+    console.warn('Could not calculate distance:', error);
     return 0;
   }
 }

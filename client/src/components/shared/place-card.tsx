@@ -24,7 +24,8 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
   // Calculate real distance from device location to place
   const { distance, isLoading: distanceLoading } = useDistance({
     latitude: place.latitude,
-    longitude: place.longitude
+    longitude: place.longitude,
+    address: place.address
   });
   
   // Effect to reset animation
