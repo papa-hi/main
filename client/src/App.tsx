@@ -23,11 +23,13 @@ import SimpleTestPage from "./pages/simple-test";
 import { useState, useEffect } from "react";
 import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
 import ErrorBoundary from "./components/shared/error-boundary";
-import { AuthProvider } from "./hooks/use-auth";
+import { AuthProvider, useAuth } from "./hooks/use-auth";
 import { FirebaseAuthProvider } from "./hooks/use-firebase-auth";
 import { ChatProvider } from "./hooks/use-chat";
 import { AdminProvider } from "./hooks/use-admin";
 import { ProtectedRoute } from "./lib/protected-route";
+import { useWelcome } from "./hooks/use-welcome";
+import AnimatedWelcome from "./components/welcome/animated-welcome";
 
 function Router() {
   return (
