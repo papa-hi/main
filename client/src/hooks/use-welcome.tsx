@@ -6,12 +6,12 @@ export function useWelcome() {
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
-    // Check if welcome screen has been shown before
-    const hasSeenWelcome = localStorage.getItem(WELCOME_SHOWN_KEY);
-    
-    if (!hasSeenWelcome) {
-      setShowWelcome(true);
-    }
+    // Disabled: Welcome screen is turned off
+    // const hasSeenWelcome = localStorage.getItem(WELCOME_SHOWN_KEY);
+    // if (!hasSeenWelcome) {
+    //   setShowWelcome(true);
+    // }
+    setShowWelcome(false);
   }, []);
 
   const completeWelcome = () => {
