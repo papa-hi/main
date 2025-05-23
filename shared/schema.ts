@@ -40,6 +40,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   profileImage: true,
   bio: true,
   city: true,
+  childrenInfo: true,
 });
 
 // Playdate schema

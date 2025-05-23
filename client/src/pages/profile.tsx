@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { User, Playdate, Place } from "@shared/schema";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PlaceCard } from "@/components/shared/place-card";
 import { PlaydateCard } from "@/components/shared/playdate-card";
 import { useLocation } from "wouter";
+import { Plus, Trash2, Baby } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -44,6 +45,7 @@ type EditProfileFormValues = {
   email: string;
   phoneNumber?: string;
   city: string;
+  childrenInfo?: { name: string; age: number }[];
 };
 
 export default function ProfilePage() {
@@ -76,6 +78,10 @@ export default function ProfilePage() {
     city: z.string().min(2, {
       message: t('profile.cityMinLength', 'City must contain at least 2 characters'),
     }),
+    childrenInfo: z.array(z.object({
+      name: z.string().min(1, 'Child name is required'),
+      age: z.number().min(0).max(18, 'Age must be between 0 and 18'),
+    })).optional(),
   });
   
   // Fetch user profile data
@@ -151,6 +157,7 @@ export default function ProfilePage() {
       email: user?.email || "",
       phoneNumber: user?.phoneNumber || "",
       city: user?.city || "",
+      childrenInfo: user?.childrenInfo || [],
     },
   });
   
@@ -164,6 +171,7 @@ export default function ProfilePage() {
         email: user.email,
         phoneNumber: user.phoneNumber || "",
         city: user.city || "",
+        childrenInfo: user.childrenInfo || [],
       });
     }
   }, [user, form]);
