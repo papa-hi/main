@@ -1,12 +1,12 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { playdates, places, users, chatMessages, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema } from "@shared/schema";
+import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
 import { setupAdminRoutes } from "./admin";
-import { upload, getFileUrl, deleteProfileImage } from "./upload";
+import { upload, getFileUrl, deleteProfileImage, storeImageInDatabase } from "./upload";
 import path from "path";
 import fs from "fs";
 import { WebSocketServer, WebSocket } from 'ws';
@@ -74,6 +74,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Setup admin routes
   setupAdminRoutes(app);
+
+  // Image serving endpoint - serves images from database
+  app.get("/api/images/:filename", async (req, res) => {
+    try {
+      const { filename } = req.params;
+      
+      const [image] = await db
+        .select()
+        .from(imageStorage)
+        .where(eq(imageStorage.filename, filename));
+      
+      if (!image) {
+        return res.status(404).json({ error: "Image not found" });
+      }
+      
+      // Convert base64 back to buffer
+      const imageBuffer = Buffer.from(image.dataBase64, 'base64');
+      
+      res.set({
+        'Content-Type': image.mimeType,
+        'Content-Length': imageBuffer.length,
+        'Cache-Control': 'public, max-age=31536000', // Cache for 1 year
+      });
+      
+      res.send(imageBuffer);
+    } catch (error) {
+      console.error("Error serving image:", error);
+      res.status(500).json({ error: "Failed to serve image" });
+    }
+  });
   
   // Handle profile image upload during registration (no auth required)
   app.post("/api/upload/profile-image", upload.single('profileImage'), async (req: Request, res: Response) => {
@@ -82,12 +112,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No file uploaded" });
       }
       
-      // Get filename and create a simple consistent URL
-      const filename = req.file.filename;
-      const imageUrl = `/profile-images/${filename}`;
+      // Store image in database - no user ID since this is during registration
+      const filename = await storeImageInDatabase(req.file, null, 'profile');
+      const imageUrl = `/api/images/${filename}`;
       
       console.log(`Profile image uploaded during registration: ${filename}`);
-      console.log(`Image URL: ${imageUrl}`);
+      console.log(`Database image URL: ${imageUrl}`);
       
       res.json({ 
         success: true, 
