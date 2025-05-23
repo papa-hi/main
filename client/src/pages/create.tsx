@@ -42,7 +42,7 @@ export default function CreatePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [locationText, setLocationText] = useState("");
-  const [participants, setParticipants] = useState(5);
+  const [participants, setParticipants] = useState<number | ''>('');
   const [date, setDate] = useState<Date>(new Date());
   const [startTime, setStartTime] = useState("10:00");
   const [endTime, setEndTime] = useState("11:00");
@@ -81,7 +81,7 @@ export default function CreatePage() {
         location: locationText || t('playdates.defaultLocation', 'Te bepalen'),
         startTime: selectedDate.toISOString(),
         endTime: endDate.toISOString(),
-        maxParticipants: participants || 5
+        maxParticipants: participants || 10
       };
       
       console.log("Sending playdate data:", playdate);
@@ -247,7 +247,7 @@ export default function CreatePage() {
                 max={50}
                 className="pl-10"
                 value={participants}
-                onChange={(e) => setParticipants(parseInt(e.target.value) || 5)}
+                onChange={(e) => setParticipants(e.target.value === '' ? '' : parseInt(e.target.value) || '')}
               />
             </div>
             <p className="text-sm text-muted-foreground mt-1">{t('playdates.participantsNote', 'Inclusief jezelf en je kinderen')}</p>
