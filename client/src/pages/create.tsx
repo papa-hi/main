@@ -151,10 +151,10 @@ export default function CreatePage() {
           </div>
           
           <div>
-            <label htmlFor="description" className="block text-sm font-medium mb-1">Beschrijving</label>
+            <label htmlFor="description" className="block text-sm font-medium mb-1">{t('playdates.description', 'Beschrijving')}</label>
             <Textarea
               id="description"
-              placeholder="Vertel meer over deze speelafspraak..."
+              placeholder={t('playdates.descriptionPlaceholder', 'Vertel meer over deze speelafspraak...')}
               className="min-h-[100px]"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -162,7 +162,7 @@ export default function CreatePage() {
           </div>
           
           <div>
-            <label htmlFor="date" className="block text-sm font-medium mb-1">Datum</label>
+            <label htmlFor="date" className="block text-sm font-medium mb-1">{t('playdates.date', 'Datum')}</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -174,7 +174,7 @@ export default function CreatePage() {
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP", { locale: nl }) : "Kies een datum"}
+                  {date ? format(date, "PPP", { locale: getDateLocale() }) : t('playdates.chooseDatePlaceholder', 'Kies een datum')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -191,7 +191,7 @@ export default function CreatePage() {
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="startTime" className="block text-sm font-medium mb-1">Starttijd</label>
+              <label htmlFor="startTime" className="block text-sm font-medium mb-1">{t('playdates.startTime', 'Starttijd')}</label>
               <div className="relative">
                 <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input 
@@ -206,7 +206,7 @@ export default function CreatePage() {
             </div>
             
             <div>
-              <label htmlFor="endTime" className="block text-sm font-medium mb-1">Eindtijd</label>
+              <label htmlFor="endTime" className="block text-sm font-medium mb-1">{t('playdates.endTime', 'Eindtijd')}</label>
               <div className="relative">
                 <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input 
