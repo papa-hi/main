@@ -2,6 +2,8 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { Request } from 'express';
+import { db } from './db';
+import { imageStorage } from '@shared/schema';
 
 // Create upload directory if it doesn't exist
 const uploadDir = path.join(process.cwd(), 'uploads');
@@ -48,14 +50,41 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
   }
 };
 
-// Setup upload middleware
+// Setup upload middleware with memory storage for database insertion
 export const upload = multer({ 
-  storage: storage,
+  storage: multer.memoryStorage(), // Store in memory for database insertion
   fileFilter: fileFilter,
   limits: {
     fileSize: 8 * 1024 * 1024 // 8MB max file size
   }
 });
+
+// Store image in database and return the filename
+export const storeImageInDatabase = async (
+  file: Express.Multer.File, 
+  uploadedBy: number | null,
+  category: 'profile' | 'place'
+): Promise<string> => {
+  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+  const extension = path.extname(file.originalname);
+  const filename = file.fieldname + '-' + uniqueSuffix + extension;
+  
+  // Convert buffer to base64
+  const dataBase64 = file.buffer.toString('base64');
+  
+  // Store in database
+  await db.insert(imageStorage).values({
+    filename,
+    originalName: file.originalname,
+    mimeType: file.mimetype,
+    size: file.size,
+    dataBase64,
+    uploadedBy,
+    category
+  });
+  
+  return filename;
+};
 
 // Get public URLs for files
 export const getFileUrl = (filename: string, type: 'profile-image' | 'place-image' | 'other' = 'other'): string => {

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar, unique, bytea } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar, unique } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -233,6 +233,41 @@ export const insertChatMessageSchema = createInsertSchema(chatMessages).pick({
   senderId: true,
   content: true,
 });
+
+// Image storage table for persistent uploads
+export const imageStorage = pgTable("image_storage", {
+  id: serial("id").primaryKey(),
+  filename: text("filename").notNull().unique(),
+  originalName: text("original_name").notNull(),
+  mimeType: text("mime_type").notNull(),
+  size: integer("size").notNull(),
+  dataBase64: text("data_base64").notNull(), // Store as base64 string
+  uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
+  uploadedBy: integer("uploaded_by").references(() => users.id),
+  category: text("category").notNull(), // 'profile' or 'place'
+});
+
+// Image storage relations
+export const imageStorageRelations = relations(imageStorage, ({ one }) => ({
+  uploader: one(users, {
+    fields: [imageStorage.uploadedBy],
+    references: [users.id],
+  }),
+}));
+
+// Image storage schemas
+export const insertImageSchema = createInsertSchema(imageStorage).pick({
+  filename: true,
+  originalName: true,
+  mimeType: true,
+  size: true,
+  dataBase64: true,
+  uploadedBy: true,
+  category: true,
+});
+
+export type InsertImage = z.infer<typeof insertImageSchema>;
+export type StoredImage = typeof imageStorage.$inferSelect;
 
 // Chat type definitions
 export type InsertChat = z.infer<typeof insertChatSchema>;
