@@ -160,6 +160,12 @@ export default function ProfilePage() {
       childrenInfo: user?.childrenInfo || [],
     },
   });
+
+  // Field array for managing children info
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "childrenInfo",
+  });
   
   // Update form values when user data is loaded
   useEffect(() => {
@@ -499,6 +505,82 @@ export default function ProfilePage() {
               </FormItem>
             )}
           />
+
+          {/* Children Information Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Baby className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">{t('profile.childrenInfo', 'Children Information')}</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {t('profile.childrenInfoDescription', 'Add your children\'s names and ages to help other parents find suitable playdates.')}
+            </p>
+            
+            {fields.length === 0 && (
+              <p className="text-sm text-muted-foreground italic">
+                {t('profile.noChildrenAdded', 'No children added yet.')}
+              </p>
+            )}
+            
+            {fields.map((field, index) => (
+              <div key={field.id} className="flex gap-3 items-end p-4 border rounded-lg bg-muted/30">
+                <FormField
+                  control={form.control}
+                  name={`childrenInfo.${index}.name`}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>{t('profile.childName', 'Child Name')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder={t('profile.childNamePlaceholder', 'e.g. Emma')} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name={`childrenInfo.${index}.age`}
+                  render={({ field }) => (
+                    <FormItem className="w-24">
+                      <FormLabel>{t('profile.age', 'Age')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="18"
+                          placeholder="5"
+                          {...field}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => remove(index)}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => append({ name: "", age: 0 })}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {t('profile.addChild', 'Add Child')}
+            </Button>
+          </div>
           
           <div className="flex justify-between">
             <Button 
