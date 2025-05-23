@@ -3,12 +3,14 @@ import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { nl } from "date-fns/locale";
+import { nl, enUS, de, es, fr } from "date-fns/locale";
+import type { Locale } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
   Popover,
@@ -21,7 +23,20 @@ export default function CreatePage() {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
   const { user, isLoading } = useAuth();
+  const { t, i18n } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Get the appropriate locale for date formatting
+  const getDateLocale = (): Locale => {
+    switch (i18n.language) {
+      case 'nl': return nl;
+      case 'en': return enUS;
+      case 'de': return de;
+      case 'es': return es;
+      case 'fr': return fr;
+      default: return nl;
+    }
+  };
   
   // Form state
   const [title, setTitle] = useState("");
@@ -36,8 +51,8 @@ export default function CreatePage() {
   useEffect(() => {
     if (!isLoading && !user) {
       toast({
-        title: "Je bent niet ingelogd",
-        description: "Je moet ingelogd zijn om een speelafspraak te maken.",
+        title: t('playdates.notLoggedIn', 'Je bent niet ingelogd'),
+        description: t('playdates.loginRequired', 'Je moet ingelogd zijn om een speelafspraak te maken.'),
         variant: "destructive",
       });
       navigate("/auth");
@@ -90,8 +105,8 @@ export default function CreatePage() {
       // Update the UI and redirect
       queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
       toast({
-        title: "Speelafspraak aangemaakt!",
-        description: "Je nieuwe speelafspraak is succesvol aangemaakt."
+        title: t('playdates.created', 'Speelafspraak aangemaakt!'),
+        description: t('playdates.createdSuccess', 'Je nieuwe speelafspraak is succesvol aangemaakt.')
       });
       
       // Always redirect to the playdates list
@@ -118,17 +133,17 @@ export default function CreatePage() {
   return (
     <div className="py-2">
       <div className="mb-6">
-        <h1 className="text-2xl font-heading font-bold">Nieuwe Speelafspraak</h1>
-        <p className="text-muted-foreground">Plan een speelafspraak met andere vaders en kinderen</p>
+        <h1 className="text-2xl font-heading font-bold">{t('playdates.createPlaydate', 'Nieuwe Speelafspraak')}</h1>
+        <p className="text-muted-foreground">{t('playdates.createPlaydateDesc', 'Plan een speelafspraak met andere vaders en kinderen')}</p>
       </div>
       
       <div className="bg-white rounded-xl p-6 shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium mb-1">Titel</label>
+            <label htmlFor="title" className="block text-sm font-medium mb-1">{t('playdates.title', 'Titel')}</label>
             <Input 
               id="title"
-              placeholder="Bijv. 'Speelmiddag in het park'"
+              placeholder={t('playdates.titlePlaceholder', "Bijv. 'Speelmiddag in het park'")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
