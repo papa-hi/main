@@ -9,14 +9,14 @@ interface AnimatedInputProps extends InputProps {
   animationStyle?: "scale" | "glow" | "border" | "bounce";
 }
 
-export function AnimatedInput({
+export const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(({
   className,
   animateOnFocus = true,
   successIcon = false,
   highlightColor = "rgba(var(--primary), 0.3)",
   animationStyle = "scale",
   ...props
-}: AnimatedInputProps) {
+}, ref) => {
   const [isFocused, setIsFocused] = React.useState(false);
   const [isValid, setIsValid] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -56,7 +56,7 @@ export function AnimatedInput({
       successIcon && isValid && !isFocused && "form-success"
     )}>
       <Input
-        ref={inputRef}
+        ref={ref || inputRef}
         className={cn(
           animateOnFocus && "input-focus-animation",
           animateOnFocus && animationStyle === "scale" && "input-focus-scale",
@@ -72,4 +72,6 @@ export function AnimatedInput({
       />
     </div>
   );
-}
+});
+
+AnimatedInput.displayName = "AnimatedInput";

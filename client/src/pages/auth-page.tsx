@@ -216,12 +216,8 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>{t("auth:username", "Username")}</FormLabel>
                           <FormControl>
-                            <AnimatedInput 
+                            <Input 
                               placeholder={t("auth:usernamePlaceholder", "Enter your username")} 
-                              animateOnFocus={true}
-                              animationStyle="glow"
-                              highlightColor="rgba(var(--primary), 0.4)"
-                              successIcon={Boolean(field.value)}
                               {...field} 
                             />
                           </FormControl>
@@ -236,13 +232,9 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>{t("auth:password", "Password")}</FormLabel>
                           <FormControl>
-                            <AnimatedInput 
+                            <Input 
                               type="password" 
                               placeholder={t("auth:passwordPlaceholder", "Enter your password")} 
-                              animateOnFocus={true}
-                              animationStyle="border"
-                              highlightColor="rgba(var(--primary), 0.7)"
-                              successIcon={Boolean(field.value)}
                               {...field} 
                             />
                           </FormControl>
