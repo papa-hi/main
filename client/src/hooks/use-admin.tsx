@@ -108,6 +108,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     enabled: !!user, // Only run when user is logged in
+    retry: false, // Don't retry on auth errors
   });
 
   // User stats query
