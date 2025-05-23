@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "../lib/queryClient";
+import { useAuth } from "./use-auth";
 
 // Type definitions for admin-related data
 type UserStats = {
@@ -92,26 +93,21 @@ const AdminContext = createContext<AdminContextType | null>(null);
 // Provider component
 export function AdminProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Users management queries
   const {
     data: users = [],
     isLoading: isLoadingUsers,
     refetch: refetchUsers,
-  } = useQuery<User[]>({
+  } = useQuery({
     queryKey: ["/api/admin/users"],
     queryFn: async () => {
       const res = await apiRequest("GET", "/api/admin/users");
       if (!res.ok) throw new Error("Failed to fetch users");
       return await res.json();
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to load users: ${error.message}`,
-        variant: "destructive",
-      });
-    },
+    enabled: !!user, // Only run when user is logged in
   });
 
   // User stats query
