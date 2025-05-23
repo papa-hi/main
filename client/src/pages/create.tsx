@@ -76,9 +76,9 @@ export default function CreatePage() {
       
       // Create a playdate object with all fields
       const playdate = {
-        title: title || "Nieuwe speelafspraak",
+        title: title || t('playdates.defaultTitle', 'Nieuwe speelafspraak'),
         description: description || "",
-        location: locationText || "Te bepalen",
+        location: locationText || t('playdates.defaultLocation', 'Te bepalen'),
         startTime: selectedDate.toISOString(),
         endTime: endDate.toISOString(),
         maxParticipants: participants || 5
@@ -222,12 +222,12 @@ export default function CreatePage() {
           </div>
           
           <div>
-            <label htmlFor="location" className="block text-sm font-medium mb-1">Locatie</label>
+            <label htmlFor="location" className="block text-sm font-medium mb-1">{t('playdates.location', 'Locatie')}</label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input 
                 id="location"
-                placeholder="Bijv. 'Vondelpark, Amsterdam'" 
+                placeholder={t('playdates.locationPlaceholder', "Bijv. 'Vondelpark, Amsterdam'")} 
                 className="pl-10" 
                 value={locationText}
                 onChange={(e) => setLocationText(e.target.value)}
@@ -237,7 +237,7 @@ export default function CreatePage() {
           </div>
           
           <div>
-            <label htmlFor="maxParticipants" className="block text-sm font-medium mb-1">Maximaal aantal deelnemers</label>
+            <label htmlFor="maxParticipants" className="block text-sm font-medium mb-1">{t('playdates.maxParticipants', 'Maximaal aantal deelnemers')}</label>
             <div className="relative">
               <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
@@ -250,7 +250,7 @@ export default function CreatePage() {
                 onChange={(e) => setParticipants(parseInt(e.target.value) || 5)}
               />
             </div>
-            <p className="text-sm text-muted-foreground mt-1">Inclusief jezelf en je kinderen</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('playdates.participantsNote', 'Inclusief jezelf en je kinderen')}</p>
           </div>
           
           <div className="flex justify-end gap-3 pt-4">
@@ -260,14 +260,14 @@ export default function CreatePage() {
               onClick={() => navigate("/playdates")}
               disabled={isSubmitting}
             >
-              Annuleren
+              {t('playdates.cancel', 'Annuleren')}
             </Button>
             <Button 
               type="submit" 
               className="bg-primary hover:bg-primary-dark text-white"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Opslaan..." : "Speelafspraak Aanmaken"}
+              {isSubmitting ? t('playdates.creating', 'Opslaan...') : t('playdates.createButton', 'Speelafspraak Aanmaken')}
             </Button>
           </div>
         </form>
