@@ -212,7 +212,14 @@
     "lastNameMinLength": "Last name must contain at least 2 characters",
     "bioMaxLength": "Bio may contain at most 500 characters",
     "validEmail": "Please enter a valid email address",
-    "cityMinLength": "City must contain at least 2 characters"
+    "cityMinLength": "City must contain at least 2 characters",
+    "childrenInfo": "Children Information",
+    "childrenInfoDescription": "Add your children's names and ages to help other parents find suitable playdates.",
+    "noChildrenAdded": "No children added yet.",
+    "childName": "Child Name",
+    "childNamePlaceholder": "e.g. Emma",
+    "age": "Age",
+    "addChild": "Add Child"
   },
   "welcome": {
     "skip": "Skip",

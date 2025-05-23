@@ -206,7 +206,14 @@
     "lastNameMinLength": "El apellido debe contener al menos 2 caracteres",
     "bioMaxLength": "La biografía puede contener máximo 500 caracteres",
     "validEmail": "Por favor ingresa una dirección de correo válida",
-    "cityMinLength": "La ciudad debe contener al menos 2 caracteres"
+    "cityMinLength": "La ciudad debe contener al menos 2 caracteres",
+    "childrenInfo": "Información de los niños",
+    "childrenInfoDescription": "Agrega los nombres y edades de tus hijos para ayudar a otros padres a encontrar citas de juego adecuadas.",
+    "noChildrenAdded": "No se han agregado niños aún.",
+    "childName": "Nombre del niño",
+    "childNamePlaceholder": "ej. Emma",
+    "age": "Edad",
+    "addChild": "Agregar niño"
   },
   "playdates": {
     "create": "Crear cita de juego",

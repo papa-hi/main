@@ -211,7 +211,14 @@
     "lastNameMinLength": "Achternaam moet minimaal 2 tekens bevatten",
     "bioMaxLength": "Bio mag maximaal 500 tekens bevatten",
     "validEmail": "Voer een geldig e-mailadres in",
-    "cityMinLength": "Stad moet minimaal 2 tekens bevatten"
+    "cityMinLength": "Stad moet minimaal 2 tekens bevatten",
+    "childrenInfo": "Kinderen Informatie",
+    "childrenInfoDescription": "Voeg de namen en leeftijden van je kinderen toe om andere ouders te helpen passende speelafspraken te vinden.",
+    "noChildrenAdded": "Nog geen kinderen toegevoegd.",
+    "childName": "Naam Kind",
+    "childNamePlaceholder": "bijv. Emma",
+    "age": "Leeftijd",
+    "addChild": "Kind Toevoegen"
   },
   "welcome": {
     "skip": "Overslaan",

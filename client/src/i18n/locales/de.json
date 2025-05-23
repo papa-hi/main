@@ -206,7 +206,14 @@
     "lastNameMinLength": "Nachname muss mindestens 2 Zeichen enthalten",
     "bioMaxLength": "Biografie darf höchstens 500 Zeichen enthalten",
     "validEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
-    "cityMinLength": "Stadt muss mindestens 2 Zeichen enthalten"
+    "cityMinLength": "Stadt muss mindestens 2 Zeichen enthalten",
+    "childrenInfo": "Kinder Informationen",
+    "childrenInfoDescription": "Füge die Namen und Alter deiner Kinder hinzu, um anderen Eltern zu helfen, passende Spieltermine zu finden.",
+    "noChildrenAdded": "Noch keine Kinder hinzugefügt.",
+    "childName": "Name des Kindes",
+    "childNamePlaceholder": "z.B. Emma",
+    "age": "Alter",
+    "addChild": "Kind hinzufügen"
   },
   "welcome": {
     "skip": "Überspringen",
