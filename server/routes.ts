@@ -1667,9 +1667,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Name, latitude, longitude, and type are required" });
       }
       
-      // Validate type is either restaurant or playground
-      if (req.body.type !== 'restaurant' && req.body.type !== 'playground') {
-        return res.status(400).json({ error: "Type must be either 'restaurant' or 'playground'" });
+      // Validate type is either restaurant, playground, or museum
+      if (req.body.type !== 'restaurant' && req.body.type !== 'playground' && req.body.type !== 'museum') {
+        return res.status(400).json({ error: "Type must be either 'restaurant', 'playground', or 'museum'" });
       }
       
       // Create a new place object
@@ -1723,9 +1723,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Name, latitude, longitude, and type are required" });
       }
       
-      // Validate type is either restaurant or playground
-      if (req.body.type !== 'restaurant' && req.body.type !== 'playground') {
-        return res.status(400).json({ error: "Type must be either 'restaurant' or 'playground'" });
+      // Validate type is either restaurant, playground, or museum
+      if (req.body.type !== 'restaurant' && req.body.type !== 'playground' && req.body.type !== 'museum') {
+        return res.status(400).json({ error: "Type must be either 'restaurant', 'playground', or 'museum'" });
       }
       
       // Get the uploaded image file, if any
