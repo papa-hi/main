@@ -34,21 +34,9 @@ export function NotificationSettings() {
             {t('notifications.title', 'Push Notifications')}
           </CardTitle>
           <CardDescription>
-            {t('notifications.webviewLimitation', 'Notifications are not available in embedded browsers.')}
+            {t('notifications.notSupported', 'Push notifications are not supported on this device or browser.')}
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-lg">
-            <p className="text-sm text-amber-700 dark:text-amber-300 mb-2">
-              {t('notifications.webviewInstructions', 'To enable notifications:')}
-            </p>
-            <ol className="text-sm text-amber-600 dark:text-amber-400 list-decimal list-inside space-y-1">
-              <li>{t('notifications.openInBrowser', 'Open this app in Chrome browser directly')}</li>
-              <li>{t('notifications.copyUrl', 'Copy the URL and paste it in Chrome')}</li>
-              <li>{t('notifications.allowPermissions', 'Allow notifications when prompted in Chrome')}</li>
-            </ol>
-          </div>
-        </CardContent>
       </Card>
     );
   }
@@ -87,19 +75,6 @@ export function NotificationSettings() {
             <p className="text-sm text-destructive">
               {t('notifications.permissionDenied', 'Notification permission was denied. Please enable notifications in your browser settings to receive alerts.')}
             </p>
-          </div>
-        )}
-
-        {permission === 'default' && (
-          <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
-            <p className="text-sm text-blue-700 dark:text-blue-300 mb-2">
-              {t('notifications.permissionInstructions', 'To enable notifications:')}
-            </p>
-            <ol className="text-sm text-blue-600 dark:text-blue-400 list-decimal list-inside space-y-1">
-              <li>{t('notifications.step1', 'Tap the toggle above')}</li>
-              <li>{t('notifications.step2', 'Allow notifications when prompted')}</li>
-              <li>{t('notifications.step3', 'If no popup appears, check your browser settings')}</li>
-            </ol>
           </div>
         )}
 

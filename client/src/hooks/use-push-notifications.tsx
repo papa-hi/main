@@ -20,27 +20,13 @@ export function usePushNotifications() {
   });
 
   useEffect(() => {
-    // More permissive detection for mobile browsers
-    const hasNotification = 'Notification' in window;
-    const hasServiceWorker = 'serviceWorker' in navigator;
-    const hasPushManager = 'PushManager' in window;
-    
-    // Support notifications if we have the basic APIs
-    const isSupported = hasNotification && hasServiceWorker;
-    
-    console.log('Push notification support check:', {
-      hasNotification,
-      hasServiceWorker,
-      hasPushManager,
-      isWebView,
-      isSupported,
-      userAgent: navigator.userAgent.substring(0, 100)
-    });
+    // Check if push notifications are supported
+    const isSupported = 'serviceWorker' in navigator && 'PushManager' in window;
     
     setState(prev => ({
       ...prev,
       isSupported,
-      permission: hasNotification ? Notification.permission : 'denied'
+      permission: isSupported ? Notification.permission : 'denied'
     }));
 
     if (isSupported && user) {
@@ -63,82 +49,54 @@ export function usePushNotifications() {
   };
 
   const requestPermission = async (): Promise<NotificationPermission> => {
-    try {
-      // For mobile devices, we need to be more explicit about requesting permission
-      if ('Notification' in window && Notification.permission === 'default') {
-        // On mobile, the permission request might not show a popup immediately
-        // We need to trigger it from a user gesture
-        const permission = await Notification.requestPermission();
-        setState(prev => ({ ...prev, permission }));
-        return permission;
-      }
-      
-      const currentPermission = Notification.permission;
-      setState(prev => ({ ...prev, permission: currentPermission }));
-      return currentPermission;
-    } catch (error) {
-      console.error('Error requesting notification permission:', error);
-      const currentPermission = Notification.permission;
-      setState(prev => ({ ...prev, permission: currentPermission }));
-      return currentPermission;
-    }
+    const permission = await Notification.requestPermission();
+    setState(prev => ({ ...prev, permission }));
+    return permission;
   };
 
   const subscribe = async (): Promise<boolean> => {
-    console.log('Subscribe attempt started');
-    
-    if (!user) {
-      console.error('User not authenticated');
+    if (!state.isSupported || !user) {
+      console.error('Push notifications not supported or user not authenticated');
       return false;
     }
 
     setState(prev => ({ ...prev, isLoading: true }));
 
     try {
-      // Simple permission request
-      console.log('Requesting permission...');
-      const permission = await Notification.requestPermission();
-      console.log('Permission result:', permission);
+      // Request permission if not granted
+      const permission = state.permission === 'default' ? await requestPermission() : state.permission;
       
       if (permission !== 'granted') {
-        setState(prev => ({ ...prev, permission, isLoading: false }));
         toast({
           title: "Permission Required",
-          description: "Please allow notifications in your browser to receive playdate reminders.",
+          description: "Please allow notifications to receive playdate reminders.",
           variant: "destructive",
         });
         return false;
       }
 
       // Get service worker registration
-      console.log('Getting service worker registration...');
       const registration = await navigator.serviceWorker.ready;
-      console.log('Service worker ready');
 
       // Get VAPID public key from server
-      console.log('Fetching VAPID public key...');
       const response = await fetch('/api/push/vapid-public-key');
       if (!response.ok) {
         throw new Error('Failed to get VAPID public key');
       }
       
       const { publicKey } = await response.json();
-      console.log('Got VAPID public key');
       
       if (!publicKey) {
         throw new Error('VAPID public key not configured on server');
       }
 
       // Subscribe to push notifications
-      console.log('Subscribing to push notifications...');
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey)
       });
-      console.log('Push subscription successful');
 
       // Send subscription to server
-      console.log('Sending subscription to server...');
       const subscribeResponse = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: {
@@ -152,7 +110,6 @@ export function usePushNotifications() {
       if (!subscribeResponse.ok) {
         throw new Error('Failed to save subscription to server');
       }
-      console.log('Subscription saved to server');
 
       setState(prev => ({
         ...prev,
@@ -168,31 +125,15 @@ export function usePushNotifications() {
       return true;
     } catch (error) {
       console.error('Error subscribing to push notifications:', error);
-      
-      let errorMessage = "Failed to enable notifications. Please try again.";
-      
-      if (error instanceof Error) {
-        if (error.message.includes('timeout')) {
-          errorMessage = "The request timed out. Please check your connection and try again.";
-        } else if (error.message.includes('not supported')) {
-          errorMessage = "Your browser doesn't support push notifications.";
-        } else if (error.message.includes('Permission')) {
-          errorMessage = "Please allow notifications in your browser settings.";
-        }
-      }
-      
       setState(prev => ({ ...prev, isLoading: false }));
       
       toast({
         title: "Subscription Failed",
-        description: errorMessage,
+        description: "Failed to enable notifications. Please try again.",
         variant: "destructive",
       });
       
       return false;
-    } finally {
-      // Ensure loading state is always reset
-      setState(prev => ({ ...prev, isLoading: false }));
     }
   };
 
