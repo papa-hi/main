@@ -11,6 +11,9 @@ app.use(express.urlencoded({ extended: false }));
 // Serve files from the uploads directory
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
+// Serve static assets (playground images, etc.)
+app.use('/assets', express.static(path.join(process.cwd(), 'public', 'assets')));
+
 // Serve place images in multiple formats for maximum compatibility
 // This allows images saved with any path format to work
 app.use('/place-images', express.static(path.join(process.cwd(), 'uploads', 'place-images')));
@@ -35,9 +38,9 @@ app.get('/playground-image/:filename', (req, res) => {
     }
   }
 
-  // If image not found, provide a fallback
+  // If image not found, return 404
   console.log(`[IMAGE_DEBUG] Playground image not found: ${filename}`);
-  res.redirect('https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop');
+  res.status(404).send('Image not found');
 });
 
 app.use((req, res, next) => {
