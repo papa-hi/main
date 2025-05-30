@@ -176,6 +176,16 @@
       "benches": "Banken",
       "sandbox": "Zandbak",
       "waterGames": "Waterspellen"
+    },
+    "museumFeatures": {
+      "interactiveExhibits": "Interactieve tentoonstellingen",
+      "audioGuides": "Audiogidsen",
+      "familyTours": "Familierondleidingen",
+      "educationalPrograms": "Educatieve programma's",
+      "giftShop": "Cadeauwinkel",
+      "cafe": "Café",
+      "wheelchairAccessible": "Rolstoeltoegankelijk",
+      "strollerFriendly": "Kinderwagenvriendelijk"
     }
   },
   "profile": {

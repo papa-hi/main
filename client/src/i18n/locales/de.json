@@ -136,6 +136,12 @@
     "clearSearch": "Suche löschen",
     "addRestaurant": "Restaurant hinzufügen",
     "addNewRestaurant": "Neues Restaurant hinzufügen",
+    "addMuseum": "Museum hinzufügen",
+    "addNewMuseum": "Neues Museum hinzufügen",
+    "museumAdded": "Museum hinzugefügt",
+    "museumAddedMessage": "Das Museum wurde erfolgreich hinzugefügt.",
+    "museumNamePlaceholder": "z.B. Kindermuseum",
+    "museumDescriptionPlaceholder": "z.B. Interaktives Museum mit praktischen Ausstellungen für Kinder",
     "cancel": "Abbrechen",
     "restaurantNamePlaceholder": "z.B. Familien Küche",
     "restaurantDescriptionPlaceholder": "z.B. Familienfreundliches Restaurant mit Spielecke",
@@ -165,6 +171,16 @@
       "benches": "Bänke",
       "sandbox": "Sandkasten",
       "waterGames": "Wasserspiele"
+    },
+    "museumFeatures": {
+      "interactiveExhibits": "Interaktive Ausstellungen",
+      "audioGuides": "Audioführungen",
+      "familyTours": "Familienführungen",
+      "educationalPrograms": "Bildungsprogramme",
+      "giftShop": "Geschenkeladen",
+      "cafe": "Café",
+      "wheelchairAccessible": "Rollstuhlgerecht",
+      "strollerFriendly": "Kinderwagenfreundlich"
     }
   },
   "profile": {
