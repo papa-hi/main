@@ -75,7 +75,9 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
     <div className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64 transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-md">
       <div className="relative">
         <img 
-          src={place.imageUrl} 
+          src={place.type === 'playground' && place.imageUrl?.includes('place-images') 
+            ? `/playground-image/${place.imageUrl.split('/').pop()}` 
+            : place.imageUrl} 
           alt={place.name} 
           onError={(e) => {
             // If image fails to load, fallback to a default image
@@ -83,8 +85,6 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
             target.onerror = null; // Prevent infinite loop
             target.src = place.type === 'playground' 
               ? 'https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop'
-              : place.type === 'museum'
-              ? 'https://images.unsplash.com/photo-1566127992631-137a642a90f4?q=80&w=500&auto=format&fit=crop'
               : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80';
           }}
           className="w-full h-40 object-cover rounded-t-xl" 

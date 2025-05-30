@@ -78,8 +78,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup admin routes
   setupAdminRoutes(app);
 
-
-
   // Image serving endpoint - serves images from database
   app.get("/api/images/:filename", async (req, res) => {
     try {
