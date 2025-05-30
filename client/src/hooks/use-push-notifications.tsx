@@ -63,10 +63,24 @@ export function usePushNotifications() {
     setState(prev => ({ ...prev, isLoading: true }));
 
     try {
+      // Check browser compatibility first
+      if (!('Notification' in window)) {
+        throw new Error('Notifications not supported');
+      }
+
+      if (!('serviceWorker' in navigator)) {
+        throw new Error('Service workers not supported');
+      }
+
+      if (!('PushManager' in window)) {
+        throw new Error('Push messaging not supported');
+      }
+
       // Request permission if not granted
       const permission = state.permission === 'default' ? await requestPermission() : state.permission;
       
       if (permission !== 'granted') {
+        setState(prev => ({ ...prev, permission }));
         toast({
           title: "Permission Required",
           description: "Please allow notifications to receive playdate reminders.",
@@ -75,8 +89,12 @@ export function usePushNotifications() {
         return false;
       }
 
-      // Get service worker registration
-      const registration = await navigator.serviceWorker.ready;
+      // Get service worker registration with timeout
+      const registrationPromise = navigator.serviceWorker.ready;
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Service worker timeout')), 10000)
+      );
+      const registration = await Promise.race([registrationPromise, timeoutPromise]) as ServiceWorkerRegistration;
 
       // Get VAPID public key from server
       const response = await fetch('/api/push/vapid-public-key');
@@ -90,11 +108,15 @@ export function usePushNotifications() {
         throw new Error('VAPID public key not configured on server');
       }
 
-      // Subscribe to push notifications
-      const subscription = await registration.pushManager.subscribe({
+      // Subscribe to push notifications with timeout
+      const subscribePromise = registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey)
       });
+      const subscribeTimeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Push subscription timeout')), 15000)
+      );
+      const subscription = await Promise.race([subscribePromise, subscribeTimeoutPromise]) as PushSubscription;
 
       // Send subscription to server
       const subscribeResponse = await fetch('/api/push/subscribe', {
@@ -125,15 +147,31 @@ export function usePushNotifications() {
       return true;
     } catch (error) {
       console.error('Error subscribing to push notifications:', error);
+      
+      let errorMessage = "Failed to enable notifications. Please try again.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes('timeout')) {
+          errorMessage = "The request timed out. Please check your connection and try again.";
+        } else if (error.message.includes('not supported')) {
+          errorMessage = "Your browser doesn't support push notifications.";
+        } else if (error.message.includes('Permission')) {
+          errorMessage = "Please allow notifications in your browser settings.";
+        }
+      }
+      
       setState(prev => ({ ...prev, isLoading: false }));
       
       toast({
         title: "Subscription Failed",
-        description: "Failed to enable notifications. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
       
       return false;
+    } finally {
+      // Ensure loading state is always reset
+      setState(prev => ({ ...prev, isLoading: false }));
     }
   };
 
