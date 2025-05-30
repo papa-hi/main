@@ -91,13 +91,27 @@ export function NotificationSettings() {
               }
             </Button>
             {isLoading && (
-              <Button 
-                variant="outline"
-                onClick={() => window.location.reload()}
-                className="w-full text-xs"
-              >
-                {t('notifications.refresh', 'Refresh Page')}
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  variant="outline"
+                  onClick={async () => {
+                    // Direct browser check
+                    const registration = await navigator.serviceWorker.ready;
+                    const subscription = await registration.pushManager.getSubscription();
+                    if (subscription) {
+                      window.location.reload();
+                    } else {
+                      window.location.reload();
+                    }
+                  }}
+                  className="w-full text-xs"
+                >
+                  {t('notifications.refresh', 'Check Status')}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  If stuck, notifications may actually be enabled. Try refreshing the page.
+                </p>
+              </div>
             )}
           </div>
         )}
