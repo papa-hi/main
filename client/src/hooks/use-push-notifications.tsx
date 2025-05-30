@@ -20,13 +20,26 @@ export function usePushNotifications() {
   });
 
   useEffect(() => {
-    // Check if push notifications are supported
-    const isSupported = 'serviceWorker' in navigator && 'PushManager' in window;
+    // More lenient support detection for mobile browsers
+    const hasNotification = 'Notification' in window;
+    const hasServiceWorker = 'serviceWorker' in navigator;
+    const hasPushManager = 'PushManager' in window;
+    
+    // Support notifications if we have basic notification API
+    const isSupported = hasNotification && hasServiceWorker;
+    
+    console.log('Push notification support check:', {
+      hasNotification,
+      hasServiceWorker,
+      hasPushManager,
+      isSupported,
+      userAgent: navigator.userAgent.substring(0, 100)
+    });
     
     setState(prev => ({
       ...prev,
       isSupported,
-      permission: isSupported ? Notification.permission : 'denied'
+      permission: hasNotification ? Notification.permission : 'denied'
     }));
 
     if (isSupported && user) {

@@ -34,9 +34,21 @@ export function NotificationSettings() {
             {t('notifications.title', 'Push Notifications')}
           </CardTitle>
           <CardDescription>
-            {t('notifications.notSupported', 'Push notifications are not supported on this device or browser.')}
+            {t('notifications.mobileSupport', 'Notifications may have limited support on mobile browsers.')}
           </CardDescription>
         </CardHeader>
+        <CardContent>
+          <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+            <p className="text-sm text-blue-700 dark:text-blue-300 mb-2">
+              {t('notifications.mobileInstructions', 'To enable notifications on mobile:')}
+            </p>
+            <ol className="text-sm text-blue-600 dark:text-blue-400 list-decimal list-inside space-y-1">
+              <li>{t('notifications.mobileStep1', 'Check if your browser supports notifications')}</li>
+              <li>{t('notifications.mobileStep2', 'Look for notification settings in your browser menu')}</li>
+              <li>{t('notifications.mobileStep3', 'Try using the desktop version for full features')}</li>
+            </ol>
+          </div>
+        </CardContent>
       </Card>
     );
   }
