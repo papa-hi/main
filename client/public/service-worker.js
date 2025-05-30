@@ -90,13 +90,15 @@ self.addEventListener('fetch', (event) => {
 // Handle push notifications
 self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {};
+  
   const options = {
     body: data.body || 'Nieuw bericht van Papa-Hi!',
-    icon: '/icons/icon-192x192.svg',
-    badge: '/icons/icon-192x192.svg',
-    data: {
-      url: data.url || '/',
-    },
+    icon: data.icon || '/icons/icon-192x192.png',
+    badge: data.badge || '/icons/icon-192x192.png',
+    data: data.data || { url: '/' },
+    actions: data.actions || [],
+    requireInteraction: true,
+    tag: data.data?.type || 'general'
   };
 
   event.waitUntil(
@@ -110,18 +112,42 @@ self.addEventListener('push', (event) => {
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+  
+  const notificationData = event.notification.data;
+  let targetUrl = '/';
+  
+  // Handle action clicks
+  if (event.action) {
+    switch (event.action) {
+      case 'view':
+        if (notificationData.type === 'playdate_reminder' || notificationData.type === 'playdate_update') {
+          targetUrl = '/playdates';
+        }
+        break;
+      default:
+        targetUrl = notificationData.url || '/';
+    }
+  } else {
+    // Handle notification body click
+    if (notificationData.type === 'playdate_reminder' || notificationData.type === 'playdate_update') {
+      targetUrl = '/playdates';
+    } else {
+      targetUrl = notificationData.url || '/';
+    }
+  }
+
   event.waitUntil(
-    clients.matchAll({ type: 'window' }).then((clientList) => {
-      const url = event.notification.data.url;
-      // If a window already exists, focus it
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Check if there's already a window open with the target URL
       for (const client of clientList) {
-        if (client.url === url && 'focus' in client) {
+        if (client.url.includes(new URL(targetUrl, self.location.origin).pathname) && 'focus' in client) {
           return client.focus();
         }
       }
-      // Otherwise, open a new window
+      
+      // If no suitable window found, open a new one
       if (clients.openWindow) {
-        return clients.openWindow(url);
+        return clients.openWindow(targetUrl);
       }
     })
   );

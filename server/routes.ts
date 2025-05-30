@@ -14,6 +14,9 @@ import { fetchNearbyPlaygrounds } from "./maps-service";
 import { db } from "./db";
 import { eq, and, gte, asc, count } from "drizzle-orm";
 import crypto from "crypto";
+import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate } from "./push-notifications";
+import { pushSubscriptions } from "@shared/schema";
+import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified } from "./notification-scheduler";
 
 // Counter to track which playground image to use next
 let playgroundImageCounter = 0;
@@ -102,6 +105,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error serving image:", error);
       res.status(500).json({ error: "Failed to serve image" });
+    }
+  });
+
+  // Push notification endpoints
+  app.get("/api/push/vapid-public-key", (req, res) => {
+    const publicKey = getVapidPublicKey();
+    if (!publicKey) {
+      return res.status(500).json({ error: "VAPID keys not configured" });
+    }
+    res.json({ publicKey });
+  });
+
+  app.post("/api/push/subscribe", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { subscription } = req.body;
+      if (!subscription || !subscription.endpoint || !subscription.keys) {
+        return res.status(400).json({ error: "Invalid subscription data" });
+      }
+
+      // Save subscription to database
+      await db.insert(pushSubscriptions).values({
+        userId,
+        endpoint: subscription.endpoint,
+        p256dhKey: subscription.keys.p256dh,
+        authKey: subscription.keys.auth,
+      }).onConflictDoUpdate({
+        target: [pushSubscriptions.userId, pushSubscriptions.endpoint],
+        set: {
+          lastUsed: new Date(),
+        },
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error saving push subscription:", error);
+      res.status(500).json({ error: "Failed to save subscription" });
+    }
+  });
+
+  app.post("/api/push/unsubscribe", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { endpoint } = req.body;
+      if (!endpoint) {
+        return res.status(400).json({ error: "Endpoint required" });
+      }
+
+      await db.delete(pushSubscriptions)
+        .where(and(
+          eq(pushSubscriptions.userId, userId),
+          eq(pushSubscriptions.endpoint, endpoint)
+        ));
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error removing push subscription:", error);
+      res.status(500).json({ error: "Failed to remove subscription" });
     }
   });
   
