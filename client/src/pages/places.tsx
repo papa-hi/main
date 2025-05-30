@@ -52,6 +52,7 @@ export default function PlacesPage() {
     // Filter by tab selection
     if (activeTab === 'restaurants' && place.type !== 'restaurant') return false;
     if (activeTab === 'playgrounds' && place.type !== 'playground') return false;
+    if (activeTab === 'museums' && place.type !== 'museum') return false;
     
     // Filter by search term
     if (searchTerm) {
@@ -190,10 +191,11 @@ export default function PlacesPage() {
       
       {/* Tabs for filtering */}
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-6">
-        <TabsList className="mb-6 w-full grid grid-cols-3">
+        <TabsList className="mb-6 w-full grid grid-cols-4">
           <TabsTrigger value="all" className="text-sm">{t('places.all')}</TabsTrigger>
           <TabsTrigger value="restaurants" className="text-sm">{t('places.restaurant')}</TabsTrigger>
           <TabsTrigger value="playgrounds" className="text-sm">{t('places.playground')}</TabsTrigger>
+          <TabsTrigger value="museums" className="text-sm">{t('places.museum', 'Museums')}</TabsTrigger>
         </TabsList>
       </Tabs>
       

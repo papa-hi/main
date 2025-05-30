@@ -99,7 +99,7 @@ export const playdateParticipantsRelations = relations(playdateParticipants, ({ 
 export const places = pgTable("places", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  type: text("type").notNull(), // 'restaurant' or 'playground'
+  type: text("type").notNull(), // 'restaurant', 'playground', or 'museum'
   description: text("description"),
   address: text("address").notNull(),
   latitude: text("latitude").notNull(),

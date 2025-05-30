@@ -108,6 +108,14 @@ export function NearbyPlaces() {
           >
             {t('places.playground', 'Playgrounds')}
           </button>
+          <button 
+            className={`py-1 px-3 rounded-lg font-medium ${activeFilter === "museum" 
+              ? "bg-primary text-white" 
+              : "bg-white text-dark"}`}
+            onClick={() => handleFilterChange("museum")}
+          >
+            {t('places.museum', 'Museums')}
+          </button>
         </div>
       </div>
       
