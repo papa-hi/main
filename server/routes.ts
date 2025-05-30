@@ -291,6 +291,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userWithoutPassword.favoriteLocations = [];
       }
       
+      // Use default avatar if no profile image is set
+      if (!userWithoutPassword.profileImage) {
+        userWithoutPassword.profileImage = "/avatar.png";
+      }
+      
       res.json(userWithoutPassword);
     } catch (err) {
       console.error("Error fetching user:", err);
@@ -313,7 +318,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: user.id,
           firstName: user.firstName,
           lastName: user.lastName,
-          profileImage: user.profileImage,
+          profileImage: user.profileImage || "/avatar.png",
           city: user.city,
           badge: user.badge,
           bio: user.bio
@@ -398,6 +403,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userWithDetails = {
         ...featuredUser,
         badge: featuredUser.badge || "Actieve Papa",
+        // Use default avatar if no profile image is set
+        profileImage: featuredUser.profileImage || "/avatar.png",
         // Only include real children data, no fictional data
         childrenInfo: hasChildrenInfo ? featuredUser.childrenInfo : [],
         hasChildrenInfo: hasChildrenInfo,
@@ -433,6 +440,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add some additional details if it's not already there
       if (!userWithoutSensitive.childrenInfo) {
         userWithoutSensitive.childrenInfo = [];
+      }
+      
+      // Use default avatar if no profile image is set
+      if (!userWithoutSensitive.profileImage) {
+        userWithoutSensitive.profileImage = "/avatar.png";
       }
       
       // Return user data
