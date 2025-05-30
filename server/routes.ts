@@ -74,12 +74,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup admin routes
   setupAdminRoutes(app);
 
-  // Serve playground images as static files
-  app.get("/playground*.png", (req, res) => {
-    const path = require('path');
-    const filename = req.path.substring(1); // Remove leading slash
-    const imagePath = path.join(process.cwd(), filename);
-    res.sendFile(imagePath);
+  // Serve playground images directly
+  app.get('/playground1.png', (req, res) => {
+    res.sendFile(process.cwd() + '/playground1.png');
+  });
+  app.get('/playground2.png', (req, res) => {
+    res.sendFile(process.cwd() + '/playground2.png');
+  });
+  app.get('/playground3.png', (req, res) => {
+    res.sendFile(process.cwd() + '/playground3.png');
+  });
+  app.get('/playground4.png', (req, res) => {
+    res.sendFile(process.cwd() + '/playground4.png');
   });
 
   // Image serving endpoint - serves images from database
