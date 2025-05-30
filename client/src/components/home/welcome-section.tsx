@@ -205,10 +205,11 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
       
       {!playdatesLoading && !randomPlaydate && (
         <div className="relative rounded-xl overflow-hidden mb-6">
+          {/* Rotating Banner Background */}
           <img 
-            src="https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=400&q=80" 
-            alt={t('home.featuredAltText', 'Dad and child at playground')} 
-            className="w-full h-52 object-cover"
+            src={`/banner${currentBanner}.png`}
+            alt="Children playing together"
+            className="w-full h-52 object-cover transition-opacity duration-1000"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent flex flex-col justify-end p-6">
             <span className="text-white text-xs font-medium bg-accent py-1 px-3 rounded-full inline-block mb-2 w-fit">
