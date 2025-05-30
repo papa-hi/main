@@ -6,6 +6,22 @@ import { Bell, BellOff } from "lucide-react";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useTranslation } from "react-i18next";
 
+// Helper function to convert VAPID key
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 export function NotificationSettings() {
   console.log('📱 NOTIFICATION COMPONENT: Loading notification settings');
   const { t } = useTranslation();
@@ -94,7 +110,33 @@ export function NotificationSettings() {
         {!isSubscribed && permission === 'granted' && (
           <div className="space-y-2">
             <Button 
-              onClick={subscribe} 
+              onClick={async () => {
+                try {
+                  // Direct notification request without React state
+                  const permission = await Notification.requestPermission();
+                  if (permission !== 'granted') return;
+                  
+                  const registration = await navigator.serviceWorker.ready;
+                  const vapidResponse = await fetch('/api/push/vapid-public-key');
+                  const { publicKey } = await vapidResponse.json();
+                  
+                  const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(publicKey)
+                  });
+                  
+                  await fetch('/api/push/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subscription: subscription.toJSON() })
+                  });
+                  
+                  alert('Notifications enabled successfully!');
+                  window.location.reload();
+                } catch (error) {
+                  alert('Failed to enable notifications: ' + (error instanceof Error ? error.message : 'Unknown error'));
+                }
+              }}
               disabled={isLoading}
               className="w-full"
             >
@@ -103,29 +145,6 @@ export function NotificationSettings() {
                 : t('notifications.enable', 'Enable Notifications')
               }
             </Button>
-            {isLoading && (
-              <div className="space-y-2">
-                <Button 
-                  variant="outline"
-                  onClick={async () => {
-                    // Direct browser check
-                    const registration = await navigator.serviceWorker.ready;
-                    const subscription = await registration.pushManager.getSubscription();
-                    if (subscription) {
-                      window.location.reload();
-                    } else {
-                      window.location.reload();
-                    }
-                  }}
-                  className="w-full text-xs"
-                >
-                  {t('notifications.refresh', 'Check Status')}
-                </Button>
-                <p className="text-xs text-muted-foreground text-center">
-                  If stuck, notifications may actually be enabled. Try refreshing the page.
-                </p>
-              </div>
-            )}
           </div>
         )}
 
