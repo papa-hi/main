@@ -49,9 +49,25 @@ export function usePushNotifications() {
   };
 
   const requestPermission = async (): Promise<NotificationPermission> => {
-    const permission = await Notification.requestPermission();
-    setState(prev => ({ ...prev, permission }));
-    return permission;
+    try {
+      // For mobile devices, we need to be more explicit about requesting permission
+      if ('Notification' in window && Notification.permission === 'default') {
+        // On mobile, the permission request might not show a popup immediately
+        // We need to trigger it from a user gesture
+        const permission = await Notification.requestPermission();
+        setState(prev => ({ ...prev, permission }));
+        return permission;
+      }
+      
+      const currentPermission = Notification.permission;
+      setState(prev => ({ ...prev, permission: currentPermission }));
+      return currentPermission;
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+      const currentPermission = Notification.permission;
+      setState(prev => ({ ...prev, permission: currentPermission }));
+      return currentPermission;
+    }
   };
 
   const subscribe = async (): Promise<boolean> => {
@@ -79,9 +95,31 @@ export function usePushNotifications() {
         throw new Error('Push messaging not supported');
       }
 
-      // Request permission if not granted
+      // Request permission if not granted with timeout
       console.log('Requesting notification permission, current permission:', state.permission);
-      const permission = state.permission === 'default' ? await requestPermission() : state.permission;
+      
+      let permission = state.permission;
+      if (state.permission === 'default') {
+        try {
+          // Set a timeout for the permission request
+          const permissionPromise = requestPermission();
+          const timeoutPromise = new Promise<NotificationPermission>((_, reject) => 
+            setTimeout(() => reject(new Error('Permission request timeout')), 10000)
+          );
+          
+          permission = await Promise.race([permissionPromise, timeoutPromise]);
+        } catch (error) {
+          console.log('Permission request failed or timed out:', error);
+          setState(prev => ({ ...prev, isLoading: false }));
+          toast({
+            title: "Permission Required",
+            description: "Please enable notifications manually in your browser settings. Look for the notification icon in your address bar or browser menu.",
+            variant: "destructive",
+          });
+          return false;
+        }
+      }
+      
       console.log('Permission result:', permission);
       
       if (permission !== 'granted') {

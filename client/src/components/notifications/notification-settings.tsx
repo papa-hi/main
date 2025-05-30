@@ -78,6 +78,19 @@ export function NotificationSettings() {
           </div>
         )}
 
+        {permission === 'default' && (
+          <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+            <p className="text-sm text-blue-700 dark:text-blue-300 mb-2">
+              {t('notifications.permissionInstructions', 'To enable notifications:')}
+            </p>
+            <ol className="text-sm text-blue-600 dark:text-blue-400 list-decimal list-inside space-y-1">
+              <li>{t('notifications.step1', 'Tap the toggle above')}</li>
+              <li>{t('notifications.step2', 'Allow notifications when prompted')}</li>
+              <li>{t('notifications.step3', 'If no popup appears, check your browser settings')}</li>
+            </ol>
+          </div>
+        )}
+
         {!isSubscribed && permission === 'granted' && (
           <Button 
             onClick={subscribe} 
