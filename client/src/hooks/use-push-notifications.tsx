@@ -123,6 +123,16 @@ export function usePushNotifications() {
         description: "You'll now receive playdate reminders and updates!",
       });
 
+      // Force a small delay to ensure state updates properly on mobile
+      setTimeout(() => {
+        setState(prev => ({
+          ...prev,
+          isSubscribed: true,
+          isLoading: false,
+          permission: 'granted'
+        }));
+      }, 100);
+
       return true;
     } catch (error) {
       console.error('Error subscribing to push notifications:', error);
