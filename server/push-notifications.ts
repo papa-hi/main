@@ -4,10 +4,9 @@ import { pushSubscriptions, users } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
 // VAPID keys for push notifications
-// Note: In production, these should be environment variables
 const vapidKeys = {
-  publicKey: process.env.VAPID_PUBLIC_KEY || '',
-  privateKey: process.env.VAPID_PRIVATE_KEY || ''
+  publicKey: process.env.VAPID_PUBLIC_KEY || 'BLslB1PkERhUIoQhTLjwpQdp5p3KK0ZqGhLuJxIJhLLWWCdaJPvGw_KEFOgO5pfTk7Fg_Dt97wqxl9DH2IUzmCg',
+  privateKey: process.env.VAPID_PRIVATE_KEY || '4POhzv8wNe-mUNaPznu6aTn25kZ7wmLaus323F02M7Q'
 };
 
 // Configure web-push

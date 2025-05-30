@@ -85,6 +85,10 @@ export function usePushNotifications() {
       }
       
       const { publicKey } = await response.json();
+      
+      if (!publicKey) {
+        throw new Error('VAPID public key not configured on server');
+      }
 
       // Subscribe to push notifications
       const subscription = await registration.pushManager.subscribe({
