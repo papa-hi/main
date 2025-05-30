@@ -55,11 +55,14 @@ export function usePushNotifications() {
   };
 
   const subscribe = async (): Promise<boolean> => {
+    console.log('Subscribe attempt started', { isSupported: state.isSupported, hasUser: !!user });
+    
     if (!state.isSupported || !user) {
       console.error('Push notifications not supported or user not authenticated');
       return false;
     }
 
+    console.log('Setting loading state to true');
     setState(prev => ({ ...prev, isLoading: true }));
 
     try {
@@ -77,10 +80,13 @@ export function usePushNotifications() {
       }
 
       // Request permission if not granted
+      console.log('Requesting notification permission, current permission:', state.permission);
       const permission = state.permission === 'default' ? await requestPermission() : state.permission;
+      console.log('Permission result:', permission);
       
       if (permission !== 'granted') {
-        setState(prev => ({ ...prev, permission }));
+        console.log('Permission not granted, exiting');
+        setState(prev => ({ ...prev, permission, isLoading: false }));
         toast({
           title: "Permission Required",
           description: "Please allow notifications to receive playdate reminders.",
@@ -89,36 +95,35 @@ export function usePushNotifications() {
         return false;
       }
 
-      // Get service worker registration with timeout
-      const registrationPromise = navigator.serviceWorker.ready;
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Service worker timeout')), 10000)
-      );
-      const registration = await Promise.race([registrationPromise, timeoutPromise]) as ServiceWorkerRegistration;
+      // Get service worker registration
+      console.log('Getting service worker registration...');
+      const registration = await navigator.serviceWorker.ready;
+      console.log('Service worker ready');
 
       // Get VAPID public key from server
+      console.log('Fetching VAPID public key...');
       const response = await fetch('/api/push/vapid-public-key');
       if (!response.ok) {
         throw new Error('Failed to get VAPID public key');
       }
       
       const { publicKey } = await response.json();
+      console.log('Got VAPID public key');
       
       if (!publicKey) {
         throw new Error('VAPID public key not configured on server');
       }
 
-      // Subscribe to push notifications with timeout
-      const subscribePromise = registration.pushManager.subscribe({
+      // Subscribe to push notifications
+      console.log('Subscribing to push notifications...');
+      const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey)
       });
-      const subscribeTimeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Push subscription timeout')), 15000)
-      );
-      const subscription = await Promise.race([subscribePromise, subscribeTimeoutPromise]) as PushSubscription;
+      console.log('Push subscription successful');
 
       // Send subscription to server
+      console.log('Sending subscription to server...');
       const subscribeResponse = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: {
@@ -132,6 +137,7 @@ export function usePushNotifications() {
       if (!subscribeResponse.ok) {
         throw new Error('Failed to save subscription to server');
       }
+      console.log('Subscription saved to server');
 
       setState(prev => ({
         ...prev,
