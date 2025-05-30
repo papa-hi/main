@@ -142,6 +142,12 @@
     "clearSearch": "Clear search",
     "addRestaurant": "Add Restaurant",
     "addNewRestaurant": "Add New Restaurant",
+    "addMuseum": "Add Museum",
+    "addNewMuseum": "Add New Museum",
+    "museumAdded": "Museum Added",
+    "museumAddedMessage": "The museum has been added successfully.",
+    "museumNamePlaceholder": "e.g. Children's Science Museum",
+    "museumDescriptionPlaceholder": "e.g. Interactive museum with hands-on exhibits for children",
     "cancel": "Cancel",
     "restaurantNamePlaceholder": "e.g. Family Kitchen",
     "restaurantDescriptionPlaceholder": "e.g. Family-friendly restaurant with play area",
@@ -171,6 +177,16 @@
       "benches": "Benches",
       "sandbox": "Sandbox",
       "waterGames": "Water games"
+    },
+    "museumFeatures": {
+      "interactiveExhibits": "Interactive exhibits",
+      "audioGuides": "Audio guides",
+      "familyTours": "Family tours",
+      "educationalPrograms": "Educational programs",
+      "giftShop": "Gift shop",
+      "cafe": "Cafe",
+      "wheelchairAccessible": "Wheelchair accessible",
+      "strollerFriendly": "Stroller friendly"
     }
   },
   "profile": {
