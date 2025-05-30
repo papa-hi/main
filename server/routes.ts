@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema } from "@shared/schema";
+import { playdates, places, users, chatMessages, imageStorage, pushSubscriptions, insertPlaydateSchema, insertPlaceSchema, insertPushSubscriptionSchema, User as SelectUser, insertChatMessageSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
@@ -14,6 +14,7 @@ import { fetchNearbyPlaygrounds } from "./maps-service";
 import { db } from "./db";
 import { eq, and, gte, asc, count } from "drizzle-orm";
 import crypto from "crypto";
+import { sendPlaydateReminder, sendPlaydateUpdate, generateVapidKeys } from "./notifications";
 
 // Counter to track which playground image to use next
 let playgroundImageCounter = 0;
@@ -1085,6 +1086,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error removing favorite place:", err);
       res.status(500).json({ message: "Failed to remove favorite place" });
     }
+  });
+
+  // Push notification endpoints
+  app.post("/api/notifications/subscribe", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const subscriptionData = insertPushSubscriptionSchema.parse(req.body);
+      
+      // Store or update the push subscription
+      await db.insert(pushSubscriptions)
+        .values({
+          userId,
+          ...subscriptionData
+        })
+        .onConflictDoUpdate({
+          target: [pushSubscriptions.userId, pushSubscriptions.endpoint],
+          set: {
+            p256dh: subscriptionData.p256dh,
+            auth: subscriptionData.auth,
+          }
+        });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error saving push subscription:", error);
+      res.status(500).json({ error: "Failed to save push subscription" });
+    }
+  });
+
+  app.delete("/api/notifications/unsubscribe", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { endpoint } = req.body;
+      
+      await db.delete(pushSubscriptions)
+        .where(and(
+          eq(pushSubscriptions.userId, userId),
+          eq(pushSubscriptions.endpoint, endpoint)
+        ));
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error removing push subscription:", error);
+      res.status(500).json({ error: "Failed to remove push subscription" });
+    }
+  });
+
+  app.get("/api/notifications/vapid-key", async (req, res) => {
+    res.json({ 
+      publicKey: process.env.VAPID_PUBLIC_KEY || '' 
+    });
   });
 
   // Chat REST API endpoints
