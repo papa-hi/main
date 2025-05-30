@@ -20,16 +20,13 @@ export function usePushNotifications() {
   });
 
   useEffect(() => {
-    // Detect if running in WebView vs full browser
-    const isWebView = navigator.userAgent.includes('wv') || 
-                     navigator.userAgent.includes('WebView') ||
-                     (window as any).navigator?.standalone === false;
+    // More permissive detection for mobile browsers
     const hasNotification = 'Notification' in window;
     const hasServiceWorker = 'serviceWorker' in navigator;
     const hasPushManager = 'PushManager' in window;
     
-    // In WebView, notifications are usually restricted
-    const isSupported = hasNotification && hasServiceWorker && !isWebView;
+    // Support notifications if we have the basic APIs
+    const isSupported = hasNotification && hasServiceWorker;
     
     console.log('Push notification support check:', {
       hasNotification,
@@ -88,63 +85,26 @@ export function usePushNotifications() {
   };
 
   const subscribe = async (): Promise<boolean> => {
-    console.log('Subscribe attempt started', { isSupported: state.isSupported, hasUser: !!user });
+    console.log('Subscribe attempt started');
     
-    if (!state.isSupported || !user) {
-      console.error('Push notifications not supported or user not authenticated');
+    if (!user) {
+      console.error('User not authenticated');
       return false;
     }
 
-    console.log('Setting loading state to true');
     setState(prev => ({ ...prev, isLoading: true }));
 
     try {
-      // Check browser compatibility first
-      if (!('Notification' in window)) {
-        throw new Error('Notifications not supported');
-      }
-
-      if (!('serviceWorker' in navigator)) {
-        throw new Error('Service workers not supported');
-      }
-
-      if (!('PushManager' in window)) {
-        throw new Error('Push messaging not supported');
-      }
-
-      // Request permission if not granted with timeout
-      console.log('Requesting notification permission, current permission:', state.permission);
-      
-      let permission = state.permission;
-      if (state.permission === 'default') {
-        try {
-          // Set a timeout for the permission request
-          const permissionPromise = requestPermission();
-          const timeoutPromise = new Promise<NotificationPermission>((_, reject) => 
-            setTimeout(() => reject(new Error('Permission request timeout')), 10000)
-          );
-          
-          permission = await Promise.race([permissionPromise, timeoutPromise]);
-        } catch (error) {
-          console.log('Permission request failed or timed out:', error);
-          setState(prev => ({ ...prev, isLoading: false }));
-          toast({
-            title: "Permission Required",
-            description: "Please enable notifications manually in your browser settings. Look for the notification icon in your address bar or browser menu.",
-            variant: "destructive",
-          });
-          return false;
-        }
-      }
-      
+      // Simple permission request
+      console.log('Requesting permission...');
+      const permission = await Notification.requestPermission();
       console.log('Permission result:', permission);
       
       if (permission !== 'granted') {
-        console.log('Permission not granted, exiting');
         setState(prev => ({ ...prev, permission, isLoading: false }));
         toast({
           title: "Permission Required",
-          description: "Please allow notifications to receive playdate reminders.",
+          description: "Please allow notifications in your browser to receive playdate reminders.",
           variant: "destructive",
         });
         return false;
