@@ -22,6 +22,8 @@ import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified
 let playgroundImageCounter = 0;
 // Counter to track which restaurant image to use next
 let restaurantImageCounter = 0;
+// Counter to track which museum image to use next
+let museumImageCounter = 0;
 
 // Helper function to get a playground image with variety
 function getRandomPlaygroundImage(): string {
@@ -50,6 +52,22 @@ function getRandomRestaurantImage(): string {
   // Cycle through images sequentially to ensure variety
   const selectedImage = restaurantImages[restaurantImageCounter % restaurantImages.length];
   restaurantImageCounter++;
+  
+  return selectedImage;
+}
+
+// Helper function to get a museum image with variety
+function getRandomMuseumImage(): string {
+  const museumImages = [
+    "/assets/museum1.png",
+    "/assets/museum2.png", 
+    "/assets/museum3.png",
+    "/assets/museum4.png"
+  ];
+  
+  // Cycle through images sequentially to ensure variety
+  const selectedImage = museumImages[museumImageCounter % museumImages.length];
+  museumImageCounter++;
   
   return selectedImage;
 }
@@ -1681,6 +1699,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         imageUrl: req.body.imageUrl || (
           req.body.type === 'restaurant' 
             ? getRandomRestaurantImage()
+            : req.body.type === 'museum'
+            ? getRandomMuseumImage()
             : getRandomPlaygroundImage()
         ),
         features: req.body.features || [],
@@ -1746,13 +1766,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           imageUrl = getRandomRestaurantImage();
           console.log(`No image uploaded for restaurant, using random restaurant image: ${imageUrl}`);
         }
+      } else if (req.body.type === 'museum') {
+        if (req.file) {
+          // Create a proper URL to the uploaded file if user uploaded one
+          const filename = req.file.filename;
+          imageUrl = `/uploads/place-images/${filename}`;
+          console.log(`Museum image uploaded: ${filename}`);
+          console.log(`Image URL: ${imageUrl}`);
+        } else {
+          // Use a random museum image if no file uploaded
+          imageUrl = getRandomMuseumImage();
+          console.log(`No image uploaded for museum, using random museum image: ${imageUrl}`);
+        }
       } else {
-        // For other types (museum, etc.), still allow file uploads
+        // For other types, still allow file uploads
         if (req.file) {
           const filename = req.file.filename;
           imageUrl = `/uploads/place-images/${filename}`;
         } else {
-          imageUrl = getRandomRestaurantImage(); // Default fallback
+          imageUrl = getRandomPlaygroundImage(); // Default fallback
         }
       }
       
