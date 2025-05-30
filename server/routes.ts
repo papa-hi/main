@@ -909,6 +909,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         const newPlaydate = await storage.createPlaydate(playdateDataWithCreator);
         
+        // Schedule push notification reminders for the new playdate
+        await schedulePlaydateReminders(newPlaydate.id);
+        
         console.log("Successfully created new playdate:", newPlaydate);
         return res.status(201).json(newPlaydate);
       } catch (validationErr) {
@@ -959,6 +962,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update the playdate
       const updatedPlaydate = await storage.updatePlaydate(playdateId, updateData);
+      
+      // Notify participants about the playdate modification
+      await notifyPlaydateModified(playdateId);
       
       res.status(200).json(updatedPlaydate);
     } catch (err) {
