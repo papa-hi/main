@@ -17,8 +17,8 @@ const museumFormSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
   description: z.string().optional(),
   address: z.string().min(3, { message: "Address is required" }),
-  latitude: z.number().min(-90).max(90).refine(val => val !== 0, { message: "Please set a valid location" }),
-  longitude: z.number().min(-180).max(180).refine(val => val !== 0, { message: "Please set a valid location" }),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
   imageUrl: z.string().optional(),
   features: z.array(z.string()).default([]),
 });
@@ -41,8 +41,8 @@ export function AddMuseumForm({ onSuccess }: AddMuseumFormProps) {
       name: '',
       description: '',
       address: '',
-      latitude: userLat || 52.3676, // Default to Amsterdam coordinates
-      longitude: userLng || 4.9041,
+      latitude: userLat || 0,
+      longitude: userLng || 0,
       features: [],
     },
     mode: 'onChange',
