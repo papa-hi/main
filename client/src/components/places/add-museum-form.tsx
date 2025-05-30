@@ -81,17 +81,8 @@ export function AddMuseumForm({ onSuccess }: AddMuseumFormProps) {
   // Mutation for adding museum
   const addMuseumMutation = useMutation({
     mutationFn: async (data: MuseumFormValues & { type: string }) => {
-      const response = await fetch('/api/places', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to add museum');
-      }
-      return response.json();
+      const response = await apiRequest('POST', '/api/places', data);
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/places'] });
@@ -105,8 +96,8 @@ export function AddMuseumForm({ onSuccess }: AddMuseumFormProps) {
     onError: (error) => {
       console.error('Error adding museum:', error);
       toast({
-        title: t('places.addError', 'Error Adding Museum'),
-        description: t('places.addErrorMessage', 'There was an error adding the museum. Please try again.'),
+        title: t('places.museumAddError', 'Error Adding Museum'),
+        description: error.message || t('places.museumAddErrorMessage', 'There was an error adding the museum. Please try again.'),
         variant: "destructive",
       });
     },
