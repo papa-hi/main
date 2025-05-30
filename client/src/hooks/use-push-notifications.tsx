@@ -55,18 +55,28 @@ export function usePushNotifications() {
   };
 
   const subscribe = async (): Promise<boolean> => {
+    console.log('🔔 PUSH NOTIFICATION DEBUG: Starting subscription process');
+    console.log('📱 Device:', navigator.userAgent);
+    console.log('👤 User authenticated:', !!user);
+    console.log('🌐 Support check:', state.isSupported);
+    console.log('🔒 Current permission:', state.permission);
+    
     if (!state.isSupported || !user) {
-      console.error('Push notifications not supported or user not authenticated');
+      console.error('❌ PUSH NOTIFICATION DEBUG: Not supported or user not authenticated');
       return false;
     }
 
+    console.log('⏳ PUSH NOTIFICATION DEBUG: Setting loading state');
     setState(prev => ({ ...prev, isLoading: true }));
 
     try {
       // Request permission if not granted
+      console.log('🔐 PUSH NOTIFICATION DEBUG: Checking permission');
       const permission = state.permission === 'default' ? await requestPermission() : state.permission;
+      console.log('🔐 PUSH NOTIFICATION DEBUG: Permission result:', permission);
       
       if (permission !== 'granted') {
+        console.log('❌ PUSH NOTIFICATION DEBUG: Permission denied');
         toast({
           title: "Permission Required",
           description: "Please allow notifications to receive playdate reminders.",
@@ -76,27 +86,36 @@ export function usePushNotifications() {
       }
 
       // Get service worker registration
+      console.log('🔧 PUSH NOTIFICATION DEBUG: Getting service worker registration');
       const registration = await navigator.serviceWorker.ready;
+      console.log('✅ PUSH NOTIFICATION DEBUG: Service worker ready');
 
       // Get VAPID public key from server
+      console.log('🔑 PUSH NOTIFICATION DEBUG: Fetching VAPID key');
       const response = await fetch('/api/push/vapid-public-key');
+      console.log('🔑 PUSH NOTIFICATION DEBUG: VAPID response status:', response.status);
+      
       if (!response.ok) {
         throw new Error('Failed to get VAPID public key');
       }
       
       const { publicKey } = await response.json();
+      console.log('🔑 PUSH NOTIFICATION DEBUG: Got VAPID key:', publicKey ? 'Yes' : 'No');
       
       if (!publicKey) {
         throw new Error('VAPID public key not configured on server');
       }
 
       // Subscribe to push notifications
+      console.log('📝 PUSH NOTIFICATION DEBUG: Creating browser subscription');
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey)
       });
+      console.log('✅ PUSH NOTIFICATION DEBUG: Browser subscription created');
 
       // Send subscription to server
+      console.log('📤 PUSH NOTIFICATION DEBUG: Sending subscription to server');
       const subscribeResponse = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: {
@@ -106,20 +125,24 @@ export function usePushNotifications() {
           subscription: subscription.toJSON()
         })
       });
+      console.log('📤 PUSH NOTIFICATION DEBUG: Server response status:', subscribeResponse.status);
 
       if (!subscribeResponse.ok) {
         throw new Error('Failed to save subscription to server');
       }
 
       // Store subscription status in localStorage for mobile PWAs
+      console.log('💾 PUSH NOTIFICATION DEBUG: Storing in localStorage');
       localStorage.setItem('pushNotificationEnabled', 'true');
       
+      console.log('🎯 PUSH NOTIFICATION DEBUG: Setting React state');
       setState(prev => ({
         ...prev,
         isSubscribed: true,
         isLoading: false,
         permission: 'granted'
       }));
+      console.log('🎯 PUSH NOTIFICATION DEBUG: React state updated');
 
       toast({
         title: "Notifications Enabled",
