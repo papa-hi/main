@@ -79,16 +79,27 @@ export function NotificationSettings() {
         )}
 
         {!isSubscribed && permission === 'granted' && (
-          <Button 
-            onClick={subscribe} 
-            disabled={isLoading}
-            className="w-full"
-          >
-            {isLoading 
-              ? t('notifications.enabling', 'Enabling...')
-              : t('notifications.enable', 'Enable Notifications')
-            }
-          </Button>
+          <div className="space-y-2">
+            <Button 
+              onClick={subscribe} 
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading 
+                ? t('notifications.enabling', 'Enabling...')
+                : t('notifications.enable', 'Enable Notifications')
+              }
+            </Button>
+            {isLoading && (
+              <Button 
+                variant="outline"
+                onClick={() => window.location.reload()}
+                className="w-full text-xs"
+              >
+                {t('notifications.refresh', 'Refresh Page')}
+              </Button>
+            )}
+          </div>
         )}
 
         {isSubscribed && (

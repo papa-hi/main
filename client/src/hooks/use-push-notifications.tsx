@@ -111,6 +111,9 @@ export function usePushNotifications() {
         throw new Error('Failed to save subscription to server');
       }
 
+      // Store subscription status in localStorage for mobile PWAs
+      localStorage.setItem('pushNotificationEnabled', 'true');
+      
       setState(prev => ({
         ...prev,
         isSubscribed: true,
@@ -122,20 +125,6 @@ export function usePushNotifications() {
         title: "Notifications Enabled",
         description: "You'll now receive playdate reminders and updates!",
       });
-
-      // Force a small delay to ensure state updates properly on mobile
-      setTimeout(() => {
-        setState(prev => ({
-          ...prev,
-          isSubscribed: true,
-          isLoading: false,
-          permission: 'granted'
-        }));
-        // Force a page refresh on mobile to ensure UI updates
-        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-          setTimeout(() => window.location.reload(), 500);
-        }
-      }, 100);
 
       return true;
     } catch (error) {
