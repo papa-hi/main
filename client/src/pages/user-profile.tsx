@@ -121,7 +121,7 @@ export default function UserProfilePage({ params }: { params?: UserProfileParams
 
   // Cache-busting function for profile images
   const getProfileImage = (imageUrl: string | null) => {
-    if (!imageUrl) return "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=500&q=80";
+    if (!imageUrl) return "/avatar.png";
     
     // If it's already a full URL, return it
     if (imageUrl.startsWith('http')) return imageUrl;

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ProfileAvatar } from "@/components/ui/profile-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -121,13 +121,13 @@ export default function DiscoverPage() {
               
               <CardContent className="pt-0">
                 <div className="flex items-center gap-4 -mt-12">
-                  <Avatar className="h-16 w-16 border-4 border-white">
-                    <AvatarImage 
-                      src={user.profileImage ? `${user.profileImage}?t=${new Date().getTime()}` : `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`} 
-                      alt={`${user.firstName} ${user.lastName}`} 
-                    />
-                    <AvatarFallback>{`${user.firstName.charAt(0)}${user.lastName.charAt(0)}`}</AvatarFallback>
-                  </Avatar>
+                  <ProfileAvatar 
+                    profileImage={user.profileImage}
+                    firstName={user.firstName}
+                    lastName={user.lastName}
+                    size="lg"
+                    className="border-4 border-white"
+                  />
                   
                   <div>
                     <div className="flex items-center gap-2">
