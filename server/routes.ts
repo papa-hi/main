@@ -199,44 +199,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Serve profile images explicitly (to make consistent across environments)
-  app.use('/profile-images', (req, res, next) => {
-    // Security check to prevent directory traversal
-    if (req.path.includes('..')) {
-      return res.status(403).send('Forbidden');
-    }
-    next();
-  }, (req, res, next) => {
-    const profileImagesPath = path.join(process.cwd(), 'uploads', 'profile-images');
-    const filePath = path.join(profileImagesPath, req.path);
-    
-    // Add debug logging
-    console.log(`[PROFILE_IMAGE_SERVER] Request for: ${req.path}`);
-    console.log(`[PROFILE_IMAGE_SERVER] Full path: ${filePath}`);
-    
-    // Check if file exists before sending
-    if (fs.existsSync(filePath)) {
-      // Set cache control headers to prevent caching
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
+  // Serve images from database
+  app.get('/api/images/:filename', async (req, res) => {
+    try {
+      const filename = req.params.filename;
       
-      res.sendFile(filePath, (err) => {
-        if (err) {
-          console.error(`[PROFILE_IMAGE_SERVER] Error sending file: ${err.message}`);
-          next(err);
-        }
-      });
-    } else {
-      console.error(`[PROFILE_IMAGE_SERVER] File not found: ${filePath}`);
-      
-      // Send a default placeholder image instead of 404
-      const placeholderPath = path.join(process.cwd(), 'client', 'src', 'assets', 'default-avatar.png');
-      if (fs.existsSync(placeholderPath)) {
-        res.sendFile(placeholderPath);
-      } else {
-        res.status(404).send('Profile image not found');
+      // Security check to prevent directory traversal
+      if (filename.includes('..') || filename.includes('/')) {
+        return res.status(403).send('Forbidden');
       }
+      
+      console.log(`[DATABASE_IMAGE_SERVER] Request for: ${filename}`);
+      
+      // Fetch image from database
+      const imageRecord = await db.select().from(imageStorage).where(eq(imageStorage.filename, filename)).limit(1);
+      
+      if (imageRecord.length === 0) {
+        console.error(`[DATABASE_IMAGE_SERVER] Image not found: ${filename}`);
+        return res.status(404).send('Image not found');
+      }
+      
+      const image = imageRecord[0];
+      
+      // Convert base64 back to buffer
+      const imageBuffer = Buffer.from(image.dataBase64, 'base64');
+      
+      // Set appropriate headers
+      res.setHeader('Content-Type', image.mimeType);
+      res.setHeader('Content-Length', imageBuffer.length);
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+      
+      console.log(`[DATABASE_IMAGE_SERVER] Serving image: ${filename}, size: ${imageBuffer.length} bytes`);
+      
+      // Send the image
+      res.send(imageBuffer);
+    } catch (error) {
+      console.error(`[DATABASE_IMAGE_SERVER] Error serving image:`, error);
+      res.status(500).send('Error serving image');
     }
   });
   
@@ -708,6 +707,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Upload profile image
   app.post("/api/users/me/profile-image", isAuthenticated, upload.single('profileImage'), async (req: Request, res: Response) => {
+    console.log("REQUEST BODY for POST /api/users/me/profile-image:", req.body);
+    console.log("Auth check for profile endpoint:", req.url);
+    console.log("Is authenticated:", req.isAuthenticated());
+    console.log("User object:", req.user);
+    console.log("Session:", req.session);
+    
     try {
       const userId = req.user?.id;
       
@@ -719,28 +724,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No file uploaded" });
       }
       
-      // Get the current user to find the old profile image (if any)
-      const currentUser = await storage.getUserById(userId);
-      if (currentUser?.profileImage) {
-        // Extract filename from the URL if it exists and it's not an external URL
-        const oldFilename = currentUser.profileImage.split('/').pop();
-        if (oldFilename && !currentUser.profileImage.startsWith('http')) {
-          // Delete the old profile image
-          deleteProfileImage(oldFilename);
-        }
-      }
-      
-      // Get filename for the uploaded file
-      const filename = req.file.filename;
-      
-      // Use a simple, consistent format that will work across environments
-      // Just store the filename directly - simplest approach
-      const profileImageUrl = `/profile-images/${filename}`;
+      // Store image in database and get the filename
+      const filename = await storeImageInDatabase(req.file, userId, 'profile');
+      const profileImageUrl = `/api/images/${filename}`;
       
       console.log(`Profile image updated: ${filename}`);
       console.log(`Image stored at: ${profileImageUrl}`);
       
-      // Update the user's profile with just the relative URL to the image
+      // Update the user's profile with the database image URL
       const updatedUser = await storage.updateUser(userId, { 
         profileImage: profileImageUrl
       });
