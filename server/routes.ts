@@ -24,11 +24,9 @@ let playgroundImageCounter = 0;
 // Helper function to get a playground image with variety
 function getRandomPlaygroundImage(): string {
   const playgroundImages = [
-    "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1572571981886-11d52968eb11?q=80&w=500&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?q=80&w=500&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1596724878582-76f4a7a73e77?q=80&w=500&auto=format&fit=crop"
+    "/assets/playground2.png",
+    "/assets/playground3.png", 
+    "/assets/playground4.png"
   ];
   
   // Cycle through images sequentially to ensure variety
@@ -1534,17 +1532,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Name, latitude, and longitude are required" });
       }
       
-      // Define an array of high-quality playground images
-      const playgroundImages = [
-        "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-        "https://images.unsplash.com/photo-1572571981886-11d52968eb11?q=80&w=500&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?q=80&w=500&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1596724878582-76f4a7a73e77?q=80&w=500&auto=format&fit=crop"
-      ];
-      
-      // Select a random image from the array
-      const randomImageUrl = playgroundImages[Math.floor(Math.random() * playgroundImages.length)];
+      // Use the shared random playground image function
+      const randomImageUrl = getRandomPlaygroundImage();
       
       // Create a new place object
       const playgroundData = {
