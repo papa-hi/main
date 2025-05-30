@@ -95,6 +95,11 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
               <i className="fas fa-utensils text-primary mr-1"></i>
               {t('places.restaurant', 'Restaurant')}
             </>
+          ) : place.type === 'museum' ? (
+            <>
+              <i className="fas fa-university text-primary mr-1"></i>
+              {t('places.museum', 'Museums')}
+            </>
           ) : (
             <>
               <i className="fas fa-tree text-primary mr-1"></i>

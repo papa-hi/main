@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation as useGeoLocation } from "@/hooks/use-location";
 import { useTranslation } from "react-i18next";
 
-type PlaceType = "all" | "restaurant" | "playground";
+type PlaceType = "all" | "restaurant" | "playground" | "museum";
 
 export function NearbyPlaces() {
   const [location] = useLocation();
