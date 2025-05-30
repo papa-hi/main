@@ -7,6 +7,7 @@ import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useTranslation } from "react-i18next";
 
 export function NotificationSettings() {
+  console.log('📱 NOTIFICATION COMPONENT: Loading notification settings');
   const { t } = useTranslation();
   const {
     isSupported,
@@ -16,11 +17,23 @@ export function NotificationSettings() {
     subscribe,
     unsubscribe
   } = usePushNotifications();
+  
+  console.log('📱 NOTIFICATION COMPONENT: Hook state:', {
+    isSupported,
+    isSubscribed,
+    isLoading,
+    permission
+  });
 
   const handleToggleNotifications = async () => {
+    console.log('🎯 BUTTON CLICKED: Toggle notifications called');
+    console.log('🎯 CURRENT STATE:', { isSubscribed, isLoading });
+    
     if (isSubscribed) {
+      console.log('🔄 UNSUBSCRIBING...');
       await unsubscribe();
     } else {
+      console.log('🔄 SUBSCRIBING...');
       await subscribe();
     }
   };
