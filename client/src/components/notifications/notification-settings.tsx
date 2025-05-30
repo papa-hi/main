@@ -34,18 +34,18 @@ export function NotificationSettings() {
             {t('notifications.title', 'Push Notifications')}
           </CardTitle>
           <CardDescription>
-            {t('notifications.mobileSupport', 'Notifications may have limited support on mobile browsers.')}
+            {t('notifications.webviewLimitation', 'Notifications are not available in embedded browsers.')}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
-            <p className="text-sm text-blue-700 dark:text-blue-300 mb-2">
-              {t('notifications.mobileInstructions', 'To enable notifications on mobile:')}
+          <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-lg">
+            <p className="text-sm text-amber-700 dark:text-amber-300 mb-2">
+              {t('notifications.webviewInstructions', 'To enable notifications:')}
             </p>
-            <ol className="text-sm text-blue-600 dark:text-blue-400 list-decimal list-inside space-y-1">
-              <li>{t('notifications.mobileStep1', 'Check if your browser supports notifications')}</li>
-              <li>{t('notifications.mobileStep2', 'Look for notification settings in your browser menu')}</li>
-              <li>{t('notifications.mobileStep3', 'Try using the desktop version for full features')}</li>
+            <ol className="text-sm text-amber-600 dark:text-amber-400 list-decimal list-inside space-y-1">
+              <li>{t('notifications.openInBrowser', 'Open this app in Chrome browser directly')}</li>
+              <li>{t('notifications.copyUrl', 'Copy the URL and paste it in Chrome')}</li>
+              <li>{t('notifications.allowPermissions', 'Allow notifications when prompted in Chrome')}</li>
             </ol>
           </div>
         </CardContent>

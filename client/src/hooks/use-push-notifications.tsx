@@ -20,18 +20,22 @@ export function usePushNotifications() {
   });
 
   useEffect(() => {
-    // More lenient support detection for mobile browsers
+    // Detect if running in WebView vs full browser
+    const isWebView = navigator.userAgent.includes('wv') || 
+                     navigator.userAgent.includes('WebView') ||
+                     (window as any).navigator?.standalone === false;
     const hasNotification = 'Notification' in window;
     const hasServiceWorker = 'serviceWorker' in navigator;
     const hasPushManager = 'PushManager' in window;
     
-    // Support notifications if we have basic notification API
-    const isSupported = hasNotification && hasServiceWorker;
+    // In WebView, notifications are usually restricted
+    const isSupported = hasNotification && hasServiceWorker && !isWebView;
     
     console.log('Push notification support check:', {
       hasNotification,
       hasServiceWorker,
       hasPushManager,
+      isWebView,
       isSupported,
       userAgent: navigator.userAgent.substring(0, 100)
     });
