@@ -24,18 +24,14 @@ let playgroundImageCounter = 0;
 // Helper function to get a playground image with variety
 function getRandomPlaygroundImage(): string {
   const playgroundImages = [
-    "https://images.unsplash.com/photo-1551966775-a4ddc8df052b?q=80&w=500&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1680099567302-d1e26339a2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1572571981886-11d52968eb11?q=80&w=500&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?q=80&w=500&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1596724878582-76f4a7a73e77?q=80&w=500&auto=format&fit=crop"
+    "/playground1.png",
+    "/playground2.png", 
+    "/playground3.png",
+    "/playground4.png"
   ];
   
-  // Cycle through images sequentially to ensure variety
-  const selectedImage = playgroundImages[playgroundImageCounter % playgroundImages.length];
-  playgroundImageCounter++;
-  
-  return selectedImage;
+  // Randomly select one of the custom playground images
+  return playgroundImages[Math.floor(Math.random() * playgroundImages.length)];
 }
 
 // Middleware to check if user is authenticated
@@ -77,6 +73,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Setup admin routes
   setupAdminRoutes(app);
+
+  // Serve playground images as static files
+  app.get("/playground*.png", (req, res) => {
+    const path = require('path');
+    const filename = req.path.substring(1); // Remove leading slash
+    const imagePath = path.join(process.cwd(), filename);
+    res.sendFile(imagePath);
+  });
 
   // Image serving endpoint - serves images from database
   app.get("/api/images/:filename", async (req, res) => {
