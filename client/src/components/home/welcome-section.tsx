@@ -32,11 +32,11 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
     return () => clearInterval(timer);
   }, []);
 
-  // Rotate banner every 5 seconds
+  // Rotate banner every 10 seconds
   useEffect(() => {
     const bannerTimer = setInterval(() => {
       setCurrentBanner(prev => (prev === 3 ? 1 : prev + 1));
-    }, 5000);
+    }, 10000);
 
     return () => clearInterval(bannerTimer);
   }, []);
