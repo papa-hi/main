@@ -107,81 +107,81 @@ export function NotificationSettings() {
           </div>
         )}
 
-        {!isSubscribed && (
-          <div className="space-y-3">
-            <Button 
-              onClick={async () => {
-                try {
-                  // Mobile-specific notification setup
-                  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-                    alert('Push notifications are not supported on this device');
-                    return;
-                  }
-
-                  // Request permission first
-                  let permission = Notification.permission;
-                  if (permission === 'default') {
-                    permission = await Notification.requestPermission();
-                  }
-                  
-                  if (permission !== 'granted') {
-                    alert('Please allow notifications in your browser settings');
-                    return;
-                  }
-
-                  // Get service worker and subscribe
-                  const registration = await navigator.serviceWorker.ready;
-                  
-                  // Check if already subscribed
-                  const existingSubscription = await registration.pushManager.getSubscription();
-                  if (existingSubscription) {
-                    alert('Notifications are already enabled!');
-                    window.location.href = window.location.href;
-                    return;
-                  }
-
-                  // Get VAPID key and create subscription
-                  const vapidResponse = await fetch('/api/push/vapid-public-key');
-                  if (!vapidResponse.ok) throw new Error('Server error');
-                  
-                  const { publicKey } = await vapidResponse.json();
-                  if (!publicKey) throw new Error('No VAPID key');
-
-                  const subscription = await registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(publicKey)
-                  });
-
-                  // Save to server
-                  const saveResponse = await fetch('/api/push/subscribe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ subscription: subscription.toJSON() })
-                  });
-
-                  if (!saveResponse.ok) throw new Error('Failed to save');
-
-                  alert('Push notifications enabled! The page will now refresh.');
-                  setTimeout(() => {
-                    window.location.href = window.location.href;
-                  }, 1000);
-                  
-                } catch (error) {
-                  alert('Error: ' + (error instanceof Error ? error.message : 'Unknown error'));
+        <div className="space-y-3">
+          <Button 
+            onClick={async (e) => {
+              e.preventDefault();
+              console.log('Button clicked - starting notification setup');
+              try {
+                // Mobile-specific notification setup
+                if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                  alert('Push notifications are not supported on this device');
+                  return;
                 }
-              }}
-              className="w-full"
-            >
-              Enable Push Notifications
-            </Button>
-            
-            <div className="text-xs text-muted-foreground space-y-1">
-              <p>• You'll receive reminders before playdates</p>
-              <p>• Get notified when someone joins your activities</p>
-              <p>• Stay updated on playdate changes</p>
-            </div>
+
+                // Request permission first
+                let permission = Notification.permission;
+                if (permission === 'default') {
+                  permission = await Notification.requestPermission();
+                }
+                
+                if (permission !== 'granted') {
+                  alert('Please allow notifications in your browser settings');
+                  return;
+                }
+
+                // Get service worker and subscribe
+                const registration = await navigator.serviceWorker.ready;
+                
+                // Check if already subscribed
+                const existingSubscription = await registration.pushManager.getSubscription();
+                if (existingSubscription) {
+                  alert('Notifications are already enabled!');
+                  window.location.href = window.location.href;
+                  return;
+                }
+
+                // Get VAPID key and create subscription
+                const vapidResponse = await fetch('/api/push/vapid-public-key');
+                if (!vapidResponse.ok) throw new Error('Server error');
+                
+                const { publicKey } = await vapidResponse.json();
+                if (!publicKey) throw new Error('No VAPID key');
+
+                const subscription = await registration.pushManager.subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey: urlBase64ToUint8Array(publicKey)
+                });
+
+                // Save to server
+                const saveResponse = await fetch('/api/push/subscribe', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ subscription: subscription.toJSON() })
+                });
+
+                if (!saveResponse.ok) throw new Error('Failed to save');
+
+                alert('Push notifications enabled! The page will now refresh.');
+                setTimeout(() => {
+                  window.location.href = window.location.href;
+                }, 1000);
+                
+              } catch (error) {
+                alert('Error: ' + (error instanceof Error ? error.message : 'Unknown error'));
+              }
+            }}
+            className="w-full"
+          >
+            Enable Push Notifications
+          </Button>
+          
+          <div className="text-xs text-muted-foreground space-y-1">
+            <p>• You'll receive reminders before playdates</p>
+            <p>• Get notified when someone joins your activities</p>
+            <p>• Stay updated on playdate changes</p>
           </div>
-        )}
+        </div>
 
         {isSubscribed && (
           <div className="space-y-3">
