@@ -131,6 +131,10 @@ export function usePushNotifications() {
           isLoading: false,
           permission: 'granted'
         }));
+        // Force a page refresh on mobile to ensure UI updates
+        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+          setTimeout(() => window.location.reload(), 500);
+        }
       }, 100);
 
       return true;
