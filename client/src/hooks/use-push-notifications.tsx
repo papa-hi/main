@@ -114,7 +114,8 @@ export function usePushNotifications() {
       setState(prev => ({
         ...prev,
         isSubscribed: true,
-        isLoading: false
+        isLoading: false,
+        permission: 'granted'
       }));
 
       toast({
