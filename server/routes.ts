@@ -1021,6 +1021,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       await storage.joinPlaydate(userId, playdateId);
       
+      // Send notification to other participants about new joiner
+      await notifyNewParticipant(playdateId, userId);
+      
       // Get the updated playdate to return to client
       const updatedPlaydate = await storage.getUserPlaydates(userId);
       

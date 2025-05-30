@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { useTranslation } from "react-i18next";
+import { NotificationSettings } from "@/components/notifications/notification-settings";
 
 type EditProfileFormValues = {
   firstName: string;
@@ -650,9 +651,10 @@ export default function ProfilePage() {
       {/* Tabs for favorite places and created playdates */}
       <div className="mt-8">
         <Tabs defaultValue="playdates">
-          <TabsList className="w-full grid grid-cols-2">
+          <TabsList className="w-full grid grid-cols-3">
             <TabsTrigger value="playdates">{t('profile.myPlaydates', 'My Playdates')}</TabsTrigger>
             <TabsTrigger value="places">{t('profile.favoritePlaces', 'Favorite Places')}</TabsTrigger>
+            <TabsTrigger value="notifications">{t('profile.notifications', 'Notifications')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="playdates" className="mt-4">
@@ -779,6 +781,10 @@ export default function ProfilePage() {
                 </Button>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="notifications" className="mt-4">
+            <NotificationSettings />
           </TabsContent>
         </Tabs>
       </div>
