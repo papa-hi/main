@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import defaultAvatarPath from "@assets/avatar.png";
 
 interface ProfileAvatarProps {
   profileImage?: string | null;
@@ -52,7 +51,7 @@ export function ProfileAvatar({
         />
       ) : (
         <AvatarImage 
-          src={defaultAvatarPath} 
+          src="/avatar.png" 
           alt="Default avatar"
         />
       )}
