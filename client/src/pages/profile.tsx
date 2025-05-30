@@ -647,45 +647,6 @@ export default function ProfilePage() {
         </AlertDialogContent>
       </AlertDialog>
       
-      {/* Notification Settings */}
-      <div className="mt-8">
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold mb-4">Notificatie-instellingen</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Email herinneringen</p>
-                <p className="text-sm text-muted-foreground">Ontvang email herinneringen 24 uur voor je speelafspraken</p>
-              </div>
-              <div className="text-sm text-green-600">Ingeschakeld</div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Push notificaties</p>
-                <p className="text-sm text-muted-foreground">Ontvang browser notificaties voor updates</p>
-              </div>
-              <button 
-                className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                onClick={() => {
-                  // Initialize notification service
-                  import('@/lib/notifications').then(({ notificationService }) => {
-                    notificationService.initialize().then(() => {
-                      notificationService.requestPermission().then(granted => {
-                        if (granted) {
-                          notificationService.subscribeToPushNotifications();
-                        }
-                      });
-                    });
-                  });
-                }}
-              >
-                Inschakelen
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Tabs for favorite places and created playdates */}
       <div className="mt-8">
         <Tabs defaultValue="playdates">

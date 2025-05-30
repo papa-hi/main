@@ -418,33 +418,3 @@ export const insertRatingSchema = createInsertSchema(ratings).pick({
 // Rating type definitions
 export type InsertRating = z.infer<typeof insertRatingSchema>;
 export type Rating = typeof ratings.$inferSelect;
-
-// Push notification subscriptions
-export const pushSubscriptions = pgTable("push_subscriptions", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
-  endpoint: text("endpoint").notNull(),
-  p256dh: text("p256dh").notNull(),
-  auth: text("auth").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-}, (table) => ({
-  uniqueUserEndpoint: unique().on(table.userId, table.endpoint),
-}));
-
-// Push subscription relations
-export const pushSubscriptionsRelations = relations(pushSubscriptions, ({ one }) => ({
-  user: one(users, {
-    fields: [pushSubscriptions.userId],
-    references: [users.id],
-  }),
-}));
-
-// Push subscription schemas
-export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions).pick({
-  endpoint: true,
-  p256dh: true,
-  auth: true,
-});
-
-export type InsertPushSubscription = z.infer<typeof insertPushSubscriptionSchema>;
-export type PushSubscription = typeof pushSubscriptions.$inferSelect;
