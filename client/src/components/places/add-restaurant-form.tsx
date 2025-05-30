@@ -89,7 +89,7 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
         latitude: data.latitude.toString(),
         longitude: data.longitude.toString(),
         features: data.features,
-        imageUrl: data.imageUrl || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&h=160&q=80",
+        // imageUrl is now handled by the server with random restaurant images
       };
 
       const response = await apiRequest('POST', '/api/places', restaurantData);

@@ -20,6 +20,8 @@ import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified
 
 // Counter to track which playground image to use next
 let playgroundImageCounter = 0;
+// Counter to track which restaurant image to use next
+let restaurantImageCounter = 0;
 
 // Helper function to get a playground image with variety
 function getRandomPlaygroundImage(): string {
@@ -32,6 +34,22 @@ function getRandomPlaygroundImage(): string {
   // Cycle through images sequentially to ensure variety
   const selectedImage = playgroundImages[playgroundImageCounter % playgroundImages.length];
   playgroundImageCounter++;
+  
+  return selectedImage;
+}
+
+// Helper function to get a restaurant image with variety
+function getRandomRestaurantImage(): string {
+  const restaurantImages = [
+    "/assets/restaurant1.png",
+    "/assets/restaurant2.png", 
+    "/assets/restaurant3.png",
+    "/assets/restaurant4.png"
+  ];
+  
+  // Cycle through images sequentially to ensure variety
+  const selectedImage = restaurantImages[restaurantImageCounter % restaurantImages.length];
+  restaurantImageCounter++;
   
   return selectedImage;
 }
@@ -1662,7 +1680,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         longitude: req.body.longitude.toString(),
         imageUrl: req.body.imageUrl || (
           req.body.type === 'restaurant' 
-            ? "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+            ? getRandomRestaurantImage()
             : getRandomPlaygroundImage()
         ),
         features: req.body.features || [],
@@ -1711,22 +1729,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get the uploaded image file, if any
       let imageUrl = '';
       
-      // For restaurants, we still accept file uploads
-      // For playgrounds, we use random images instead
+      // Use custom images for both restaurants and playgrounds
       if (req.body.type === 'playground') {
         // Use a random playground image
         imageUrl = getRandomPlaygroundImage();
         console.log(`Using random playground image: ${imageUrl}`);
-      } else if (req.file) {
-        // Create a proper URL to the uploaded file (for restaurants)
-        const filename = req.file.filename;
-        imageUrl = `/uploads/place-images/${filename}`;
-        console.log(`Restaurant image uploaded: ${filename}`);
-        console.log(`Image URL: ${imageUrl}`);
+      } else if (req.body.type === 'restaurant') {
+        if (req.file) {
+          // Create a proper URL to the uploaded file if user uploaded one
+          const filename = req.file.filename;
+          imageUrl = `/uploads/place-images/${filename}`;
+          console.log(`Restaurant image uploaded: ${filename}`);
+          console.log(`Image URL: ${imageUrl}`);
+        } else {
+          // Use a random restaurant image if no file uploaded
+          imageUrl = getRandomRestaurantImage();
+          console.log(`No image uploaded for restaurant, using random restaurant image: ${imageUrl}`);
+        }
       } else {
-        // Fallback image for restaurants if no file uploaded
-        imageUrl = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
-        console.log(`No image uploaded for restaurant, using fallback image`);
+        // For other types (museum, etc.), still allow file uploads
+        if (req.file) {
+          const filename = req.file.filename;
+          imageUrl = `/uploads/place-images/${filename}`;
+        } else {
+          imageUrl = getRandomRestaurantImage(); // Default fallback
+        }
       }
       
       // Parse features if they were sent as a JSON string (from FormData)
