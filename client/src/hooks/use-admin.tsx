@@ -103,9 +103,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery({
     queryKey: ["/api/admin/users"],
     queryFn: async () => {
-      const res = await apiRequest("/api/admin/users", {
-        method: "GET",
-      });
+      const res = await apiRequest("GET", "/api/admin/users");
       if (!res.ok) throw new Error("Failed to fetch users");
       return await res.json();
     },
@@ -121,14 +119,17 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery<UserStats>({
     queryKey: ["/api/admin/stats/users"],
     queryFn: async () => {
-      const res = await apiRequest("/api/admin/stats/users", {
-        method: "GET",
-      });
+      const res = await apiRequest("GET", "/api/admin/stats/users");
       if (!res.ok) throw new Error("Failed to fetch user stats");
       return await res.json();
     },
-    enabled: !!user,
-    retry: false,
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to load user statistics: ${error.message}`,
+        variant: "destructive",
+      });
+    },
   });
 
   // Page stats query
@@ -139,14 +140,17 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery<PageStat[]>({
     queryKey: ["/api/admin/stats/pages"],
     queryFn: async () => {
-      const res = await apiRequest("/api/admin/stats/pages", {
-        method: "GET",
-      });
+      const res = await apiRequest("GET", "/api/admin/stats/pages");
       if (!res.ok) throw new Error("Failed to fetch page stats");
       return await res.json();
     },
-    enabled: !!user,
-    retry: false,
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to load page statistics: ${error.message}`,
+        variant: "destructive",
+      });
+    },
   });
 
   // Feature stats query
@@ -157,14 +161,17 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery<FeatureStat[]>({
     queryKey: ["/api/admin/stats/features"],
     queryFn: async () => {
-      const res = await apiRequest("/api/admin/stats/features", {
-        method: "GET",
-      });
+      const res = await apiRequest("GET", "/api/admin/stats/features");
       if (!res.ok) throw new Error("Failed to fetch feature stats");
       return await res.json();
     },
-    enabled: !!user,
-    retry: false,
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to load feature statistics: ${error.message}`,
+        variant: "destructive",
+      });
+    },
   });
 
   // Activity logs query
@@ -175,14 +182,17 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery<UserActivity[]>({
     queryKey: ["/api/admin/activity"],
     queryFn: async () => {
-      const res = await apiRequest("/api/admin/activity", {
-        method: "GET",
-      });
+      const res = await apiRequest("GET", "/api/admin/activity");
       if (!res.ok) throw new Error("Failed to fetch activity logs");
       return await res.json();
     },
-    enabled: !!user,
-    retry: false,
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to load activity logs: ${error.message}`,
+        variant: "destructive",
+      });
+    },
   });
 
   // Admin logs query
@@ -193,24 +203,23 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery<AdminLog[]>({
     queryKey: ["/api/admin/logs"],
     queryFn: async () => {
-      const res = await apiRequest("/api/admin/logs", {
-        method: "GET",
-      });
+      const res = await apiRequest("GET", "/api/admin/logs");
       if (!res.ok) throw new Error("Failed to fetch admin logs");
       return await res.json();
     },
-    enabled: !!user,
-    retry: false,
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to load admin logs: ${error.message}`,
+        variant: "destructive",
+      });
+    },
   });
 
   // Change user role mutation
   const changeUserRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: number; role: string }) => {
-      const res = await apiRequest(`/api/admin/users/${userId}/role`, { 
-        method: "PATCH", 
-        body: JSON.stringify({ role }), 
-        headers: { 'Content-Type': 'application/json' } 
-      });
+      const res = await apiRequest("PATCH", `/api/admin/users/${userId}/role`, { role });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || "Failed to change user role");
@@ -237,7 +246,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      const res = await apiRequest(`/api/admin/users/${userId}`, { method: "DELETE" });
+      const res = await apiRequest("DELETE", `/api/admin/users/${userId}`);
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || "Failed to delete user");
@@ -294,7 +303,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         isDeleting: deleteUserMutation.isPending,
         
         // Stats
-        userStats: userStats || null,
+        userStats,
         isLoadingUserStats,
         pageStats,
         isLoadingPageStats,

@@ -34,13 +34,13 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
   const timeRange = `${formatTime(startDate)} - ${formatTime(endDate)}`;
   
   // Check if current user is a participant
-  const isParticipating = playdate.participants?.some(p => p.id === user?.id) || false;
+  const isParticipating = playdate.participants.some(p => p.id === user?.id);
   
   // Check if playdate is at max capacity
-  const isAtMaxCapacity = (playdate.participants?.length || 0) >= playdate.maxParticipants;
+  const isAtMaxCapacity = playdate.participants.length >= playdate.maxParticipants;
   
   // Check if current user is the creator (first participant)
-  const isCreator = playdate.participants?.[0]?.id === user?.id;
+  const isCreator = playdate.participants[0]?.id === user?.id;
   
   const handleDelete = async () => {
     if (confirm(t('playdates.confirmDelete', 'Are you sure you want to delete this playdate?'))) {
@@ -82,7 +82,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
     setIsJoining(true);
     
     try {
-      await apiRequest(`/api/playdates/${playdate.id}/join`, { method: 'POST' });
+      await apiRequest('POST', `/api/playdates/${playdate.id}/join`);
       
       // Invalidate queries to refetch playdates
       queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
@@ -110,7 +110,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
       setIsLeaving(true);
       
       try {
-        await apiRequest(`/api/playdates/${playdate.id}/join`, { method: 'DELETE' });
+        await apiRequest('DELETE', `/api/playdates/${playdate.id}/join`);
         
         // Invalidate queries to refetch playdates
         queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
@@ -160,7 +160,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
           </div>
           <div className="flex items-center mb-3">
             <div className="flex space-x-1 mr-3">
-              {(playdate.participants || []).map((participant, index) => {
+              {playdate.participants.map((participant, index) => {
                 if (index < 2) {
                   return (
                     <img 
@@ -174,14 +174,14 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
                 } 
                 return null;
               })}
-              {(playdate.participants || []).length > 2 && (
+              {playdate.participants.length > 2 && (
                 <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs text-primary font-medium cursor-pointer hover:bg-primary/20 transition-colors duration-300 hover:scale-110 transform">
-                  +{(playdate.participants || []).length - 2}
+                  +{playdate.participants.length - 2}
                 </div>
               )}
             </div>
             <span className="text-xs text-dark/60">
-              {(playdate.participants || []).length} / {playdate.maxParticipants} {t('playdates.participants', 'deelnemers')}
+              {playdate.participants.length} / {playdate.maxParticipants} {t('playdates.participants', 'deelnemers')}
             </span>
           </div>
           

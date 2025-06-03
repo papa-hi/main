@@ -1,8 +1,5 @@
 import type { Request, Response, NextFunction, Express } from "express";
 import { storage } from "./storage";
-import { db } from "./db";
-import { places } from "@shared/schema";
-import { desc } from "drizzle-orm";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 
@@ -34,7 +31,8 @@ export const logAdminAction = async (
       action,
       details,
       adminId,
-      ipAddress
+      ipAddress,
+      timestamp: new Date()
     });
   } catch (error) {
     console.error("Error logging admin action:", error);
@@ -57,7 +55,8 @@ export const logUserActivity = async (
       userId,
       details,
       ipAddress,
-      userAgent
+      userAgent,
+      timestamp: new Date()
     });
   } catch (error) {
     console.error("Error logging user activity:", error);
@@ -82,7 +81,8 @@ export const logPageView = async (
       ipAddress,
       userAgent,
       duration,
-      referrer
+      referrer,
+      timestamp: new Date()
     });
   } catch (error) {
     console.error("Error logging page view:", error);
@@ -101,7 +101,8 @@ export const logFeatureUsage = async (
       feature,
       action,
       userId,
-      details
+      details,
+      timestamp: new Date()
     });
   } catch (error) {
     console.error("Error logging feature usage:", error);
@@ -271,18 +272,9 @@ export function setupAdminRoutes(app: Express) {
   // Places management routes
   app.get('/api/admin/places', isAdmin, async (req: Request, res: Response) => {
     try {
-      // Force use of database query to get accurate place count
-      const placesData = await db.select().from(places).orderBy(desc(places.rating));
-      
-      // Add distance and isSaved properties for compatibility
-      const placesWithMetadata = placesData.map(place => ({
-        ...place,
-        distance: 0,
-        isSaved: false
-      }));
-      
-      await logAdminAction("View places list", { count: placesWithMetadata.length }, req);
-      res.json(placesWithMetadata);
+      const places = await storage.getPlaces({});
+      await logAdminAction("View places list", { count: places.length }, req);
+      res.json(places);
     } catch (error) {
       console.error("Error fetching places:", error);
       res.status(500).json({ error: "Failed to fetch places" });

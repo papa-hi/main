@@ -17,7 +17,6 @@ import crypto from "crypto";
 import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate } from "./push-notifications";
 import { pushSubscriptions } from "@shared/schema";
 import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified } from "./notification-scheduler";
-import { logUserActivity, logPageView, logFeatureUsage } from "./admin";
 
 // Helper function to geocode address and get coordinates
 async function geocodeAddress(address: string): Promise<{ latitude: number; longitude: number } | null> {
@@ -365,11 +364,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all users from storage, limiting what data is returned
       const users = await storage.getAllUsers();
       
-      // Log user activity
-      await logUserActivity("View users directory", { 
-        totalUsers: users.length 
-      }, req);
-      
       // Filter out sensitive information
       const safeUsers = users.map(user => {
         const userWithoutSensitive = { ...user } as Partial<SelectUser>;
@@ -643,7 +637,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const users = await storage.getAllUsers();
+      const users = await storage.getAllUsers(searchParams);
       
       // Remove sensitive information
       const sanitizedUsers = users.map(user => {
@@ -828,12 +822,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/playdates/upcoming", async (req, res) => {
     try {
       const upcomingPlaydates = await storage.getUpcomingPlaydates();
-      
-      // Log user activity
-      if (req.user?.id) {
-        await logUserActivity("View upcoming playdates", { count: upcomingPlaydates.length }, req);
-      }
-      
       res.json(upcomingPlaydates);
     } catch (err) {
       console.error("Error fetching upcoming playdates:", err);
@@ -922,14 +910,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Playdate not found" });
       }
       
-      // Log user activity
-      if (req.user?.id) {
-        await logUserActivity("View playdate details", { 
-          playdateId: playdateId, 
-          title: playdate.title 
-        }, req);
-      }
-      
       res.json(playdate);
     } catch (err) {
       console.error("Error fetching playdate:", err);
@@ -977,19 +957,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const validPlaydate = insertPlaydateSchema.parse(playdateData);
         console.log("Validated playdate data:", validPlaydate);
         
-        // Geocode the location to get coordinates
-        let coordinates = null;
-        if (validPlaydate.location) {
-          coordinates = await geocodeAddress(validPlaydate.location);
-          console.log("Geocoded coordinates for location:", validPlaydate.location, coordinates);
-        }
-        
-        // Create the playdate with coordinates
+        // Create the playdate
         const playdateDataWithCreator = {
           ...validPlaydate,
-          creatorId,
-          latitude: coordinates ? coordinates.latitude.toString() : "0",
-          longitude: coordinates ? coordinates.longitude.toString() : "0"
+          creatorId
         };
         
         console.log("REGULAR ENDPOINT: Final playdate data with creatorId:", playdateDataWithCreator);
@@ -1591,7 +1562,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const playdates = await storage.getUpcomingPlaydates();
+      const playdates = await storage.getUpcomingPlaydates(searchParams);
       res.json(playdates);
     } catch (error) {
       console.error("Error searching playdates:", error);

@@ -6,7 +6,6 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
-import { logUserActivity } from "./admin";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 
@@ -129,15 +128,8 @@ export function setupAuth(app: Express) {
       if (err) return next(err);
       if (!user) return res.status(401).json({ error: "Invalid username or password" });
       
-      req.login(user, async (loginErr) => {
+      req.login(user, (loginErr) => {
         if (loginErr) return next(loginErr);
-        
-        // Update last login time
-        await storage.updateUserLastLogin(user.id);
-        
-        // Log user activity
-        await logUserActivity("User login", { method: "local" }, req);
-        
         const userWithoutPassword = { ...user } as Partial<SelectUser>;
         delete userWithoutPassword.password;
         res.status(200).json(userWithoutPassword);
@@ -216,17 +208,11 @@ export function setupAuth(app: Express) {
       }
       
       // Log the user in
-      req.login(user, async (err) => {
+      req.login(user, (err) => {
         if (err) {
           console.error("Error logging in user:", err);
           return res.status(500).json({ error: "Failed to log in" });
         }
-        
-        // Update last login time
-        await storage.updateUserLastLogin(user.id);
-        
-        // Log user activity
-        await logUserActivity("User login", { method: "firebase" }, req);
         
         console.log("User logged in successfully:", user.id);
         const userWithoutPassword = { ...user } as Partial<SelectUser>;

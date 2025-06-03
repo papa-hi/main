@@ -16,12 +16,12 @@ import { Edit, Trash2, MapPin, Star, Users } from "lucide-react";
 
 // Component to show real rating data for each place
 function PlaceRatingDisplay({ placeId }: { placeId: number }) {
-  const { data: ratingData } = useQuery<{ averageRating: number; totalRatings: string }>({
+  const { data: ratingData } = useQuery({
     queryKey: [`/api/places/${placeId}/rating`],
   });
 
   const averageRating = ratingData?.averageRating ? (ratingData.averageRating / 20).toFixed(1) : "0.0";
-  const totalRatings = ratingData?.totalRatings || "0";
+  const totalRatings = ratingData?.totalRatings || 0;
 
   return (
     <div className="flex items-center gap-4 text-sm">
@@ -51,14 +51,6 @@ export function PlacesManagement() {
   // Fetch all places
   const { data: places = [], isLoading } = useQuery<Place[]>({
     queryKey: ["/api/admin/places"],
-    queryFn: async () => {
-      const res = await apiRequest("/api/admin/places", {
-        method: "GET",
-      });
-      if (!res.ok) throw new Error("Failed to fetch places");
-      return await res.json();
-    },
-    retry: false,
   });
 
   // Edit place mutation

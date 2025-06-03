@@ -32,17 +32,17 @@ export default function PlaydateDetailPage() {
   });
 
   // Check if user has already joined
-  const hasJoined = user && playdate?.participants?.some(p => p.id === user.id);
+  const hasJoined = user && playdate?.participants.some(p => p.id === user.id);
   // Check if user is the creator (first participant)
-  const isCreator = user && playdate?.participants?.[0]?.id === user.id;
+  const isCreator = user && playdate?.participants[0]?.id === user.id;
   // Check if playdate is full
-  const isFull = playdate && (playdate.participants || []).length >= playdate.maxParticipants;
+  const isFull = playdate && playdate.participants.length >= playdate.maxParticipants;
 
   // Handle join playdate
   const joinPlaydateMutation = useMutation({
     mutationFn: async () => {
       setIsJoining(true);
-      const res = await apiRequest(`/api/playdates/${playdateId}/join`, { method: "POST" });
+      const res = await apiRequest("POST", `/api/playdates/${playdateId}/join`);
       setIsJoining(false);
       return await res.json();
     },
@@ -68,7 +68,7 @@ export default function PlaydateDetailPage() {
   const leavePlaydateMutation = useMutation({
     mutationFn: async () => {
       setIsLeaving(true);
-      const res = await apiRequest(`/api/playdates/${playdateId}/leave`, { method: "POST" });
+      const res = await apiRequest("POST", `/api/playdates/${playdateId}/leave`);
       setIsLeaving(false);
       return await res.json();
     },
