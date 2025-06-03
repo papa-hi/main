@@ -103,7 +103,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery({
     queryKey: ["/api/admin/users"],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/admin/users");
+      const res = await apiRequest("/api/admin/users", {
+        method: "GET",
+      });
       if (!res.ok) throw new Error("Failed to fetch users");
       return await res.json();
     },
@@ -119,17 +121,14 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery<UserStats>({
     queryKey: ["/api/admin/stats/users"],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/admin/stats/users");
+      const res = await apiRequest("/api/admin/stats/users", {
+        method: "GET",
+      });
       if (!res.ok) throw new Error("Failed to fetch user stats");
       return await res.json();
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to load user statistics: ${error.message}`,
-        variant: "destructive",
-      });
-    },
+    enabled: !!user,
+    retry: false,
   });
 
   // Page stats query
