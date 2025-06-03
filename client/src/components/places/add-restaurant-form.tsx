@@ -92,7 +92,14 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
         // imageUrl is now handled by the server with random restaurant images
       };
 
-      const response = await apiRequest('POST', '/api/places', restaurantData);
+      const response = await apiRequest('/api/places', {
+        method: 'POST',
+        body: JSON.stringify(restaurantData),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add restaurant');
+      }
       return await response.json();
     },
     onSuccess: () => {
