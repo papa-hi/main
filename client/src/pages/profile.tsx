@@ -223,7 +223,7 @@ export default function ProfilePage() {
     
     try {
       // First update the profile data via the regular API
-      await apiRequest('PATCH', '/api/users/me', data);
+      await apiRequest('/api/users/me', { method: 'PATCH', body: JSON.stringify(data) });
       
       // If there's a profile image, upload it
       if (profileImage) {

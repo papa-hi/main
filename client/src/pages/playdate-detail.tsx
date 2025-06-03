@@ -42,7 +42,7 @@ export default function PlaydateDetailPage() {
   const joinPlaydateMutation = useMutation({
     mutationFn: async () => {
       setIsJoining(true);
-      const res = await apiRequest("POST", `/api/playdates/${playdateId}/join`);
+      const res = await apiRequest(`/api/playdates/${playdateId}/join`, { method: "POST" });
       setIsJoining(false);
       return await res.json();
     },
@@ -68,7 +68,7 @@ export default function PlaydateDetailPage() {
   const leavePlaydateMutation = useMutation({
     mutationFn: async () => {
       setIsLeaving(true);
-      const res = await apiRequest("POST", `/api/playdates/${playdateId}/leave`);
+      const res = await apiRequest(`/api/playdates/${playdateId}/leave`, { method: "POST" });
       setIsLeaving(false);
       return await res.json();
     },
