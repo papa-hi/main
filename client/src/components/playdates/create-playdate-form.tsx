@@ -52,17 +52,19 @@ export function CreatePlaydateForm({
   });
 
   const createPlaydateMutation = useMutation({
-    mutationFn: (data: CreatePlaydateFormData) => 
-      apiRequest("/api/playdates", {
+    mutationFn: async (data: CreatePlaydateFormData) => {
+      const response = await apiRequest("/api/playdates", {
         method: "POST",
         body: JSON.stringify({
           ...data,
-          latitude: parseFloat(data.latitude) || 0,
-          longitude: parseFloat(data.longitude) || 0,
+          latitude: data.latitude || "0",
+          longitude: data.longitude || "0",
           startTime: new Date(data.startTime).toISOString(),
           endTime: new Date(data.endTime).toISOString(),
         }),
-      }),
+      });
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/playdates"] });
       toast({
