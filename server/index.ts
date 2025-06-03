@@ -92,12 +92,16 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    console.error(`Error ${status} on ${req.method} ${req.path}:`, err);
+    
+    // Only send response if headers haven't been sent
+    if (!res.headersSent) {
+      res.status(status).json({ error: message });
+    }
   });
 
   // importantly only setup vite in development and after
