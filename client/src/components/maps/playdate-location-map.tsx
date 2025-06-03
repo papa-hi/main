@@ -65,40 +65,24 @@ function FitBounds({ playdateCoords, userCoords }: {
   return null;
 }
 
-// Function to get coordinates from places database or extract from location string
-async function getLocationCoordinates(location: string): Promise<[number, number] | null> {
-  // First, try to extract embedded coordinates from format "Location [lat,lng]"
-  const coordMatch = location.match(/\[([^,]+),([^\]]+)\]/);
-  if (coordMatch) {
-    const lat = parseFloat(coordMatch[1]);
-    const lng = parseFloat(coordMatch[2]);
-    if (!isNaN(lat) && !isNaN(lng)) {
-      return [lat, lng];
-    }
-  }
-  
-  // If no embedded coordinates, try to find the place in the database
+// Function to geocode address using OpenStreetMap Nominatim API
+async function geocodeAddress(address: string): Promise<[number, number] | null> {
   try {
-    // Extract place name from location (typically the first part before comma)
-    const placeName = location.split(',')[0].trim();
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=nl`
+    );
+    const data = await response.json();
     
-    // Search for the place in the database
-    const response = await fetch(`/api/places/search?q=${encodeURIComponent(placeName)}`);
-    const places = await response.json();
-    
-    if (places && places.length > 0) {
-      const place = places[0];
-      const lat = parseFloat(place.latitude);
-      const lng = parseFloat(place.longitude);
-      if (!isNaN(lat) && !isNaN(lng)) {
-        return [lat, lng];
-      }
+    if (data && data.length > 0) {
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+      return [lat, lon];
     }
   } catch (error) {
-    console.error('Error fetching place coordinates:', error);
+    console.error('Geocoding error:', error);
   }
   
-  // Default to Amsterdam center if all else fails
+  // Default to Amsterdam center if geocoding fails
   return [52.3676, 4.9041];
 }
 
@@ -130,10 +114,10 @@ export function PlaydateLocationMap({ location, title, className = "h-64" }: Pla
   const [isGeocoding, setIsGeocoding] = useState(false);
 
   useEffect(() => {
-    // Get playdate location coordinates
+    // Geocode playdate location coordinates
     const loadCoordinates = async () => {
       setIsGeocoding(true);
-      const coords = await getLocationCoordinates(location);
+      const coords = await geocodeAddress(location);
       setPlaydateCoords(coords);
       setIsGeocoding(false);
     };
