@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { nl, enUS, de, es, fr } from "date-fns/locale";
 import type { Locale } from "date-fns";
 import { apiRequest } from "@/lib/queryClient";
+import { PlaydateLocationMap } from "@/components/maps/playdate-location-map";
 
 export default function PlaydateDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -261,6 +262,16 @@ export default function PlaydateDetailPage() {
               </div>
             </div>
           </div>
+        </div>
+        
+        {/* Location Map */}
+        <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+          <h2 className="text-lg font-heading font-medium mb-4">{t('playdates.location', 'Location')}</h2>
+          <PlaydateLocationMap 
+            location={playdate.location}
+            title={playdate.title}
+            className="h-64"
+          />
         </div>
         
         <div className="bg-white rounded-xl p-6 shadow-sm">
