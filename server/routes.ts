@@ -18,6 +18,27 @@ import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPl
 import { pushSubscriptions } from "@shared/schema";
 import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified } from "./notification-scheduler";
 
+// Helper function to geocode address and get coordinates
+async function geocodeAddress(address: string): Promise<{ latitude: number; longitude: number } | null> {
+  try {
+    if (!address || address.trim() === '') return null;
+    
+    const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=nl`;
+    const response = await fetch(geocodeUrl);
+    const data = await response.json();
+
+    if (data && data.length > 0) {
+      return {
+        latitude: parseFloat(data[0].lat),
+        longitude: parseFloat(data[0].lon)
+      };
+    }
+  } catch (error) {
+    console.error('Geocoding error:', error);
+  }
+  return null;
+}
+
 // Counter to track which playground image to use next
 let playgroundImageCounter = 0;
 // Counter to track which restaurant image to use next
@@ -1221,8 +1242,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Update the place with new coordinates
         const updatedPlace = await storage.updatePlace(placeId, {
-          latitude: lat,
-          longitude: lon
+          latitude: lat.toString(),
+          longitude: lon.toString()
         });
 
         res.json({
@@ -1842,14 +1863,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Type must be either 'restaurant', 'playground', or 'museum'" });
       }
       
+      // Auto-geocode coordinates if they are 0 or missing but address is provided
+      let latitude = parseFloat(req.body.latitude) || 0;
+      let longitude = parseFloat(req.body.longitude) || 0;
+      
+      if ((latitude === 0 || longitude === 0) && req.body.address) {
+        console.log(`Auto-geocoding address: ${req.body.address}`);
+        const coords = await geocodeAddress(req.body.address);
+        if (coords) {
+          latitude = coords.latitude;
+          longitude = coords.longitude;
+          console.log(`Geocoded coordinates: ${latitude}, ${longitude}`);
+        }
+      }
+
       // Create a new place object
       const placeData = {
         name: req.body.name,
         type: req.body.type,
         description: req.body.description || "",
         address: req.body.address || "",
-        latitude: req.body.latitude.toString(),
-        longitude: req.body.longitude.toString(),
+        latitude: latitude.toString(),
+        longitude: longitude.toString(),
         imageUrl: req.body.imageUrl || (
           req.body.type === 'restaurant' 
             ? getRandomRestaurantImage()
@@ -1956,14 +1991,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Auto-geocode coordinates if they are 0 or missing but address is provided
+      let latitude = parseFloat(req.body.latitude) || 0;
+      let longitude = parseFloat(req.body.longitude) || 0;
+      
+      if ((latitude === 0 || longitude === 0) && req.body.address) {
+        console.log(`Auto-geocoding address: ${req.body.address}`);
+        const coords = await geocodeAddress(req.body.address);
+        if (coords) {
+          latitude = coords.latitude;
+          longitude = coords.longitude;
+          console.log(`Geocoded coordinates: ${latitude}, ${longitude}`);
+        }
+      }
+      
       // Create a new place object
       const placeData = {
         name: req.body.name,
         type: req.body.type,
         description: req.body.description || "",
         address: req.body.address || "",
-        latitude: req.body.latitude.toString(),
-        longitude: req.body.longitude.toString(),
+        latitude: latitude.toString(),
+        longitude: longitude.toString(),
         imageUrl: imageUrl,
         features: features,
       };
