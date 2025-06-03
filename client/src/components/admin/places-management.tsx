@@ -16,12 +16,12 @@ import { Edit, Trash2, MapPin, Star, Users } from "lucide-react";
 
 // Component to show real rating data for each place
 function PlaceRatingDisplay({ placeId }: { placeId: number }) {
-  const { data: ratingData } = useQuery({
+  const { data: ratingData } = useQuery<{ averageRating: number; totalRatings: string }>({
     queryKey: [`/api/places/${placeId}/rating`],
   });
 
   const averageRating = ratingData?.averageRating ? (ratingData.averageRating / 20).toFixed(1) : "0.0";
-  const totalRatings = ratingData?.totalRatings || 0;
+  const totalRatings = ratingData?.totalRatings || "0";
 
   return (
     <div className="flex items-center gap-4 text-sm">
