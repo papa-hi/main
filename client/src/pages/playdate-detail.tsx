@@ -32,11 +32,11 @@ export default function PlaydateDetailPage() {
   });
 
   // Check if user has already joined
-  const hasJoined = user && playdate?.participants.some(p => p.id === user.id);
+  const hasJoined = user && playdate?.participants?.some(p => p.id === user.id);
   // Check if user is the creator (first participant)
-  const isCreator = user && playdate?.participants[0]?.id === user.id;
+  const isCreator = user && playdate?.participants?.[0]?.id === user.id;
   // Check if playdate is full
-  const isFull = playdate && playdate.participants.length >= playdate.maxParticipants;
+  const isFull = playdate && (playdate.participants || []).length >= playdate.maxParticipants;
 
   // Handle join playdate
   const joinPlaydateMutation = useMutation({

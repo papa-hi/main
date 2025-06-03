@@ -1,0 +1,68 @@
+2
+playdate-card.tsx:163 Uncaught TypeError: Cannot read properties of undefined (reading 'map')
+    at PlaydateCard (playdate-card.tsx:163:38)
+
+2
+playdate-card.tsx:163 Uncaught TypeError: Cannot read properties of undefined (reading 'map')
+    at PlaydateCard (playdate-card.tsx:163:38)
+chunk-RPCDYKBN.js?v=c1727640:14032 The above error occurred in the <PlaydateCard> component:
+
+    at PlaydateCard (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/playdate-card.tsx:32:32)
+    at div
+    at section
+    at UpcomingPlaydates (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/home/upcoming-playdates.tsx:25:17)
+    at div
+    at HomePage (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/pages/home.tsx:29:21)
+    at Route (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c1727640:323:16)
+    at ProtectedRoute (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/lib/protected-route.tsx:23:3)
+    at Switch (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c1727640:379:17)
+    at Router (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=2advr4gRyAhR1OYyzTOH_:52:20)
+    at main
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:22:32)
+    at AdminProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-admin.tsx:27:33)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at FirebaseAuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-firebase-auth.tsx:23:40)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=c1727640:2805:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=2advr4gRyAhR1OYyzTOH_:176:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=2advr4gRyAhR1OYyzTOH_:25:3)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundaryClass.
+error-boundary.tsx:28 Error boundary caught an error: TypeError: Cannot read properties of undefined (reading 'map')
+    at PlaydateCard (playdate-card.tsx:163:38)
+ 
+{componentStack: '\n    at PlaydateCard (https://04661828-2b6e-42fa-a…/theme-provider.tsx?v=2advr4gRyAhR1OYyzTOH_:25:3)'}
+chunk-RPCDYKBN.js?v=c1727640:14032 The above error occurred in the <PlaydateCard> component:
+
+    at PlaydateCard (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/playdate-card.tsx:32:32)
+    at div
+    at section
+    at UpcomingPlaydates (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/home/upcoming-playdates.tsx:25:17)
+    at div
+    at HomePage (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/pages/home.tsx:29:21)
+    at Route (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c1727640:323:16)
+    at ProtectedRoute (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/lib/protected-route.tsx:23:3)
+    at Switch (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c1727640:379:17)
+    at Router (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=2advr4gRyAhR1OYyzTOH_:52:20)
+    at main
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:22:32)
+    at AdminProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-admin.tsx:27:33)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at FirebaseAuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-firebase-auth.tsx:23:40)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=c1727640:2805:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=2advr4gRyAhR1OYyzTOH_:176:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=2advr4gRyAhR1OYyzTOH_:25:3)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundaryClass.
+error-boundary.tsx:28 Error boundary caught an error: TypeError: Cannot read properties of undefined (reading 'map')
+    at PlaydateCard (playdate-card.tsx:163:38)
+ 
+{componentStack: '\n    at PlaydateCard (https://04661828-2b6e-42fa-a…/theme-provider.tsx?v=2advr4gRyAhR1OYyzTOH_:25:3)'}
+componentDidCatch	@	error-boundary.tsx:28

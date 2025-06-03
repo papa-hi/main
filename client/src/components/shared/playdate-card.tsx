@@ -160,7 +160,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
           </div>
           <div className="flex items-center mb-3">
             <div className="flex space-x-1 mr-3">
-              {playdate.participants.map((participant, index) => {
+              {(playdate.participants || []).map((participant, index) => {
                 if (index < 2) {
                   return (
                     <img 
@@ -174,14 +174,14 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
                 } 
                 return null;
               })}
-              {playdate.participants.length > 2 && (
+              {(playdate.participants || []).length > 2 && (
                 <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs text-primary font-medium cursor-pointer hover:bg-primary/20 transition-colors duration-300 hover:scale-110 transform">
-                  +{playdate.participants.length - 2}
+                  +{(playdate.participants || []).length - 2}
                 </div>
               )}
             </div>
             <span className="text-xs text-dark/60">
-              {playdate.participants.length} / {playdate.maxParticipants} {t('playdates.participants', 'deelnemers')}
+              {(playdate.participants || []).length} / {playdate.maxParticipants} {t('playdates.participants', 'deelnemers')}
             </span>
           </div>
           

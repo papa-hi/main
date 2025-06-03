@@ -688,7 +688,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="flex items-center mb-2">
                           <span className="text-xs text-dark/60">
-                            {playdate.participants.length} / {playdate.maxParticipants} deelnemers
+                            {(playdate.participants || []).length} / {playdate.maxParticipants} deelnemers
                           </span>
                         </div>
                         
