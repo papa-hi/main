@@ -1172,7 +1172,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         place.name.toLowerCase().trim().includes(location.toLowerCase())
       );
       
-      if (matchingPlace && matchingPlace.latitude !== 0 && matchingPlace.longitude !== 0) {
+      if (matchingPlace && Number(matchingPlace.latitude) !== 0 && Number(matchingPlace.longitude) !== 0) {
         res.json({ 
           latitude: matchingPlace.latitude, 
           longitude: matchingPlace.longitude,
