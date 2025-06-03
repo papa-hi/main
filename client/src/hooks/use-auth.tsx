@@ -41,10 +41,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         method: "POST",
         body: JSON.stringify(credentials),
       });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || t("errors.loginFailed", "Invalid username or password"));
-      }
       return await res.json();
     },
     onSuccess: (user: SelectUser) => {
@@ -93,12 +89,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("/api/logout", {
+      await apiRequest("/api/logout", {
         method: "POST",
       });
-      if (!res.ok) {
-        throw new Error(t("errors.logoutFailed", "Logout failed"));
-      }
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
