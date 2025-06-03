@@ -82,7 +82,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
     setIsJoining(true);
     
     try {
-      await apiRequest('POST', `/api/playdates/${playdate.id}/join`);
+      await apiRequest(`/api/playdates/${playdate.id}/join`, { method: 'POST' });
       
       // Invalidate queries to refetch playdates
       queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
@@ -110,7 +110,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
       setIsLeaving(true);
       
       try {
-        await apiRequest('DELETE', `/api/playdates/${playdate.id}/join`);
+        await apiRequest(`/api/playdates/${playdate.id}/join`, { method: 'DELETE' });
         
         // Invalidate queries to refetch playdates
         queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
