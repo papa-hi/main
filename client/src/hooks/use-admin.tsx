@@ -193,17 +193,14 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery<AdminLog[]>({
     queryKey: ["/api/admin/logs"],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/admin/logs");
+      const res = await apiRequest("/api/admin/logs", {
+        method: "GET",
+      });
       if (!res.ok) throw new Error("Failed to fetch admin logs");
       return await res.json();
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to load admin logs: ${error.message}`,
-        variant: "destructive",
-      });
-    },
+    enabled: !!user,
+    retry: false,
   });
 
   // Change user role mutation

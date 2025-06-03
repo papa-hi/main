@@ -51,6 +51,14 @@ export function PlacesManagement() {
   // Fetch all places
   const { data: places = [], isLoading } = useQuery<Place[]>({
     queryKey: ["/api/admin/places"],
+    queryFn: async () => {
+      const res = await apiRequest("/api/admin/places", {
+        method: "GET",
+      });
+      if (!res.ok) throw new Error("Failed to fetch places");
+      return await res.json();
+    },
+    retry: false,
   });
 
   // Edit place mutation
