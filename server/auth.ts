@@ -216,11 +216,17 @@ export function setupAuth(app: Express) {
       }
       
       // Log the user in
-      req.login(user, (err) => {
+      req.login(user, async (err) => {
         if (err) {
           console.error("Error logging in user:", err);
           return res.status(500).json({ error: "Failed to log in" });
         }
+        
+        // Update last login time
+        await storage.updateUserLastLogin(user.id);
+        
+        // Log user activity
+        await logUserActivity("User login", { method: "firebase" }, req);
         
         console.log("User logged in successfully:", user.id);
         const userWithoutPassword = { ...user } as Partial<SelectUser>;

@@ -422,6 +422,14 @@ export class MemStorage implements IStorage {
     
     return updatedUser;
   }
+
+  async updateUserLastLogin(id: number): Promise<void> {
+    const user = this.users.get(id);
+    if (user) {
+      user.lastLogin = new Date();
+      this.users.set(id, user);
+    }
+  }
   
   async getFeaturedUser(): Promise<User | undefined> {
     // For demo purposes, just return the second user as featured
@@ -1221,6 +1229,13 @@ export class DatabaseStorage implements IStorage {
     }
     
     return updatedUser;
+  }
+
+  async updateUserLastLogin(id: number): Promise<void> {
+    await db
+      .update(users)
+      .set({ lastLogin: new Date() })
+      .where(eq(users.id, id));
   }
   
   async getFeaturedUser(): Promise<User | undefined> {
