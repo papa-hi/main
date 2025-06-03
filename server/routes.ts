@@ -1188,6 +1188,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update place coordinates using geocoding
+  app.post("/api/places/:id/update-coordinates", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const placeId = parseInt(req.params.id);
+      if (isNaN(placeId)) {
+        return res.status(400).json({ error: "Invalid place ID" });
+      }
+
+      const place = await storage.getPlaceById(placeId);
+      if (!place) {
+        return res.status(404).json({ error: "Place not found" });
+      }
+
+      // Check if coordinates are already set
+      if (Number(place.latitude) !== 0 && Number(place.longitude) !== 0) {
+        return res.json({ 
+          message: "Place already has coordinates",
+          latitude: place.latitude,
+          longitude: place.longitude
+        });
+      }
+
+      // Geocode the address
+      const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place.address)}&limit=1&countrycodes=nl`;
+      const response = await fetch(geocodeUrl);
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+
+        // Update the place with new coordinates
+        const updatedPlace = await storage.updatePlace(placeId, {
+          latitude: lat,
+          longitude: lon
+        });
+
+        res.json({
+          message: "Coordinates updated successfully",
+          latitude: lat,
+          longitude: lon,
+          place: updatedPlace
+        });
+      } else {
+        res.status(400).json({ error: "Could not geocode address" });
+      }
+    } catch (err) {
+      console.error("Error updating place coordinates:", err);
+      res.status(500).json({ error: "Failed to update coordinates" });
+    }
+  });
+
+  // Batch update coordinates for all places missing them
+  app.post("/api/places/update-all-coordinates", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const places = await storage.getPlaces({});
+      const placesToUpdate = places.filter(place => 
+        Number(place.latitude) === 0 && Number(place.longitude) === 0
+      );
+
+      if (placesToUpdate.length === 0) {
+        return res.json({ message: "All places already have coordinates" });
+      }
+
+      const results = [];
+      
+      for (const place of placesToUpdate) {
+        try {
+          // Add delay to respect rate limits
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place.address)}&limit=1&countrycodes=nl`;
+          const response = await fetch(geocodeUrl);
+          const data = await response.json();
+
+          if (data && data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
+
+            const updatedPlace = await storage.updatePlace(place.id, {
+              latitude: lat,
+              longitude: lon
+            });
+
+            results.push({
+              id: place.id,
+              name: place.name,
+              success: true,
+              latitude: lat,
+              longitude: lon
+            });
+          } else {
+            results.push({
+              id: place.id,
+              name: place.name,
+              success: false,
+              error: "Could not geocode address"
+            });
+          }
+        } catch (error) {
+          results.push({
+            id: place.id,
+            name: place.name,
+            success: false,
+            error: error.message
+          });
+        }
+      }
+
+      res.json({
+        message: `Updated coordinates for ${results.filter(r => r.success).length} of ${placesToUpdate.length} places`,
+        results
+      });
+    } catch (err) {
+      console.error("Error batch updating coordinates:", err);
+      res.status(500).json({ error: "Failed to batch update coordinates" });
+    }
+  });
+
   app.post("/api/places/:id/favorite", isAuthenticated, async (req, res) => {
     try {
       const placeId = parseInt(req.params.id);
