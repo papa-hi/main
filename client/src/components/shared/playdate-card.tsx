@@ -34,13 +34,13 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
   const timeRange = `${formatTime(startDate)} - ${formatTime(endDate)}`;
   
   // Check if current user is a participant
-  const isParticipating = playdate.participants.some(p => p.id === user?.id);
+  const isParticipating = playdate.participants?.some(p => p.id === user?.id) || false;
   
   // Check if playdate is at max capacity
-  const isAtMaxCapacity = playdate.participants.length >= playdate.maxParticipants;
+  const isAtMaxCapacity = (playdate.participants?.length || 0) >= playdate.maxParticipants;
   
   // Check if current user is the creator (first participant)
-  const isCreator = playdate.participants[0]?.id === user?.id;
+  const isCreator = playdate.participants?.[0]?.id === user?.id;
   
   const handleDelete = async () => {
     if (confirm(t('playdates.confirmDelete', 'Are you sure you want to delete this playdate?'))) {

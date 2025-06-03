@@ -643,7 +643,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const users = await storage.getAllUsers(searchParams);
+      const users = await storage.getAllUsers();
       
       // Remove sensitive information
       const sanitizedUsers = users.map(user => {
@@ -1591,7 +1591,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const playdates = await storage.getUpcomingPlaydates(searchParams);
+      const playdates = await storage.getUpcomingPlaydates();
       res.json(playdates);
     } catch (error) {
       console.error("Error searching playdates:", error);

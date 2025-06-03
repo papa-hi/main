@@ -126,7 +126,7 @@ export class DatabaseStorage implements IStorage {
       .select({ count: count() })
       .from(users)
       .where(and(
-        isNull(users.lastLogin) === false,
+        not(isNull(users.lastLogin)),
         gte(users.lastLogin, oneMonthAgo)
       ));
     
@@ -479,7 +479,7 @@ export class DatabaseStorage implements IStorage {
       .values({ placeId, userId, rating })
       .onConflictDoUpdate({
         target: [ratings.placeId, ratings.userId],
-        set: { rating, updatedAt: new Date() }
+        set: { rating }
       });
 
     await this.updatePlaceRatingFromRatings(placeId);
@@ -558,7 +558,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(chatMessages)
       .where(eq(chatMessages.chatId, chatId))
-      .orderBy(desc(chatMessages.createdAt))
+      .orderBy(desc(chatMessages.id))
       .limit(limit)
       .offset(offset);
     
@@ -568,7 +568,7 @@ export class DatabaseStorage implements IStorage {
   async sendMessage(chatId: number, senderId: number, content: string): Promise<ChatMessage> {
     const [message] = await db
       .insert(chatMessages)
-      .values({ chatId, senderId, content })
+      .values({ chatId, senderId, content, isRead: false })
       .returning();
     
     return message as ChatMessage;
