@@ -65,8 +65,8 @@ function FitBounds({ playdateCoords, userCoords }: {
   return null;
 }
 
-// Function to extract coordinates from location string or geocode address
-async function parseLocationCoordinates(location: string): Promise<[number, number] | null> {
+// Function to get coordinates from places database or extract from location string
+async function getLocationCoordinates(location: string): Promise<[number, number] | null> {
   // First, try to extract embedded coordinates from format "Location [lat,lng]"
   const coordMatch = location.match(/\[([^,]+),([^\]]+)\]/);
   if (coordMatch) {
@@ -77,21 +77,25 @@ async function parseLocationCoordinates(location: string): Promise<[number, numb
     }
   }
   
-  // If no embedded coordinates, try geocoding the address
+  // If no embedded coordinates, try to find the place in the database
   try {
-    const cleanAddress = location.replace(/\[.*?\]/g, '').trim(); // Remove coordinate brackets
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cleanAddress)}&limit=1&countrycodes=nl`
-    );
-    const data = await response.json();
+    // Extract place name from location (typically the first part before comma)
+    const placeName = location.split(',')[0].trim();
     
-    if (data && data.length > 0) {
-      const lat = parseFloat(data[0].lat);
-      const lon = parseFloat(data[0].lon);
-      return [lat, lon];
+    // Search for the place in the database
+    const response = await fetch(`/api/places/search?q=${encodeURIComponent(placeName)}`);
+    const places = await response.json();
+    
+    if (places && places.length > 0) {
+      const place = places[0];
+      const lat = parseFloat(place.latitude);
+      const lng = parseFloat(place.longitude);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        return [lat, lng];
+      }
     }
   } catch (error) {
-    console.error('Geocoding error:', error);
+    console.error('Error fetching place coordinates:', error);
   }
   
   // Default to Amsterdam center if all else fails
@@ -126,10 +130,10 @@ export function PlaydateLocationMap({ location, title, className = "h-64" }: Pla
   const [isGeocoding, setIsGeocoding] = useState(false);
 
   useEffect(() => {
-    // Parse playdate location coordinates
+    // Get playdate location coordinates
     const loadCoordinates = async () => {
       setIsGeocoding(true);
-      const coords = await parseLocationCoordinates(location);
+      const coords = await getLocationCoordinates(location);
       setPlaydateCoords(coords);
       setIsGeocoding(false);
     };
