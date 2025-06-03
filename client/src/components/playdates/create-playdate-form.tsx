@@ -40,7 +40,7 @@ export function CreatePlaydateForm({
   const form = useForm<CreatePlaydateFormData>({
     resolver: zodResolver(createPlaydateFormSchema),
     defaultValues: {
-      title: "",
+      title: defaultLocation ? `Playdate at ${defaultLocation.split(',')[0]}` : "",
       description: "",
       location: defaultLocation || "",
       latitude: defaultLatitude?.toString() || "",
