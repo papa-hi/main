@@ -7,6 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useAuth } from "@/hooks/use-auth";
 import { StarRating } from "@/components/reviews/review-form";
 import { useDistance } from "@/hooks/use-distance";
+import { Button } from "@/components/ui/button";
+import { CreatePlaydateForm } from "@/components/playdates/create-playdate-form";
 
 interface PlaceCardProps {
   place: Place;
@@ -20,6 +22,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
   const [isSaved, setIsSaved] = useState(place.isSaved);
   const [isToggling, setIsToggling] = useState(false);
   const [animateHeart, setAnimateHeart] = useState(false);
+  const [showCreatePlaydate, setShowCreatePlaydate] = useState(false);
   
   // Calculate real distance from device location to place
   const { distance, isLoading: distanceLoading } = useDistance({
@@ -174,11 +177,39 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
             })}
           </div>
         )}
+        {/* Create Playdate Button */}
+        <div className="mb-3">
+          <Button 
+            onClick={() => setShowCreatePlaydate(true)}
+            className="w-full bg-primary hover:bg-primary/90 text-white"
+            size="sm"
+          >
+            <i className="fas fa-calendar-plus mr-2"></i>
+            {t('playdates.createPlaydate', 'Create Playdate')}
+          </Button>
+        </div>
+        
         {/* Rating moved to bottom */}
         <div className="mt-auto pt-2 border-t border-gray-100">
           <StarRating placeId={place.id} size="sm" showCount={true} />
         </div>
       </div>
+      
+      {/* Create Playdate Dialog */}
+      <Dialog open={showCreatePlaydate} onOpenChange={setShowCreatePlaydate}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {t('playdates.createPlaydateAt', 'Create Playdate at {{placeName}}', { placeName: place.name })}
+            </DialogTitle>
+          </DialogHeader>
+          <CreatePlaydateForm 
+            place={place}
+            onSuccess={() => setShowCreatePlaydate(false)}
+            onCancel={() => setShowCreatePlaydate(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
