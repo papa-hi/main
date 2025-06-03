@@ -1153,6 +1153,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get place coordinates by name (for playdate location mapping)
+  app.get("/api/places/coordinates", async (req, res) => {
+    try {
+      const location = req.query.location as string;
+      if (!location) {
+        return res.status(400).json({ error: "Location parameter is required" });
+      }
+      
+      console.log(`Looking up coordinates for location: ${location}`);
+      
+      // Try to find a place by name in the location string
+      const places = await storage.getPlaces({});
+      
+      // Look for a place name that appears in the location string
+      const matchingPlace = places.find(place => 
+        location.toLowerCase().includes(place.name.toLowerCase().trim()) ||
+        place.name.toLowerCase().trim().includes(location.toLowerCase())
+      );
+      
+      if (matchingPlace && matchingPlace.latitude !== 0 && matchingPlace.longitude !== 0) {
+        res.json({ 
+          latitude: matchingPlace.latitude, 
+          longitude: matchingPlace.longitude,
+          address: matchingPlace.address,
+          name: matchingPlace.name
+        });
+      } else {
+        res.status(404).json({ error: "Place not found or coordinates not available" });
+      }
+    } catch (err) {
+      console.error("Error fetching place coordinates:", err);
+      res.status(500).json({ error: "Failed to fetch place coordinates" });
+    }
+  });
+
   app.post("/api/places/:id/favorite", isAuthenticated, async (req, res) => {
     try {
       const placeId = parseInt(req.params.id);

@@ -65,24 +65,33 @@ function FitBounds({ playdateCoords, userCoords }: {
   return null;
 }
 
-// Function to geocode address using OpenStreetMap Nominatim API
-async function geocodeAddress(address: string): Promise<[number, number] | null> {
+// Function to get coordinates from database or fallback to geocoding
+async function getLocationCoordinates(location: string): Promise<[number, number] | null> {
   try {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=nl`
-    );
-    const data = await response.json();
+    // First try to get coordinates from our database
+    const response = await fetch(`/api/places/coordinates?location=${encodeURIComponent(location)}`);
     
-    if (data && data.length > 0) {
-      const lat = parseFloat(data[0].lat);
-      const lon = parseFloat(data[0].lon);
+    if (response.ok) {
+      const data = await response.json();
+      return [data.latitude, data.longitude];
+    }
+    
+    // If not found in database, try geocoding as fallback
+    const geocodeResponse = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1&countrycodes=nl`
+    );
+    const geocodeData = await geocodeResponse.json();
+    
+    if (geocodeData && geocodeData.length > 0) {
+      const lat = parseFloat(geocodeData[0].lat);
+      const lon = parseFloat(geocodeData[0].lon);
       return [lat, lon];
     }
   } catch (error) {
-    console.error('Geocoding error:', error);
+    console.error('Location lookup error:', error);
   }
   
-  // Default to Amsterdam center if geocoding fails
+  // Default to Amsterdam center if all fails
   return [52.3676, 4.9041];
 }
 
@@ -114,10 +123,10 @@ export function PlaydateLocationMap({ location, title, className = "h-64" }: Pla
   const [isGeocoding, setIsGeocoding] = useState(false);
 
   useEffect(() => {
-    // Geocode playdate location coordinates
+    // Get playdate location coordinates
     const loadCoordinates = async () => {
       setIsGeocoding(true);
-      const coords = await geocodeAddress(location);
+      const coords = await getLocationCoordinates(location);
       setPlaydateCoords(coords);
       setIsGeocoding(false);
     };
