@@ -272,9 +272,18 @@ export function setupAdminRoutes(app: Express) {
   // Places management routes
   app.get('/api/admin/places', isAdmin, async (req: Request, res: Response) => {
     try {
-      const places = await storage.getPlaces({});
-      await logAdminAction("View places list", { count: places.length }, req);
-      res.json(places);
+      // Force use of database query to get accurate place count
+      const placesData = await db.select().from(places).orderBy(desc(places.rating));
+      
+      // Add distance and isSaved properties for compatibility
+      const placesWithMetadata = placesData.map(place => ({
+        ...place,
+        distance: 0,
+        isSaved: false
+      }));
+      
+      await logAdminAction("View places list", { count: placesWithMetadata.length }, req);
+      res.json(placesWithMetadata);
     } catch (error) {
       console.error("Error fetching places:", error);
       res.status(500).json({ error: "Failed to fetch places" });
