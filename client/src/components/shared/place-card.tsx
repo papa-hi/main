@@ -204,9 +204,10 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
             </DialogTitle>
           </DialogHeader>
           <CreatePlaydateForm 
-            place={place}
+            defaultLocation={place.name + (place.address ? `, ${place.address}` : '')}
+            defaultLatitude={parseFloat(place.latitude)}
+            defaultLongitude={parseFloat(place.longitude)}
             onSuccess={() => setShowCreatePlaydate(false)}
-            onCancel={() => setShowCreatePlaydate(false)}
           />
         </DialogContent>
       </Dialog>
