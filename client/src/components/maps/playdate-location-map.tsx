@@ -65,11 +65,23 @@ function FitBounds({ playdateCoords, userCoords }: {
   return null;
 }
 
-// Function to geocode address using OpenStreetMap Nominatim API
-async function geocodeAddress(address: string): Promise<[number, number] | null> {
+// Function to extract coordinates from location string or geocode address
+async function parseLocationCoordinates(location: string): Promise<[number, number] | null> {
+  // First, try to extract embedded coordinates from format "Location [lat,lng]"
+  const coordMatch = location.match(/\[([^,]+),([^\]]+)\]/);
+  if (coordMatch) {
+    const lat = parseFloat(coordMatch[1]);
+    const lng = parseFloat(coordMatch[2]);
+    if (!isNaN(lat) && !isNaN(lng)) {
+      return [lat, lng];
+    }
+  }
+  
+  // If no embedded coordinates, try geocoding the address
   try {
+    const cleanAddress = location.replace(/\[.*?\]/g, '').trim(); // Remove coordinate brackets
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=nl`
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cleanAddress)}&limit=1&countrycodes=nl`
     );
     const data = await response.json();
     
@@ -82,7 +94,7 @@ async function geocodeAddress(address: string): Promise<[number, number] | null>
     console.error('Geocoding error:', error);
   }
   
-  // Default to Amsterdam center if geocoding fails
+  // Default to Amsterdam center if all else fails
   return [52.3676, 4.9041];
 }
 
@@ -114,10 +126,10 @@ export function PlaydateLocationMap({ location, title, className = "h-64" }: Pla
   const [isGeocoding, setIsGeocoding] = useState(false);
 
   useEffect(() => {
-    // Geocode playdate location coordinates
+    // Parse playdate location coordinates
     const loadCoordinates = async () => {
       setIsGeocoding(true);
-      const coords = await geocodeAddress(location);
+      const coords = await parseLocationCoordinates(location);
       setPlaydateCoords(coords);
       setIsGeocoding(false);
     };

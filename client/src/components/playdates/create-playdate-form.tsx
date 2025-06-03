@@ -54,7 +54,7 @@ export function CreatePlaydateForm({ place, onSuccess, onCancel }: CreatePlaydat
     defaultValues: {
       title: place ? `Playdate at ${place.name}` : '',
       description: '',
-      location: place ? `${place.name}, ${place.address}` : '',
+      location: place ? `${place.name}, ${place.address} [${place.latitude},${place.longitude}]` : '',
       startTime: `${defaultDate}T${defaultStartTime}`,
       endTime: `${defaultDate}T${defaultEndTime}`,
       maxParticipants: 4,
