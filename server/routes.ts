@@ -957,10 +957,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const validPlaydate = insertPlaydateSchema.parse(playdateData);
         console.log("Validated playdate data:", validPlaydate);
         
-        // Create the playdate
+        // Geocode the location to get coordinates
+        let coordinates = null;
+        if (validPlaydate.location) {
+          coordinates = await geocodeAddress(validPlaydate.location);
+          console.log("Geocoded coordinates for location:", validPlaydate.location, coordinates);
+        }
+        
+        // Create the playdate with coordinates
         const playdateDataWithCreator = {
           ...validPlaydate,
-          creatorId
+          creatorId,
+          latitude: coordinates ? coordinates.latitude.toString() : "0",
+          longitude: coordinates ? coordinates.longitude.toString() : "0"
         };
         
         console.log("REGULAR ENDPOINT: Final playdate data with creatorId:", playdateDataWithCreator);
