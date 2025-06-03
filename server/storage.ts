@@ -125,8 +125,12 @@ export class MemStorage implements IStorage {
       profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
       bio: "Vader van Noah (6) en Eva (4). Ik werk als ontwerper en ben in mijn vrije tijd graag buiten met de kinderen. We houden van fietsen, zwemmen en natuur ontdekken. Altijd op zoek naar nieuwe speeltuinen en kinderboerderijen!",
       city: "Amsterdam",
+      badge: null,
       createdAt: new Date(),
-      favoriteLocations: ["Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht"]
+      favoriteLocations: ["Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht"],
+      childrenInfo: [{ name: "Noah", age: 6 }, { name: "Eva", age: 4 }],
+      role: "user",
+      lastLogin: null
     };
     
     const user2: User = {
@@ -140,8 +144,12 @@ export class MemStorage implements IStorage {
       profileImage: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
       bio: "Vader van Noah (6) en Eva (4). Ik werk als ontwerper en ben in mijn vrije tijd graag buiten met de kinderen. We houden van fietsen, zwemmen en natuur ontdekken. Altijd op zoek naar nieuwe speeltuinen en kinderboerderijen!",
       city: "Amsterdam",
+      badge: null,
       createdAt: new Date(),
-      favoriteLocations: ["Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht"]
+      favoriteLocations: ["Artis Zoo", "NEMO Science Museum", "Vondelpark", "Boerderij Meerzicht"],
+      childrenInfo: [{ name: "Noah", age: 6 }, { name: "Eva", age: 4 }],
+      role: "user",
+      lastLogin: null
     };
     
     this.users.set(user1.id, user1);
@@ -162,17 +170,13 @@ export class MemStorage implements IStorage {
       title: "Speelmiddag met Noah & Liam",
       description: "Een gezellige middag in het park met onze kinderen. Neem wat snacks mee!",
       location: "Speeltuin Amstelpark",
+      latitude: "52.3676",
+      longitude: "4.9041",
       startTime: new Date(nextWeek.setHours(14, 0)),
       endTime: new Date(nextWeek.setHours(17, 0)),
       creatorId: 1,
       maxParticipants: 5,
-      createdAt: new Date(),
-      participants: [
-        { id: 1, firstName: "Thomas", lastName: "de Vries", profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" },
-        { id: 2, firstName: "Martijn", lastName: "van der Berg", profileImage: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" },
-        { id: 3, firstName: "Erik", lastName: "Bakker", profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" },
-        { id: 4, firstName: "Pieter", lastName: "Jansen", profileImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" }
-      ]
+      createdAt: new Date()
     };
     
     const playdate2: Playdate = {
@@ -180,20 +184,13 @@ export class MemStorage implements IStorage {
       title: "Vaderdag Picknick",
       description: "Picknick ter gelegenheid van vaderdag. Iedereen neemt wat te eten mee.",
       location: "Vondelpark, Amsterdam",
+      latitude: "52.3740",
+      longitude: "4.9123",
       startTime: new Date(nextMonth.setHours(12, 0)),
       endTime: new Date(nextMonth.setHours(15, 0)),
       creatorId: 2,
       maxParticipants: 10,
-      createdAt: new Date(),
-      participants: [
-        { id: 1, firstName: "Thomas", lastName: "de Vries", profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" },
-        { id: 2, firstName: "Martijn", lastName: "van der Berg", profileImage: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" },
-        { id: 3, firstName: "Erik", lastName: "Bakker", profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" },
-        { id: 5, firstName: "Joost", lastName: "Visser", profileImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" },
-        { id: 6, firstName: "Willem", lastName: "Smit", profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" },
-        { id: 7, firstName: "Jan", lastName: "van Dijk", profileImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" },
-        { id: 8, firstName: "Kees", lastName: "Meijer", profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" }
-      ]
+      createdAt: new Date()
     };
     
     const playdate3: Playdate = {
@@ -201,16 +198,13 @@ export class MemStorage implements IStorage {
       title: "Zwemmen in buitenzwembad",
       description: "Lekker zwemmen met de kinderen in het buitenzwembad.",
       location: "Sloterparkbad, Amsterdam",
+      latitude: "52.3555",
+      longitude: "4.9876",
       startTime: new Date(pastDate.setHours(10, 0)),
       endTime: new Date(pastDate.setHours(12, 0)),
       creatorId: 1,
       maxParticipants: 6,
-      createdAt: new Date(pastDate.setDate(pastDate.getDate() - 7)),
-      participants: [
-        { id: 1, firstName: "Thomas", lastName: "de Vries", profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" },
-        { id: 3, firstName: "Erik", lastName: "Bakker", profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" },
-        { id: 5, firstName: "Joost", lastName: "Visser", profileImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&h=36&q=80" }
-      ]
+      createdAt: new Date(pastDate.setDate(pastDate.getDate() - 7))
     };
     
     this.playdates.set(playdate1.id, playdate1);
@@ -406,7 +400,15 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userIdCounter++;
-    const user: User = { ...insertUser, id, createdAt: new Date() };
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      createdAt: new Date(),
+      badge: null,
+      favoriteLocations: [],
+      role: insertUser.role || 'user',
+      lastLogin: null
+    };
     this.users.set(id, user);
     return user;
   }
