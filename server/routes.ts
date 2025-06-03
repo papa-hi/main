@@ -365,6 +365,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all users from storage, limiting what data is returned
       const users = await storage.getAllUsers();
       
+      // Log user activity
+      await logUserActivity("View users directory", { 
+        totalUsers: users.length 
+      }, req);
+      
       // Filter out sensitive information
       const safeUsers = users.map(user => {
         const userWithoutSensitive = { ...user } as Partial<SelectUser>;

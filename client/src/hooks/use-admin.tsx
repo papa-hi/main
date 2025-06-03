@@ -206,7 +206,11 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   // Change user role mutation
   const changeUserRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: number; role: string }) => {
-      const res = await apiRequest("PATCH", `/api/admin/users/${userId}/role`, { role });
+      const res = await apiRequest(`/api/admin/users/${userId}/role`, { 
+        method: "PATCH", 
+        body: JSON.stringify({ role }), 
+        headers: { 'Content-Type': 'application/json' } 
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || "Failed to change user role");
@@ -233,7 +237,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      const res = await apiRequest("DELETE", `/api/admin/users/${userId}`);
+      const res = await apiRequest(`/api/admin/users/${userId}`, { method: "DELETE" });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || "Failed to delete user");
