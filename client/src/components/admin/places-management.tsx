@@ -56,7 +56,14 @@ export function PlacesManagement() {
   // Edit place mutation
   const editPlaceMutation = useMutation({
     mutationFn: async (data: { id: number; updates: Partial<Place> }) => {
-      const res = await apiRequest("PATCH", `/api/admin/places/${data.id}`, data.updates);
+      const res = await apiRequest(`/api/admin/places/${data.id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data.updates),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to update place');
+      }
       return await res.json();
     },
     onSuccess: () => {
@@ -79,7 +86,13 @@ export function PlacesManagement() {
   // Delete place mutation
   const deletePlaceMutation = useMutation({
     mutationFn: async (placeId: number) => {
-      const res = await apiRequest("DELETE", `/api/admin/places/${placeId}`);
+      const res = await apiRequest(`/api/admin/places/${placeId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to delete place');
+      }
       return await res.json();
     },
     onSuccess: () => {
