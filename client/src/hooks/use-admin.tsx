@@ -139,17 +139,14 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery<PageStat[]>({
     queryKey: ["/api/admin/stats/pages"],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/admin/stats/pages");
+      const res = await apiRequest("/api/admin/stats/pages", {
+        method: "GET",
+      });
       if (!res.ok) throw new Error("Failed to fetch page stats");
       return await res.json();
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to load page statistics: ${error.message}`,
-        variant: "destructive",
-      });
-    },
+    enabled: !!user,
+    retry: false,
   });
 
   // Feature stats query
@@ -160,17 +157,14 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery<FeatureStat[]>({
     queryKey: ["/api/admin/stats/features"],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/admin/stats/features");
+      const res = await apiRequest("/api/admin/stats/features", {
+        method: "GET",
+      });
       if (!res.ok) throw new Error("Failed to fetch feature stats");
       return await res.json();
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to load feature statistics: ${error.message}`,
-        variant: "destructive",
-      });
-    },
+    enabled: !!user,
+    retry: false,
   });
 
   // Activity logs query
@@ -181,17 +175,14 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   } = useQuery<UserActivity[]>({
     queryKey: ["/api/admin/activity"],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/admin/activity");
+      const res = await apiRequest("/api/admin/activity", {
+        method: "GET",
+      });
       if (!res.ok) throw new Error("Failed to fetch activity logs");
       return await res.json();
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to load activity logs: ${error.message}`,
-        variant: "destructive",
-      });
-    },
+    enabled: !!user,
+    retry: false,
   });
 
   // Admin logs query
