@@ -48,14 +48,14 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
     setIsToggling(true);
     try {
       if (isSaved) {
-        await apiRequest('DELETE', `/api/places/${place.id}/favorite`);
+        await apiRequest(`/api/places/${place.id}/favorite`, { method: 'DELETE' });
         setIsSaved(false);
         toast({
           title: t('places.removedFromFavorites', 'Removed from favorites'),
           description: t('places.placeRemovedFromFavorites', '{{name}} has been removed from your favorites.', {name: place.name}),
         });
       } else {
-        await apiRequest('POST', `/api/places/${place.id}/favorite`);
+        await apiRequest(`/api/places/${place.id}/favorite`, { method: 'POST' });
         setIsSaved(true);
         setAnimateHeart(true); // Trigger animation when saving
         toast({
