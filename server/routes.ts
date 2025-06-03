@@ -1289,8 +1289,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const lon = parseFloat(data[0].lon);
 
             const updatedPlace = await storage.updatePlace(place.id, {
-              latitude: lat,
-              longitude: lon
+              latitude: lat.toString(),
+              longitude: lon.toString()
             });
 
             results.push({
@@ -1313,7 +1313,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             id: place.id,
             name: place.name,
             success: false,
-            error: error.message
+            error: error instanceof Error ? error.message : "Unknown error"
           });
         }
       }

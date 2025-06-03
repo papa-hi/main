@@ -1,226 +1,212 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { insertPlaydateSchema } from "@shared/schema";
 import { z } from "zod";
-import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from "react-i18next";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Place } from "@shared/schema";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Calendar, Clock, Users, MapPin } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 
-const playdateFormSchema = z.object({
-  title: z.string().min(3, { message: "Title must be at least 3 characters" }),
-  description: z.string().optional(),
-  location: z.string().min(3, { message: "Location is required" }),
-  startTime: z.string().min(1, { message: "Start time is required" }),
-  endTime: z.string().min(1, { message: "End time is required" }),
-  maxParticipants: z.number().min(1).max(50),
+// Create form schema with validation for playdate creation
+const createPlaydateFormSchema = insertPlaydateSchema.extend({
+  startTime: z.string().min(1, "Start time is required"),
+  endTime: z.string().min(1, "End time is required"),
 });
 
-type PlaydateFormValues = z.infer<typeof playdateFormSchema>;
+type CreatePlaydateFormData = z.infer<typeof createPlaydateFormSchema>;
 
 interface CreatePlaydateFormProps {
-  place?: Place;
   onSuccess?: () => void;
-  onCancel?: () => void;
+  defaultLocation?: string;
+  defaultLatitude?: number;
+  defaultLongitude?: number;
 }
 
-export function CreatePlaydateForm({ place, onSuccess, onCancel }: CreatePlaydateFormProps) {
+export function CreatePlaydateForm({ 
+  onSuccess, 
+  defaultLocation,
+  defaultLatitude,
+  defaultLongitude 
+}: CreatePlaydateFormProps) {
   const { toast } = useToast();
-  const { t } = useTranslation();
-
-  // Get today's date for default values
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  const queryClient = useQueryClient();
   
-  const defaultDate = tomorrow.toISOString().split('T')[0];
-  const defaultStartTime = "10:00";
-  const defaultEndTime = "12:00";
-
-  const form = useForm<PlaydateFormValues>({
-    resolver: zodResolver(playdateFormSchema),
+  const form = useForm<CreatePlaydateFormData>({
+    resolver: zodResolver(createPlaydateFormSchema),
     defaultValues: {
-      title: place ? `Playdate at ${place.name}` : '',
-      description: '',
-      location: place ? `${place.name}, ${place.address}` : '',
-      startTime: `${defaultDate}T${defaultStartTime}`,
-      endTime: `${defaultDate}T${defaultEndTime}`,
-      maxParticipants: 4,
+      title: "",
+      description: "",
+      location: defaultLocation || "",
+      latitude: defaultLatitude?.toString() || "",
+      longitude: defaultLongitude?.toString() || "",
+      startTime: "",
+      endTime: "",
+      maxParticipants: 6,
     },
   });
 
   const createPlaydateMutation = useMutation({
-    mutationFn: async (data: PlaydateFormValues) => {
-      const response = await apiRequest('POST', '/api/playdates', {
-        ...data,
-        startTime: new Date(data.startTime).toISOString(),
-        endTime: new Date(data.endTime).toISOString(),
-      });
-      return await response.json();
-    },
+    mutationFn: (data: CreatePlaydateFormData) => 
+      apiRequest("/api/playdates", {
+        method: "POST",
+        body: JSON.stringify({
+          ...data,
+          latitude: parseFloat(data.latitude) || 0,
+          longitude: parseFloat(data.longitude) || 0,
+          startTime: new Date(data.startTime).toISOString(),
+          endTime: new Date(data.endTime).toISOString(),
+        }),
+      }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/playdates/upcoming'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/playdates"] });
       toast({
-        title: t('playdates.playdateCreated', 'Playdate Created'),
-        description: t('playdates.playdateCreatedMessage', 'Your playdate has been created successfully.'),
+        title: "Playdate Created",
+        description: "Your playdate has been created successfully!",
       });
       form.reset();
       onSuccess?.();
     },
-    onError: (error) => {
-      console.error('Error creating playdate:', error);
+    onError: (error: any) => {
       toast({
-        title: t('playdates.createError', 'Error Creating Playdate'),
-        description: error.message || t('playdates.createErrorMessage', 'There was an error creating the playdate. Please try again.'),
+        title: "Error",
+        description: error.message || "Failed to create playdate",
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit = (data: PlaydateFormValues) => {
+  const onSubmit = (data: CreatePlaydateFormData) => {
     createPlaydateMutation.mutate(data);
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('playdates.title', 'Title')}</FormLabel>
-              <FormControl>
-                <Input placeholder={t('playdates.titlePlaceholder', 'Enter playdate title')} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="title" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Playdate Title
+          </Label>
+          <Input
+            id="title"
+            {...form.register("title")}
+            placeholder="Fun playdate at the park"
+            className="mt-1"
+          />
+          {form.formState.errors.title && (
+            <p className="text-sm text-red-500 mt-1">
+              {form.formState.errors.title.message}
+            </p>
           )}
-        />
+        </div>
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('playdates.description', 'Description')}</FormLabel>
-              <FormControl>
-                <Textarea 
-                  placeholder={t('playdates.descriptionPlaceholder', 'Tell more about this playdate...')}
-                  className="min-h-[80px]"
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+        <div>
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            {...form.register("description")}
+            placeholder="Describe your playdate..."
+            className="mt-1"
+            rows={3}
+          />
+          {form.formState.errors.description && (
+            <p className="text-sm text-red-500 mt-1">
+              {form.formState.errors.description.message}
+            </p>
           )}
-        />
+        </div>
 
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('playdates.location', 'Location')}</FormLabel>
-              <FormControl>
-                <Input placeholder={t('playdates.locationPlaceholder', 'Enter location')} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+        <div>
+          <Label htmlFor="location" className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            Location
+          </Label>
+          <Input
+            id="location"
+            {...form.register("location")}
+            placeholder="Park name or address"
+            className="mt-1"
+          />
+          {form.formState.errors.location && (
+            <p className="text-sm text-red-500 mt-1">
+              {form.formState.errors.location.message}
+            </p>
           )}
-        />
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="startTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('playdates.startTime', 'Start Time')}</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="datetime-local" 
-                    {...field} 
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          <div>
+            <Label htmlFor="startTime" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Start Time
+            </Label>
+            <Input
+              id="startTime"
+              type="datetime-local"
+              {...form.register("startTime")}
+              className="mt-1"
+            />
+            {form.formState.errors.startTime && (
+              <p className="text-sm text-red-500 mt-1">
+                {form.formState.errors.startTime.message}
+              </p>
             )}
-          />
+          </div>
 
-          <FormField
-            control={form.control}
-            name="endTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('playdates.endTime', 'End Time')}</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="datetime-local" 
-                    {...field} 
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          <div>
+            <Label htmlFor="endTime">End Time</Label>
+            <Input
+              id="endTime"
+              type="datetime-local"
+              {...form.register("endTime")}
+              className="mt-1"
+            />
+            {form.formState.errors.endTime && (
+              <p className="text-sm text-red-500 mt-1">
+                {form.formState.errors.endTime.message}
+              </p>
             )}
-          />
+          </div>
         </div>
 
-        <FormField
-          control={form.control}
-          name="maxParticipants"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('playdates.maxParticipants', 'Max Participants')}</FormLabel>
-              <FormControl>
-                <Input 
-                  type="number" 
-                  min={1} 
-                  max={50}
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+        <div>
+          <Label htmlFor="maxParticipants" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Maximum Participants
+          </Label>
+          <Input
+            id="maxParticipants"
+            type="number"
+            min="2"
+            max="20"
+            {...form.register("maxParticipants", { valueAsNumber: true })}
+            className="mt-1"
+          />
+          {form.formState.errors.maxParticipants && (
+            <p className="text-sm text-red-500 mt-1">
+              {form.formState.errors.maxParticipants.message}
+            </p>
           )}
-        />
-
-        <div className="flex justify-end gap-3 pt-4">
-          {onCancel && (
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onCancel}
-              disabled={createPlaydateMutation.isPending}
-            >
-              {t('common.cancel', 'Cancel')}
-            </Button>
-          )}
-          <Button 
-            type="submit" 
-            className="bg-primary hover:bg-primary/90 text-white"
-            disabled={createPlaydateMutation.isPending}
-          >
-            {createPlaydateMutation.isPending 
-              ? t('playdates.creating', 'Creating...') 
-              : t('playdates.createButton', 'Create Playdate')
-            }
-          </Button>
         </div>
-      </form>
-    </Form>
+
+        {/* Hidden coordinate fields */}
+        <input type="hidden" {...form.register("latitude")} />
+        <input type="hidden" {...form.register("longitude")} />
+      </div>
+
+      <Button 
+        type="submit" 
+        className="w-full"
+        disabled={createPlaydateMutation.isPending}
+      >
+        {createPlaydateMutation.isPending ? "Creating..." : "Create Playdate"}
+      </Button>
+    </form>
   );
 }

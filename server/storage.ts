@@ -57,6 +57,7 @@ export interface IStorage {
   
   // Places methods
   getPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]>;
+  getPlaceById(id: number): Promise<Place | undefined>;
   getNearbyPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]>;
   getUserFavoritePlaces(userId: number): Promise<Place[]>;
   addFavoritePlace(userId: number, placeId: number): Promise<any>;
@@ -1662,6 +1663,11 @@ export class DatabaseStorage implements IStorage {
     }
     
     return result;
+  }
+
+  async getPlaceById(id: number): Promise<Place | undefined> {
+    const [place] = await db.select().from(places).where(eq(places.id, id));
+    return place || undefined;
   }
   
   async getNearbyPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]> {
