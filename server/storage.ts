@@ -406,8 +406,13 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
       badge: null,
       favoriteLocations: [],
-      role: insertUser.role || 'user',
-      lastLogin: null
+      role: 'user',
+      lastLogin: null,
+      phoneNumber: insertUser.phoneNumber || null,
+      profileImage: insertUser.profileImage || null,
+      bio: insertUser.bio || null,
+      city: insertUser.city || null,
+      childrenInfo: insertUser.childrenInfo as { name: string; age: number }[] | undefined
     };
     this.users.set(id, user);
     return user;
@@ -980,7 +985,7 @@ export class DatabaseStorage implements IStorage {
     return result.map(user => ({
       ...user,
       childrenInfo: user.childrenInfo as { name: string; age: number }[] | undefined,
-    }));
+    })) as User[];
   }
   
   async setUserRole(userId: number, role: string): Promise<User> {
@@ -993,7 +998,7 @@ export class DatabaseStorage implements IStorage {
     return {
       ...updatedUser,
       childrenInfo: updatedUser.childrenInfo as { name: string; age: number }[] | undefined,
-    };
+    } as User;
   }
   
   async getUsersByRole(role: string): Promise<User[]> {
