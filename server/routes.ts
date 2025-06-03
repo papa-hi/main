@@ -1853,9 +1853,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Not authenticated" });
       }
       
-      // Validate required fields
-      if (!req.body.name || !req.body.latitude || !req.body.longitude || !req.body.type) {
-        return res.status(400).json({ error: "Name, latitude, longitude, and type are required" });
+      // Validate required fields - allow 0 coordinates if address is provided for geocoding
+      if (!req.body.name || !req.body.type) {
+        return res.status(400).json({ error: "Name and type are required" });
+      }
+      
+      // Check if we have coordinates or an address for geocoding
+      const hasCoordinates = req.body.latitude && req.body.longitude && 
+                           parseFloat(req.body.latitude) !== 0 && parseFloat(req.body.longitude) !== 0;
+      const hasAddress = req.body.address && req.body.address.trim().length > 0;
+      
+      if (!hasCoordinates && !hasAddress) {
+        return res.status(400).json({ error: "Either valid coordinates or an address is required" });
       }
       
       // Validate type is either restaurant, playground, or museum
@@ -1925,9 +1934,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Not authenticated" });
       }
       
-      // Validate required fields
-      if (!req.body.name || !req.body.latitude || !req.body.longitude || !req.body.type) {
-        return res.status(400).json({ error: "Name, latitude, longitude, and type are required" });
+      // Validate required fields - allow 0 coordinates if address is provided for geocoding
+      if (!req.body.name || !req.body.type) {
+        return res.status(400).json({ error: "Name and type are required" });
+      }
+      
+      // Check if we have coordinates or an address for geocoding
+      const hasCoordinates = req.body.latitude && req.body.longitude && 
+                           parseFloat(req.body.latitude) !== 0 && parseFloat(req.body.longitude) !== 0;
+      const hasAddress = req.body.address && req.body.address.trim().length > 0;
+      
+      if (!hasCoordinates && !hasAddress) {
+        return res.status(400).json({ error: "Either valid coordinates or an address is required" });
       }
       
       // Validate type is either restaurant, playground, or museum
