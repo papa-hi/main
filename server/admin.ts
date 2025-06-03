@@ -34,8 +34,7 @@ export const logAdminAction = async (
       action,
       details,
       adminId,
-      ipAddress,
-      timestamp: new Date()
+      ipAddress
     });
   } catch (error) {
     console.error("Error logging admin action:", error);
@@ -83,8 +82,7 @@ export const logPageView = async (
       ipAddress,
       userAgent,
       duration,
-      referrer,
-      timestamp: new Date()
+      referrer
     });
   } catch (error) {
     console.error("Error logging page view:", error);
@@ -103,8 +101,7 @@ export const logFeatureUsage = async (
       feature,
       action,
       userId,
-      details,
-      timestamp: new Date()
+      details
     });
   } catch (error) {
     console.error("Error logging feature usage:", error);

@@ -917,6 +917,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Playdate not found" });
       }
       
+      // Log user activity
+      if (req.user?.id) {
+        await logUserActivity("View playdate details", { 
+          playdateId: playdateId, 
+          title: playdate.title 
+        }, req);
+      }
+      
       res.json(playdate);
     } catch (err) {
       console.error("Error fetching playdate:", err);
