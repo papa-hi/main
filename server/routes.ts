@@ -17,6 +17,7 @@ import crypto from "crypto";
 import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate } from "./push-notifications";
 import { pushSubscriptions } from "@shared/schema";
 import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified } from "./notification-scheduler";
+import { logUserActivity, logPageView, logFeatureUsage } from "./admin";
 
 // Helper function to geocode address and get coordinates
 async function geocodeAddress(address: string): Promise<{ latitude: number; longitude: number } | null> {
@@ -822,6 +823,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/playdates/upcoming", async (req, res) => {
     try {
       const upcomingPlaydates = await storage.getUpcomingPlaydates();
+      
+      // Log user activity
+      if (req.user?.id) {
+        await logUserActivity("View upcoming playdates", { count: upcomingPlaydates.length }, req);
+      }
+      
       res.json(upcomingPlaydates);
     } catch (err) {
       console.error("Error fetching upcoming playdates:", err);

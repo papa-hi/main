@@ -1,5 +1,8 @@
 import type { Request, Response, NextFunction, Express } from "express";
 import { storage } from "./storage";
+import { db } from "./db";
+import { places } from "@shared/schema";
+import { desc } from "drizzle-orm";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 
@@ -55,8 +58,7 @@ export const logUserActivity = async (
       userId,
       details,
       ipAddress,
-      userAgent,
-      timestamp: new Date()
+      userAgent
     });
   } catch (error) {
     console.error("Error logging user activity:", error);
