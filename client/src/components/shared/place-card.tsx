@@ -133,7 +133,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
           <div>
             {/* Show debug info */}
             <span className="text-xs text-gray-400 mr-2">
-              {place.type === 'playground' ? '(P)' : '(R)'}
+              {place.type === 'playground' ? '(P)' : place.type === 'museum' ? '(M)' : '(R)'}
             </span>
             
             {/* Edit button */}
