@@ -11,6 +11,7 @@ import { useLocation as useGeoLocation } from "@/hooks/use-location";
 import { useTranslation } from "react-i18next";
 import { AddRestaurantForm } from "@/components/places/add-restaurant-form";
 import { AddMuseumForm } from "@/components/places/add-museum-form";
+import { AddPlaygroundForm } from "@/components/places/add-playground-form";
 import { EditPlaygroundForm } from "@/components/places/edit-playground-form";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -77,6 +78,8 @@ export default function PlacesPage() {
   const [showAddRestaurantForm, setShowAddRestaurantForm] = useState(false);
   // Define state for showing add museum form
   const [showAddMuseumForm, setShowAddMuseumForm] = useState(false);
+  // Define state for showing add playground form
+  const [showAddPlaygroundForm, setShowAddPlaygroundForm] = useState(false);
   // Define state for the edit playground dialog
   const [editPlaygroundOpen, setEditPlaygroundOpen] = useState(false);
   const [selectedPlayground, setSelectedPlayground] = useState<Place | null>(null);
@@ -168,6 +171,18 @@ export default function PlacesPage() {
                 : t('places.addMuseum', 'Add Museum')}
             </Button>
           )}
+          {user && activeTab === 'playgrounds' && (
+            <Button 
+              onClick={() => setShowAddPlaygroundForm(!showAddPlaygroundForm)}
+              className="flex items-center gap-1 text-sm"
+              variant="default"
+            >
+              <i className={`fas fa-${showAddPlaygroundForm ? 'times' : 'plus'} mr-1`}></i>
+              {showAddPlaygroundForm 
+                ? t('places.cancel', 'Cancel') 
+                : t('places.addPlayground', 'Add Playground')}
+            </Button>
+          )}
           <Button
             variant="outline"
             onClick={() => setLocation('/playground-map')}
@@ -193,6 +208,14 @@ export default function PlacesPage() {
         <div className="mb-8 p-6 bg-white rounded-xl shadow-sm">
           <h2 className="text-xl font-bold mb-4">{t('places.addNewMuseum', 'Add New Museum')}</h2>
           <AddMuseumForm onSuccess={() => setShowAddMuseumForm(false)} />
+        </div>
+      )}
+
+      {/* Add Playground Form */}
+      {user && showAddPlaygroundForm && activeTab === 'playgrounds' && (
+        <div className="mb-8 p-6 bg-white rounded-xl shadow-sm">
+          <h2 className="text-xl font-bold mb-4">{t('places.addNewPlayground', 'Add New Playground')}</h2>
+          <AddPlaygroundForm onSuccess={() => setShowAddPlaygroundForm(false)} />
         </div>
       )}
       
