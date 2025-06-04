@@ -177,11 +177,23 @@
       "strollerAccessible": "Kinderwagen toegankelijk"
     },
     "playgroundFeatures": {
-      "restrooms": "Toiletten",
+      "title": "Speeltuin Voorzieningen",
+      "description": "Selecteer alle voorzieningen die beschikbaar zijn op deze speeltuin",
+      "swings": "Schommels",
+      "slides": "Glijbanen",
+      "climbingEquipment": "Klimtoestellen",
+      "sandbox": "Zandbak",
+      "seesaw": "Wip",
+      "springRiders": "Veerwipjes",
+      "basketballCourt": "Basketbalveld",
+      "soccerField": "Voetbalveld",
       "picnicTables": "Picknicktafels",
       "benches": "Banken",
-      "sandbox": "Zandbak",
-      "waterGames": "Waterspellen"
+      "restrooms": "Toiletten",
+      "parking": "Parkeren beschikbaar",
+      "shade": "Schaduw/overdekte gebieden",
+      "fenced": "Omheind gebied",
+      "waterFeatures": "Waterspellen"
     },
     "museumFeatures": {
       "interactiveExhibits": "Interactieve tentoonstellingen",

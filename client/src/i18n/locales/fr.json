@@ -172,11 +172,23 @@
       "strollerAccessible": "Accessible aux poussettes"
     },
     "playgroundFeatures": {
-      "restrooms": "Toilettes",
+      "title": "Équipements de l'aire de jeux",
+      "description": "Sélectionnez tous les équipements disponibles dans cette aire de jeux",
+      "swings": "Balançoires",
+      "slides": "Toboggans",
+      "climbingEquipment": "Équipements d'escalade",
+      "sandbox": "Bac à sable",
+      "seesaw": "Bascule",
+      "springRiders": "Jeux à ressort",
+      "basketballCourt": "Terrain de basket",
+      "soccerField": "Terrain de football",
       "picnicTables": "Tables de pique-nique",
       "benches": "Bancs",
-      "sandbox": "Bac à sable",
-      "waterGames": "Jeux d'eau"
+      "restrooms": "Toilettes",
+      "parking": "Parking disponible",
+      "shade": "Zones ombragées/couvertes",
+      "fenced": "Zone clôturée",
+      "waterFeatures": "Jeux d'eau"
     },
     "museumFeatures": {
       "interactiveExhibits": "Expositions interactives",

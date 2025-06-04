@@ -172,11 +172,23 @@
       "strollerAccessible": "Accesible para cochecitos"
     },
     "playgroundFeatures": {
-      "restrooms": "Baños",
+      "title": "Equipamiento del parque infantil",
+      "description": "Selecciona todo el equipamiento disponible en este parque infantil",
+      "swings": "Columpios",
+      "slides": "Toboganes",
+      "climbingEquipment": "Equipos de escalada",
+      "sandbox": "Arenero",
+      "seesaw": "Balancín",
+      "springRiders": "Juegos de resorte",
+      "basketballCourt": "Cancha de baloncesto",
+      "soccerField": "Campo de fútbol",
       "picnicTables": "Mesas de picnic",
       "benches": "Bancos",
-      "sandbox": "Arenero",
-      "waterGames": "Juegos de agua"
+      "restrooms": "Baños",
+      "parking": "Estacionamiento disponible",
+      "shade": "Áreas con sombra/cubiertas",
+      "fenced": "Área cercada",
+      "waterFeatures": "Juegos de agua"
     },
     "museumFeatures": {
       "interactiveExhibits": "Exposiciones interactivas",

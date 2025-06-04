@@ -172,11 +172,23 @@
       "strollerAccessible": "Kinderwagen-zugänglich"
     },
     "playgroundFeatures": {
-      "restrooms": "Toiletten",
+      "title": "Spielplatz Ausstattung",
+      "description": "Wählen Sie alle verfügbaren Einrichtungen auf diesem Spielplatz aus",
+      "swings": "Schaukeln",
+      "slides": "Rutschen",
+      "climbingEquipment": "Klettergeräte",
+      "sandbox": "Sandkasten",
+      "seesaw": "Wippe",
+      "springRiders": "Federwippen",
+      "basketballCourt": "Basketballplatz",
+      "soccerField": "Fußballfeld",
       "picnicTables": "Picknicktische",
       "benches": "Bänke",
-      "sandbox": "Sandkasten",
-      "waterGames": "Wasserspiele"
+      "restrooms": "Toiletten",
+      "parking": "Parkplätze verfügbar",
+      "shade": "Schatten/überdachte Bereiche",
+      "fenced": "Eingezäunter Bereich",
+      "waterFeatures": "Wasserspiele"
     },
     "museumFeatures": {
       "interactiveExhibits": "Interaktive Ausstellungen",

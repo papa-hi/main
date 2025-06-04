@@ -178,11 +178,23 @@
       "strollerAccessible": "Stroller accessible"
     },
     "playgroundFeatures": {
-      "restrooms": "Restrooms",
+      "title": "Playground Features",
+      "description": "Select all features available at this playground",
+      "swings": "Swings",
+      "slides": "Slides",
+      "climbingEquipment": "Climbing equipment",
+      "sandbox": "Sandbox",
+      "seesaw": "Seesaw",
+      "springRiders": "Spring riders",
+      "basketballCourt": "Basketball court",
+      "soccerField": "Soccer field",
       "picnicTables": "Picnic tables",
       "benches": "Benches",
-      "sandbox": "Sandbox",
-      "waterGames": "Water games"
+      "restrooms": "Restrooms",
+      "parking": "Parking available",
+      "shade": "Shade/covered areas",
+      "fenced": "Fenced area",
+      "waterFeatures": "Water features"
     },
     "museumFeatures": {
       "interactiveExhibits": "Interactive exhibits",
