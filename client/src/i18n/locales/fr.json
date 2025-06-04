@@ -177,6 +177,16 @@
       "benches": "Bancs",
       "sandbox": "Bac à sable",
       "waterGames": "Jeux d'eau"
+    },
+    "museumFeatures": {
+      "interactiveExhibits": "Expositions interactives",
+      "audioGuides": "Guides audio",
+      "familyTours": "Visites familiales",
+      "educationalPrograms": "Programmes éducatifs",
+      "giftShop": "Boutique de souvenirs",
+      "cafe": "Café",
+      "wheelchairAccessible": "Accessible en fauteuil roulant",
+      "strollerFriendly": "Adapté aux poussettes"
     }
   },
   "profile": {

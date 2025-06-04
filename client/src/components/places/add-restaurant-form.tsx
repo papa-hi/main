@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
@@ -241,7 +242,7 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
             <FormItem>
               <FormLabel>{t('common.features', 'Features')}</FormLabel>
               <FormControl>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   {[
                     { key: 'kidsMenu', defaultText: 'Kids menu' },
                     { key: 'highChairs', defaultText: 'High Chairs' },
@@ -249,27 +250,28 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
                     { key: 'playCorner', defaultText: 'Play corner' },
                     { key: 'strollerAccessible', defaultText: 'Stroller accessible' }
                   ].map((featureObj) => {
-                    // Get the translated text for this feature
                     const translatedText = t(`places.restaurantFeatures.${featureObj.key}`, featureObj.defaultText);
                     
                     return (
-                      <Button
-                        key={featureObj.key}
-                        type="button"
-                        variant={field.value.includes(featureObj.key) ? "default" : "outline"}
-                        size="sm"
-                        className={field.value.includes(featureObj.key) ? "bg-primary text-white" : ""}
-                        onClick={() => {
-                          if (field.value.includes(featureObj.key)) {
-                            field.onChange(field.value.filter(f => f !== featureObj.key));
-                          } else {
-                            field.onChange([...field.value, featureObj.key]);
-                          }
-                        }}
-                      >
-                        {field.value.includes(featureObj.key) && <i className="fas fa-check mr-1"></i>}
-                        {translatedText}
-                      </Button>
+                      <div key={featureObj.key} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={featureObj.key}
+                          checked={field.value.includes(featureObj.key)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              field.onChange([...field.value, featureObj.key]);
+                            } else {
+                              field.onChange(field.value.filter(f => f !== featureObj.key));
+                            }
+                          }}
+                        />
+                        <label
+                          htmlFor={featureObj.key}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {translatedText}
+                        </label>
+                      </div>
                     );
                   })}
                 </div>
