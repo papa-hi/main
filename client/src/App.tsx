@@ -15,7 +15,7 @@ import CreatePage from "./pages/create";
 import EditPlaydatePage from "./pages/edit-playdate";
 import ChatPage from "./pages/chat";
 import AuthPage from "./pages/auth-page";
-import PlaygroundMapPage from "./pages/playground-map";
+
 import AdminDashboard from "./pages/admin";
 import AdminCheck from "./pages/admin-check";
 import TestCreatePlaydate from "./pages/test-create-playdate";
@@ -58,7 +58,7 @@ function Router() {
       <ProtectedRoute path="/chat/:id" component={ChatPage} />
       <ProtectedRoute path="/discover" component={DiscoverPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
-      <ProtectedRoute path="/playground-map" component={PlaygroundMapPage} />
+
       <ProtectedRoute path="/admin" component={AdminDashboard} />
       <Route path="/admin-check" component={AdminCheck} />
       <Route path="/auth" component={AuthPage} />

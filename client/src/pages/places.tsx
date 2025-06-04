@@ -183,15 +183,7 @@ export default function PlacesPage() {
                 : t('places.addPlayground', 'Add Playground')}
             </Button>
           )}
-          <Button
-            variant="outline"
-            onClick={() => setLocation('/playground-map')}
-            className="flex items-center gap-1 text-sm"
-          >
-            <i className="fas fa-map-marked-alt mr-1"></i>
-            <span className="hidden sm:inline">{t('nav.playgroundMap')}</span>
-            <span className="sm:hidden">{t('nav.map', 'Map')}</span>
-          </Button>
+
         </div>
       </div>
       

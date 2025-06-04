@@ -190,11 +190,7 @@ export function Header({ user }: HeaderProps) {
               {t('nav.places', 'Places')}
             </a>
           </Link>
-          <Link href="/playground-map">
-            <a className={`font-medium hover:text-accent transition ${location === '/playground-map' ? 'text-accent' : ''}`}>
-              {t('nav.playgroundMap', 'Speeltuin Kaart')}
-            </a>
-          </Link>
+
           <Link href="/chat">
             <a className={`font-medium hover:text-accent transition ${location === '/chat' ? 'text-accent' : ''}`}>
               {t('nav.chat', 'Berichten')}
