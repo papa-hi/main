@@ -1130,25 +1130,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Places routes
-  app.get("/api/places/:id", async (req, res) => {
-    try {
-      const placeId = parseInt(req.params.id);
-      if (isNaN(placeId)) {
-        return res.status(400).json({ error: "Invalid place ID" });
-      }
-      
-      const place = await storage.getPlaceById(placeId);
-      if (!place) {
-        return res.status(404).json({ error: "Place not found" });
-      }
-      
-      res.json(place);
-    } catch (err) {
-      console.error("Error fetching place details:", err);
-      res.status(500).json({ error: "Failed to fetch place details" });
-    }
-  });
-
   app.get("/api/places", async (req, res) => {
     try {
       // Extract query parameters for filtering
@@ -2116,6 +2097,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user rating:", error);
       res.status(500).json({ error: "Failed to fetch user rating" });
+    }
+  });
+
+  // Get individual place details
+  app.get("/api/places/:id", async (req, res) => {
+    try {
+      const placeId = parseInt(req.params.id);
+      if (isNaN(placeId)) {
+        return res.status(400).json({ error: "Invalid place ID" });
+      }
+      
+      const place = await storage.getPlaceById(placeId);
+      if (!place) {
+        return res.status(404).json({ error: "Place not found" });
+      }
+      
+      res.json(place);
+    } catch (err) {
+      console.error("Error fetching place details:", err);
+      res.status(500).json({ error: "Failed to fetch place details" });
     }
   });
 

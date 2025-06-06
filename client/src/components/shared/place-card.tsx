@@ -20,6 +20,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
   const { toast } = useToast();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const [isSaved, setIsSaved] = useState(place.isSaved);
   const [isToggling, setIsToggling] = useState(false);
   const [animateHeart, setAnimateHeart] = useState(false);
@@ -75,8 +76,20 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent navigation if clicking on interactive elements
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('a')) {
+      return;
+    }
+    setLocation(`/places/${place.id}`);
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64 transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-md">
+    <div 
+      className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64 transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-md cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="relative">
         <img 
           src={place.type === 'playground' && place.imageUrl?.includes('place-images') 
