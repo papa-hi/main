@@ -9,6 +9,7 @@ import { StarRating } from "@/components/reviews/review-form";
 import { useDistance } from "@/hooks/use-distance";
 import { Button } from "@/components/ui/button";
 import { CreatePlaydateForm } from "@/components/playdates/create-playdate-form";
+import { useLocation } from "wouter";
 
 interface PlaceCardProps {
   place: Place;
