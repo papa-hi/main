@@ -63,6 +63,8 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
     }
 
     console.log('Welcome email sent successfully:', data?.id);
+    console.log('Email details:', { from: 'papa@papa-hi.com', to, subject: 'Welcome to PaPa-Hi! 🎉' });
+    console.log('Check your spam folder and email delivery status in Resend dashboard');
     return true;
   } catch (error) {
     console.error('Failed to send welcome email:', error);
