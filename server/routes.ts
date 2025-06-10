@@ -2124,6 +2124,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/test", (req, res) => {
     res.json({ message: "Test endpoint works!" });
   });
+
+  // Test email endpoint for admins
+  app.post("/api/admin/test-email", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user!;
+      if (user.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ error: "Email address is required" });
+      }
+
+      const { sendTestEmail } = await import('./email-service');
+      const success = await sendTestEmail(email);
+      
+      if (success) {
+        res.json({ message: "Test email sent successfully" });
+      } else {
+        res.status(500).json({ error: "Failed to send test email" });
+      }
+    } catch (error) {
+      console.error("Error sending test email:", error);
+      res.status(500).json({ error: "Failed to send test email" });
+    }
+  });
   
   // Endpoint to provide environment variables needed on the frontend
   app.get("/api/env", (req, res) => {

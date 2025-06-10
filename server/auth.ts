@@ -8,6 +8,7 @@ import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
+import { sendWelcomeEmail } from "./email-service";
 
 declare global {
   namespace Express {
@@ -111,6 +112,18 @@ export function setupAuth(app: Express) {
         password: hashedPassword,
         role: finalRole
       });
+
+      // Send welcome email (don't wait for it to complete)
+      if (user.email && user.firstName) {
+        sendWelcomeEmail({
+          to: user.email,
+          firstName: user.firstName,
+          username: user.username
+        }).catch(error => {
+          console.error('Failed to send welcome email:', error);
+          // Don't fail registration if email fails
+        });
+      }
 
       req.login(user, (err) => {
         if (err) return next(err);
