@@ -46,7 +46,8 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
     });
 
     if (error) {
-      console.error('Error sending welcome email:', error);
+      console.error('❌ RESEND ERROR: Failed to send welcome email:', error);
+      console.log(`📧 EMAIL FAILURE: ${to} - ${error.message || 'Unknown error'}`);
       
       // Handle common Resend validation errors gracefully
       if (error.message && (
@@ -54,11 +55,12 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
         error.message.includes('You can only send testing emails') ||
         error.message.includes('verify a domain')
       )) {
-        console.log('Email service limitation - continuing with registration');
-        console.log(`Welcome email attempted for: ${to}`);
-        return true;
+        console.log('🚫 DOMAIN RESTRICTION: Email blocked by Resend validation');
+        console.log('⚠️  Registration continues without email delivery');
+        return true; // Don't block registration for domain restrictions
       }
       
+      console.log('💥 SMTP FAILURE: Technical error sending email');
       return false;
     }
 
