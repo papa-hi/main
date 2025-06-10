@@ -9,6 +9,7 @@ import { User as SelectUser } from "@shared/schema";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import { sendWelcomeEmail } from "./email-service";
+import { emailQueue } from "./email-queue";
 
 declare global {
   namespace Express {
