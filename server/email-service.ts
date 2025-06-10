@@ -192,7 +192,7 @@ function generateWelcomeEmailHTML(firstName: string, username: string): string {
           <p>Ready to get started? Log in to your account and begin exploring!</p>
           
           <center>
-            <a href="${process.env.NODE_ENV === 'production' ? 'https://your-app.replit.app' : 'http://localhost:5000'}" class="cta-button">
+            <a href="https://papa-hi.com" class="cta-button">
               Start Exploring PaPa-Hi
             </a>
           </center>
@@ -231,7 +231,7 @@ Your account (${username}) is now ready, and you can start exploring everything 
 
 Ready to get started? Log in to your account and begin exploring!
 
-Visit: ${process.env.NODE_ENV === 'production' ? 'https://your-app.replit.app' : 'http://localhost:5000'}
+Visit: https://papa-hi.com
 
 If you have any questions or need help getting started, feel free to reach out to our support team.
 
