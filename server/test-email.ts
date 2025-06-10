@@ -1,10 +1,15 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 async function testEmailConfiguration() {
   try {
     console.log('Testing Resend configuration...');
+    
+    if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not configured');
+      return;
+    }
+    
+    const resend = new Resend(process.env.RESEND_API_KEY);
     
     // Test 1: Check if API key is working
     const { data: domains, error: domainsError } = await resend.domains.list();

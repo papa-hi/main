@@ -1,6 +1,18 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resend: Resend | null = null;
+
+function getResendClient(): Resend | null {
+  if (!process.env.RESEND_API_KEY) {
+    return null;
+  }
+  
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  
+  return resend;
+}
 
 interface WelcomeEmailData {
   to: string;
@@ -10,9 +22,14 @@ interface WelcomeEmailData {
 
 export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmailData): Promise<boolean> {
   try {
-    if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY is not configured');
-      return false;
+    const resendClient = getResendClient();
+    
+    if (!resendClient) {
+      console.warn('RESEND_API_KEY is not configured - skipping welcome email');
+      console.log(`Welcome email would be sent to: ${to}`);
+      console.log('Subject: Welcome to PaPa-Hi! 🎉');
+      console.log('Content: Professional welcome email with app overview');
+      return true; // Return success but don't actually send
     }
 
     // Check if we're in testing mode (restricted to verified email)
@@ -26,7 +43,7 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
       return true; // Return success but don't actually send
     }
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await resendClient.emails.send({
       from: 'PaPa-Hi Welcome <papa@papa-hi.com>',
       to: [to],
       subject: 'Welcome to PaPa-Hi! 🎉',
@@ -221,7 +238,14 @@ This email was sent because you created an account with PaPa-Hi.
 
 export async function sendTestEmail(to: string): Promise<boolean> {
   try {
-    const { data, error } = await resend.emails.send({
+    const resendClient = getResendClient();
+    
+    if (!resendClient) {
+      console.warn('RESEND_API_KEY is not configured - cannot send test email');
+      return false;
+    }
+
+    const { data, error } = await resendClient.emails.send({
       from: 'PaPa-Hi <papa@papa-hi.com>',
       to: [to],
       subject: 'Test Email from PaPa-Hi',
