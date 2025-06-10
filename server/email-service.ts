@@ -15,8 +15,19 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
       return false;
     }
 
+    // Check if we're in testing mode (restricted to verified email)
+    const isTestingMode = to !== 'papa@papa-hi.com';
+    
+    if (isTestingMode) {
+      console.log(`Skipping welcome email in testing mode for: ${to}`);
+      console.log('Welcome email would be sent to:', to);
+      console.log('Subject: Welcome to PaPa-Hi! 🎉');
+      console.log('Content: Professional welcome email with app overview');
+      return true; // Return success but don't actually send
+    }
+
     const { data, error } = await resend.emails.send({
-      from: 'PaPa-Hi Welcome <onboarding@resend.dev>',
+      from: 'PaPa-Hi Welcome <welcome@papa-hi.com>',
       to: [to],
       subject: 'Welcome to PaPa-Hi! 🎉',
       html: generateWelcomeEmailHTML(firstName, username),
@@ -211,7 +222,7 @@ This email was sent because you created an account with PaPa-Hi.
 export async function sendTestEmail(to: string): Promise<boolean> {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'PaPa-Hi <delivered@resend.dev>',
+      from: 'PaPa-Hi <test@papa-hi.com>',
       to: [to],
       subject: 'Test Email from PaPa-Hi',
       html: '<h1>Test Email</h1><p>This is a test email from PaPa-Hi to verify email functionality.</p>',
