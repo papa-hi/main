@@ -228,7 +228,7 @@ export function setupAuth(app: Express) {
             console.log(`🔥 FIREBASE NEW USER: Attempting to send welcome email to: ${user.email}`);
             console.log(`Firebase user details: ${user.firstName} ${user.lastName} (${user.username})`);
             
-            // Send welcome email asynchronously but with better error handling
+            // Send welcome email with immediate delivery
             sendWelcomeEmail({
               to: user.email,
               firstName: user.firstName,
