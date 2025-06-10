@@ -221,6 +221,27 @@ export function setupAuth(app: Express) {
         try {
           user = await storage.createUser(newUser);
           console.log("New user created successfully:", user.id);
+          
+          // Send welcome email for new Firebase users
+          if (user.email && user.firstName) {
+            console.log(`Attempting to send welcome email to Firebase user: ${user.email}`);
+            sendWelcomeEmail({
+              to: user.email,
+              firstName: user.firstName,
+              username: user.username
+            }).then(success => {
+              if (success) {
+                console.log(`Welcome email sent successfully to Firebase user: ${user.email}`);
+              } else {
+                console.error(`Failed to send welcome email to Firebase user: ${user.email}`);
+              }
+            }).catch(error => {
+              console.error('Welcome email error for Firebase user:', error);
+              // Don't fail registration if email fails
+            });
+          } else {
+            console.log('Skipping welcome email for Firebase user - missing email or firstName');
+          }
         } catch (createError) {
           console.error("Error creating user:", createError);
           return res.status(500).json({ error: "Failed to create user account" });
