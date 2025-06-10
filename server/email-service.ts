@@ -32,19 +32,23 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
       return true; // Return success but don't actually send
     }
 
-    // Check if we're in testing mode (restricted to verified email)
-    const isTestingMode = to !== 'papa@papa-hi.com';
+    // Send emails to all addresses when RESEND_API_KEY is configured
+    // Only restrict in local development without proper email setup
+    const shouldSkipEmail = process.env.NODE_ENV === 'development' && 
+                           (!process.env.RESEND_API_KEY || to !== 'papa@papa-hi.com');
     
-    if (isTestingMode) {
-      console.log(`Skipping welcome email in testing mode for: ${to}`);
+    if (shouldSkipEmail) {
+      console.log(`Skipping welcome email in development mode for: ${to}`);
       console.log('Welcome email would be sent to:', to);
       console.log('Subject: Welcome to PaPa-Hi! 🎉');
       console.log('Content: Professional welcome email with app overview');
       return true; // Return success but don't actually send
     }
+    
+    console.log(`Sending welcome email to: ${to} (NODE_ENV: ${process.env.NODE_ENV})`);
 
     const { data, error } = await resendClient.emails.send({
-      from: 'PaPa-Hi Welcome <papa@papa-hi.com>',
+      from: 'PaPa-Hi <onboarding@resend.dev>',
       to: [to],
       subject: 'Welcome to PaPa-Hi! 🎉',
       html: generateWelcomeEmailHTML(firstName, username),
@@ -184,7 +188,7 @@ function generateWelcomeEmailHTML(firstName: string, username: string): string {
           <p>Ready to get started? Log in to your account and begin exploring!</p>
           
           <center>
-            <a href="http://localhost:5000" class="cta-button">
+            <a href="${process.env.NODE_ENV === 'production' ? 'https://your-app.replit.app' : 'http://localhost:5000'}" class="cta-button">
               Start Exploring PaPa-Hi
             </a>
           </center>
@@ -223,7 +227,7 @@ Your account (${username}) is now ready, and you can start exploring everything 
 
 Ready to get started? Log in to your account and begin exploring!
 
-Visit: http://localhost:5000
+Visit: ${process.env.NODE_ENV === 'production' ? 'https://your-app.replit.app' : 'http://localhost:5000'}
 
 If you have any questions or need help getting started, feel free to reach out to our support team.
 
@@ -246,7 +250,7 @@ export async function sendTestEmail(to: string): Promise<boolean> {
     }
 
     const { data, error } = await resendClient.emails.send({
-      from: 'PaPa-Hi <papa@papa-hi.com>',
+      from: 'PaPa-Hi <onboarding@resend.dev>',
       to: [to],
       subject: 'Test Email from PaPa-Hi',
       html: '<h1>Test Email</h1><p>This is a test email from PaPa-Hi to verify email functionality.</p>',
