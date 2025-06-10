@@ -236,7 +236,7 @@ Visit: https://papa-hi.com
 If you have any questions or need help getting started, feel free to reach out to our support team.
 
 Happy exploring!
-The PaPa-Hi Team
+The PaPa-Hi Tribe
 
 ---
 This email was sent because you created an account with PaPa-Hi.
