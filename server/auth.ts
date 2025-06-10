@@ -115,14 +115,23 @@ export function setupAuth(app: Express) {
 
       // Send welcome email (don't wait for it to complete)
       if (user.email && user.firstName) {
+        console.log(`Attempting to send welcome email to: ${user.email}`);
         sendWelcomeEmail({
           to: user.email,
           firstName: user.firstName,
           username: user.username
+        }).then(success => {
+          if (success) {
+            console.log(`Welcome email sent successfully to: ${user.email}`);
+          } else {
+            console.error(`Failed to send welcome email to: ${user.email}`);
+          }
         }).catch(error => {
-          console.error('Failed to send welcome email:', error);
+          console.error('Welcome email error:', error);
           // Don't fail registration if email fails
         });
+      } else {
+        console.log('Skipping welcome email - missing email or firstName');
       }
 
       req.login(user, (err) => {
