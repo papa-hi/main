@@ -228,20 +228,29 @@ export function setupAuth(app: Express) {
             console.log(`🔥 FIREBASE NEW USER: Attempting to send welcome email to: ${user.email}`);
             console.log(`Firebase user details: ${user.firstName} ${user.lastName} (${user.username})`);
             
-            // Send welcome email with immediate delivery
-            sendWelcomeEmail({
+            // Send welcome email with immediate delivery and wait for completion
+            // Capture user data for async email processing
+            const emailData = {
               to: user.email,
               firstName: user.firstName,
               username: user.username
-            }).then(success => {
-              if (success) {
-                console.log(`✅ FIREBASE WELCOME EMAIL: Successfully sent to ${user.email}`);
-              } else {
-                console.error(`❌ FIREBASE WELCOME EMAIL: Failed to send to ${user.email}`);
+            };
+            
+            // Process email immediately after response
+            setImmediate(async () => {
+              try {
+                console.log(`📧 FIREBASE EMAIL: Starting delivery process for ${emailData.to}`);
+                const success = await sendWelcomeEmail(emailData);
+                
+                if (success) {
+                  console.log(`✅ FIREBASE WELCOME EMAIL: Successfully sent to ${emailData.to}`);
+                } else {
+                  console.error(`❌ FIREBASE WELCOME EMAIL: Failed to send to ${emailData.to}`);
+                }
+              } catch (error) {
+                console.error('❌ FIREBASE WELCOME EMAIL ERROR:', error);
+                console.error('Email details:', emailData);
               }
-            }).catch(error => {
-              console.error('❌ FIREBASE WELCOME EMAIL ERROR:', error);
-              console.error('Email details:', { to: user.email, firstName: user.firstName, username: user.username });
             });
           } else {
             console.log(`⚠️  FIREBASE SIGNUP: Skipping welcome email - missing data. Email: ${user.email}, FirstName: ${user.firstName}`);
