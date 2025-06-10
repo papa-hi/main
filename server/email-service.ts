@@ -16,7 +16,7 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
     }
 
     const { data, error } = await resend.emails.send({
-      from: 'PaPa-Hi <welcome@papa-hi.app>',
+      from: 'PaPa-Hi <onboarding@resend.dev>',
       to: [to],
       subject: 'Welcome to PaPa-Hi! 🎉',
       html: generateWelcomeEmailHTML(firstName, username),
@@ -211,7 +211,7 @@ This email was sent because you created an account with PaPa-Hi.
 export async function sendTestEmail(to: string): Promise<boolean> {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'PaPa-Hi <test@papa-hi.app>',
+      from: 'PaPa-Hi <delivered@resend.dev>',
       to: [to],
       subject: 'Test Email from PaPa-Hi',
       html: '<h1>Test Email</h1><p>This is a test email from PaPa-Hi to verify email functionality.</p>',
