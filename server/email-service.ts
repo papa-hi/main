@@ -16,7 +16,7 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
     }
 
     const { data, error } = await resend.emails.send({
-      from: 'PaPa-Hi <onboarding@resend.dev>',
+      from: 'PaPa-Hi Welcome <onboarding@resend.dev>',
       to: [to],
       subject: 'Welcome to PaPa-Hi! 🎉',
       html: generateWelcomeEmailHTML(firstName, username),
@@ -156,7 +156,7 @@ function generateWelcomeEmailHTML(firstName: string, username: string): string {
           <p>Ready to get started? Log in to your account and begin exploring!</p>
           
           <center>
-            <a href="${process.env.NODE_ENV === 'production' ? 'https://papa-hi.app' : 'http://localhost:5000'}" class="cta-button">
+            <a href="http://localhost:5000" class="cta-button">
               Start Exploring PaPa-Hi
             </a>
           </center>
@@ -195,7 +195,7 @@ Your account (${username}) is now ready, and you can start exploring everything 
 
 Ready to get started? Log in to your account and begin exploring!
 
-Visit: ${process.env.NODE_ENV === 'production' ? 'https://papa-hi.app' : 'http://localhost:5000'}
+Visit: http://localhost:5000
 
 If you have any questions or need help getting started, feel free to reach out to our support team.
 
