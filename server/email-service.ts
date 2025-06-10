@@ -3,12 +3,17 @@ import { Resend } from 'resend';
 let resend: Resend | null = null;
 
 function getResendClient(): Resend | null {
-  if (!process.env.RESEND_API_KEY) {
+  const apiKey = process.env.RESEND_API_KEY;
+  console.log(`Checking RESEND_API_KEY: ${apiKey ? 'Present' : 'Missing'}`);
+  
+  if (!apiKey) {
+    console.log('RESEND_API_KEY not found in environment variables');
     return null;
   }
   
   if (!resend) {
-    resend = new Resend(process.env.RESEND_API_KEY);
+    console.log('Initializing Resend client');
+    resend = new Resend(apiKey);
   }
   
   return resend;
@@ -32,20 +37,8 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
       return true; // Return success but don't actually send
     }
 
-    // Send emails to all addresses when RESEND_API_KEY is configured
-    // Only restrict in local development without proper email setup
-    const shouldSkipEmail = process.env.NODE_ENV === 'development' && 
-                           (!process.env.RESEND_API_KEY || to !== 'papa@papa-hi.com');
-    
-    if (shouldSkipEmail) {
-      console.log(`Skipping welcome email in development mode for: ${to}`);
-      console.log('Welcome email would be sent to:', to);
-      console.log('Subject: Welcome to PaPa-Hi! 🎉');
-      console.log('Content: Professional welcome email with app overview');
-      return true; // Return success but don't actually send
-    }
-    
-    console.log(`Sending welcome email to: ${to} (NODE_ENV: ${process.env.NODE_ENV})`);
+    // Send emails when RESEND_API_KEY is configured
+    console.log(`Sending welcome email to: ${to}`);
 
     const { data, error } = await resendClient.emails.send({
       from: 'PaPa-Hi <onboarding@resend.dev>',
