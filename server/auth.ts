@@ -224,23 +224,26 @@ export function setupAuth(app: Express) {
           
           // Send welcome email for new Firebase users
           if (user.email && user.firstName) {
-            console.log(`Attempting to send welcome email to Firebase user: ${user.email}`);
+            console.log(`🔥 FIREBASE NEW USER: Attempting to send welcome email to: ${user.email}`);
+            console.log(`Firebase user details: ${user.firstName} ${user.lastName} (${user.username})`);
+            
+            // Send welcome email asynchronously but with better error handling
             sendWelcomeEmail({
               to: user.email,
               firstName: user.firstName,
               username: user.username
             }).then(success => {
               if (success) {
-                console.log(`Welcome email sent successfully to Firebase user: ${user.email}`);
+                console.log(`✅ FIREBASE WELCOME EMAIL: Successfully sent to ${user.email}`);
               } else {
-                console.error(`Failed to send welcome email to Firebase user: ${user.email}`);
+                console.error(`❌ FIREBASE WELCOME EMAIL: Failed to send to ${user.email}`);
               }
             }).catch(error => {
-              console.error('Welcome email error for Firebase user:', error);
-              // Don't fail registration if email fails
+              console.error('❌ FIREBASE WELCOME EMAIL ERROR:', error);
+              console.error('Email details:', { to: user.email, firstName: user.firstName, username: user.username });
             });
           } else {
-            console.log('Skipping welcome email for Firebase user - missing email or firstName');
+            console.log(`⚠️  FIREBASE SIGNUP: Skipping welcome email - missing data. Email: ${user.email}, FirstName: ${user.firstName}`);
           }
         } catch (createError) {
           console.error("Error creating user:", createError);
