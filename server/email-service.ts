@@ -4,15 +4,12 @@ let resend: Resend | null = null;
 
 function getResendClient(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY;
-  console.log(`Checking RESEND_API_KEY: ${apiKey ? 'Present' : 'Missing'}`);
   
   if (!apiKey) {
-    console.log('RESEND_API_KEY not found in environment variables');
     return null;
   }
   
   if (!resend) {
-    console.log('Initializing Resend client');
     resend = new Resend(apiKey);
   }
   
@@ -50,6 +47,13 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
 
     if (error) {
       console.error('Error sending welcome email:', error);
+      
+      // For validation errors, still return success to avoid blocking user registration
+      if (error.message && error.message.includes('Invalid `to` field')) {
+        console.log('Email validation error - continuing with registration');
+        return true;
+      }
+      
       return false;
     }
 
