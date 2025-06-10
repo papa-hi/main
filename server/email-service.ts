@@ -38,7 +38,7 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
     console.log(`Sending welcome email to: ${to}`);
 
     const { data, error } = await resendClient.emails.send({
-      from: 'PaPa-Hi <onboarding@resend.dev>',
+      from: 'PaPa-Hi <papa@papa-hi.com>',
       to: [to],
       subject: 'Welcome to PaPa-Hi! 🎉',
       html: generateWelcomeEmailHTML(firstName, username),
@@ -48,9 +48,14 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
     if (error) {
       console.error('Error sending welcome email:', error);
       
-      // For validation errors, still return success to avoid blocking user registration
-      if (error.message && error.message.includes('Invalid `to` field')) {
-        console.log('Email validation error - continuing with registration');
+      // Handle common Resend validation errors gracefully
+      if (error.message && (
+        error.message.includes('Invalid `to` field') ||
+        error.message.includes('You can only send testing emails') ||
+        error.message.includes('verify a domain')
+      )) {
+        console.log('Email service limitation - continuing with registration');
+        console.log(`Welcome email attempted for: ${to}`);
         return true;
       }
       
@@ -247,7 +252,7 @@ export async function sendTestEmail(to: string): Promise<boolean> {
     }
 
     const { data, error } = await resendClient.emails.send({
-      from: 'PaPa-Hi <onboarding@resend.dev>',
+      from: 'PaPa-Hi <papa@papa-hi.com>',
       to: [to],
       subject: 'Test Email from PaPa-Hi',
       html: '<h1>Test Email</h1><p>This is a test email from PaPa-Hi to verify email functionality.</p>',
