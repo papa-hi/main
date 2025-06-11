@@ -1,15 +1,15 @@
-import { sendWelcomeEmail } from './server/email-service.js';
+import { sendWelcomeEmail } from './server/email-service';
 
 async function testCollinsWelcome() {
-  console.log('Testing welcome email for Collins...');
+  console.log('Testing welcome email to Collins...');
   
-  const success = await sendWelcomeEmail({
-    to: 'collins@sisterschools.eu',
+  const result = await sendWelcomeEmail({
+    to: 'clidede@akamai.com',
     firstName: 'Collins',
-    username: 'google_j6AfW1OD'
+    username: 'rentgari'
   });
   
-  console.log('Email send result:', success);
+  console.log('Email test result:', result);
 }
 
-testCollinsWelcome().catch(console.error);
+testCollinsWelcome();

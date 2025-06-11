@@ -43,6 +43,11 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
       subject: 'Welcome to PaPa-Hi! 🎉',
       html: generateWelcomeEmailHTML(firstName, username),
       text: generateWelcomeEmailText(firstName, username),
+      headers: {
+        'X-Entity-Ref-ID': `welcome-${Date.now()}`,
+        'X-Priority': '1',
+        'Importance': 'high'
+      }
     });
 
     if (error) {
