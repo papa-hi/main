@@ -49,14 +49,27 @@ export function usePushNotifications() {
     }
 
     try {
-      // For older browsers that might not support the promise-based API
-      if (typeof Notification.requestPermission === 'function') {
-        const permission = await Notification.requestPermission();
-        console.log('Notification permission result:', permission);
-        return permission;
-      } else {
-        throw new Error('Notification.requestPermission is not available');
-      }
+      // For older browsers and Android devices that need callback-style API
+      const requestPermissionAsync = (): Promise<NotificationPermission> => {
+        return new Promise((resolve) => {
+          if (typeof Notification.requestPermission === 'function') {
+            const result = Notification.requestPermission((permission) => {
+              resolve(permission);
+            });
+            
+            // If the function returns a promise (modern browsers)
+            if (result && typeof result.then === 'function') {
+              result.then(resolve);
+            }
+          } else {
+            resolve('denied');
+          }
+        });
+      };
+
+      const permission = await requestPermissionAsync();
+      console.log('Notification permission result:', permission);
+      return permission;
     } catch (error) {
       console.error('Error requesting notification permission:', error);
       throw error;

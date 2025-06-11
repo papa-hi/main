@@ -43,11 +43,22 @@ export default function NotificationSettings() {
         return;
       }
 
+      // For Android devices, add a small delay to ensure user gesture is preserved
+      if (/Android/i.test(navigator.userAgent)) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
       const success = await subscribe();
       if (success) {
         toast({
           title: t('settings.notifications.subscribed'),
           description: t('settings.notifications.subscribedDesc'),
+        });
+      } else if (error) {
+        toast({
+          title: t('settings.notifications.subscriptionFailed'),
+          description: error,
+          variant: "destructive"
         });
       }
     }
@@ -205,6 +216,13 @@ export default function NotificationSettings() {
               <Bell className="h-4 w-4 mr-2" />
               {loading ? t('settings.notifications.enabling') : t('settings.notifications.enablePush')}
             </Button>
+            
+            {/* Show additional help for Android devices */}
+            {/Android/i.test(navigator.userAgent) && (
+              <p className="text-xs text-muted-foreground mt-2">
+                If the permission dialog doesn't appear, try enabling notifications in your browser's site settings.
+              </p>
+            )}
           </div>
         )}
       </CardContent>
