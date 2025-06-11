@@ -169,7 +169,11 @@ export default function SettingsPage() {
                   <p className="text-sm text-muted-foreground mb-3">
                     {t('settings.help.contactSupportDesc')}
                   </p>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => window.location.href = 'mailto:papa@papa-hi.com?subject=PaPa-Hi Support Request'}
+                  >
                     {t('settings.help.contactUs')}
                   </Button>
                 </div>
