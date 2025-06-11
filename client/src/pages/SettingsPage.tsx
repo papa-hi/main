@@ -7,11 +7,13 @@ import NotificationSettings from '@/components/NotificationSettings';
 import { useQuery } from '@tanstack/react-query';
 import { getQueryFn } from '@/lib/queryClient';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'wouter';
 import type { User } from '@shared/schema';
 
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState('notifications');
   const { t } = useTranslation();
+  const [_, navigate] = useLocation();
 
   const { data: user } = useQuery<User>({
     queryKey: ['/api/user'],
@@ -86,7 +88,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <Separator />
-                <Button variant="outline">{t('settings.account.editProfile')}</Button>
+                <Button variant="outline" onClick={() => navigate('/profile')}>{t('settings.account.editProfile')}</Button>
               </div>
             </CardContent>
           </Card>
