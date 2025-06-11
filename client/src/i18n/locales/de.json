@@ -452,6 +452,7 @@
       "unsubscribedDesc": "Du erhältst keine Push-Benachrichtigungen mehr.",
       "subscriptionFailed": "Anmeldung fehlgeschlagen",
       "subscriptionFailedDesc": "Etwas ist beim Einrichten der Benachrichtigungen schiefgelaufen.",
+      "permissionDeniedDesc": "Benachrichtigungen sind blockiert. Bitte aktivieren Sie sie in Ihren Browser-Einstellungen.",
       "activeStatus": "Push-Benachrichtigungen sind aktiv",
       "preferences": "Benachrichtigungs-Einstellungen",
       "playdateReminders": "Spieltreffen-Erinnerungen",

@@ -444,6 +444,7 @@
       "unsubscribedDesc": "Je ontvangt geen push meldingen meer.",
       "subscriptionFailed": "Abonnement mislukt",
       "subscriptionFailedDesc": "Er ging iets mis bij het instellen van meldingen.",
+      "permissionDeniedDesc": "Meldingen zijn geblokkeerd. Schakel ze in via je browserinstellingen.",
       "activeStatus": "Push meldingen zijn actief",
       "preferences": "Melding Voorkeuren",
       "playdateReminders": "Playdate Herinneringen",

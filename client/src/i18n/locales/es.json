@@ -455,6 +455,7 @@
       "unsubscribedDesc": "Ya no recibirás notificaciones push.",
       "subscriptionFailed": "Suscripción fallida",
       "subscriptionFailedDesc": "Algo salió mal al configurar las notificaciones.",
+      "permissionDeniedDesc": "Las notificaciones están bloqueadas. Por favor habilítalas en la configuración de tu navegador.",
       "activeStatus": "Las notificaciones push están activas",
       "preferences": "Preferencias de Notificación",
       "playdateReminders": "Recordatorios de Citas de Juego",

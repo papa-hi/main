@@ -39,8 +39,28 @@ export function usePushNotifications() {
   };
 
   const requestPermission = async (): Promise<NotificationPermission> => {
-    const permission = await Notification.requestPermission();
-    return permission;
+    // Check current permission first
+    if (Notification.permission === 'granted') {
+      return 'granted';
+    }
+    
+    if (Notification.permission === 'denied') {
+      return 'denied';
+    }
+
+    try {
+      // For older browsers that might not support the promise-based API
+      if (typeof Notification.requestPermission === 'function') {
+        const permission = await Notification.requestPermission();
+        console.log('Notification permission result:', permission);
+        return permission;
+      } else {
+        throw new Error('Notification.requestPermission is not available');
+      }
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+      throw error;
+    }
   };
 
   const subscribe = async (): Promise<boolean> => {
@@ -53,28 +73,51 @@ export function usePushNotifications() {
     setError(null);
 
     try {
-      const permission = await requestPermission();
+      console.log('Starting notification subscription process...');
+      
+      // Add timeout for permission request
+      const permissionTimeout = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Permission request timed out')), 10000);
+      });
+
+      const permissionRequest = requestPermission();
+      const permission = await Promise.race([permissionRequest, permissionTimeout]);
+      
+      console.log('Permission result:', permission);
       
       if (permission !== 'granted') {
-        setError('Permission denied for notifications');
+        const errorMsg = permission === 'denied' 
+          ? 'Notifications were blocked. Please enable them in your browser settings.' 
+          : 'Permission was not granted for notifications';
+        setError(errorMsg);
         setLoading(false);
         return false;
       }
 
+      console.log('Getting VAPID key from server...');
       // Get VAPID public key from server
       const envResponse = await fetch('/api/env');
+      if (!envResponse.ok) {
+        throw new Error('Failed to get server configuration');
+      }
+      
       const envData = await envResponse.json();
       const vapidPublicKey = envData.VAPID_PUBLIC_KEY || 'BLslB1PkERhUIoQhTLjwpQdp5p3KK0ZqGhLuJxIJhLLWWCdaJPvGw_KEFOgO5pfTk7Fg_Dt97wqxl9DH2IUzmCg';
 
+      console.log('Converting VAPID key...');
       // Convert VAPID key to Uint8Array
       const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
 
+      console.log('Waiting for service worker...');
       const registration = await navigator.serviceWorker.ready;
+      
+      console.log('Creating push subscription...');
       const pushSubscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey
       });
 
+      console.log('Push subscription created, sending to server...');
       // Send subscription to server
       const subscriptionData: PushSubscriptionData = {
         endpoint: pushSubscription.endpoint,
@@ -86,13 +129,16 @@ export function usePushNotifications() {
 
       await apiRequest('POST', '/api/push/subscribe', subscriptionData);
 
+      console.log('Subscription successful!');
       setSubscription(pushSubscription);
       setIsSubscribed(true);
       setLoading(false);
       return true;
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to subscribe');
+      console.error('Subscription error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to subscribe to notifications';
+      setError(errorMessage);
       setLoading(false);
       return false;
     }

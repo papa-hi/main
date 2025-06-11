@@ -33,6 +33,16 @@ export default function NotificationSettings() {
         });
       }
     } else {
+      // Check if permission is already denied
+      if (Notification.permission === 'denied') {
+        toast({
+          title: t('settings.notifications.subscriptionFailed'),
+          description: t('settings.notifications.permissionDeniedDesc'),
+          variant: "destructive"
+        });
+        return;
+      }
+
       const success = await subscribe();
       if (success) {
         toast({

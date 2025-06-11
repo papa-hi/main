@@ -478,6 +478,7 @@
       "unsubscribedDesc": "You will no longer receive push notifications.",
       "subscriptionFailed": "Subscription failed",
       "subscriptionFailedDesc": "Something went wrong while setting up notifications.",
+      "permissionDeniedDesc": "Notifications are blocked. Please enable them in your browser settings.",
       "activeStatus": "Push notifications are active",
       "preferences": "Notification Preferences",
       "playdateReminders": "Playdate Reminders",

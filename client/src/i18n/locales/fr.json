@@ -455,6 +455,7 @@
       "unsubscribedDesc": "Vous ne recevrez plus de notifications push.",
       "subscriptionFailed": "Abonnement échoué",
       "subscriptionFailedDesc": "Une erreur s'est produite lors de la configuration des notifications.",
+      "permissionDeniedDesc": "Les notifications sont bloquées. Veuillez les activer dans les paramètres de votre navigateur.",
       "activeStatus": "Les notifications push sont actives",
       "preferences": "Préférences de Notification",
       "playdateReminders": "Rappels de Rendez-vous de Jeu",
