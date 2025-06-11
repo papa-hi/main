@@ -72,31 +72,14 @@ export function usePushNotifications() {
     setError(null);
 
     try {
-      window.dispatchEvent(new CustomEvent('debug-notification', { 
-        detail: { message: '🔄 Step 1: Starting subscription process', type: 'info' } 
-      }));
-      
       // Shorter timeout for mobile devices
       const timeoutDuration = /Android/i.test(navigator.userAgent) ? 5000 : 10000;
       const permissionTimeout = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('debug-notification', { 
-            detail: { message: `⏰ Permission timeout after ${timeoutDuration/1000}s`, type: 'error' } 
-          }));
-          reject(new Error(`Permission request timed out after ${timeoutDuration/1000} seconds`));
-        }, timeoutDuration);
+        setTimeout(() => reject(new Error(`Permission request timed out after ${timeoutDuration/1000} seconds`)), timeoutDuration);
       });
 
-      window.dispatchEvent(new CustomEvent('debug-notification', { 
-        detail: { message: '🔐 Step 2: Requesting permission', type: 'info' } 
-      }));
-      
       const permissionRequest = requestPermission();
       const permission = await Promise.race([permissionRequest, permissionTimeout]);
-      
-      window.dispatchEvent(new CustomEvent('debug-notification', { 
-        detail: { message: `✅ Step 3: Permission = ${permission}`, type: 'info' } 
-      }));
       
       if (permission !== 'granted') {
         const errorMsg = permission === 'denied' 
@@ -107,10 +90,6 @@ export function usePushNotifications() {
         return false;
       }
 
-      window.dispatchEvent(new CustomEvent('debug-notification', { 
-        detail: { message: '🌐 Step 4: Getting VAPID key from server', type: 'info' } 
-      }));
-      
       // Get VAPID public key from server
       const envResponse = await fetch('/api/env');
       if (!envResponse.ok) {
@@ -120,36 +99,19 @@ export function usePushNotifications() {
       const envData = await envResponse.json();
       const vapidPublicKey = envData.VAPID_PUBLIC_KEY || 'BLslB1PkERhUIoQhTLjwpQdp5p3KK0ZqGhLuJxIJhLLWWCdaJPvGw_KEFOgO5pfTk7Fg_Dt97wqxl9DH2IUzmCg';
 
-      window.dispatchEvent(new CustomEvent('debug-notification', { 
-        detail: { message: '🔑 Step 5: Converting VAPID key', type: 'info' } 
-      }));
-      
       // Convert VAPID key to Uint8Array
       const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
 
-      window.dispatchEvent(new CustomEvent('debug-notification', { 
-        detail: { message: '⚙️ Step 6: Waiting for service worker', type: 'info' } 
-      }));
-      
-      // Add timeout for service worker ready
+      // Add timeout for service worker ready with fallback for Android devices
       const swTimeout = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('debug-notification', { 
-            detail: { message: '❌ Service worker timeout - trying fallback', type: 'error' } 
-          }));
-          reject(new Error('Service worker ready timeout'));
-        }, 3000);
+        setTimeout(() => reject(new Error('Service worker ready timeout')), 3000);
       });
 
       let registration;
       try {
         registration = await Promise.race([navigator.serviceWorker.ready, swTimeout]);
       } catch (error) {
-        // Fallback: Register service worker manually
-        window.dispatchEvent(new CustomEvent('debug-notification', { 
-          detail: { message: '🔄 Fallback: Manual SW registration', type: 'info' } 
-        }));
-        
+        // Fallback: Register service worker manually for Android devices
         registration = await navigator.serviceWorker.register('/service-worker.js');
         await registration.update();
         
@@ -161,16 +123,11 @@ export function usePushNotifications() {
         registration = await Promise.race([navigator.serviceWorker.ready, readyTimeout]);
       }
       
-      window.dispatchEvent(new CustomEvent('debug-notification', { 
-        detail: { message: '📱 Step 7: Creating push subscription (CRITICAL)', type: 'info' } 
-      }));
-      
       const pushSubscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey
       });
 
-      console.log('Push subscription created, sending to server...');
       // Send subscription to server (wrap in subscription object as expected by server)
       const subscriptionData = {
         subscription: {
@@ -182,20 +139,14 @@ export function usePushNotifications() {
         }
       };
 
-      window.dispatchEvent(new CustomEvent('debug-notification', { 
-        detail: { message: '📡 Step 8: Sending to server', type: 'info' } 
-      }));
-
       await apiRequest('POST', '/api/push/subscribe', subscriptionData);
 
-      console.log('Subscription successful!');
       setSubscription(pushSubscription);
       setIsSubscribed(true);
       setLoading(false);
       return true;
 
     } catch (err) {
-      console.error('Subscription error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to subscribe to notifications';
       setError(errorMessage);
       setLoading(false);
