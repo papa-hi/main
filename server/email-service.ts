@@ -170,49 +170,8 @@ export function generateWelcomeEmailHTML(firstName: string, username: string): s
           margin: 30px 0;
           position: relative;
         }
-        .playground-scene {
-          position: relative;
-          height: 100px;
-          margin: 20px 0;
-          text-align: center;
-        }
-        .floating-circle {
-          position: absolute;
-          font-size: 24px;
+        .floating-hearts {
           animation: float 3s ease-in-out infinite;
-        }
-        .circle-1 {
-          left: 10%;
-          animation-delay: 0s;
-        }
-        .circle-2 {
-          left: 30%;
-          animation-delay: 0.5s;
-        }
-        .circle-3 {
-          left: 60%;
-          animation-delay: 1s;
-        }
-        .circle-4 {
-          left: 80%;
-          animation-delay: 1.5s;
-        }
-        .playground-elements {
-          margin-top: 60px;
-        }
-        .playground-emoji {
-          font-size: 28px;
-          margin: 0 10px;
-          display: inline-block;
-        }
-        .swing {
-          animation: bounce 2s ease-in-out infinite;
-        }
-        .seesaw {
-          animation: seesaw 3s ease-in-out infinite;
-        }
-        .slide {
-          animation: pulse 2.5s ease-in-out infinite;
         }
         .bounce-in {
           animation: bounceIn 1.5s ease-out;
@@ -242,45 +201,12 @@ export function generateWelcomeEmailHTML(firstName: string, username: string): s
           50% { transform: scale(1.05); }
           100% { transform: scale(1); }
         }
-        @keyframes bounce {
-          0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-          40% { transform: translateY(-10px); }
-          60% { transform: translateY(-5px); }
-        }
-        @keyframes seesaw {
-          0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(10deg); }
-          75% { transform: rotate(-10deg); }
-        }
         .feature-icon {
           color: #ff6b35;
           margin-right: 10px;
           font-size: 18px;
           animation: bounceIn 1s ease-out;
           animation-delay: calc(var(--delay) * 0.2s);
-        }
-        .footer-animation {
-          text-align: center;
-          margin: 20px 0;
-        }
-        .footer-emoji {
-          font-size: 32px;
-          margin: 0 8px;
-          display: inline-block;
-        }
-        .family-row {
-          text-align: center;
-        }
-        .family-emoji {
-          font-size: 28px;
-          margin: 0 15px;
-          display: inline-block;
-          animation: bounce 2s ease-in-out infinite;
-        }
-        .heart-emoji {
-          font-size: 24px;
-          color: #ff6b35;
-          animation: pulse 1.5s ease-in-out infinite;
         }
       </style>
     </head>
@@ -289,17 +215,43 @@ export function generateWelcomeEmailHTML(firstName: string, username: string): s
         <div class="header">
           <div class="logo bounce-in">PaPa-Hi</div>
           <div class="welcome-animation">
-            <div class="playground-scene">
-              <div class="floating-circle circle-1">🎈</div>
-              <div class="floating-circle circle-2">⭐</div>
-              <div class="floating-circle circle-3">🎪</div>
-              <div class="floating-circle circle-4">🎠</div>
-              <div class="playground-elements">
-                <span class="playground-emoji swing">🛝</span>
-                <span class="playground-emoji seesaw">🎪</span>
-                <span class="playground-emoji slide">🏰</span>
-              </div>
-            </div>
+            <svg width="200" height="120" viewBox="0 0 200 120" class="floating-hearts">
+              <circle cx="40" cy="40" r="8" fill="#ff6b35" opacity="0.8">
+                <animate attributeName="cy" values="40;30;40" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="80" cy="60" r="6" fill="#ffa500" opacity="0.6">
+                <animate attributeName="cy" values="60;50;60" dur="2.5s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="120" cy="45" r="7" fill="#ff69b4" opacity="0.7">
+                <animate attributeName="cy" values="45;35;45" dur="1.8s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="160" cy="55" r="5" fill="#32cd32" opacity="0.5">
+                <animate attributeName="cy" values="55;45;55" dur="2.2s" repeatCount="indefinite"/>
+              </circle>
+              
+              <!-- Animated playground elements -->
+              <rect x="20" y="80" width="40" height="20" fill="#8B4513" rx="5">
+                <animate attributeName="height" values="20;25;20" dur="3s" repeatCount="indefinite"/>
+              </rect>
+              <rect x="70" y="85" width="30" height="15" fill="#228B22" rx="3">
+                <animate attributeName="height" values="15;18;15" dur="2.5s" repeatCount="indefinite"/>
+              </rect>
+              <circle cx="130" cy="90" r="10" fill="#FFD700">
+                <animate attributeName="r" values="10;12;10" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              
+              <!-- Family figures -->
+              <g transform="translate(150, 75)">
+                <circle cx="5" cy="5" r="3" fill="#ffdbac"/>
+                <rect x="2" y="8" width="6" height="8" fill="#4169E1" rx="1"/>
+                <circle cx="15" cy="5" r="3" fill="#ffdbac"/>
+                <rect x="12" y="8" width="6" height="8" fill="#FF69B4" rx="1"/>
+                <circle cx="25" cy="8" r="2" fill="#ffdbac"/>
+                <rect x="23" y="10" width="4" height="6" fill="#32CD32" rx="1"/>
+                <animateTransform attributeName="transform" type="translate" 
+                  values="150,75; 148,75; 150,75" dur="4s" repeatCount="indefinite"/>
+              </g>
+            </svg>
           </div>
           <h1 class="welcome-title slide-in">Welcome to PaPa-Hi, ${firstName}! 🎉</h1>
         </div>
@@ -349,19 +301,49 @@ export function generateWelcomeEmailHTML(firstName: string, username: string): s
         </div>
         
         <div class="footer">
-          <div class="footer-playground" style="margin-bottom: 20px;">
-            <div class="footer-animation">
-              <span class="footer-emoji bounce" style="animation-delay: 0s;">🏰</span>
-              <span class="footer-emoji float" style="animation-delay: 0.5s;">🎪</span>
-              <span class="footer-emoji pulse" style="animation-delay: 1s;">🎠</span>
-              <span class="footer-emoji bounce" style="animation-delay: 1.5s;">🛝</span>
-              <span class="footer-emoji float" style="animation-delay: 2s;">⭐</span>
-            </div>
-            <div class="family-row" style="margin-top: 15px;">
-              <span class="family-emoji" style="animation-delay: 0.2s;">👨‍👩‍👧‍👦</span>
-              <span class="heart-emoji" style="animation-delay: 0.8s;">❤️</span>
-              <span class="family-emoji" style="animation-delay: 1.4s;">👨‍👩‍👧‍👦</span>
-            </div>
+          <div class="welcome-animation" style="margin-bottom: 20px;">
+            <svg width="300" height="80" viewBox="0 0 300 80" style="animation: slideIn 2s ease-out;">
+              <!-- Animated playground scene -->
+              <rect x="20" y="60" width="260" height="15" fill="#90EE90" rx="8"/>
+              
+              <!-- Swing set -->
+              <line x1="50" y1="20" x2="50" y2="60" stroke="#8B4513" stroke-width="3"/>
+              <line x1="80" y1="20" x2="80" y2="60" stroke="#8B4513" stroke-width="3"/>
+              <line x1="45" y1="20" x2="85" y2="20" stroke="#8B4513" stroke-width="3"/>
+              <rect x="60" y="35" width="12" height="3" fill="#DEB887" rx="1">
+                <animateTransform attributeName="transform" type="rotate" 
+                  values="0 66 36; 15 66 36; 0 66 36; -15 66 36; 0 66 36" dur="4s" repeatCount="indefinite"/>
+              </rect>
+              
+              <!-- Slide -->
+              <polygon points="120,25 150,25 155,60 115,60" fill="#FF6347" opacity="0.8"/>
+              <rect x="155" y="45" width="15" height="8" fill="#8B4513"/>
+              
+              <!-- Seesaw -->
+              <rect x="195" y="47" width="40" height="3" fill="#DEB887" rx="1">
+                <animateTransform attributeName="transform" type="rotate" 
+                  values="0 215 48; 10 215 48; 0 215 48; -10 215 48; 0 215 48" dur="3s" repeatCount="indefinite"/>
+              </rect>
+              <rect x="213" y="50" width="4" height="8" fill="#8B4513"/>
+              
+              <!-- Moving children figures -->
+              <g>
+                <circle cx="65" cy="30" r="2" fill="#ffdbac"/>
+                <rect x="63" y="32" width="4" height="6" fill="#FF69B4" rx="1"/>
+                <animateTransform attributeName="transform" type="translate" 
+                  values="0,0; 5,0; 0,0; -5,0; 0,0" dur="3s" repeatCount="indefinite"/>
+              </g>
+              
+              <!-- Floating hearts -->
+              <circle cx="250" cy="25" r="3" fill="#FF69B4" opacity="0.7">
+                <animate attributeName="cy" values="25;15;25" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="270" cy="35" r="2" fill="#FF6B35" opacity="0.6">
+                <animate attributeName="cy" values="35;25;35" dur="2.5s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
           </div>
           <p>This email was sent because you created an account with PaPa-Hi.</p>
           <p>© 2025 PaPa-Hi. Made with ❤️ for Dutch families.</p>
