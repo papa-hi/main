@@ -72,19 +72,31 @@ export function usePushNotifications() {
     setError(null);
 
     try {
-      console.log('Starting notification subscription process...');
+      window.dispatchEvent(new CustomEvent('debug-notification', { 
+        detail: { message: '🔄 Step 1: Starting subscription process', type: 'info' } 
+      }));
       
       // Shorter timeout for mobile devices
       const timeoutDuration = /Android/i.test(navigator.userAgent) ? 5000 : 10000;
       const permissionTimeout = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error(`Permission request timed out after ${timeoutDuration/1000} seconds`)), timeoutDuration);
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('debug-notification', { 
+            detail: { message: `⏰ Permission timeout after ${timeoutDuration/1000}s`, type: 'error' } 
+          }));
+          reject(new Error(`Permission request timed out after ${timeoutDuration/1000} seconds`));
+        }, timeoutDuration);
       });
 
-      console.log('Requesting notification permission...');
+      window.dispatchEvent(new CustomEvent('debug-notification', { 
+        detail: { message: '🔐 Step 2: Requesting permission', type: 'info' } 
+      }));
+      
       const permissionRequest = requestPermission();
       const permission = await Promise.race([permissionRequest, permissionTimeout]);
       
-      console.log('Permission result:', permission);
+      window.dispatchEvent(new CustomEvent('debug-notification', { 
+        detail: { message: `✅ Step 3: Permission = ${permission}`, type: 'info' } 
+      }));
       
       if (permission !== 'granted') {
         const errorMsg = permission === 'denied' 
@@ -95,7 +107,10 @@ export function usePushNotifications() {
         return false;
       }
 
-      console.log('Getting VAPID key from server...');
+      window.dispatchEvent(new CustomEvent('debug-notification', { 
+        detail: { message: '🌐 Step 4: Getting VAPID key from server', type: 'info' } 
+      }));
+      
       // Get VAPID public key from server
       const envResponse = await fetch('/api/env');
       if (!envResponse.ok) {
@@ -105,14 +120,23 @@ export function usePushNotifications() {
       const envData = await envResponse.json();
       const vapidPublicKey = envData.VAPID_PUBLIC_KEY || 'BLslB1PkERhUIoQhTLjwpQdp5p3KK0ZqGhLuJxIJhLLWWCdaJPvGw_KEFOgO5pfTk7Fg_Dt97wqxl9DH2IUzmCg';
 
-      console.log('Converting VAPID key...');
+      window.dispatchEvent(new CustomEvent('debug-notification', { 
+        detail: { message: '🔑 Step 5: Converting VAPID key', type: 'info' } 
+      }));
+      
       // Convert VAPID key to Uint8Array
       const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
 
-      console.log('Waiting for service worker...');
+      window.dispatchEvent(new CustomEvent('debug-notification', { 
+        detail: { message: '⚙️ Step 6: Waiting for service worker', type: 'info' } 
+      }));
+      
       const registration = await navigator.serviceWorker.ready;
       
-      console.log('Creating push subscription...');
+      window.dispatchEvent(new CustomEvent('debug-notification', { 
+        detail: { message: '📱 Step 7: Creating push subscription (CRITICAL)', type: 'info' } 
+      }));
+      
       const pushSubscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey

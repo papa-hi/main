@@ -33,6 +33,16 @@ export default function NotificationSettings() {
     console.log(message);
   };
 
+  // Listen for debug events from the hook
+  useEffect(() => {
+    const handleDebugEvent = (event: CustomEvent) => {
+      addDebugLog(event.detail.message);
+    };
+
+    window.addEventListener('debug-notification', handleDebugEvent as EventListener);
+    return () => window.removeEventListener('debug-notification', handleDebugEvent as EventListener);
+  }, []);
+
   // Auto-reset loading state after 8 seconds to prevent getting stuck
   useEffect(() => {
     if (loading) {
