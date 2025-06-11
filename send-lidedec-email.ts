@@ -1,18 +1,18 @@
-import { sendWelcomeEmail } from './server/email-service.js';
+import { sendWelcomeEmail } from './server/email-service';
 
 async function sendLidedecWelcome() {
-  console.log('Sending welcome email to lidedec@hotmail.com...');
+  console.log('Sending welcome email to Collins Lidede...');
   
-  const success = await sendWelcomeEmail({
-    to: 'lidedec@hotmail.com',
-    firstName: 'Lidede',
-    username: 'jose'
+  const result = await sendWelcomeEmail({
+    to: 'Lidede@collinslidede.com',
+    firstName: 'Collins',
+    username: 'Lidede'
   });
   
-  if (success) {
-    console.log('Welcome email successfully sent');
+  if (result) {
+    console.log('Email sent successfully to Collins Lidede');
   } else {
-    console.log('Failed to send welcome email');
+    console.log('Failed to send email to Collins Lidede');
   }
 }
 

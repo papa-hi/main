@@ -79,7 +79,7 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
   }
 }
 
-function generateWelcomeEmailHTML(firstName: string, username: string): string {
+export function generateWelcomeEmailHTML(firstName: string, username: string): string {
   return `
     <!DOCTYPE html>
     <html>
