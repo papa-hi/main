@@ -11,6 +11,7 @@ import type { User } from '@shared/schema';
 
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState('notifications');
+  const { t } = useTranslation();
 
   const { data: user } = useQuery<User>({
     queryKey: ['/api/user'],
