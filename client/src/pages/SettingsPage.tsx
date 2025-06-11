@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Settings, User, Bell, Shield, HelpCircle } from 'lucide-react';
+import { Settings, User as UserIcon, Bell, Shield, HelpCircle } from 'lucide-react';
 import NotificationSettings from '@/components/NotificationSettings';
 import { useQuery } from '@tanstack/react-query';
 import { getQueryFn } from '@/lib/queryClient';
@@ -25,7 +25,7 @@ export default function SettingsPage() {
     {
       id: 'account',
       title: 'Account',
-      icon: User,
+      icon: UserIcon,
       description: 'Persoonlijke gegevens en profiel'
     },
     {
@@ -52,7 +52,7 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
+                <UserIcon className="h-5 w-5" />
                 Account Instellingen
               </CardTitle>
               <CardDescription>

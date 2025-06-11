@@ -60,6 +60,7 @@ function Router() {
       <ProtectedRoute path="/chat" component={ChatPage} />
       <ProtectedRoute path="/chat/:id" component={ChatPage} />
       <ProtectedRoute path="/discover" component={DiscoverPage} />
+      <ProtectedRoute path="/settings" component={SettingsPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
 
       <ProtectedRoute path="/admin" component={AdminDashboard} />
