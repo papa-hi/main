@@ -151,6 +151,11 @@ function generateWelcomeEmailHTML(firstName: string, username: string): string {
           border-radius: 6px;
           font-weight: bold;
           margin: 20px 0;
+          animation: pulse 2s infinite;
+          transition: transform 0.3s ease;
+        }
+        .cta-button:hover {
+          transform: scale(1.05);
         }
         .footer {
           text-align: center;
@@ -160,13 +165,95 @@ function generateWelcomeEmailHTML(firstName: string, username: string): string {
           color: #888;
           font-size: 14px;
         }
+        .welcome-animation {
+          text-align: center;
+          margin: 30px 0;
+          position: relative;
+        }
+        .floating-hearts {
+          animation: float 3s ease-in-out infinite;
+        }
+        .bounce-in {
+          animation: bounceIn 1.5s ease-out;
+        }
+        .slide-in {
+          animation: slideIn 1s ease-out;
+        }
+        .pulse {
+          animation: pulse 2s infinite;
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        @keyframes bounceIn {
+          0% { transform: scale(0.3); opacity: 0; }
+          50% { transform: scale(1.05); }
+          70% { transform: scale(0.9); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes slideIn {
+          0% { transform: translateX(-100%); opacity: 0; }
+          100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); }
+        }
+        .feature-icon {
+          color: #ff6b35;
+          margin-right: 10px;
+          font-size: 18px;
+          animation: bounceIn 1s ease-out;
+          animation-delay: calc(var(--delay) * 0.2s);
+        }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
-          <div class="logo">PaPa-Hi</div>
-          <h1 class="welcome-title">Welcome to PaPa-Hi, ${firstName}! 🎉</h1>
+          <div class="logo bounce-in">PaPa-Hi</div>
+          <div class="welcome-animation">
+            <svg width="200" height="120" viewBox="0 0 200 120" class="floating-hearts">
+              <circle cx="40" cy="40" r="8" fill="#ff6b35" opacity="0.8">
+                <animate attributeName="cy" values="40;30;40" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="80" cy="60" r="6" fill="#ffa500" opacity="0.6">
+                <animate attributeName="cy" values="60;50;60" dur="2.5s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="120" cy="45" r="7" fill="#ff69b4" opacity="0.7">
+                <animate attributeName="cy" values="45;35;45" dur="1.8s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="160" cy="55" r="5" fill="#32cd32" opacity="0.5">
+                <animate attributeName="cy" values="55;45;55" dur="2.2s" repeatCount="indefinite"/>
+              </circle>
+              
+              <!-- Animated playground elements -->
+              <rect x="20" y="80" width="40" height="20" fill="#8B4513" rx="5">
+                <animate attributeName="height" values="20;25;20" dur="3s" repeatCount="indefinite"/>
+              </rect>
+              <rect x="70" y="85" width="30" height="15" fill="#228B22" rx="3">
+                <animate attributeName="height" values="15;18;15" dur="2.5s" repeatCount="indefinite"/>
+              </rect>
+              <circle cx="130" cy="90" r="10" fill="#FFD700">
+                <animate attributeName="r" values="10;12;10" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              
+              <!-- Family figures -->
+              <g transform="translate(150, 75)">
+                <circle cx="5" cy="5" r="3" fill="#ffdbac"/>
+                <rect x="2" y="8" width="6" height="8" fill="#4169E1" rx="1"/>
+                <circle cx="15" cy="5" r="3" fill="#ffdbac"/>
+                <rect x="12" y="8" width="6" height="8" fill="#FF69B4" rx="1"/>
+                <circle cx="25" cy="8" r="2" fill="#ffdbac"/>
+                <rect x="23" y="10" width="4" height="6" fill="#32CD32" rx="1"/>
+                <animateTransform attributeName="transform" type="translate" 
+                  values="150,75; 148,75; 150,75" dur="4s" repeatCount="indefinite"/>
+              </g>
+            </svg>
+          </div>
+          <h1 class="welcome-title slide-in">Welcome to PaPa-Hi, ${firstName}! 🎉</h1>
         </div>
         
         <div class="content">
@@ -178,23 +265,23 @@ function generateWelcomeEmailHTML(firstName: string, username: string): string {
           
           <div class="features">
             <div class="feature-item">
-              <span class="feature-icon">🏰</span>
+              <span class="feature-icon" style="--delay: 1">🏰</span>
               <span>Discover amazing playgrounds, restaurants, and museums</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">📍</span>
+              <span class="feature-icon" style="--delay: 2">📍</span>
               <span>Find family-friendly places near you</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">👨‍👩‍👧‍👦</span>
+              <span class="feature-icon" style="--delay: 3">👨‍👩‍👧‍👦</span>
               <span>Organize playdates with other families</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">⭐</span>
+              <span class="feature-icon" style="--delay: 4">⭐</span>
               <span>Rate and review places you visit</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">💬</span>
+              <span class="feature-icon" style="--delay: 5">💬</span>
               <span>Connect with other parents in your area</span>
             </div>
           </div>
