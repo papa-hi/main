@@ -301,6 +301,50 @@ function generateWelcomeEmailHTML(firstName: string, username: string): string {
         </div>
         
         <div class="footer">
+          <div class="welcome-animation" style="margin-bottom: 20px;">
+            <svg width="300" height="80" viewBox="0 0 300 80" style="animation: slideIn 2s ease-out;">
+              <!-- Animated playground scene -->
+              <rect x="20" y="60" width="260" height="15" fill="#90EE90" rx="8"/>
+              
+              <!-- Swing set -->
+              <line x1="50" y1="20" x2="50" y2="60" stroke="#8B4513" stroke-width="3"/>
+              <line x1="80" y1="20" x2="80" y2="60" stroke="#8B4513" stroke-width="3"/>
+              <line x1="45" y1="20" x2="85" y2="20" stroke="#8B4513" stroke-width="3"/>
+              <rect x="60" y="35" width="12" height="3" fill="#DEB887" rx="1">
+                <animateTransform attributeName="transform" type="rotate" 
+                  values="0 66 36; 15 66 36; 0 66 36; -15 66 36; 0 66 36" dur="4s" repeatCount="indefinite"/>
+              </rect>
+              
+              <!-- Slide -->
+              <polygon points="120,25 150,25 155,60 115,60" fill="#FF6347" opacity="0.8"/>
+              <rect x="155" y="45" width="15" height="8" fill="#8B4513"/>
+              
+              <!-- Seesaw -->
+              <rect x="195" y="47" width="40" height="3" fill="#DEB887" rx="1">
+                <animateTransform attributeName="transform" type="rotate" 
+                  values="0 215 48; 10 215 48; 0 215 48; -10 215 48; 0 215 48" dur="3s" repeatCount="indefinite"/>
+              </rect>
+              <rect x="213" y="50" width="4" height="8" fill="#8B4513"/>
+              
+              <!-- Moving children figures -->
+              <g>
+                <circle cx="65" cy="30" r="2" fill="#ffdbac"/>
+                <rect x="63" y="32" width="4" height="6" fill="#FF69B4" rx="1"/>
+                <animateTransform attributeName="transform" type="translate" 
+                  values="0,0; 5,0; 0,0; -5,0; 0,0" dur="3s" repeatCount="indefinite"/>
+              </g>
+              
+              <!-- Floating hearts -->
+              <circle cx="250" cy="25" r="3" fill="#FF69B4" opacity="0.7">
+                <animate attributeName="cy" values="25;15;25" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="270" cy="35" r="2" fill="#FF6B35" opacity="0.6">
+                <animate attributeName="cy" values="35;25;35" dur="2.5s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+          </div>
           <p>This email was sent because you created an account with PaPa-Hi.</p>
           <p>© 2025 PaPa-Hi. Made with ❤️ for Dutch families.</p>
         </div>
