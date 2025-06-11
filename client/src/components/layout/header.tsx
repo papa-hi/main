@@ -135,7 +135,7 @@ export function Header({ user }: HeaderProps) {
           {/* Mobile User Profile Section */}
           <div className="md:hidden flex items-center">
             {isAuthenticated ? (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 <Link href="/profile">
                   <a className="text-white hover:text-accent">
                     <img 
@@ -143,6 +143,12 @@ export function Header({ user }: HeaderProps) {
                       alt="Profile" 
                       className="w-8 h-8 rounded-full object-cover border-2 border-white/20"
                     />
+                  </a>
+                </Link>
+                <Link href="/settings">
+                  <a className="bg-white/10 hover:bg-white/20 text-white px-2 py-1 rounded-md flex items-center text-sm">
+                    <i className="fas fa-cog mr-1"></i>
+                    <span>{t('header.settings', 'Settings')}</span>
                   </a>
                 </Link>
                 <button 
