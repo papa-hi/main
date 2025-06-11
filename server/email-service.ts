@@ -88,8 +88,9 @@ function generateWelcomeEmailHTML(firstName: string, username: string): string {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Welcome to PaPa-Hi!</title>
       <style>
+        @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
         body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          font-family: 'Varela Round', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           line-height: 1.6;
           color: #333;
           max-width: 600px;
@@ -108,12 +109,14 @@ function generateWelcomeEmailHTML(firstName: string, username: string): string {
           margin-bottom: 30px;
         }
         .logo {
+          font-family: 'Varela Round', sans-serif;
           font-size: 32px;
           font-weight: bold;
           color: #ff6b35;
           margin-bottom: 10px;
         }
         .welcome-title {
+          font-family: 'Varela Round', sans-serif;
           color: #2c3e50;
           font-size: 24px;
           margin-bottom: 20px;
