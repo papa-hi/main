@@ -23,6 +23,15 @@ export default function NotificationSettings() {
   const { t } = useTranslation();
   const [testLoading, setTestLoading] = useState(false);
   const [retryAvailable, setRetryAvailable] = useState(false);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+  const [showDebug, setShowDebug] = useState(false);
+
+  const addDebugLog = (message: string) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = `${timestamp}: ${message}`;
+    setDebugLogs(prev => [...prev, logEntry]);
+    console.log(message);
+  };
 
   // Auto-reset loading state after 8 seconds to prevent getting stuck
   useEffect(() => {
@@ -60,26 +69,32 @@ export default function NotificationSettings() {
   };
 
   const handleToggleNotifications = async () => {
-    console.log('🔔 Toggle notifications clicked');
-    console.log('Current state:', { isSubscribed, loading, error });
-    console.log('Notification permission:', Notification.permission);
-    console.log('User agent:', navigator.userAgent);
+    setDebugLogs([]);
+    setShowDebug(true);
+    
+    addDebugLog('🔔 Toggle notifications clicked');
+    addDebugLog(`Current state: subscribed=${isSubscribed}, loading=${loading}`);
+    addDebugLog(`Permission: ${Notification.permission}`);
+    addDebugLog(`User agent: ${navigator.userAgent.substring(0, 50)}...`);
 
     if (isSubscribed) {
-      console.log('📤 Attempting to unsubscribe...');
+      addDebugLog('📤 Attempting to unsubscribe...');
       const success = await unsubscribe();
       if (success) {
+        addDebugLog('✅ Unsubscribe successful');
         toast({
           title: t('settings.notifications.unsubscribed'),
           description: t('settings.notifications.unsubscribedDesc'),
         });
+      } else {
+        addDebugLog('❌ Unsubscribe failed');
       }
     } else {
-      console.log('📥 Attempting to subscribe...');
+      addDebugLog('📥 Attempting to subscribe...');
       
       // Check if permission is already denied
       if (Notification.permission === 'denied') {
-        console.log('❌ Permission already denied');
+        addDebugLog('❌ Permission already denied');
         toast({
           title: t('settings.notifications.subscriptionFailed'),
           description: t('settings.notifications.permissionDeniedDesc'),
@@ -90,22 +105,22 @@ export default function NotificationSettings() {
 
       // For Android devices, add a small delay to ensure user gesture is preserved
       if (/Android/i.test(navigator.userAgent)) {
-        console.log('📱 Android device detected, adding delay...');
+        addDebugLog('📱 Android device detected, adding delay...');
         await new Promise(resolve => setTimeout(resolve, 100));
       }
 
-      console.log('🚀 Calling subscribe function...');
+      addDebugLog('🚀 Calling subscribe function...');
       const success = await subscribe();
-      console.log('✅ Subscribe result:', success);
+      addDebugLog(`✅ Subscribe result: ${success}`);
       
       if (success) {
-        console.log('🎉 Subscription successful');
+        addDebugLog('🎉 Subscription successful');
         toast({
           title: t('settings.notifications.subscribed'),
           description: t('settings.notifications.subscribedDesc'),
         });
       } else {
-        console.log('❌ Subscription failed, error:', error);
+        addDebugLog(`❌ Subscription failed, error: ${error}`);
         if (error) {
           toast({
             title: t('settings.notifications.subscriptionFailed'),
@@ -272,6 +287,29 @@ export default function NotificationSettings() {
                t('settings.notifications.enablePush')}
             </Button>
             
+            {/* Mobile Debug Panel */}
+            {showDebug && debugLogs.length > 0 && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg border">
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-sm font-medium">Debug Log</h4>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowDebug(false)}
+                  >
+                    ✕
+                  </Button>
+                </div>
+                <div className="space-y-1 max-h-40 overflow-y-auto">
+                  {debugLogs.map((log, index) => (
+                    <div key={index} className="text-xs font-mono bg-white p-1 rounded">
+                      {log}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Show retry help if stuck */}
             {retryAvailable && (
               <div className="mt-3 space-y-2">
