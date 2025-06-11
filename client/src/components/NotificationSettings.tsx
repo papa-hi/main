@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,7 +38,13 @@ export default function NotificationSettings() {
   }, [loading]);
 
   const handleToggleNotifications = async () => {
+    console.log('🔔 Toggle notifications clicked');
+    console.log('Current state:', { isSubscribed, loading, error });
+    console.log('Notification permission:', Notification.permission);
+    console.log('User agent:', navigator.userAgent);
+
     if (isSubscribed) {
+      console.log('📤 Attempting to unsubscribe...');
       const success = await unsubscribe();
       if (success) {
         toast({
@@ -47,8 +53,11 @@ export default function NotificationSettings() {
         });
       }
     } else {
+      console.log('📥 Attempting to subscribe...');
+      
       // Check if permission is already denied
       if (Notification.permission === 'denied') {
+        console.log('❌ Permission already denied');
         toast({
           title: t('settings.notifications.subscriptionFailed'),
           description: t('settings.notifications.permissionDeniedDesc'),
@@ -59,21 +68,29 @@ export default function NotificationSettings() {
 
       // For Android devices, add a small delay to ensure user gesture is preserved
       if (/Android/i.test(navigator.userAgent)) {
+        console.log('📱 Android device detected, adding delay...');
         await new Promise(resolve => setTimeout(resolve, 100));
       }
 
+      console.log('🚀 Calling subscribe function...');
       const success = await subscribe();
+      console.log('✅ Subscribe result:', success);
+      
       if (success) {
+        console.log('🎉 Subscription successful');
         toast({
           title: t('settings.notifications.subscribed'),
           description: t('settings.notifications.subscribedDesc'),
         });
-      } else if (error) {
-        toast({
-          title: t('settings.notifications.subscriptionFailed'),
-          description: error,
-          variant: "destructive"
-        });
+      } else {
+        console.log('❌ Subscription failed, error:', error);
+        if (error) {
+          toast({
+            title: t('settings.notifications.subscriptionFailed'),
+            description: error,
+            variant: "destructive"
+          });
+        }
       }
     }
   };
@@ -224,15 +241,24 @@ export default function NotificationSettings() {
           <div className="text-center py-4">
             <Button
               onClick={handleToggleNotifications}
-              disabled={loading}
+              disabled={loading && !retryAvailable}
               className="w-full"
             >
               <Bell className="h-4 w-4 mr-2" />
-              {loading ? t('settings.notifications.enabling') : t('settings.notifications.enablePush')}
+              {loading && !retryAvailable ? t('settings.notifications.enabling') : 
+               retryAvailable ? 'Retry Enabling Notifications' :
+               t('settings.notifications.enablePush')}
             </Button>
             
+            {/* Show retry help if stuck */}
+            {retryAvailable && (
+              <p className="text-xs text-red-600 mt-2">
+                Something went wrong. Check the browser console for details and try again.
+              </p>
+            )}
+            
             {/* Show additional help for Android devices */}
-            {/Android/i.test(navigator.userAgent) && (
+            {/Android/i.test(navigator.userAgent) && !retryAvailable && (
               <p className="text-xs text-muted-foreground mt-2">
                 If the permission dialog doesn't appear, try enabling notifications in your browser's site settings.
               </p>
