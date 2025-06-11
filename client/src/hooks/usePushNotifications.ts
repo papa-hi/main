@@ -171,14 +171,20 @@ export function usePushNotifications() {
       });
 
       console.log('Push subscription created, sending to server...');
-      // Send subscription to server
-      const subscriptionData: PushSubscriptionData = {
-        endpoint: pushSubscription.endpoint,
-        keys: {
-          p256dh: arrayBufferToBase64(pushSubscription.getKey('p256dh')!),
-          auth: arrayBufferToBase64(pushSubscription.getKey('auth')!)
+      // Send subscription to server (wrap in subscription object as expected by server)
+      const subscriptionData = {
+        subscription: {
+          endpoint: pushSubscription.endpoint,
+          keys: {
+            p256dh: arrayBufferToBase64(pushSubscription.getKey('p256dh')!),
+            auth: arrayBufferToBase64(pushSubscription.getKey('auth')!)
+          }
         }
       };
+
+      window.dispatchEvent(new CustomEvent('debug-notification', { 
+        detail: { message: '📡 Step 8: Sending to server', type: 'info' } 
+      }));
 
       await apiRequest('POST', '/api/push/subscribe', subscriptionData);
 
