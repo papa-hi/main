@@ -21,27 +21,27 @@ export default function SettingsPage() {
   const sections = [
     {
       id: 'notifications',
-      title: 'Meldingen',
+      title: t('settings.notifications.title'),
       icon: Bell,
-      description: 'Push meldingen en voorkeuren'
+      description: t('settings.notifications.subtitle')
     },
     {
       id: 'account',
-      title: 'Account',
+      title: t('settings.account.title'),
       icon: UserIcon,
-      description: 'Persoonlijke gegevens en profiel'
+      description: t('settings.account.subtitle')
     },
     {
       id: 'privacy',
-      title: 'Privacy',
+      title: t('settings.privacy.title'),
       icon: Shield,
-      description: 'Privacy instellingen en gegevens'
+      description: t('settings.privacy.subtitle')
     },
     {
       id: 'help',
-      title: 'Help',
+      title: t('settings.help.title'),
       icon: HelpCircle,
-      description: 'Veelgestelde vragen en ondersteuning'
+      description: t('settings.help.subtitle')
     }
   ];
 
@@ -56,37 +56,37 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <UserIcon className="h-5 w-5" />
-                Account Instellingen
+                {t('settings.account.title')}
               </CardTitle>
               <CardDescription>
-                Beheer je persoonlijke gegevens en profiel
+                {t('settings.account.subtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-medium mb-2">Persoonlijke Informatie</h4>
+                  <h4 className="font-medium mb-2">{t('settings.account.personalInfo')}</h4>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-muted-foreground">Naam:</span>
-                      <p>{user?.firstName || 'Niet ingesteld'} {user?.lastName || ''}</p>
+                      <span className="text-muted-foreground">{t('settings.account.name')}:</span>
+                      <p>{user?.firstName || t('settings.account.notSet')} {user?.lastName || ''}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Gebruikersnaam:</span>
-                      <p>{user?.username || 'Niet ingesteld'}</p>
+                      <span className="text-muted-foreground">{t('settings.account.username')}:</span>
+                      <p>{user?.username || t('settings.account.notSet')}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Email:</span>
-                      <p>{user?.email || 'Niet ingesteld'}</p>
+                      <span className="text-muted-foreground">{t('settings.account.email')}:</span>
+                      <p>{user?.email || t('settings.account.notSet')}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Stad:</span>
-                      <p>{user?.city || 'Niet ingesteld'}</p>
+                      <span className="text-muted-foreground">{t('settings.account.city')}:</span>
+                      <p>{user?.city || t('settings.account.notSet')}</p>
                     </div>
                   </div>
                 </div>
                 <Separator />
-                <Button variant="outline">Profiel Bewerken</Button>
+                <Button variant="outline">{t('settings.account.editProfile')}</Button>
               </div>
             </CardContent>
           </Card>
@@ -98,28 +98,35 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Privacy Instellingen
+                {t('settings.privacy.title')}
               </CardTitle>
               <CardDescription>
-                Beheer je privacy en gegevensgebruik
+                {t('settings.privacy.subtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-medium mb-2">Zichtbaarheid</h4>
+                  <h4 className="font-medium mb-2">{t('settings.privacy.dataPrivacy')}</h4>
                   <p className="text-sm text-muted-foreground">
-                    Je profiel is zichtbaar voor andere ouders in de PaPa-Hi community.
+                    {t('settings.privacy.dataPrivacyDesc')}
                   </p>
                 </div>
                 <Separator />
                 <div>
-                  <h4 className="font-medium mb-2">Gegevens</h4>
+                  <h4 className="font-medium mb-2">{t('settings.privacy.chatHistory')}</h4>
                   <p className="text-sm text-muted-foreground mb-3">
-                    We gebruiken je gegevens alleen voor het verbeteren van je ervaring.
+                    {t('settings.privacy.chatHistoryDesc')}
+                  </p>
+                </div>
+                <Separator />
+                <div>
+                  <h4 className="font-medium mb-2">{t('settings.privacy.locationData')}</h4>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t('settings.privacy.locationDataDesc')}
                   </p>
                   <Button variant="outline" size="sm">
-                    Gegevens Downloaden
+                    {t('settings.privacy.manageData')}
                   </Button>
                 </div>
               </div>
@@ -133,43 +140,35 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <HelpCircle className="h-5 w-5" />
-                Help & Ondersteuning
+                {t('settings.help.title')}
               </CardTitle>
               <CardDescription>
-                Krijg hulp en ondersteuning voor PaPa-Hi
+                {t('settings.help.subtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-medium mb-2">Veelgestelde Vragen</h4>
-                  <div className="space-y-2 text-sm">
-                    <details className="group">
-                      <summary className="cursor-pointer hover:text-primary">
-                        Hoe kan ik een playdate organiseren?
-                      </summary>
-                      <p className="mt-2 text-muted-foreground">
-                        Ga naar de playdates pagina en klik op "Nieuwe Playdate". Vul de details in en nodig andere ouders uit.
-                      </p>
-                    </details>
-                    <details className="group">
-                      <summary className="cursor-pointer hover:text-primary">
-                        Hoe voeg ik een nieuwe speelplek toe?
-                      </summary>
-                      <p className="mt-2 text-muted-foreground">
-                        Op de plekken pagina kun je "Nieuwe Plek Toevoegen" kiezen en alle details invullen.
-                      </p>
-                    </details>
-                  </div>
+                  <h4 className="font-medium mb-2">{t('settings.help.gettingStarted')}</h4>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t('settings.help.gettingStartedDesc')}
+                  </p>
                 </div>
                 <Separator />
                 <div>
-                  <h4 className="font-medium mb-2">Contact</h4>
+                  <h4 className="font-medium mb-2">{t('settings.help.faq')}</h4>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Heb je nog vragen? Neem contact met ons op.
+                    {t('settings.help.faqDesc')}
+                  </p>
+                </div>
+                <Separator />
+                <div>
+                  <h4 className="font-medium mb-2">{t('settings.help.contactSupport')}</h4>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t('settings.help.contactSupportDesc')}
                   </p>
                   <Button variant="outline" size="sm">
-                    Contact Opnemen
+                    {t('settings.help.contactUs')}
                   </Button>
                 </div>
               </div>
@@ -187,10 +186,10 @@ export default function SettingsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-2 mb-2">
           <Settings className="h-8 w-8" />
-          Instellingen
+          {t('settings.title')}
         </h1>
         <p className="text-muted-foreground">
-          Beheer je account, meldingen en privacy instellingen
+          {t('settings.subtitle')}
         </p>
       </div>
 
