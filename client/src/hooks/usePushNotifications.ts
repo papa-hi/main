@@ -49,27 +49,13 @@ export function usePushNotifications() {
     }
 
     try {
-      // For older browsers and Android devices that need callback-style API
-      const requestPermissionAsync = (): Promise<NotificationPermission> => {
-        return new Promise((resolve) => {
-          if (typeof Notification.requestPermission === 'function') {
-            const result = Notification.requestPermission((permission) => {
-              resolve(permission);
-            });
-            
-            // If the function returns a promise (modern browsers)
-            if (result && typeof result.then === 'function') {
-              result.then(resolve);
-            }
-          } else {
-            resolve('denied');
-          }
-        });
-      };
-
-      const permission = await requestPermissionAsync();
-      console.log('Notification permission result:', permission);
-      return permission;
+      // Direct approach for modern browsers including Android Chrome
+      if (typeof Notification.requestPermission === 'function') {
+        const permission = await Notification.requestPermission();
+        return permission;
+      } else {
+        throw new Error('Notifications not supported');
+      }
     } catch (error) {
       console.error('Error requesting notification permission:', error);
       throw error;
@@ -88,9 +74,10 @@ export function usePushNotifications() {
     try {
       console.log('Starting notification subscription process...');
       
-      // Add timeout for permission request
+      // Shorter timeout for mobile devices
+      const timeoutDuration = /Android/i.test(navigator.userAgent) ? 5000 : 10000;
       const permissionTimeout = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Permission request timed out after 10 seconds')), 10000);
+        setTimeout(() => reject(new Error(`Permission request timed out after ${timeoutDuration/1000} seconds`)), timeoutDuration);
       });
 
       console.log('Requesting notification permission...');

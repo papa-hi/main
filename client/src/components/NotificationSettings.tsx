@@ -24,18 +24,40 @@ export default function NotificationSettings() {
   const [testLoading, setTestLoading] = useState(false);
   const [retryAvailable, setRetryAvailable] = useState(false);
 
-  // Auto-reset loading state after 15 seconds to prevent getting stuck
+  // Auto-reset loading state after 8 seconds to prevent getting stuck
   useEffect(() => {
     if (loading) {
       const timeout = setTimeout(() => {
         setRetryAvailable(true);
-      }, 15000);
+      }, 8000);
       
       return () => clearTimeout(timeout);
     } else {
       setRetryAvailable(false);
     }
   }, [loading]);
+
+  const handleManualPermissionRequest = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        // Force page reload to reset state
+        window.location.reload();
+      } else {
+        toast({
+          title: t('settings.notifications.subscriptionFailed'),
+          description: 'Permission was not granted. Please check your browser settings.',
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: t('settings.notifications.subscriptionFailed'),
+        description: 'Unable to request permission. Try enabling notifications in your browser settings.',
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleToggleNotifications = async () => {
     console.log('🔔 Toggle notifications clicked');
@@ -252,9 +274,19 @@ export default function NotificationSettings() {
             
             {/* Show retry help if stuck */}
             {retryAvailable && (
-              <p className="text-xs text-red-600 mt-2">
-                Something went wrong. Check the browser console for details and try again.
-              </p>
+              <div className="mt-3 space-y-2">
+                <p className="text-xs text-red-600">
+                  Taking too long? Try the manual option below:
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleManualPermissionRequest}
+                  className="w-full"
+                >
+                  Manual Permission Request
+                </Button>
+              </div>
             )}
             
             {/* Show additional help for Android devices */}
