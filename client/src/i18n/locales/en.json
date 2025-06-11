@@ -97,7 +97,8 @@
   "header": {
     "myProfile": "My Profile",
     "language": "Language",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "settings": "Settings"
   },
   "home": {
     "welcome": "Welcome back, {{name}}!",

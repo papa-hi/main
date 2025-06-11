@@ -234,6 +234,14 @@ export function Header({ user }: HeaderProps) {
                       </span>
                     </DropdownMenuItem>
                   </Link>
+                  <Link href="/settings">
+                    <DropdownMenuItem className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
+                      <span className="flex items-center">
+                        <i className="fas fa-cog mr-2 text-primary/80"></i>
+                        {t('header.settings', 'Instellingen')}
+                      </span>
+                    </DropdownMenuItem>
+                  </Link>
                   {authUser?.role === 'admin' && (
                     <Link href="/admin">
                       <DropdownMenuItem className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">

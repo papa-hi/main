@@ -6,11 +6,12 @@ import { Settings, User as UserIcon, Bell, Shield, HelpCircle } from 'lucide-rea
 import NotificationSettings from '@/components/NotificationSettings';
 import { useQuery } from '@tanstack/react-query';
 import { getQueryFn } from '@/lib/queryClient';
+import type { User } from '@shared/schema';
 
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState('notifications');
 
-  const { data: user } = useQuery({
+  const { data: user } = useQuery<User>({
     queryKey: ['/api/user'],
     queryFn: getQueryFn({ on401: 'returnNull' })
   });
@@ -66,15 +67,15 @@ export default function SettingsPage() {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-muted-foreground">Naam:</span>
-                      <p>{user?.firstName} {user?.lastName}</p>
+                      <p>{user?.firstName || 'Niet ingesteld'} {user?.lastName || ''}</p>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Gebruikersnaam:</span>
-                      <p>{user?.username}</p>
+                      <p>{user?.username || 'Niet ingesteld'}</p>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Email:</span>
-                      <p>{user?.email}</p>
+                      <p>{user?.email || 'Niet ingesteld'}</p>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Stad:</span>

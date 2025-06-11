@@ -96,7 +96,8 @@
   "header": {
     "myProfile": "Mijn Profiel",
     "language": "Taal",
-    "notifications": "Meldingen"
+    "notifications": "Meldingen",
+    "settings": "Instellingen"
   },
   "home": {
     "welcome": "Welkom terug, {{name}}!",
@@ -416,7 +417,69 @@
     "addPlaygroundInstructions": "Klik op de kaart om een nieuwe speeltuin toe te voegen",
     "addPlaygroundTip": "Selecteer de exacte locatie van de speeltuin op de kaart",
     "contributeTitle": "Draag bij aan de Community",
-    "contributeExplanation": "Onze speeltuin data komt zowel van OpenStreetMap als van bijdragen uit de community. Help andere ouders door speeltuinen toe te voegen die je kent.",
+    "contributeExplanation": "Onze speeltuin data komt zowel van OpenStreetMap als van bijdragen uit de community. Help andere ouders door speeltuinen toe te voegen die je kent."
+  },
+  "settings": {
+    "title": "Instellingen",
+    "subtitle": "Beheer je account en voorkeuren",
+    "notifications": {
+      "title": "Meldingen",
+      "subtitle": "Push meldingen en voorkeuren",
+      "pushNotifications": "Push Meldingen",
+      "enablePush": "Push meldingen inschakelen",
+      "enablePushDesc": "Ontvang meldingen voor speelafspraken, berichten en updates",
+      "testNotification": "Test Melding",
+      "testNotificationDesc": "Stuur een test melding om te controleren of alles werkt",
+      "sendTest": "Test Versturen",
+      "notificationsSent": "Test melding verstuurd!",
+      "checkDevice": "Controleer je apparaat voor de melding.",
+      "enableFirst": "Schakel eerst push meldingen in om een test te versturen.",
+      "permissionDenied": "Meldingen geweigerd",
+      "permissionDeniedDesc": "Je hebt meldingen geweigerd. Schakel ze in via je browserinstellingen.",
+      "notSupported": "Niet ondersteund",
+      "notSupportedDesc": "Je browser ondersteunt geen push meldingen.",
+      "subscribed": "Geabonneerd op meldingen",
+      "subscribedDesc": "Je ontvangt nu push meldingen.",
+      "unsubscribed": "Uitgeschreven van meldingen",
+      "unsubscribedDesc": "Je ontvangt geen push meldingen meer.",
+      "subscriptionFailed": "Abonnement mislukt",
+      "subscriptionFailedDesc": "Er ging iets mis bij het instellen van meldingen."
+    },
+    "account": {
+      "title": "Account",
+      "subtitle": "Persoonlijke gegevens en profiel",
+      "personalInfo": "Persoonlijke Informatie",
+      "name": "Naam",
+      "username": "Gebruikersnaam",
+      "email": "Email",
+      "city": "Stad",
+      "notSet": "Niet ingesteld",
+      "editProfile": "Profiel Bewerken"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "subtitle": "Gegevensbescherming en privacy-instellingen",
+      "dataPrivacy": "Gegevensprivacy",
+      "dataPrivacyDesc": "Je gegevens worden veilig opgeslagen en nooit gedeeld zonder toestemming.",
+      "chatHistory": "Chatgeschiedenis",
+      "chatHistoryDesc": "Berichten worden automatisch verwijderd na 7 dagen.",
+      "locationData": "Locatiegegevens",
+      "locationDataDesc": "Locatiegegevens worden alleen gebruikt voor het vinden van nabijgelegen plekken.",
+      "manageData": "Gegevens Beheren"
+    },
+    "help": {
+      "title": "Help & Ondersteuning",
+      "subtitle": "Hulp en veelgestelde vragen",
+      "gettingStarted": "Aan de slag",
+      "gettingStartedDesc": "Leer hoe je het beste gebruik kunt maken van PaPa-Hi.",
+      "faq": "Veelgestelde Vragen",
+      "faqDesc": "Vind antwoorden op veelgestelde vragen.",
+      "contactSupport": "Contact Opnemen",
+      "contactSupportDesc": "Neem contact op met ons ondersteuningsteam.",
+      "contactUs": "Neem Contact Op"
+    }
+  },
+  "playgroundMapContinued": {
     "contributeHowTo": "Om een speeltuin toe te voegen, klik op de \"Speeltuin Toevoegen\" knop in de kaart en selecteer de exacte locatie. Vul de details in zoals naam en beschrijving om andere ouders te helpen goede speeltuinen te vinden.",
     "contributeNote": "Let op: Je moet ingelogd zijn om bij te dragen. Alle bijdragen worden gecontroleerd op kwaliteit.",
     "dataSourcesTitle": "Gegevensbronnen",
