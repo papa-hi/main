@@ -443,7 +443,19 @@
       "unsubscribed": "Uitgeschreven van meldingen",
       "unsubscribedDesc": "Je ontvangt geen push meldingen meer.",
       "subscriptionFailed": "Abonnement mislukt",
-      "subscriptionFailedDesc": "Er ging iets mis bij het instellen van meldingen."
+      "subscriptionFailedDesc": "Er ging iets mis bij het instellen van meldingen.",
+      "activeStatus": "Push meldingen zijn actief",
+      "preferences": "Melding Voorkeuren",
+      "playdateReminders": "Playdate Herinneringen",
+      "playdateRemindersDesc": "Krijg een herinnering voor aankomende playdates",
+      "newMessages": "Nieuwe Berichten",
+      "newMessagesDesc": "Meldingen voor nieuwe chat berichten",
+      "playdateUpdates": "Playdate Updates",
+      "playdateUpdatesDesc": "Wijzigingen in playdates waar je aan deelneemt",
+      "newLocations": "Nieuwe Locaties",
+      "newLocationsDesc": "Meldingen over nieuwe speelplekken in jouw buurt",
+      "sendingTest": "Versturen...",
+      "enabling": "Inschakelen..."
     },
     "account": {
       "title": "Account",

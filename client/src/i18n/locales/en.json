@@ -477,7 +477,19 @@
       "unsubscribed": "Unsubscribed from notifications",
       "unsubscribedDesc": "You will no longer receive push notifications.",
       "subscriptionFailed": "Subscription failed",
-      "subscriptionFailedDesc": "Something went wrong while setting up notifications."
+      "subscriptionFailedDesc": "Something went wrong while setting up notifications.",
+      "activeStatus": "Push notifications are active",
+      "preferences": "Notification Preferences",
+      "playdateReminders": "Playdate Reminders",
+      "playdateRemindersDesc": "Get reminders for upcoming playdates",
+      "newMessages": "New Messages",
+      "newMessagesDesc": "Notifications for new chat messages",
+      "playdateUpdates": "Playdate Updates",
+      "playdateUpdatesDesc": "Changes in playdates you're participating in",
+      "newLocations": "New Locations",
+      "newLocationsDesc": "Notifications about new playgrounds in your area",
+      "sendingTest": "Sending...",
+      "enabling": "Enabling..."
     },
     "account": {
       "title": "Account",

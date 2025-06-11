@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Bell, BellOff, Smartphone, AlertCircle, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function NotificationSettings() {
   const {
@@ -19,6 +20,7 @@ export default function NotificationSettings() {
   } = usePushNotifications();
   
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [testLoading, setTestLoading] = useState(false);
 
   const handleToggleNotifications = async () => {
@@ -26,16 +28,16 @@ export default function NotificationSettings() {
       const success = await unsubscribe();
       if (success) {
         toast({
-          title: "Meldingen uitgeschakeld",
-          description: "Je ontvangt geen push meldingen meer",
+          title: t('settings.notifications.unsubscribed'),
+          description: t('settings.notifications.unsubscribedDesc'),
         });
       }
     } else {
       const success = await subscribe();
       if (success) {
         toast({
-          title: "Meldingen ingeschakeld",
-          description: "Je ontvangt nu push meldingen",
+          title: t('settings.notifications.subscribed'),
+          description: t('settings.notifications.subscribedDesc'),
         });
       }
     }
@@ -48,13 +50,13 @@ export default function NotificationSettings() {
     
     if (success) {
       toast({
-        title: "Test melding verstuurd",
-        description: "Controleer je apparaat voor de melding",
+        title: t('settings.notifications.notificationsSent'),
+        description: t('settings.notifications.checkDevice'),
       });
     } else {
       toast({
-        title: "Test mislukt",
-        description: "Kon geen test melding versturen",
+        title: t('settings.notifications.subscriptionFailed'),
+        description: t('settings.notifications.subscriptionFailedDesc'),
         variant: "destructive"
       });
     }
@@ -66,16 +68,16 @@ export default function NotificationSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BellOff className="h-5 w-5" />
-            Push Meldingen
+            {t('settings.notifications.pushNotifications')}
           </CardTitle>
           <CardDescription>
-            Push meldingen worden niet ondersteund door jouw browser
+            {t('settings.notifications.notSupportedDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 text-muted-foreground">
             <AlertCircle className="h-4 w-4" />
-            <span>Gebruik een moderne browser voor push meldingen</span>
+            <span>{t('settings.notifications.notSupported')}</span>
           </div>
         </CardContent>
       </Card>
@@ -87,10 +89,10 @@ export default function NotificationSettings() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          Push Meldingen
+          {t('settings.notifications.pushNotifications')}
         </CardTitle>
         <CardDescription>
-          Ontvang meldingen over nieuwe playdates, berichten en updates
+          {t('settings.notifications.enablePushDesc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -104,10 +106,10 @@ export default function NotificationSettings() {
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <Label htmlFor="push-notifications" className="text-base font-medium">
-              Push Meldingen
+              {t('settings.notifications.pushNotifications')}
             </Label>
             <p className="text-sm text-muted-foreground">
-              Krijg meldingen zelfs als de app gesloten is
+              {t('settings.notifications.enablePushDesc')}
             </p>
           </div>
           <Switch
