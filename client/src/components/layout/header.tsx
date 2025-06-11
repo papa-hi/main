@@ -135,31 +135,43 @@ export function Header({ user }: HeaderProps) {
           {/* Mobile User Profile Section */}
           <div className="md:hidden flex items-center">
             {isAuthenticated ? (
-              <div className="flex items-center space-x-2">
-                <Link href="/profile">
-                  <a className="text-white hover:text-accent">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="text-white hover:text-accent focus:outline-none">
                     <img 
                       src={user.profileImage} 
                       alt="Profile" 
                       className="w-8 h-8 rounded-full object-cover border-2 border-white/20"
                     />
-                  </a>
-                </Link>
-                <Link href="/settings">
-                  <a className="bg-white/10 hover:bg-white/20 text-white px-2 py-1 rounded-md flex items-center text-sm">
-                    <i className="fas fa-cog mr-1"></i>
-                    <span>{t('header.settings', 'Settings')}</span>
-                  </a>
-                </Link>
-                <button 
-                  onClick={handleLogout}
-                  className="bg-red-500/20 hover:bg-red-500/30 text-white px-2 py-1 rounded-md flex items-center text-sm"
-                  aria-label="Logout"
-                >
-                  <i className="fas fa-sign-out-alt mr-1"></i>
-                  <span>{t('auth.logoutButton', 'Logout')}</span>
-                </button>
-              </div>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">
+                      <a className="flex items-center w-full cursor-pointer">
+                        <i className="fas fa-user mr-2"></i>
+                        {t('header.myProfile', 'My Profile')}
+                      </a>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">
+                      <a className="flex items-center w-full cursor-pointer">
+                        <i className="fas fa-cog mr-2"></i>
+                        {t('header.settings', 'Settings')}
+                      </a>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    className="cursor-pointer text-red-600 focus:text-red-600"
+                    onClick={handleLogout}
+                  >
+                    <i className="fas fa-sign-out-alt mr-2"></i>
+                    {t('auth.logoutButton', 'Logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link href="/auth">
                 <a className="bg-white/10 text-white hover:bg-white/20 px-2 py-1 rounded text-sm">
