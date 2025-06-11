@@ -228,6 +228,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to remove subscription" });
     }
   });
+
+  app.post("/api/push/test", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const user = req.user as SelectUser;
+      await sendNotificationToUser(userId, {
+        title: "PaPa-Hi Test Melding",
+        body: `Hallo ${user.firstName}! Dit is een test melding van PaPa-Hi.`,
+        icon: "/icons/icon-192x192.png",
+        badge: "/icons/icon-192x192.png",
+        data: {
+          type: "test",
+          url: "/"
+        }
+      });
+
+      res.json({ success: true, message: "Test notification sent" });
+    } catch (error) {
+      console.error("Error sending test notification:", error);
+      res.status(500).json({ error: "Failed to send test notification" });
+    }
+  });
   
   // Handle profile image upload during registration (no auth required)
   app.post("/api/upload/profile-image", upload.single('profileImage'), async (req: Request, res: Response) => {
@@ -2155,7 +2181,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Endpoint to provide environment variables needed on the frontend
   app.get("/api/env", (req, res) => {
     res.json({
-      OPEN_WEATHER_API_KEY: process.env.OPEN_WEATHER_API_KEY
+      OPEN_WEATHER_API_KEY: process.env.OPEN_WEATHER_API_KEY,
+      VAPID_PUBLIC_KEY: getVapidPublicKey()
     });
   });
   

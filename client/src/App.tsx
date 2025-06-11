@@ -16,6 +16,7 @@ import EditPlaydatePage from "./pages/edit-playdate";
 import ChatPage from "./pages/chat";
 import AuthPage from "./pages/auth-page";
 import PlaceDetailsPage from "./pages/place-details";
+import SettingsPage from "./pages/SettingsPage";
 
 import AdminDashboard from "./pages/admin";
 import AdminCheck from "./pages/admin-check";
