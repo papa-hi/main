@@ -6,6 +6,7 @@ import { Settings, User as UserIcon, Bell, Shield, HelpCircle } from 'lucide-rea
 import NotificationSettings from '@/components/NotificationSettings';
 import { useQuery } from '@tanstack/react-query';
 import { getQueryFn } from '@/lib/queryClient';
+import { useTranslation } from 'react-i18next';
 import type { User } from '@shared/schema';
 
 export default function SettingsPage() {

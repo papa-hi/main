@@ -452,5 +452,65 @@
       "later": "Later",
       "install": "Install"
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and preferences",
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Push notifications and preferences",
+      "pushNotifications": "Push Notifications",
+      "enablePush": "Enable push notifications",
+      "enablePushDesc": "Receive notifications for playdates, messages, and updates",
+      "testNotification": "Test Notification",
+      "testNotificationDesc": "Send a test notification to check if everything works",
+      "sendTest": "Send Test",
+      "notificationsSent": "Test notification sent!",
+      "checkDevice": "Check your device for the notification.",
+      "enableFirst": "Enable push notifications first to send a test.",
+      "permissionDenied": "Notifications denied",
+      "permissionDeniedDesc": "You have denied notifications. Enable them in your browser settings.",
+      "notSupported": "Not supported",
+      "notSupportedDesc": "Your browser doesn't support push notifications.",
+      "subscribed": "Subscribed to notifications",
+      "subscribedDesc": "You will now receive push notifications.",
+      "unsubscribed": "Unsubscribed from notifications",
+      "unsubscribedDesc": "You will no longer receive push notifications.",
+      "subscriptionFailed": "Subscription failed",
+      "subscriptionFailedDesc": "Something went wrong while setting up notifications."
+    },
+    "account": {
+      "title": "Account",
+      "subtitle": "Personal information and profile",
+      "personalInfo": "Personal Information",
+      "name": "Name",
+      "username": "Username",
+      "email": "Email",
+      "city": "City",
+      "notSet": "Not set",
+      "editProfile": "Edit Profile"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "subtitle": "Data protection and privacy settings",
+      "dataPrivacy": "Data Privacy",
+      "dataPrivacyDesc": "Your data is stored securely and never shared without permission.",
+      "chatHistory": "Chat History",
+      "chatHistoryDesc": "Messages are automatically deleted after 7 days.",
+      "locationData": "Location Data",
+      "locationDataDesc": "Location data is only used for finding nearby places.",
+      "manageData": "Manage Data"
+    },
+    "help": {
+      "title": "Help & Support",
+      "subtitle": "Help and frequently asked questions",
+      "gettingStarted": "Getting Started",
+      "gettingStartedDesc": "Learn how to make the most of PaPa-Hi.",
+      "faq": "FAQ",
+      "faqDesc": "Find answers to frequently asked questions.",
+      "contactSupport": "Contact Support",
+      "contactSupportDesc": "Get in touch with our support team.",
+      "contactUs": "Contact Us"
+    }
   }
 }

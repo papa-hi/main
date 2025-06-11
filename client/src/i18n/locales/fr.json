@@ -91,7 +91,8 @@
   "header": {
     "myProfile": "Mon profil",
     "language": "Langue",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "settings": "Paramètres"
   },
   "home": {
     "welcome": "Bienvenue, {{name}} !",
@@ -400,6 +401,66 @@
       "description": "Obtenez un accès plus rapide et des fonctionnalités hors ligne sur votre appareil !",
       "later": "Plus tard",
       "install": "Installer"
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez votre compte et vos préférences",
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Notifications push et préférences",
+      "pushNotifications": "Notifications Push",
+      "enablePush": "Activer les notifications push",
+      "enablePushDesc": "Recevez des notifications pour les rendez-vous de jeu, messages et mises à jour",
+      "testNotification": "Notification de Test",
+      "testNotificationDesc": "Envoyez une notification de test pour vérifier que tout fonctionne",
+      "sendTest": "Envoyer Test",
+      "notificationsSent": "Notification de test envoyée !",
+      "checkDevice": "Vérifiez votre appareil pour la notification.",
+      "enableFirst": "Activez d'abord les notifications push pour envoyer un test.",
+      "permissionDenied": "Notifications refusées",
+      "permissionDeniedDesc": "Vous avez refusé les notifications. Activez-les dans les paramètres de votre navigateur.",
+      "notSupported": "Non supporté",
+      "notSupportedDesc": "Votre navigateur ne supporte pas les notifications push.",
+      "subscribed": "Abonné aux notifications",
+      "subscribedDesc": "Vous recevrez maintenant des notifications push.",
+      "unsubscribed": "Désabonné des notifications",
+      "unsubscribedDesc": "Vous ne recevrez plus de notifications push.",
+      "subscriptionFailed": "Abonnement échoué",
+      "subscriptionFailedDesc": "Quelque chose s'est mal passé lors de la configuration des notifications."
+    },
+    "account": {
+      "title": "Compte",
+      "subtitle": "Informations personnelles et profil",
+      "personalInfo": "Informations Personnelles",
+      "name": "Nom",
+      "username": "Nom d'utilisateur",
+      "email": "Email",
+      "city": "Ville",
+      "notSet": "Non défini",
+      "editProfile": "Modifier le Profil"
+    },
+    "privacy": {
+      "title": "Confidentialité",
+      "subtitle": "Protection des données et paramètres de confidentialité",
+      "dataPrivacy": "Confidentialité des Données",
+      "dataPrivacyDesc": "Vos données sont stockées en sécurité et jamais partagées sans permission.",
+      "chatHistory": "Historique du Chat",
+      "chatHistoryDesc": "Les messages sont automatiquement supprimés après 7 jours.",
+      "locationData": "Données de Localisation",
+      "locationDataDesc": "Les données de localisation ne sont utilisées que pour trouver des lieux à proximité.",
+      "manageData": "Gérer les Données"
+    },
+    "help": {
+      "title": "Aide et Support",
+      "subtitle": "Aide et questions fréquemment posées",
+      "gettingStarted": "Commencer",
+      "gettingStartedDesc": "Apprenez à tirer le meilleur parti de PaPa-Hi.",
+      "faq": "FAQ",
+      "faqDesc": "Trouvez des réponses aux questions fréquemment posées.",
+      "contactSupport": "Contacter le Support",
+      "contactSupportDesc": "Contactez notre équipe de support.",
+      "contactUs": "Nous Contacter"
     }
   }
 }

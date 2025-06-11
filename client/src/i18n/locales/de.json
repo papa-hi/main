@@ -91,7 +91,8 @@
   "header": {
     "myProfile": "Mein Profil",
     "language": "Sprache",
-    "notifications": "Benachrichtigungen"
+    "notifications": "Benachrichtigungen",
+    "settings": "Einstellungen"
   },
   "home": {
     "welcome": "Willkommen zurück, {{name}}!",
@@ -424,6 +425,66 @@
       "description": "Erhalte schnelleren Zugriff und Offline-Funktionen auf deinem Gerät!",
       "later": "Später",
       "install": "Installieren"
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Verwalte dein Konto und deine Einstellungen",
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "subtitle": "Push-Benachrichtigungen und Einstellungen",
+      "pushNotifications": "Push-Benachrichtigungen",
+      "enablePush": "Push-Benachrichtigungen aktivieren",
+      "enablePushDesc": "Erhalte Benachrichtigungen für Spieltreffen, Nachrichten und Updates",
+      "testNotification": "Test-Benachrichtigung",
+      "testNotificationDesc": "Sende eine Test-Benachrichtigung um zu prüfen ob alles funktioniert",
+      "sendTest": "Test senden",
+      "notificationsSent": "Test-Benachrichtigung gesendet!",
+      "checkDevice": "Überprüfe dein Gerät für die Benachrichtigung.",
+      "enableFirst": "Aktiviere zuerst Push-Benachrichtigungen um einen Test zu senden.",
+      "permissionDenied": "Benachrichtigungen verweigert",
+      "permissionDeniedDesc": "Du hast Benachrichtigungen verweigert. Aktiviere sie in deinen Browser-Einstellungen.",
+      "notSupported": "Nicht unterstützt",
+      "notSupportedDesc": "Dein Browser unterstützt keine Push-Benachrichtigungen.",
+      "subscribed": "Für Benachrichtigungen angemeldet",
+      "subscribedDesc": "Du erhältst jetzt Push-Benachrichtigungen.",
+      "unsubscribed": "Von Benachrichtigungen abgemeldet",
+      "unsubscribedDesc": "Du erhältst keine Push-Benachrichtigungen mehr.",
+      "subscriptionFailed": "Anmeldung fehlgeschlagen",
+      "subscriptionFailedDesc": "Etwas ist beim Einrichten der Benachrichtigungen schiefgelaufen."
+    },
+    "account": {
+      "title": "Konto",
+      "subtitle": "Persönliche Informationen und Profil",
+      "personalInfo": "Persönliche Informationen",
+      "name": "Name",
+      "username": "Benutzername",
+      "email": "E-Mail",
+      "city": "Stadt",
+      "notSet": "Nicht festgelegt",
+      "editProfile": "Profil bearbeiten"
+    },
+    "privacy": {
+      "title": "Datenschutz",
+      "subtitle": "Datenschutz und Privatsphäre-Einstellungen",
+      "dataPrivacy": "Datenschutz",
+      "dataPrivacyDesc": "Deine Daten werden sicher gespeichert und nie ohne Erlaubnis geteilt.",
+      "chatHistory": "Chat-Verlauf",
+      "chatHistoryDesc": "Nachrichten werden automatisch nach 7 Tagen gelöscht.",
+      "locationData": "Standortdaten",
+      "locationDataDesc": "Standortdaten werden nur zum Finden von Orten in der Nähe verwendet.",
+      "manageData": "Daten verwalten"
+    },
+    "help": {
+      "title": "Hilfe & Support",
+      "subtitle": "Hilfe und häufig gestellte Fragen",
+      "gettingStarted": "Erste Schritte",
+      "gettingStartedDesc": "Lerne, wie du das Beste aus PaPa-Hi herausholen kannst.",
+      "faq": "FAQ",
+      "faqDesc": "Finde Antworten auf häufig gestellte Fragen.",
+      "contactSupport": "Support kontaktieren",
+      "contactSupportDesc": "Nimm Kontakt mit unserem Support-Team auf.",
+      "contactUs": "Kontaktiere uns"
     }
   }
 }
