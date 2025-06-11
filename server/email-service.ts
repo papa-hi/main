@@ -57,7 +57,7 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
       )) {
         console.log('🚫 DOMAIN RESTRICTION: Email blocked by Resend validation');
         console.log('⚠️  Registration continues without email delivery');
-        return true; // Don't block registration for domain restrictions
+        return false; // Return false to indicate email failure
       }
       
       console.log('💥 SMTP FAILURE: Technical error sending email');
