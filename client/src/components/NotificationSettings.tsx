@@ -22,6 +22,20 @@ export default function NotificationSettings() {
   const { toast } = useToast();
   const { t } = useTranslation();
   const [testLoading, setTestLoading] = useState(false);
+  const [retryAvailable, setRetryAvailable] = useState(false);
+
+  // Auto-reset loading state after 15 seconds to prevent getting stuck
+  useEffect(() => {
+    if (loading) {
+      const timeout = setTimeout(() => {
+        setRetryAvailable(true);
+      }, 15000);
+      
+      return () => clearTimeout(timeout);
+    } else {
+      setRetryAvailable(false);
+    }
+  }, [loading]);
 
   const handleToggleNotifications = async () => {
     if (isSubscribed) {

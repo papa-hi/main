@@ -90,9 +90,10 @@ export function usePushNotifications() {
       
       // Add timeout for permission request
       const permissionTimeout = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Permission request timed out')), 10000);
+        setTimeout(() => reject(new Error('Permission request timed out after 10 seconds')), 10000);
       });
 
+      console.log('Requesting notification permission...');
       const permissionRequest = requestPermission();
       const permission = await Promise.race([permissionRequest, permissionTimeout]);
       
@@ -154,6 +155,9 @@ export function usePushNotifications() {
       setError(errorMessage);
       setLoading(false);
       return false;
+    } finally {
+      // Ensure loading is always reset
+      setLoading(false);
     }
   };
 
