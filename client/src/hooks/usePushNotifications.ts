@@ -131,7 +131,35 @@ export function usePushNotifications() {
         detail: { message: '⚙️ Step 6: Waiting for service worker', type: 'info' } 
       }));
       
-      const registration = await navigator.serviceWorker.ready;
+      // Add timeout for service worker ready
+      const swTimeout = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('debug-notification', { 
+            detail: { message: '❌ Service worker timeout - trying fallback', type: 'error' } 
+          }));
+          reject(new Error('Service worker ready timeout'));
+        }, 3000);
+      });
+
+      let registration;
+      try {
+        registration = await Promise.race([navigator.serviceWorker.ready, swTimeout]);
+      } catch (error) {
+        // Fallback: Register service worker manually
+        window.dispatchEvent(new CustomEvent('debug-notification', { 
+          detail: { message: '🔄 Fallback: Manual SW registration', type: 'info' } 
+        }));
+        
+        registration = await navigator.serviceWorker.register('/service-worker.js');
+        await registration.update();
+        
+        // Wait for it to become ready
+        const readyTimeout = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('Manual registration timeout')), 5000);
+        });
+        
+        registration = await Promise.race([navigator.serviceWorker.ready, readyTimeout]);
+      }
       
       window.dispatchEvent(new CustomEvent('debug-notification', { 
         detail: { message: '📱 Step 7: Creating push subscription (CRITICAL)', type: 'info' } 
