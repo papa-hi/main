@@ -451,7 +451,19 @@
       "unsubscribed": "Von Benachrichtigungen abgemeldet",
       "unsubscribedDesc": "Du erhältst keine Push-Benachrichtigungen mehr.",
       "subscriptionFailed": "Anmeldung fehlgeschlagen",
-      "subscriptionFailedDesc": "Etwas ist beim Einrichten der Benachrichtigungen schiefgelaufen."
+      "subscriptionFailedDesc": "Etwas ist beim Einrichten der Benachrichtigungen schiefgelaufen.",
+      "activeStatus": "Push-Benachrichtigungen sind aktiv",
+      "preferences": "Benachrichtigungs-Einstellungen",
+      "playdateReminders": "Spieltreffen-Erinnerungen",
+      "playdateRemindersDesc": "Erhalte Erinnerungen für anstehende Spieltreffen",
+      "newMessages": "Neue Nachrichten",
+      "newMessagesDesc": "Benachrichtigungen für neue Chat-Nachrichten",
+      "playdateUpdates": "Spieltreffen-Updates",
+      "playdateUpdatesDesc": "Änderungen bei Spieltreffen, an denen du teilnimmst",
+      "newLocations": "Neue Standorte",
+      "newLocationsDesc": "Benachrichtigungen über neue Spielplätze in deiner Nähe",
+      "sendingTest": "Wird gesendet...",
+      "enabling": "Wird aktiviert..."
     },
     "account": {
       "title": "Konto",

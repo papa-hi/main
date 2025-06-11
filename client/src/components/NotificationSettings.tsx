@@ -124,18 +124,18 @@ export default function NotificationSettings() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-md">
               <CheckCircle className="h-4 w-4" />
-              <span>Push meldingen zijn actief</span>
+              <span>{t('settings.notifications.activeStatus')}</span>
             </div>
 
             <div className="space-y-3">
-              <h4 className="font-medium">Melding Voorkeuren</h4>
+              <h4 className="font-medium">{t('settings.notifications.preferences')}</h4>
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-sm font-medium">Playdate Herinneringen</Label>
+                    <Label className="text-sm font-medium">{t('settings.notifications.playdateReminders')}</Label>
                     <p className="text-xs text-muted-foreground">
-                      Krijg een herinnering voor aankomende playdates
+                      {t('settings.notifications.playdateRemindersDesc')}
                     </p>
                   </div>
                   <Switch defaultChecked />
@@ -143,9 +143,9 @@ export default function NotificationSettings() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-sm font-medium">Nieuwe Berichten</Label>
+                    <Label className="text-sm font-medium">{t('settings.notifications.newMessages')}</Label>
                     <p className="text-xs text-muted-foreground">
-                      Meldingen voor nieuwe chat berichten
+                      {t('settings.notifications.newMessagesDesc')}
                     </p>
                   </div>
                   <Switch defaultChecked />
@@ -153,9 +153,9 @@ export default function NotificationSettings() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-sm font-medium">Playdate Updates</Label>
+                    <Label className="text-sm font-medium">{t('settings.notifications.playdateUpdates')}</Label>
                     <p className="text-xs text-muted-foreground">
-                      Wijzigingen in playdates waar je aan deelneemt
+                      {t('settings.notifications.playdateUpdatesDesc')}
                     </p>
                   </div>
                   <Switch defaultChecked />
@@ -163,9 +163,9 @@ export default function NotificationSettings() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-sm font-medium">Nieuwe Locaties</Label>
+                    <Label className="text-sm font-medium">{t('settings.notifications.newLocations')}</Label>
                     <p className="text-xs text-muted-foreground">
-                      Meldingen over nieuwe speelplekken in jouw buurt
+                      {t('settings.notifications.newLocationsDesc')}
                     </p>
                   </div>
                   <Switch />
@@ -180,7 +180,7 @@ export default function NotificationSettings() {
               className="w-full"
             >
               <Smartphone className="h-4 w-4 mr-2" />
-              {testLoading ? 'Versturen...' : 'Test Melding Versturen'}
+              {testLoading ? t('settings.notifications.sendingTest') : t('settings.notifications.sendTest')}
             </Button>
           </div>
         )}
@@ -193,7 +193,7 @@ export default function NotificationSettings() {
               className="w-full"
             >
               <Bell className="h-4 w-4 mr-2" />
-              {loading ? 'Inschakelen...' : 'Meldingen Inschakelen'}
+              {loading ? t('settings.notifications.enabling') : t('settings.notifications.enablePush')}
             </Button>
           </div>
         )}
