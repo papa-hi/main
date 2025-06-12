@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
@@ -20,13 +20,30 @@ export default function CreatePage() {
   const { user, isLoading } = useAuth();
   const { t } = useTranslation();
   
-  // Extract place ID from URL parameters
+  // Check for place data in sessionStorage (from place details navigation)
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  
+  useEffect(() => {
+    const storedPlace = sessionStorage.getItem('selectedPlace');
+    if (storedPlace) {
+      try {
+        const placeData = JSON.parse(storedPlace);
+        setSelectedPlace(placeData);
+        // Clear from sessionStorage after reading
+        sessionStorage.removeItem('selectedPlace');
+      } catch (error) {
+        console.error('Error parsing stored place data:', error);
+      }
+    }
+  }, []);
+
+  // Use selectedPlace from sessionStorage, fallback to URL parameter for backwards compatibility
   const searchParams = new URLSearchParams(location.split('?')[1] || '');
   const placeIdString = searchParams.get('place');
   const placeId = placeIdString ? parseInt(placeIdString, 10) : null;
   
-  // Fetch place data if placeId is provided
-  const { data: place } = useQuery<Place>({
+  // Fetch place data if placeId is provided (fallback method)
+  const { data: fetchedPlace } = useQuery<Place>({
     queryKey: ['/api/places', placeId],
     queryFn: async () => {
       if (!placeId) return null;
@@ -34,8 +51,11 @@ export default function CreatePage() {
       if (!response.ok) throw new Error('Failed to fetch place');
       return response.json();
     },
-    enabled: !!placeId,
+    enabled: !!placeId && !selectedPlace,
   });
+
+  // Use selectedPlace if available, otherwise use fetchedPlace
+  const place = selectedPlace || fetchedPlace;
   
   // Redirect to login if not authenticated
   useEffect(() => {

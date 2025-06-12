@@ -357,8 +357,16 @@ export default function PlaceDetailsPage() {
                 onClick={() => {
                   console.log('=== CREATE PLAYDATE BUTTON CLICKED ===');
                   console.log('Place ID:', place.id);
-                  console.log('Navigating to:', `/create?place=${place.id}`);
-                  window.location.href = `/create?place=${place.id}`;
+                  console.log('Storing place data in sessionStorage');
+                  // Store place data in sessionStorage to pass to create page
+                  sessionStorage.setItem('selectedPlace', JSON.stringify({
+                    id: place.id,
+                    name: place.name,
+                    address: place.address,
+                    latitude: place.latitude,
+                    longitude: place.longitude
+                  }));
+                  setLocation('/create');
                 }}
               >
                 <i className="fas fa-calendar-plus mr-2"></i>
