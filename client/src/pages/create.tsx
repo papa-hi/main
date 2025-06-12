@@ -22,7 +22,8 @@ export default function CreatePage() {
   
   // Extract place ID from URL parameters
   const searchParams = new URLSearchParams(location.split('?')[1] || '');
-  const placeId = searchParams.get('place');
+  const placeIdString = searchParams.get('place');
+  const placeId = placeIdString ? parseInt(placeIdString, 10) : null;
   
   // Fetch place data if placeId is provided
   const { data: place } = useQuery<Place>({
@@ -71,7 +72,8 @@ export default function CreatePage() {
 
   // Temporary debugging
   console.log('=== CREATE PAGE LOADED ===');
-  console.log('PlaceId from URL:', placeId);
+  console.log('PlaceId string from URL:', placeIdString);
+  console.log('PlaceId parsed:', placeId);
   console.log('Place data:', place);
   console.log('Full URL:', location);
   console.log('Default values:', {
