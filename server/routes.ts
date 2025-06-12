@@ -23,18 +23,35 @@ async function geocodeAddress(address: string): Promise<{ latitude: number; long
   try {
     if (!address || address.trim() === '') return null;
     
+    console.log(`[GEOCODE] Attempting to geocode: ${address}`);
+    
     const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=nl`;
-    const response = await fetch(geocodeUrl);
+    const response = await fetch(geocodeUrl, {
+      headers: {
+        'User-Agent': 'PaPa-Hi Family App (development)'
+      }
+    });
+    
+    if (!response.ok) {
+      console.error(`[GEOCODE] HTTP Error: ${response.status} ${response.statusText}`);
+      return null;
+    }
+    
     const data = await response.json();
+    console.log(`[GEOCODE] Response data:`, data);
 
     if (data && data.length > 0) {
-      return {
+      const result = {
         latitude: parseFloat(data[0].lat),
         longitude: parseFloat(data[0].lon)
       };
+      console.log(`[GEOCODE] Success: ${result.latitude}, ${result.longitude}`);
+      return result;
+    } else {
+      console.log(`[GEOCODE] No results found for: ${address}`);
     }
   } catch (error) {
-    console.error('Geocoding error:', error);
+    console.error(`[GEOCODE] Error:`, error);
   }
   return null;
 }
@@ -1873,6 +1890,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add generic place (restaurant or playground)
   app.post("/api/places", isAuthenticated, async (req: Request, res: Response) => {
     try {
+      console.log(`[DEBUG] POST /api/places called with body:`, JSON.stringify(req.body, null, 2));
+      
       const userId = req.user?.id;
       
       if (!userId) {
