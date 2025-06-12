@@ -1648,6 +1648,8 @@ export class DatabaseStorage implements IStorage {
         
         return {
           ...place,
+          latitude: parseFloat(place.latitude) || 0,
+          longitude: parseFloat(place.longitude) || 0,
           distance,
           isSaved: favoritePlaces[place.id] || false
         };
@@ -1667,7 +1669,14 @@ export class DatabaseStorage implements IStorage {
 
   async getPlaceById(id: number): Promise<Place | undefined> {
     const [place] = await db.select().from(places).where(eq(places.id, id));
-    return place || undefined;
+    if (!place) return undefined;
+    
+    // Convert string coordinates to numbers for map compatibility
+    return {
+      ...place,
+      latitude: parseFloat(place.latitude) || 0,
+      longitude: parseFloat(place.longitude) || 0
+    };
   }
   
   async getNearbyPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]> {

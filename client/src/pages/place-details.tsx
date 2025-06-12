@@ -147,6 +147,21 @@ export default function PlaceDetailsPage() {
     return stars;
   };
 
+  // Debug coordinates
+  console.log('Place coordinates:', { 
+    latitude: place.latitude, 
+    longitude: place.longitude,
+    latType: typeof place.latitude,
+    lonType: typeof place.longitude
+  });
+
+  // Ensure coordinates are valid numbers
+  const lat = typeof place.latitude === 'string' ? parseFloat(place.latitude) : place.latitude;
+  const lon = typeof place.longitude === 'string' ? parseFloat(place.longitude) : place.longitude;
+  
+  // Check if coordinates are valid
+  const hasValidCoordinates = !isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0;
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Header */}
@@ -272,24 +287,38 @@ export default function PlaceDetailsPage() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="h-96 rounded-lg overflow-hidden">
-                <MapContainer
-                  center={[place.latitude, place.longitude]}
-                  zoom={15}
-                  style={{ height: '100%', width: '100%' }}
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  <Marker position={[place.latitude, place.longitude]}>
-                    <Popup>
-                      <div className="text-center">
-                        <h3 className="font-semibold">{place.name}</h3>
-                        {place.address && <p className="text-sm text-gray-600">{place.address}</p>}
-                      </div>
-                    </Popup>
-                  </Marker>
-                </MapContainer>
+                {hasValidCoordinates ? (
+                  <MapContainer
+                    center={[lat, lon]}
+                    zoom={15}
+                    style={{ height: '100%', width: '100%' }}
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <Marker position={[lat, lon]}>
+                      <Popup>
+                        <div className="text-center">
+                          <h3 className="font-semibold">{place.name}</h3>
+                          {place.address && <p className="text-sm text-gray-600">{place.address}</p>}
+                        </div>
+                      </Popup>
+                    </Marker>
+                  </MapContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center bg-gray-100">
+                    <div className="text-center text-gray-500">
+                      <MapPin className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm">
+                        {t('places.noLocationAvailable', 'Location coordinates not available')}
+                      </p>
+                      {place.address && (
+                        <p className="text-xs mt-1">{place.address}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
