@@ -87,14 +87,7 @@ export function AddPlaygroundForm({ onSuccess }: AddPlaygroundFormProps) {
   // Mutation for adding playground
   const addPlaygroundMutation = useMutation({
     mutationFn: async (data: PlaygroundFormValues & { type: string }) => {
-      const response = await apiRequest('/api/places', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to add playground');
-      }
+      const response = await apiRequest('POST', '/api/places', data);
       return await response.json();
     },
     onSuccess: () => {

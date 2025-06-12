@@ -81,14 +81,7 @@ export function AddMuseumForm({ onSuccess }: AddMuseumFormProps) {
   // Mutation for adding museum
   const addMuseumMutation = useMutation({
     mutationFn: async (data: MuseumFormValues & { type: string }) => {
-      const response = await apiRequest('/api/places', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to add museum');
-      }
+      const response = await apiRequest('POST', '/api/places', data);
       return await response.json();
     },
     onSuccess: () => {
