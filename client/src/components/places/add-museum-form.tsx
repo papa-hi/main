@@ -80,7 +80,7 @@ export function AddMuseumForm({ onSuccess }: AddMuseumFormProps) {
 
   // Mutation for adding museum
   const addMuseumMutation = useMutation({
-    mutationFn: async (data: MuseumFormValues & { type: string }) => {
+    mutationFn: async (data: any) => {
       const response = await apiRequest('POST', '/api/places', data);
       return await response.json();
     },
@@ -162,47 +162,7 @@ export function AddMuseumForm({ onSuccess }: AddMuseumFormProps) {
           )}
         />
 
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="latitude"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('places.latitude', 'Latitude')}</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    step="any"
-                    placeholder="52.3676" 
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
-          <FormField
-            control={form.control}
-            name="longitude"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('places.longitude', 'Longitude')}</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    step="any"
-                    placeholder="4.9041" 
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
 
         <Button 
           type="button" 
