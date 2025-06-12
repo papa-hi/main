@@ -1,0 +1,893 @@
+wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/?token=TvAhQaw7-hC5' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=TvAhQaw7-hC5' is invalid.
+    at setupWebSocket (client:536:19)
+    at fallback (client:509:16)
+    at WebSocket.<anonymous> (client:555:7)Understand this error
+ Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+ Warning: validateDOMNesting(...): <button> cannot appear as a descendant of <button>.
+    at button
+    at button
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=61d144f5:41:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=61d144f5:52:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=61d144f5:33:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=61d144f5:41:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PSLAEUKM.js?v=61d144f5:1980:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=61d144f5:144:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=61d144f5:942:13
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-JJS7DLG7.js?v=61d144f5:38:15)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-JJS7DLG7.js?v=61d144f5:38:15)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PSLAEUKM.js?v=61d144f5:1915:15)
+    at Popper (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PSLAEUKM.js?v=61d144f5:1972:11)
+    at Menu (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=61d144f5:98:11)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-JJS7DLG7.js?v=61d144f5:38:15)
+    at DropdownMenu (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=61d144f5:908:5)
+    at div
+    at div
+    at div
+    at header
+    at Header (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/header.tsx:53:26)
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:22:32)
+    at AdminProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-admin.tsx:27:33)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at FirebaseAuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-firebase-auth.tsx:23:40)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=61d144f5:2805:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=NhSPcpmejhvHBhjzKoRsh:182:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=NhSPcpmejhvHBhjzKoRsh:25:3)
+printWarning @ /@fs/home/runner/wor…N.js?v=61d144f5:521Understand this error
+ Warning: validateDOMNesting(...): <a> cannot appear as a descendant of <a>.
+    at a
+    at a
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=61d144f5:337:18
+    at div
+    at div
+    at div
+    at header
+    at Header (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/header.tsx:53:26)
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:22:32)
+    at AdminProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-admin.tsx:27:33)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at FirebaseAuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-firebase-auth.tsx:23:40)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=61d144f5:2805:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=NhSPcpmejhvHBhjzKoRsh:182:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=NhSPcpmejhvHBhjzKoRsh:25:3)
+printWarning @ /@fs/home/runner/wor…N.js?v=61d144f5:521Understand this error
+/api/admin/stats/users:1 
+            
+            
+           Failed to load resource: the server responded with a status of 403 (Forbidden)Understand this error
+/api/admin/stats/pages:1 
+            
+            
+           Failed to load resource: the server responded with a status of 403 (Forbidden)Understand this error
+/api/admin/stats/features:1 
+            
+            
+           Failed to load resource: the server responded with a status of 403 (Forbidden)Understand this error
+/api/admin/activity:1 
+            
+            
+           Failed to load resource: the server responded with a status of 403 (Forbidden)Understand this error
+/api/admin/logs:1 
+            
+            
+           Failed to load resource: the server responded with a status of 403 (Forbidden)Understand this error
+App.tsx:88 ServiceWorker registration successful with scope:  https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+/api/admin/users:1 
+            
+            
+           Failed to load resource: the server responded with a status of 503 (Service Unavailable)Understand this error
+/apple-touch-icon.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 503 (Service Unavailable)Understand this error
+/settings:1 Error while trying to use the following icon from the Manifest: https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/apple-touch-icon.png (Download error or resource isn't a valid image)Understand this error
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection to 'wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws' failed: 
+connectWebSocket @ /src/hooks/use-chat.tsx:50Understand this error
+ WebSocket error: Event
+newSocket.onerror @ /src/hooks/use-chat.tsx:80Understand this error
+ WebSocket connection closed
+ Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+ WebSocket connection established
+ Authenticating WebSocket connection...
+ Location hook initialized
+ Requesting geolocation permission...
+ Weather hook initialized with location data: Object
+ Location still loading, waiting...
+ Location hook initialized
+ Requesting geolocation permission...
+ Location hook initialized
+ Requesting geolocation permission...
+ Geolocation permission granted
+ Location obtained: 52.3763712, 4.6759936
+ Fetching API key from server
+ Geolocation permission granted
+ Location obtained: 52.3763712, 4.6759936
+ Fetching API key from server
+ Geolocation permission granted
+ Location obtained: 52.3763712, 4.6759936
+ Fetching API key from server
+/api/users/featured:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+ API key retrieved successfully
+ Fetching city name from coordinates...
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ API key retrieved successfully
+ Fetching city name from coordinates...
+ City name found: Vijfhuizen, NL
+/api/places/30/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/33/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/12/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+ City name found: Vijfhuizen, NL
+ Weather hook initialized with location data: Object
+ Fetching API key for weather
+/api/places/11/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+ API key retrieved successfully
+ Fetching city name from coordinates...
+ City name found: Vijfhuizen, NL
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Successfully retrieved API key for weather
+ Fetching weather data for coordinates: 52.3763712, 4.6759936
+ Weather data received: Object
+ Setting weather data: Object
+/api/places/30/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/33/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/11/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/12/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+ Geocoding failed for address: Plantage Middenlaan 41A, 1018 DC Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: Object
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Kattenburgerplein 1, 1018 KK Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: Object
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Haarlemmermeerse Bos, Haarlem  SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: Object
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Jac van Looy straat 29, 2032 ZA Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: Object
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Kattenburgerplein 1, 1018 KK Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: Object
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Location hook initialized
+ Requesting geolocation permission...
+ Weather hook initialized with location data: Object
+ Location still loading, waiting...
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Location hook initialized
+ Requesting geolocation permission...
+ Location hook initialized
+ Requesting geolocation permission...
+ Geolocation permission granted
+ Location obtained: 52.3763712, 4.6759936
+ Fetching API key from server
+ Geolocation permission granted
+ Location obtained: 52.3763712, 4.6759936
+ Fetching API key from server
+ Geolocation permission granted
+ Location obtained: 52.3763712, 4.6759936
+ Fetching API key from server
+/api/places/30/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/11/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+ API key retrieved successfully
+ Fetching city name from coordinates...
+/api/places/33/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/users/featured:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/12/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+ City name found: Vijfhuizen, NL
+ Weather hook initialized with location data: Object
+ Fetching API key for weather
+ API key retrieved successfully
+ Fetching city name from coordinates...
+ City name found: Vijfhuizen, NL
+ API key retrieved successfully
+ Fetching city name from coordinates...
+ City name found: Vijfhuizen, NL
+ Successfully retrieved API key for weather
+ Fetching weather data for coordinates: 52.3763712, 4.6759936
+ Weather data received: Object
+ Setting weather data: Object
+ Location hook initialized
+ Requesting geolocation permission...
+ Geolocation permission granted
+ Location obtained: 52.3763712, 4.6759936
+ Fetching API key from server
+ API key retrieved successfully
+ Fetching city name from coordinates...
+ City name found: Vijfhuizen, NL
+ Geocoding failed for address: Plantage Middenlaan 41A, 1018 DC Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: Object
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Calculating distance for place: Object
+ Geocoding failed for address: Haarlemmermeerse Bos, Haarlem  SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: Object
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+/api/places/33/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/30/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/59/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/50/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+ Geocoding failed for address: Jac van Looy straat 29, 2032 ZA Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: Object
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+/api/places/12/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/52/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/51/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/57/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/60/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/58/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/13/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/15/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/20/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/21/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/17/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/44/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/31/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/32/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/34/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/35/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/36/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/37/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/38/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/39/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/40/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/41/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/43/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/45/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/42/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/11/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/46/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/16/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/47/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/48/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/49/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/5/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/19/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/24/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/22/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/25/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/23/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/14/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/places/18/user-rating:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+ Geocoding failed for address: Kattenburgerplein 1, 1018 KK Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Kattenburgerplein 1, 1018 KK Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Plantage Middenlaan 41A, 1018 DC Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Plantage Middenlaan 41A, 1018 DC Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Haarlemmermeerse Bos, Haarlem  SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Haarlemmermeerse Bos, Haarlem '}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Jac van Looy straat 29, 2032 ZA Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Jac van Looy straat 29, 2032 ZA Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Witte Herenstraat 36, 2011 NW Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Witte Herenstraat 36, 2011 NW Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Reinaldapad 10, 2033 SX Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Reinaldapad 10, 2033 SX Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Zeeweg 3, 2051 EB Overveen SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Zeeweg 3, 2051 EB Overveen'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Strandwal 13, 2033 CZ Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Strandwal 13, 2033 CZ Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Rode Kruislaan 1, 6951 BL Dieren  SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Rode Kruislaan 1, 6951 BL Dieren '}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Prinses Beatrix plein, Haarlem  SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Prinses Beatrix plein, Haarlem '}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Buitenplein 83, 1181 ZE Amstelveen SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Buitenplein 83, 1181 ZE Amstelveen'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Hertenkamplaan 1, 2012 CV Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Hertenkamplaan 1, 2012 CV Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Schagchelstraat 26, 2011 HZ Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Schagchelstraat 26, 2011 HZ Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Bijvoetsstraat  SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Bijvoetsstraat '}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Linnaeusstraat 2, 1092 CK Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Linnaeusstraat 2, 1092 CK Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Meeuwenlaan 88, 1021 JK Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Meeuwenlaan 88, 1021 JK Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Prinsengracht 168, 1016 HA Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Prinsengracht 168, 1016 HA Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Agnietenstraat 2, 3512 XB Utrecht SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Agnietenstraat 2, 3512 XB Utrecht'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Maliebaanstation 100, 3571 KW Utrecht SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Maliebaanstation 100, 3571 KW Utrecht'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Steenweg 6, 3511 SN Utrecht SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Steenweg 6, 3511 SN Utrecht'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Prins Willem-Alexanderhof 5, 2595 BE Den Haag SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Prins Willem-Alexanderhof 5, 2595 BE Den Haag'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: President Kennedylaan 5, 2517 JK Den Haag SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'President Kennedylaan 5, 2517 JK Den Haag'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Leuvehaven 1, 3011 EA Rotterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Leuvehaven 1, 3011 EA Rotterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Stieltjesstraat 23, 3071 JE Rotterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Stieltjesstraat 23, 3071 JE Rotterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Van Dedemstraat 8, 1624 NN Hoorn SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Van Dedemstraat 8, 1624 NN Hoorn'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Hoeferlaan 4, 6816 SG Arnhem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Hoeferlaan 4, 6816 SG Arnhem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Woudplein 2A, 2031 CZ Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Woudplein 2A, 2031 CZ Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address:  Theemsplein 22, 2014 CN Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: ' Theemsplein 22, 2014 CN Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Glipperweg 4c, 2104 AK Heemstede SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Glipperweg 4c, 2104 AK Heemstede'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Van Dortstraat 3, 2023 JN Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Van Dortstraat 3, 2023 JN Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Brouwersplein 45, 2013 PH Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Brouwersplein 45, 2013 PH Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Javastraat 23, Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Javastraat 23, Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Duinlustweg 22, 2051 AB Overveen SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Duinlustweg 22, 2051 AB Overveen'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Koningstraat 19-21, 2011 TB Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Koningstraat 19-21, 2011 TB Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Darwinweg 2, 2333 CR Leiden SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Darwinweg 2, 2333 CR Leiden'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Oosterdok 2, 1011 VX Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Oosterdok 2, 1011 VX Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Museumstraat 1, 1071 XX Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Museumstraat 1, 1071 XX Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Kattenburgerplein 1, 1018 KK Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Kattenburgerplein 1, 1018 KK Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Plantage Middenlaan 41A, 1018 DC Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Plantage Middenlaan 41A, 1018 DC Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Haarlemmermeerse Bos, Haarlem  SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Haarlemmermeerse Bos, Haarlem '}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Plantage Middenlaan 41A, 1018 DC Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Plantage Middenlaan 41A, 1018 DC Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Kattenburgerplein 1, 1018 KK Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Kattenburgerplein 1, 1018 KK Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Jac van Looy straat 29, 2032 ZA Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Jac van Looy straat 29, 2032 ZA Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Jac van Looy straat 29, 2032 ZA Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Jac van Looy straat 29, 2032 ZA Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Reinaldapad 10, 2033 SX Haarlem SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Reinaldapad 10, 2033 SX Haarlem'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Linnaeusstraat 2, 1092 CK Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Linnaeusstraat 2, 1092 CK Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km
+ Geocoding failed for address: Kattenburgerplein 1, 1018 KK Amsterdam SyntaxError: Unexpected token 'C', "Content ni"... is not valid JSON
+geocodeAddress @ /src/lib/distance.ts:65Understand this warning
+ Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Kattenburgerplein 1, 1018 KK Amsterdam'}
+calculateDistanceToPlace @ /src/lib/distance.ts:84Understand this warning
+ Distance calculation result: 0 km

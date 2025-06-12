@@ -70,13 +70,14 @@ export default function CreatePage() {
   const defaultLongitude = place ? parseFloat(place.longitude) : undefined;
 
   // Temporary debugging
-  console.log('Debug create page:', {
-    placeId,
-    place,
+  console.log('=== CREATE PAGE LOADED ===');
+  console.log('PlaceId from URL:', placeId);
+  console.log('Place data:', place);
+  console.log('Full URL:', location);
+  console.log('Default values:', {
     defaultLocation,
     defaultLatitude,
-    defaultLongitude,
-    url: location
+    defaultLongitude
   });
 
 
