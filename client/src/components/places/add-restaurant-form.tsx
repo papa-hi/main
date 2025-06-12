@@ -87,8 +87,8 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
         type: "restaurant",
         description: data.description || "",
         address: data.address,
-        latitude: (data.latitude || 0).toString(),
-        longitude: (data.longitude || 0).toString(),
+        latitude: data.latitude || 0,
+        longitude: data.longitude || 0,
         features: data.features,
         // imageUrl is now handled by the server with random restaurant images
       };

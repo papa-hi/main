@@ -17,8 +17,8 @@ const playgroundFormSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
   description: z.string().optional(),
   address: z.string().min(3, { message: "Address is required" }),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   features: z.array(z.string()).default([]),
 });
 
