@@ -1902,14 +1902,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let latitude = parseFloat(req.body.latitude) || 0;
       let longitude = parseFloat(req.body.longitude) || 0;
       
+      console.log(`[GEOCODE] Input: lat=${req.body.latitude}, lng=${req.body.longitude}, address="${req.body.address}"`);
+      console.log(`[GEOCODE] Parsed: lat=${latitude}, lng=${longitude}`);
+      
       if ((latitude === 0 || longitude === 0) && req.body.address) {
-        console.log(`Auto-geocoding address: ${req.body.address}`);
+        console.log(`[GEOCODE] Starting geocoding for: ${req.body.address}`);
         const coords = await geocodeAddress(req.body.address);
         if (coords) {
           latitude = coords.latitude;
           longitude = coords.longitude;
-          console.log(`Geocoded coordinates: ${latitude}, ${longitude}`);
+          console.log(`[GEOCODE] SUCCESS: ${latitude}, ${longitude}`);
+        } else {
+          console.log(`[GEOCODE] FAILED for: ${req.body.address}`);
         }
+      } else {
+        console.log(`[GEOCODE] Skipping - coordinates provided or no address`);
       }
 
       // Create a new place object
