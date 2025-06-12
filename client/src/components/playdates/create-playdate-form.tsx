@@ -53,6 +53,12 @@ export function CreatePlaydateForm({
 
   // Update form values when default props change
   useEffect(() => {
+    console.log('CreatePlaydateForm useEffect triggered:', {
+      defaultLocation,
+      defaultLatitude,
+      defaultLongitude
+    });
+
     if (defaultLocation || defaultLatitude || defaultLongitude) {
       const newValues = {
         title: defaultLocation ? `Playdate at ${defaultLocation.split(',')[0]}` : "",
@@ -61,15 +67,20 @@ export function CreatePlaydateForm({
         longitude: defaultLongitude?.toString() || "",
       };
       
+      console.log('Updating form with new values:', newValues);
+      
       // Only update if values are different
       const currentValues = form.getValues();
       if (currentValues.location !== newValues.location || 
           currentValues.latitude !== newValues.latitude ||
           currentValues.longitude !== newValues.longitude) {
+        console.log('Form values are different, resetting form');
         form.reset({
           ...currentValues,
           ...newValues,
         });
+      } else {
+        console.log('Form values are the same, not updating');
       }
     }
   }, [defaultLocation, defaultLatitude, defaultLongitude, form]);

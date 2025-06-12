@@ -69,6 +69,16 @@ export default function CreatePage() {
   const defaultLatitude = place ? parseFloat(place.latitude) : undefined;
   const defaultLongitude = place ? parseFloat(place.longitude) : undefined;
 
+  // Temporary debugging
+  console.log('Debug create page:', {
+    placeId,
+    place,
+    defaultLocation,
+    defaultLatitude,
+    defaultLongitude,
+    url: location
+  });
+
 
 
   return (
