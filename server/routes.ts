@@ -23,8 +23,6 @@ async function geocodeAddress(address: string): Promise<{ latitude: number; long
   try {
     if (!address || address.trim() === '') return null;
     
-    console.log(`[GEOCODE] Attempting to geocode: ${address}`);
-    
     const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=nl`;
     const response = await fetch(geocodeUrl, {
       headers: {
@@ -33,22 +31,19 @@ async function geocodeAddress(address: string): Promise<{ latitude: number; long
     });
     
     if (!response.ok) {
-      console.error(`[GEOCODE] HTTP Error: ${response.status} ${response.statusText}`);
+      console.error(`Geocoding failed: HTTP ${response.status} for address: ${address}`);
       return null;
     }
     
     const data = await response.json();
-    console.log(`[GEOCODE] Response data:`, data);
 
     if (data && data.length > 0) {
       const result = {
         latitude: parseFloat(data[0].lat),
         longitude: parseFloat(data[0].lon)
       };
-      console.log(`[GEOCODE] Success: ${result.latitude}, ${result.longitude}`);
+      console.log(`Geocoded "${address}" to coordinates: ${result.latitude}, ${result.longitude}`);
       return result;
-    } else {
-      console.log(`[GEOCODE] No results found for: ${address}`);
     }
   } catch (error) {
     console.error(`[GEOCODE] Error:`, error);
@@ -1890,8 +1885,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add generic place (restaurant or playground)
   app.post("/api/places", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      console.log(`[DEBUG] POST /api/places called with body:`, JSON.stringify(req.body, null, 2));
-      
       const userId = req.user?.id;
       
       if (!userId) {
@@ -1921,21 +1914,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let latitude = parseFloat(req.body.latitude) || 0;
       let longitude = parseFloat(req.body.longitude) || 0;
       
-      console.log(`[GEOCODE] Input: lat=${req.body.latitude}, lng=${req.body.longitude}, address="${req.body.address}"`);
-      console.log(`[GEOCODE] Parsed: lat=${latitude}, lng=${longitude}`);
-      
       if ((latitude === 0 || longitude === 0) && req.body.address) {
-        console.log(`[GEOCODE] Starting geocoding for: ${req.body.address}`);
         const coords = await geocodeAddress(req.body.address);
         if (coords) {
           latitude = coords.latitude;
           longitude = coords.longitude;
-          console.log(`[GEOCODE] SUCCESS: ${latitude}, ${longitude}`);
-        } else {
-          console.log(`[GEOCODE] FAILED for: ${req.body.address}`);
         }
-      } else {
-        console.log(`[GEOCODE] Skipping - coordinates provided or no address`);
       }
 
       // Create a new place object
