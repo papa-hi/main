@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Star, MapPin, Clock, Phone, Globe, Users } from "lucide-react";
+import { Star, MapPin, Clock, Phone, Globe, Users, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CreatePlaydateForm } from "@/components/playdates/create-playdate-form";
@@ -369,21 +369,29 @@ export default function PlaceDetailsPage() {
       </div>
       
       {/* Create Playdate Dialog */}
-      <Dialog open={showCreatePlaydate} onOpenChange={setShowCreatePlaydate}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {t('playdates.createPlaydateAt', 'Create Playdate at {{placeName}}', { placeName: place?.name })}
-            </DialogTitle>
-          </DialogHeader>
-          <CreatePlaydateForm 
-            defaultLocation={place ? place.name + (place.address ? `, ${place.address}` : '') : ''}
-            defaultLatitude={place ? parseFloat(place.latitude.toString()) : undefined}
-            defaultLongitude={place ? parseFloat(place.longitude.toString()) : undefined}
-            onSuccess={() => setShowCreatePlaydate(false)}
-          />
-        </DialogContent>
-      </Dialog>
+      {showCreatePlaydate && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50" style={{zIndex: 10000}}>
+          <div className="bg-white rounded-lg p-6 max-w-2xl max-h-[90vh] overflow-y-auto w-full mx-4" style={{zIndex: 10001}}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">
+                {t('playdates.createPlaydateAt', 'Create Playdate at {{placeName}}', { placeName: place?.name })}
+              </h2>
+              <button 
+                onClick={() => setShowCreatePlaydate(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <CreatePlaydateForm 
+              defaultLocation={place ? place.name + (place.address ? `, ${place.address}` : '') : ''}
+              defaultLatitude={place ? parseFloat(place.latitude.toString()) : undefined}
+              defaultLongitude={place ? parseFloat(place.longitude.toString()) : undefined}
+              onSuccess={() => setShowCreatePlaydate(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
