@@ -354,7 +354,12 @@ export default function PlaceDetailsPage() {
 
               <Button 
                 className="w-full justify-start"
-                onClick={() => setLocation(`/create?place=${place.id}`)}
+                onClick={() => {
+                  console.log('=== CREATE PLAYDATE BUTTON CLICKED ===');
+                  console.log('Place ID:', place.id);
+                  console.log('Navigating to:', `/create?place=${place.id}`);
+                  setLocation(`/create?place=${place.id}`);
+                }}
               >
                 <i className="fas fa-calendar-plus mr-2"></i>
                 {t('places.createPlaydate', 'Create Playdate Here')}
