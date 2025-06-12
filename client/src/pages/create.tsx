@@ -69,6 +69,8 @@ export default function CreatePage() {
   const defaultLatitude = place ? parseFloat(place.latitude) : undefined;
   const defaultLongitude = place ? parseFloat(place.longitude) : undefined;
 
+
+
   return (
     <div className="py-2">
       <div className="mb-6">

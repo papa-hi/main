@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertPlaydateSchema } from "@shared/schema";
@@ -40,16 +40,39 @@ export function CreatePlaydateForm({
   const form = useForm<CreatePlaydateFormData>({
     resolver: zodResolver(createPlaydateFormSchema),
     defaultValues: {
-      title: defaultLocation ? `Playdate at ${defaultLocation.split(',')[0]}` : "",
+      title: "",
       description: "",
-      location: defaultLocation || "",
-      latitude: defaultLatitude?.toString() || "",
-      longitude: defaultLongitude?.toString() || "",
+      location: "",
+      latitude: "",
+      longitude: "",
       startTime: "",
       endTime: "",
       maxParticipants: 6,
     },
   });
+
+  // Update form values when default props change
+  useEffect(() => {
+    if (defaultLocation || defaultLatitude || defaultLongitude) {
+      const newValues = {
+        title: defaultLocation ? `Playdate at ${defaultLocation.split(',')[0]}` : "",
+        location: defaultLocation || "",
+        latitude: defaultLatitude?.toString() || "",
+        longitude: defaultLongitude?.toString() || "",
+      };
+      
+      // Only update if values are different
+      const currentValues = form.getValues();
+      if (currentValues.location !== newValues.location || 
+          currentValues.latitude !== newValues.latitude ||
+          currentValues.longitude !== newValues.longitude) {
+        form.reset({
+          ...currentValues,
+          ...newValues,
+        });
+      }
+    }
+  }, [defaultLocation, defaultLatitude, defaultLongitude, form]);
 
   const createPlaydateMutation = useMutation({
     mutationFn: async (data: CreatePlaydateFormData) => {
