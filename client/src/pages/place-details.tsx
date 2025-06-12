@@ -358,7 +358,7 @@ export default function PlaceDetailsPage() {
                   console.log('=== CREATE PLAYDATE BUTTON CLICKED ===');
                   console.log('Place ID:', place.id);
                   console.log('Navigating to:', `/create?place=${place.id}`);
-                  setLocation(`/create?place=${place.id}`);
+                  window.location.href = `/create?place=${place.id}`;
                 }}
               >
                 <i className="fas fa-calendar-plus mr-2"></i>
