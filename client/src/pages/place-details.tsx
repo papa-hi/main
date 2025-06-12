@@ -147,14 +147,6 @@ export default function PlaceDetailsPage() {
     return stars;
   };
 
-  // Debug coordinates
-  console.log('Place coordinates:', { 
-    latitude: place.latitude, 
-    longitude: place.longitude,
-    latType: typeof place.latitude,
-    lonType: typeof place.longitude
-  });
-
   // Ensure coordinates are valid numbers
   const lat = typeof place.latitude === 'string' ? parseFloat(place.latitude) : place.latitude;
   const lon = typeof place.longitude === 'string' ? parseFloat(place.longitude) : place.longitude;
