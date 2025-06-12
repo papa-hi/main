@@ -18,8 +18,8 @@ const restaurantFormSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
   description: z.string().optional(),
   address: z.string().min(3, { message: "Address is required" }),
-  latitude: z.number(),
-  longitude: z.number(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   imageUrl: z.string().optional(),
   features: z.array(z.string()).default([]),
 });
@@ -41,8 +41,8 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
       name: '',
       description: '',
       address: '',
-      latitude: 0,
-      longitude: 0,
+      latitude: undefined,
+      longitude: undefined,
       features: [],
     },
     mode: 'onChange',
@@ -87,8 +87,8 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
         type: "restaurant",
         description: data.description || "",
         address: data.address,
-        latitude: data.latitude.toString(),
-        longitude: data.longitude.toString(),
+        latitude: (data.latitude || 0).toString(),
+        longitude: (data.longitude || 0).toString(),
         features: data.features,
         // imageUrl is now handled by the server with random restaurant images
       };

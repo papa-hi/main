@@ -17,8 +17,8 @@ const museumFormSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
   description: z.string().optional(),
   address: z.string().min(3, { message: "Address is required" }),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   imageUrl: z.string().optional(),
   features: z.array(z.string()).default([]),
 });
@@ -41,8 +41,8 @@ export function AddMuseumForm({ onSuccess }: AddMuseumFormProps) {
       name: '',
       description: '',
       address: '',
-      latitude: userLat || 0,
-      longitude: userLng || 0,
+      latitude: undefined,
+      longitude: undefined,
       features: [],
     },
     mode: 'onChange',
@@ -104,10 +104,17 @@ export function AddMuseumForm({ onSuccess }: AddMuseumFormProps) {
   });
 
   const onSubmit = (data: MuseumFormValues) => {
-    addMuseumMutation.mutate({
-      ...data,
-      type: 'museum',
-    });
+    const museumData = {
+      name: data.name,
+      type: "museum",
+      description: data.description || "",
+      address: data.address,
+      latitude: (data.latitude || 0).toString(),
+      longitude: (data.longitude || 0).toString(),
+      features: data.features,
+    };
+    
+    addMuseumMutation.mutate(museumData);
   };
 
   return (
