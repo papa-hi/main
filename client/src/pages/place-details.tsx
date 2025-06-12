@@ -8,6 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Star, MapPin, Clock, Phone, Globe, Users } from "lucide-react";
 import { useLocation } from "wouter";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CreatePlaydateForm } from "@/components/playdates/create-playdate-form";
+import { useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -42,6 +45,7 @@ export default function PlaceDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
+  const [showCreatePlaydate, setShowCreatePlaydate] = useState(false);
 
   const { data: place, isLoading: placeLoading, error: placeError } = useQuery<Place>({
     queryKey: ['/api/places', id],
@@ -354,20 +358,7 @@ export default function PlaceDetailsPage() {
 
               <Button 
                 className="w-full justify-start"
-                onClick={() => {
-                  console.log('=== CREATE PLAYDATE BUTTON CLICKED ===');
-                  console.log('Place ID:', place.id);
-                  console.log('Storing place data in sessionStorage');
-                  // Store place data in sessionStorage to pass to create page
-                  sessionStorage.setItem('selectedPlace', JSON.stringify({
-                    id: place.id,
-                    name: place.name,
-                    address: place.address,
-                    latitude: place.latitude,
-                    longitude: place.longitude
-                  }));
-                  setLocation('/create');
-                }}
+                onClick={() => setShowCreatePlaydate(true)}
               >
                 <i className="fas fa-calendar-plus mr-2"></i>
                 {t('places.createPlaydate', 'Create Playdate Here')}
@@ -376,6 +367,23 @@ export default function PlaceDetailsPage() {
           </Card>
         </div>
       </div>
+      
+      {/* Create Playdate Dialog */}
+      <Dialog open={showCreatePlaydate} onOpenChange={setShowCreatePlaydate}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {t('playdates.createPlaydateAt', 'Create Playdate at {{placeName}}', { placeName: place?.name })}
+            </DialogTitle>
+          </DialogHeader>
+          <CreatePlaydateForm 
+            defaultLocation={place ? place.name + (place.address ? `, ${place.address}` : '') : ''}
+            defaultLatitude={place ? parseFloat(place.latitude.toString()) : undefined}
+            defaultLongitude={place ? parseFloat(place.longitude.toString()) : undefined}
+            onSuccess={() => setShowCreatePlaydate(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
