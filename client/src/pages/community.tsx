@@ -338,68 +338,7 @@ export default function CommunityPage() {
     setShowComments(prev => ({ ...prev, [postId]: !prev[postId] }));
   };
 
-  // Post Comments Component
-  const PostComments = ({ postId }: { postId: number }) => {
-    const { data: comments = [], isLoading } = usePostComments(postId, true);
 
-    if (isLoading) {
-      return (
-        <div className="text-center py-4">
-          <p className="text-gray-500 text-sm">{t('community.commentsLoading', 'Loading comments...')}</p>
-        </div>
-      );
-    }
-
-    if (comments.length === 0) {
-      return (
-        <div className="text-center py-4">
-          <p className="text-gray-500 text-sm">{t('community.noComments', 'No comments yet. Be the first to comment!')}</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-4">
-        {comments.map((comment: any) => (
-          <div key={comment.id} className="flex gap-3">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={comment.author?.profileImage || undefined} />
-              <AvatarFallback>
-                {comment.author ? getUserInitials(comment.author) : 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <div className="bg-gray-50 rounded-lg px-3 py-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-sm">
-                    {comment.author?.firstName} {comment.author?.lastName}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-                  </span>
-                  {comment.isEdited && (
-                    <span className="text-xs text-gray-400">({t('community.edited', 'edited')})</span>
-                  )}
-                </div>
-                <p className="text-sm">{comment.content}</p>
-              </div>
-              <div className="flex items-center gap-2 mt-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleReaction(undefined, comment.id)}
-                  className="text-xs text-gray-500 hover:text-red-600 h-6 px-2"
-                >
-                  <Heart className="h-3 w-3 mr-1" />
-                  {comment._count?.reactions || 0}
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
 
 
 
