@@ -126,6 +126,8 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 - June 14, 2025: Initial setup
 - June 14, 2025: Completed comprehensive GDPR compliance implementation with multilingual support across 5 languages (English, Dutch, German, French, Spanish)
 - June 14, 2025: Updated company information to Haarlem, Netherlands with contact email papa@papa-hi.com throughout all privacy features and translations
+- June 14, 2025: Fixed critical community publish button bug by correcting apiRequest parameter order in all mutations
+- June 14, 2025: Implemented comprehensive multilingual support for community features with full English and Dutch translations
 
 ## User Preferences
 
