@@ -397,6 +397,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all users for user directory
+  // GDPR Data Export endpoint
+  app.get("/api/user/export-data", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      // Gather all user data for GDPR export
+      const userData = await storage.getUserById(userId);
+      const userPlaydates = await storage.getUserPlaydates(userId);
+      const userPlaces = await db.select().from(places).where(eq(places.id, userId)); // Places don't have createdBy field
+      const userChatMessages = await db.select().from(chatMessages).where(eq(chatMessages.senderId, userId));
+      const userSubscriptions = await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.userId, userId));
+
+      // Create comprehensive data export
+      const exportData = {
+        exportDate: new Date().toISOString(),
+        userData: {
+          id: userData?.id,
+          username: userData?.username,
+          firstName: userData?.firstName,
+          lastName: userData?.lastName,
+          email: userData?.email,
+          city: userData?.city,
+          bio: userData?.bio,
+          badge: userData?.badge,
+          childrenInfo: userData?.childrenInfo,
+          profileImage: userData?.profileImage,
+          createdAt: userData?.createdAt
+        },
+        playdates: userPlaydates.map(playdate => ({
+          id: playdate.id,
+          title: playdate.title,
+          description: playdate.description,
+          startTime: playdate.startTime,
+          endTime: playdate.endTime,
+          location: playdate.location,
+          createdAt: playdate.createdAt
+        })),
+        places: userPlaces.map(place => ({
+          id: place.id,
+          name: place.name,
+          description: place.description,
+          address: place.address,
+          category: place.category,
+          createdAt: place.createdAt
+        })),
+        chatMessages: userChatMessages.map(message => ({
+          id: message.id,
+          content: message.content,
+          timestamp: message.timestamp
+        })),
+        pushSubscriptions: userSubscriptions.length,
+        dataProcessingConsent: {
+          analytics: req.headers['analytics-consent'] || 'not-set',
+          marketing: req.headers['marketing-consent'] || 'not-set',
+          location: req.headers['location-consent'] || 'not-set'
+        }
+      };
+
+      res.json(exportData);
+    } catch (error) {
+      console.error("Error exporting user data:", error);
+      res.status(500).json({ error: "Failed to export user data" });
+    }
+  });
+
   app.get("/api/users", isAuthenticated, async (req, res) => {
     try {
       // Get all users from storage, limiting what data is returned

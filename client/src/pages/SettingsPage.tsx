@@ -29,6 +29,81 @@ export default function SettingsPage() {
     localStorage.getItem('location_consent') === 'true'
   );
 
+  // GDPR data management functions
+  const handleDataExport = async () => {
+    try {
+      const response = await fetch('/api/user/export-data', {
+        method: 'GET',
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `papa-hi-data-export-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        toast({
+          title: t('settings.privacy.exportSuccess', 'Data Export Complete'),
+          description: t('settings.privacy.exportSuccessDesc', 'Your data has been downloaded successfully.')
+        });
+      }
+    } catch (error) {
+      toast({
+        title: t('settings.privacy.exportError', 'Export Failed'),
+        description: t('settings.privacy.exportErrorDesc', 'Unable to export your data. Please try again.'),
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    if (confirm(t('settings.privacy.deleteConfirm', 'Are you sure you want to delete your account? This action cannot be undone.'))) {
+      // Navigate to dedicated account deletion page with proper warnings
+      navigate('/settings/delete-account');
+    }
+  };
+
+  // Update consent preferences
+  const updateAnalyticsConsent = (checked: boolean) => {
+    setAnalyticsConsent(checked);
+    localStorage.setItem('analytics_consent', checked.toString());
+    toast({
+      title: t('settings.privacy.consentUpdated', 'Preferences Updated'),
+      description: checked 
+        ? t('settings.privacy.analyticsEnabled', 'Analytics enabled') 
+        : t('settings.privacy.analyticsDisabled', 'Analytics disabled')
+    });
+  };
+
+  const updateMarketingConsent = (checked: boolean) => {
+    setMarketingConsent(checked);
+    localStorage.setItem('marketing_consent', checked.toString());
+    toast({
+      title: t('settings.privacy.consentUpdated', 'Preferences Updated'),
+      description: checked 
+        ? t('settings.privacy.marketingEnabled', 'Marketing communications enabled') 
+        : t('settings.privacy.marketingDisabled', 'Marketing communications disabled')
+    });
+  };
+
+  const updateLocationConsent = (checked: boolean) => {
+    setLocationConsent(checked);
+    localStorage.setItem('location_consent', checked.toString());
+    toast({
+      title: t('settings.privacy.consentUpdated', 'Preferences Updated'),
+      description: checked 
+        ? t('settings.privacy.locationEnabled', 'Location services enabled') 
+        : t('settings.privacy.locationDisabled', 'Location services disabled')
+    });
+  };
+
   const { data: user } = useQuery<User>({
     queryKey: ['/api/user'],
     queryFn: getQueryFn({ on401: 'returnNull' })
@@ -169,7 +244,7 @@ export default function SettingsPage() {
                       </div>
                       <Switch 
                         checked={analyticsConsent}
-                        onCheckedChange={setAnalyticsConsent}
+                        onCheckedChange={updateAnalyticsConsent}
                       />
                     </div>
                     
@@ -180,7 +255,7 @@ export default function SettingsPage() {
                       </div>
                       <Switch 
                         checked={marketingConsent}
-                        onCheckedChange={setMarketingConsent}
+                        onCheckedChange={updateMarketingConsent}
                       />
                     </div>
                     
@@ -191,7 +266,7 @@ export default function SettingsPage() {
                       </div>
                       <Switch 
                         checked={locationConsent}
-                        onCheckedChange={setLocationConsent}
+                        onCheckedChange={updateLocationConsent}
                       />
                     </div>
                   </div>
