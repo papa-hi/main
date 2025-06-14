@@ -2639,6 +2639,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get comments for a post
+  app.get("/api/community/posts/:id/comments", async (req: Request, res: Response) => {
+    try {
+      const postId = parseInt(req.params.id);
+      if (isNaN(postId)) {
+        return res.status(400).json({ error: "Invalid post ID" });
+      }
+
+      const comments = await db
+        .select({
+          id: communityComments.id,
+          content: communityComments.content,
+          isEdited: communityComments.isEdited,
+          createdAt: communityComments.createdAt,
+          updatedAt: communityComments.updatedAt,
+          parentCommentId: communityComments.parentCommentId,
+          author: {
+            id: users.id,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            profileImage: users.profileImage,
+            username: users.username,
+          },
+        })
+        .from(communityComments)
+        .leftJoin(users, eq(communityComments.authorId, users.id))
+        .where(eq(communityComments.postId, postId))
+        .orderBy(asc(communityComments.createdAt));
+
+      // Get reaction counts for each comment
+      const commentsWithCounts = await Promise.all(
+        comments.map(async (comment) => {
+          const [reactionCount] = await db
+            .select({ count: count() })
+            .from(communityReactions)
+            .where(eq(communityReactions.commentId, comment.id));
+
+          return {
+            ...comment,
+            _count: {
+              reactions: reactionCount.count,
+            },
+          };
+        })
+      );
+
+      res.json(commentsWithCounts);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      res.status(500).json({ error: "Failed to fetch comments" });
+    }
+  });
+
   // Create a comment on a post
   app.post("/api/community/posts/:id/comments", isAuthenticated, async (req: Request, res: Response) => {
     try {
