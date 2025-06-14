@@ -214,9 +214,11 @@ export function Header({ user }: HeaderProps) {
               {t('nav.chat', 'Berichten')}
             </a>
           </Link>
-          <a href="#" className="font-medium hover:text-accent transition">
-            {t('nav.community', 'Community')}
-          </a>
+          <Link href="/community">
+            <a className={`font-medium hover:text-accent transition ${location === '/community' ? 'text-accent' : ''}`}>
+              {t('nav.community', 'Community')}
+            </a>
+          </Link>
         </nav>
         
         {/* User Menu - Desktop */}

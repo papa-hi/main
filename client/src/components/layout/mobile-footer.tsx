@@ -39,6 +39,13 @@ export function MobileFooter() {
           </a>
         </Link>
         
+        <Link href="/community">
+          <a className={`flex flex-col items-center py-2 px-3 rounded-lg ${location === '/community' ? 'bg-primary/10 text-primary font-medium' : 'text-dark/70 hover:bg-gray-100'}`}>
+            <i className={`fas fa-comment-dots text-xl ${location === '/community' ? 'text-primary' : ''}`}></i>
+            <span className="text-xs mt-1 font-medium">{t('nav.community', 'Community')}</span>
+          </a>
+        </Link>
+        
         <Link href="/chat">
           <a className={`flex flex-col items-center py-2 px-3 rounded-lg ${location.includes('/chat') ? 'bg-primary/10 text-primary font-medium' : 'text-dark/70 hover:bg-gray-100'}`}>
             <i className={`fas fa-comments text-xl ${location.includes('/chat') ? 'text-primary' : ''}`}></i>
