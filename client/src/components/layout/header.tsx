@@ -124,8 +124,8 @@ export function Header({ user }: HeaderProps) {
           
           {/* Mobile Create Button (since we removed it from footer) */}
           {isAuthenticated && (
-            <Link href="/create" className="md:hidden">
-              <a className="bg-accent/90 hover:bg-accent text-white px-2 py-1 rounded-md flex items-center text-sm">
+            <Link href="/create">
+              <a className="bg-accent/90 hover:bg-accent text-white px-2 py-1 rounded-md flex items-center text-sm md:hidden">
                 <i className="fas fa-plus mr-1"></i>
                 <span>{t('navigation.new', 'New')}</span>
               </a>

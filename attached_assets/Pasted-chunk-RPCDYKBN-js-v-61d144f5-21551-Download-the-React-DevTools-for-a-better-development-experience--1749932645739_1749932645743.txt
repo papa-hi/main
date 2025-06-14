@@ -1,0 +1,363 @@
+chunk-RPCDYKBN.js?v=61d144f5:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+chunk-RPCDYKBN.js?v=61d144f5:521 Warning: validateDOMNesting(...): <button> cannot appear as a descendant of <button>.
+    at button
+    at button
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=61d144f5:41:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=61d144f5:52:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=61d144f5:33:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=61d144f5:41:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PSLAEUKM.js?v=61d144f5:1980:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=61d144f5:144:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=61d144f5:942:13
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-JJS7DLG7.js?v=61d144f5:38:15)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-JJS7DLG7.js?v=61d144f5:38:15)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PSLAEUKM.js?v=61d144f5:1915:15)
+    at Popper (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PSLAEUKM.js?v=61d144f5:1972:11)
+    at Menu (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=61d144f5:98:11)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-JJS7DLG7.js?v=61d144f5:38:15)
+    at DropdownMenu (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=61d144f5:908:5)
+    at div
+    at div
+    at div
+    at header
+    at Header (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/header.tsx:53:26)
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:22:32)
+    at AdminProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-admin.tsx:27:33)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at FirebaseAuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-firebase-auth.tsx:23:40)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=61d144f5:2805:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=Nv9bCA6tRst4dk0-n9Qk9:200:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=Nv9bCA6tRst4dk0-n9Qk9:25:3)
+printWarning @ chunk-RPCDYKBN.js?v=61d144f5:521
+error @ chunk-RPCDYKBN.js?v=61d144f5:505
+validateDOMNesting @ chunk-RPCDYKBN.js?v=61d144f5:8256
+createInstance @ chunk-RPCDYKBN.js?v=61d144f5:8328
+completeWork @ chunk-RPCDYKBN.js?v=61d144f5:16290
+completeUnitOfWork @ chunk-RPCDYKBN.js?v=61d144f5:19224
+performUnitOfWork @ chunk-RPCDYKBN.js?v=61d144f5:19206
+workLoopSync @ chunk-RPCDYKBN.js?v=61d144f5:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=61d144f5:19116
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18678
+workLoop @ chunk-RPCDYKBN.js?v=61d144f5:197
+flushWork @ chunk-RPCDYKBN.js?v=61d144f5:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=61d144f5:384Understand this error
+chunk-RPCDYKBN.js?v=61d144f5:521 Warning: validateDOMNesting(...): <a> cannot appear as a descendant of <a>.
+    at a
+    at a
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=61d144f5:337:18
+    at div
+    at div
+    at div
+    at header
+    at Header (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/header.tsx:53:26)
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:22:32)
+    at AdminProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-admin.tsx:27:33)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at FirebaseAuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-firebase-auth.tsx:23:40)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=61d144f5:2805:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=Nv9bCA6tRst4dk0-n9Qk9:200:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=Nv9bCA6tRst4dk0-n9Qk9:25:3)
+printWarning @ chunk-RPCDYKBN.js?v=61d144f5:521
+error @ chunk-RPCDYKBN.js?v=61d144f5:505
+validateDOMNesting @ chunk-RPCDYKBN.js?v=61d144f5:8256
+createInstance @ chunk-RPCDYKBN.js?v=61d144f5:8328
+completeWork @ chunk-RPCDYKBN.js?v=61d144f5:16290
+completeUnitOfWork @ chunk-RPCDYKBN.js?v=61d144f5:19224
+performUnitOfWork @ chunk-RPCDYKBN.js?v=61d144f5:19206
+workLoopSync @ chunk-RPCDYKBN.js?v=61d144f5:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=61d144f5:19116
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18678
+workLoop @ chunk-RPCDYKBN.js?v=61d144f5:197
+flushWork @ chunk-RPCDYKBN.js?v=61d144f5:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=61d144f5:384Understand this error
+use-chat.tsx:66 Attempting to connect to WebSocket at: wss://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/ws
+@radix-ui_react-select.js?v=61d144f5:871 Uncaught Error: A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+    at @radix-ui_react-select.js?v=61d144f5:871:13
+    at renderWithHooks (chunk-RPCDYKBN.js?v=61d144f5:11548:26)
+    at updateForwardRef (chunk-RPCDYKBN.js?v=61d144f5:14325:28)
+    at beginWork (chunk-RPCDYKBN.js?v=61d144f5:15946:22)
+    at HTMLUnknownElement.callCallback2 (chunk-RPCDYKBN.js?v=61d144f5:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-RPCDYKBN.js?v=61d144f5:3699:24)
+    at invokeGuardedCallback (chunk-RPCDYKBN.js?v=61d144f5:3733:39)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=61d144f5:19765:15)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=61d144f5:19198:20)
+    at workLoopSync (chunk-RPCDYKBN.js?v=61d144f5:19137:13)
+(anonymous) @ @radix-ui_react-select.js?v=61d144f5:871
+renderWithHooks @ chunk-RPCDYKBN.js?v=61d144f5:11548
+updateForwardRef @ chunk-RPCDYKBN.js?v=61d144f5:14325
+beginWork @ chunk-RPCDYKBN.js?v=61d144f5:15946
+callCallback2 @ chunk-RPCDYKBN.js?v=61d144f5:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=61d144f5:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=61d144f5:3733
+beginWork$1 @ chunk-RPCDYKBN.js?v=61d144f5:19765
+performUnitOfWork @ chunk-RPCDYKBN.js?v=61d144f5:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=61d144f5:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=61d144f5:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=61d144f5:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=61d144f5:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=61d144f5:555
+flush @ @tanstack_react-query.js?v=61d144f5:569
+batch @ @tanstack_react-query.js?v=61d144f5:587
+dispatch_fn @ @tanstack_react-query.js?v=61d144f5:996
+setData @ @tanstack_react-query.js?v=61d144f5:696
+onSuccess @ @tanstack_react-query.js?v=61d144f5:897
+resolve @ @tanstack_react-query.js?v=61d144f5:456
+Promise.then
+run @ @tanstack_react-query.js?v=61d144f5:498
+start @ @tanstack_react-query.js?v=61d144f5:536
+fetch @ @tanstack_react-query.js?v=61d144f5:926
+executeFetch_fn @ @tanstack_react-query.js?v=61d144f5:2211
+onSubscribe @ @tanstack_react-query.js?v=61d144f5:1898
+subscribe @ @tanstack_react-query.js?v=61d144f5:24
+(anonymous) @ @tanstack_react-query.js?v=61d144f5:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=61d144f5:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=61d144f5:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=61d144f5:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=61d144f5:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=61d144f5:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=61d144f5:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=61d144f5:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=61d144f5:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=61d144f5:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=61d144f5:19432
+commitRoot @ chunk-RPCDYKBN.js?v=61d144f5:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=61d144f5:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18718
+workLoop @ chunk-RPCDYKBN.js?v=61d144f5:197
+flushWork @ chunk-RPCDYKBN.js?v=61d144f5:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=61d144f5:384Understand this error
+@radix-ui_react-select.js?v=61d144f5:871 Uncaught Error: A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+    at @radix-ui_react-select.js?v=61d144f5:871:13
+    at renderWithHooks (chunk-RPCDYKBN.js?v=61d144f5:11548:26)
+    at updateForwardRef (chunk-RPCDYKBN.js?v=61d144f5:14325:28)
+    at beginWork (chunk-RPCDYKBN.js?v=61d144f5:15946:22)
+    at HTMLUnknownElement.callCallback2 (chunk-RPCDYKBN.js?v=61d144f5:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-RPCDYKBN.js?v=61d144f5:3699:24)
+    at invokeGuardedCallback (chunk-RPCDYKBN.js?v=61d144f5:3733:39)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=61d144f5:19765:15)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=61d144f5:19198:20)
+    at workLoopSync (chunk-RPCDYKBN.js?v=61d144f5:19137:13)
+(anonymous) @ @radix-ui_react-select.js?v=61d144f5:871
+renderWithHooks @ chunk-RPCDYKBN.js?v=61d144f5:11548
+updateForwardRef @ chunk-RPCDYKBN.js?v=61d144f5:14325
+beginWork @ chunk-RPCDYKBN.js?v=61d144f5:15946
+callCallback2 @ chunk-RPCDYKBN.js?v=61d144f5:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=61d144f5:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=61d144f5:3733
+beginWork$1 @ chunk-RPCDYKBN.js?v=61d144f5:19765
+performUnitOfWork @ chunk-RPCDYKBN.js?v=61d144f5:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=61d144f5:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=61d144f5:19116
+recoverFromConcurrentError @ chunk-RPCDYKBN.js?v=61d144f5:18736
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18879
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=61d144f5:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=61d144f5:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=61d144f5:555
+flush @ @tanstack_react-query.js?v=61d144f5:569
+batch @ @tanstack_react-query.js?v=61d144f5:587
+dispatch_fn @ @tanstack_react-query.js?v=61d144f5:996
+setData @ @tanstack_react-query.js?v=61d144f5:696
+onSuccess @ @tanstack_react-query.js?v=61d144f5:897
+resolve @ @tanstack_react-query.js?v=61d144f5:456
+Promise.then
+run @ @tanstack_react-query.js?v=61d144f5:498
+start @ @tanstack_react-query.js?v=61d144f5:536
+fetch @ @tanstack_react-query.js?v=61d144f5:926
+executeFetch_fn @ @tanstack_react-query.js?v=61d144f5:2211
+onSubscribe @ @tanstack_react-query.js?v=61d144f5:1898
+subscribe @ @tanstack_react-query.js?v=61d144f5:24
+(anonymous) @ @tanstack_react-query.js?v=61d144f5:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=61d144f5:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=61d144f5:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=61d144f5:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=61d144f5:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=61d144f5:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=61d144f5:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=61d144f5:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=61d144f5:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=61d144f5:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=61d144f5:19432
+commitRoot @ chunk-RPCDYKBN.js?v=61d144f5:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=61d144f5:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18718
+workLoop @ chunk-RPCDYKBN.js?v=61d144f5:197
+flushWork @ chunk-RPCDYKBN.js?v=61d144f5:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=61d144f5:384Understand this error
+chunk-RPCDYKBN.js?v=61d144f5:14032 The above error occurred in the <SelectItem> component:
+
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=61d144f5:844:7
+    at _c11 (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/select.tsx:207:13)
+    at div
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=61d144f5:41:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=61d144f5:52:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=61d144f5:33:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OKX5DAGM.js?v=61d144f5:98:15
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=61d144f5:755:13
+    at div
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=61d144f5:52:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=61d144f5:33:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OKX5DAGM.js?v=61d144f5:98:15
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-JJS7DLG7.js?v=61d144f5:38:15)
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=61d144f5:299:58
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=61d144f5:52:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DKHUMOWT.js?v=61d144f5:33:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CPFL7ZFD.js?v=61d144f5:41:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-VZKNAX3D.js?v=61d144f5:260:22
+    at SelectPortal
+    at _c7 (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/select.tsx:122:12)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-JJS7DLG7.js?v=61d144f5:38:15)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OKX5DAGM.js?v=61d144f5:28:15)
+    at CollectionProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OKX5DAGM.js?v=61d144f5:89:13)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-JJS7DLG7.js?v=61d144f5:38:15)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PSLAEUKM.js?v=61d144f5:1915:15)
+    at Popper (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PSLAEUKM.js?v=61d144f5:1972:11)
+    at Select (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=61d144f5:87:5)
+    at div
+    at div
+    at div
+    at _c9 (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/card.tsx:114:12)
+    at div
+    at _c (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at div
+    at div
+    at CommunityPage (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/pages/community.tsx:65:17)
+    at Route (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=61d144f5:323:16)
+    at ProtectedRoute (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/lib/protected-route.tsx:23:3)
+    at Switch (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=61d144f5:379:17)
+    at Router (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=Nv9bCA6tRst4dk0-n9Qk9:56:20)
+    at main
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:22:32)
+    at AdminProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-admin.tsx:27:33)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at FirebaseAuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-firebase-auth.tsx:23:40)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=61d144f5:2805:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=Nv9bCA6tRst4dk0-n9Qk9:200:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=Nv9bCA6tRst4dk0-n9Qk9:25:3)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundaryClass.
+logCapturedError @ chunk-RPCDYKBN.js?v=61d144f5:14032
+callback @ chunk-RPCDYKBN.js?v=61d144f5:14078
+callCallback @ chunk-RPCDYKBN.js?v=61d144f5:11248
+commitUpdateQueue @ chunk-RPCDYKBN.js?v=61d144f5:11265
+commitLayoutEffectOnFiber @ chunk-RPCDYKBN.js?v=61d144f5:17075
+commitLayoutMountEffects_complete @ chunk-RPCDYKBN.js?v=61d144f5:17980
+commitLayoutEffects_begin @ chunk-RPCDYKBN.js?v=61d144f5:17969
+commitLayoutEffects @ chunk-RPCDYKBN.js?v=61d144f5:17920
+commitRootImpl @ chunk-RPCDYKBN.js?v=61d144f5:19353
+commitRoot @ chunk-RPCDYKBN.js?v=61d144f5:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=61d144f5:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=61d144f5:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=61d144f5:555
+flush @ @tanstack_react-query.js?v=61d144f5:569
+batch @ @tanstack_react-query.js?v=61d144f5:587
+dispatch_fn @ @tanstack_react-query.js?v=61d144f5:996
+setData @ @tanstack_react-query.js?v=61d144f5:696
+onSuccess @ @tanstack_react-query.js?v=61d144f5:897
+resolve @ @tanstack_react-query.js?v=61d144f5:456
+Promise.then
+run @ @tanstack_react-query.js?v=61d144f5:498
+start @ @tanstack_react-query.js?v=61d144f5:536
+fetch @ @tanstack_react-query.js?v=61d144f5:926
+executeFetch_fn @ @tanstack_react-query.js?v=61d144f5:2211
+onSubscribe @ @tanstack_react-query.js?v=61d144f5:1898
+subscribe @ @tanstack_react-query.js?v=61d144f5:24
+(anonymous) @ @tanstack_react-query.js?v=61d144f5:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=61d144f5:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=61d144f5:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=61d144f5:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=61d144f5:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=61d144f5:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=61d144f5:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=61d144f5:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=61d144f5:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=61d144f5:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=61d144f5:19432
+commitRoot @ chunk-RPCDYKBN.js?v=61d144f5:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=61d144f5:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18718
+workLoop @ chunk-RPCDYKBN.js?v=61d144f5:197
+flushWork @ chunk-RPCDYKBN.js?v=61d144f5:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=61d144f5:384Understand this error
+error-boundary.tsx:28 Error boundary caught an error: Error: A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+    at @radix-ui_react-select.js?v=61d144f5:871:13
+    at renderWithHooks (chunk-RPCDYKBN.js?v=61d144f5:11548:26)
+    at updateForwardRef (chunk-RPCDYKBN.js?v=61d144f5:14325:28)
+    at beginWork (chunk-RPCDYKBN.js?v=61d144f5:15946:22)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=61d144f5:19753:22)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=61d144f5:19198:20)
+    at workLoopSync (chunk-RPCDYKBN.js?v=61d144f5:19137:13)
+    at renderRootSync (chunk-RPCDYKBN.js?v=61d144f5:19116:15)
+    at recoverFromConcurrentError (chunk-RPCDYKBN.js?v=61d144f5:18736:28)
+    at performSyncWorkOnRoot (chunk-RPCDYKBN.js?v=61d144f5:18879:28) {componentStack: '\n    at https://04661828-2b6e-42fa-a890-5e763456e3…/theme-provider.tsx?v=Nv9bCA6tRst4dk0-n9Qk9:25:3)'}
+componentDidCatch @ error-boundary.tsx:28
+callback @ chunk-RPCDYKBN.js?v=61d144f5:14084
+callCallback @ chunk-RPCDYKBN.js?v=61d144f5:11248
+commitUpdateQueue @ chunk-RPCDYKBN.js?v=61d144f5:11265
+commitLayoutEffectOnFiber @ chunk-RPCDYKBN.js?v=61d144f5:17075
+commitLayoutMountEffects_complete @ chunk-RPCDYKBN.js?v=61d144f5:17980
+commitLayoutEffects_begin @ chunk-RPCDYKBN.js?v=61d144f5:17969
+commitLayoutEffects @ chunk-RPCDYKBN.js?v=61d144f5:17920
+commitRootImpl @ chunk-RPCDYKBN.js?v=61d144f5:19353
+commitRoot @ chunk-RPCDYKBN.js?v=61d144f5:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=61d144f5:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=61d144f5:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=61d144f5:555
+flush @ @tanstack_react-query.js?v=61d144f5:569
+batch @ @tanstack_react-query.js?v=61d144f5:587
+dispatch_fn @ @tanstack_react-query.js?v=61d144f5:996
+setData @ @tanstack_react-query.js?v=61d144f5:696
+onSuccess @ @tanstack_react-query.js?v=61d144f5:897
+resolve @ @tanstack_react-query.js?v=61d144f5:456
+Promise.then
+run @ @tanstack_react-query.js?v=61d144f5:498
+start @ @tanstack_react-query.js?v=61d144f5:536
+fetch @ @tanstack_react-query.js?v=61d144f5:926
+executeFetch_fn @ @tanstack_react-query.js?v=61d144f5:2211
+onSubscribe @ @tanstack_react-query.js?v=61d144f5:1898
+subscribe @ @tanstack_react-query.js?v=61d144f5:24
+(anonymous) @ @tanstack_react-query.js?v=61d144f5:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=61d144f5:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=61d144f5:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=61d144f5:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=61d144f5:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=61d144f5:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=61d144f5:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=61d144f5:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=61d144f5:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=61d144f5:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=61d144f5:19432
+commitRoot @ chunk-RPCDYKBN.js?v=61d144f5:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=61d144f5:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=61d144f5:18718
+workLoop @ chunk-RPCDYKBN.js?v=61d144f5:197
+flushWork @ chunk-RPCDYKBN.js?v=61d144f5:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=61d144f5:384Understand this error
+App.tsx:94 ServiceWorker registration successful with scope:  https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/
+community:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+use-chat.tsx:70 WebSocket connection established
+use-chat.tsx:82 Authenticating WebSocket connection...

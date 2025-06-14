@@ -119,7 +119,7 @@ export default function CommunityPage() {
     queryFn: async () => {
       const params = new URLSearchParams({
         feed: activeTab,
-        ...(selectedCategory && { category: selectedCategory }),
+        ...(selectedCategory && selectedCategory !== 'all' && { category: selectedCategory }),
         ...(searchQuery && { search: searchQuery }),
         ...(selectedHashtag && { hashtag: selectedHashtag }),
       });
@@ -368,7 +368,7 @@ export default function CommunityPage() {
                         <SelectValue placeholder={t('community.allCategories')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">{t('community.allCategories')}</SelectItem>
+                        <SelectItem value="all">{t('community.allCategories')}</SelectItem>
                         {categories.map((category) => (
                           <SelectItem key={category.id} value={category.id}>
                             {category.name}
