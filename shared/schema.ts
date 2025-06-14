@@ -40,10 +40,11 @@ export const communityPosts = pgTable("community_posts", {
 export const communityComments = pgTable("community_comments", {
   id: serial("id").primaryKey(),
   postId: integer("post_id").notNull().references(() => communityPosts.id, { onDelete: "cascade" }),
-  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  authorId: integer("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   parentCommentId: integer("parent_comment_id").references(() => communityComments.id, { onDelete: "cascade" }),
   content: text("content").notNull(),
   isEdited: boolean("is_edited").default(false),
+  likesCount: integer("likes_count").default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -54,7 +55,7 @@ export const communityReactions = pgTable("community_reactions", {
   userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   postId: integer("post_id").references(() => communityPosts.id, { onDelete: "cascade" }),
   commentId: integer("comment_id").references(() => communityComments.id, { onDelete: "cascade" }),
-  type: text("type").notNull(), // "like", "love", "helpful", "funny"
+  reactionType: text("reaction_type").notNull(), // "like", "love", "helpful", "funny"
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
   uniqueUserPostReaction: unique().on(table.userId, table.postId),
@@ -101,7 +102,7 @@ export const communityCommentsRelations = relations(communityComments, ({ one, m
     references: [communityPosts.id],
   }),
   author: one(users, {
-    fields: [communityComments.userId],
+    fields: [communityComments.authorId],
     references: [users.id],
   }),
   parentComment: one(communityComments, {

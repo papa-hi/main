@@ -2655,7 +2655,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertCommunityCommentSchema.parse({
         ...req.body,
         postId,
-        userId,
+        authorId: userId,
       });
 
       const [newComment] = await db
