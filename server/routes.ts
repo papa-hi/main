@@ -2930,7 +2930,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Comment not found" });
       }
 
-      if (existingComment.userId !== userId) {
+      if (existingComment.authorId !== userId) {
         return res.status(403).json({ error: "You can only edit your own comments" });
       }
 
@@ -2971,7 +2971,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Comment not found" });
       }
 
-      if (existingComment.userId !== userId) {
+      if (existingComment.authorId !== userId) {
         return res.status(403).json({ error: "You can only delete your own comments" });
       }
 
