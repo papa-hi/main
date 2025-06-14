@@ -372,6 +372,7 @@
     "timeAgo": "{{time}} geleden",
     "edited": "bewerkt",
     "hashtags": "Hashtags",
+    "categoriesHeading": "Categorieën",
     "categories": {
       "general": "Algemene Discussie",
       "parenting-tips": "Opvoedingstips",

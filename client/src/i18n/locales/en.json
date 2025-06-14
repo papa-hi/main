@@ -371,6 +371,7 @@
     "timeAgo": "{{time}} ago",
     "edited": "edited",
     "hashtags": "Hashtags",
+    "categoriesHeading": "Categories",
     "categories": {
       "general": "General Discussion",
       "parenting-tips": "Parenting Tips",

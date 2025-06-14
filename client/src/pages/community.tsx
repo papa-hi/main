@@ -414,7 +414,7 @@ export default function CommunityPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Filter className="h-4 w-4" />
-                  {t('community.categories')}
+                  {t('community.categoriesHeading')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
