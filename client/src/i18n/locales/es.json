@@ -574,6 +574,17 @@
       "contactText": "Si tienes alguna pregunta sobre esta política de privacidad, por favor contáctanos en papa@papa-hi.com.",
       "backToApp": "Volver a la Aplicación"
     },
+    "retention": {
+      "title": "Retención de Datos",
+      "account": "Datos de Cuenta",
+      "accountDesc": "Retenidos mientras tu cuenta esté activa y durante 2 años después de la eliminación para cumplimiento legal",
+      "location": "Datos de Ubicación",
+      "locationDesc": "Procesados en tiempo real y no almacenados a menos que guardes lugares específicos",
+      "analytics": "Datos de Análisis",
+      "analyticsDesc": "Datos agregados y anonimizados retenidos durante 26 meses",
+      "chat": "Mensajes de Chat",
+      "chatDesc": "Los mensajes se eliminan automáticamente después de 7 días para protección de la privacidad"
+    },
     "help": {
       "title": "Ayuda y Soporte",
       "subtitle": "Ayuda y preguntas frecuentes",

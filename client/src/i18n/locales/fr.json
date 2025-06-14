@@ -584,6 +584,17 @@
       "contactSupport": "Contacter le Support",
       "contactSupportDesc": "Contactez notre équipe de support.",
       "contactUs": "Nous Contacter"
+    },
+    "retention": {
+      "title": "Conservation des Données",
+      "account": "Données de Compte",
+      "accountDesc": "Conservées tant que votre compte est actif et pendant 2 ans après la suppression pour la conformité légale",
+      "location": "Données de Localisation",
+      "locationDesc": "Traitées en temps réel et non stockées sauf si vous sauvegardez des lieux spécifiques",
+      "analytics": "Données d'Analyse",
+      "analyticsDesc": "Données agrégées et anonymisées conservées pendant 26 mois",
+      "chat": "Messages de Chat",
+      "chatDesc": "Les messages sont automatiquement supprimés après 7 jours pour la protection de la vie privée"
     }
   }
 }

@@ -584,6 +584,17 @@
       "contactSupport": "Contact Opnemen",
       "contactSupportDesc": "Neem contact op met ons ondersteuningsteam.",
       "contactUs": "Neem Contact Op"
+    },
+    "retention": {
+      "title": "Gegevensbewaring",
+      "account": "Accountgegevens",
+      "accountDesc": "Bewaard zolang je account actief is en 2 jaar na verwijdering voor juridische naleving",
+      "location": "Locatiegegevens",
+      "locationDesc": "Verwerkt in real-time en niet opgeslagen tenzij je specifieke plaatsen opslaat",
+      "analytics": "Analysegegevens",
+      "analyticsDesc": "Geaggregeerde en geanonimiseerde gegevens bewaard voor 26 maanden",
+      "chat": "Chatberichten",
+      "chatDesc": "Berichten worden automatisch verwijderd na 7 dagen voor privacybescherming"
     }
   },
   "playgroundMapContinued": {

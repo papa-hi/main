@@ -592,6 +592,17 @@
       "contactSupport": "Support kontaktieren",
       "contactSupportDesc": "Nimm Kontakt mit unserem Support-Team auf.",
       "contactUs": "Kontaktiere uns"
+    },
+    "retention": {
+      "title": "Datenspeicherung",
+      "account": "Kontodaten",
+      "accountDesc": "Aufbewahrt, solange dein Konto aktiv ist und 2 Jahre nach der Löschung für rechtliche Compliance",
+      "location": "Standortdaten",
+      "locationDesc": "In Echtzeit verarbeitet und nicht gespeichert, es sei denn, du speicherst bestimmte Orte",
+      "analytics": "Analysedaten",
+      "analyticsDesc": "Aggregierte und anonymisierte Daten für 26 Monate aufbewahrt",
+      "chat": "Chat-Nachrichten",
+      "chatDesc": "Nachrichten werden automatisch nach 7 Tagen zum Schutz der Privatsphäre gelöscht"
     }
   }
 }

@@ -618,6 +618,17 @@
       "contactSupport": "Contact Support",
       "contactSupportDesc": "Get in touch with our support team.",
       "contactUs": "Contact Us"
+    },
+    "retention": {
+      "title": "Data Retention",
+      "account": "Account Data",
+      "accountDesc": "Retained while your account is active and for 2 years after deletion for legal compliance",
+      "location": "Location Data",
+      "locationDesc": "Processed in real-time and not stored unless you save specific places",
+      "analytics": "Analytics Data",
+      "analyticsDesc": "Aggregated and anonymized data retained for 26 months",
+      "chat": "Chat Messages",
+      "chatDesc": "Messages are automatically deleted after 7 days for privacy protection"
     }
   }
 }
