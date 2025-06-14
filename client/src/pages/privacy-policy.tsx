@@ -163,7 +163,7 @@ export default function PrivacyPolicyPage() {
             <div className="bg-blue-50 p-4 rounded-lg">
               <h4 className="font-semibold text-sm mb-2">{t('privacy.rights.exercise', 'How to Exercise Your Rights')}</h4>
               <p className="text-sm text-muted-foreground mb-3">
-                {t('privacy.rights.exerciseDesc', 'Contact us at privacy@papa-hi.nl or use the data management tools in your account settings.')}
+                {t('privacy.rights.exerciseDesc', 'Contact us at papa@papa-hi.com or use the data management tools in your account settings.')}
               </p>
               <Button 
                 size="sm" 
@@ -202,6 +202,13 @@ export default function PrivacyPolicyPage() {
                   {t('privacy.retention.analyticsDesc', 'Aggregated and anonymized data retained for 26 months')}
                 </p>
               </div>
+              
+              <div>
+                <h4 className="font-semibold text-sm">{t('privacy.retention.chat', 'Chat Messages')}</h4>
+                <p className="text-sm text-muted-foreground">
+                  {t('privacy.retention.chatDesc', 'Messages are automatically deleted after 7 days for privacy protection')}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -219,7 +226,7 @@ export default function PrivacyPolicyPage() {
               
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-sm font-medium">Data Protection Officer</p>
-                <p className="text-sm text-muted-foreground">privacy@papa-hi.nl</p>
+                <p className="text-sm text-muted-foreground">papa@papa-hi.com</p>
                 <p className="text-sm text-muted-foreground">Response time: 30 days maximum</p>
               </div>
               
