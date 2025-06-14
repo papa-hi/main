@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema } from "@shared/schema";
+import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
@@ -408,7 +408,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Gather all user data for GDPR export
       const userData = await storage.getUserById(userId);
       const userPlaydates = await storage.getUserPlaydates(userId);
-      const userPlaces = await db.select().from(places).where(eq(places.id, userId)); // Places don't have createdBy field
+      // Get user's favorite places
+      const userFavoritesList = await storage.getUserFavoritePlaces(userId);
       const userChatMessages = await db.select().from(chatMessages).where(eq(chatMessages.senderId, userId));
       const userSubscriptions = await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.userId, userId));
 
@@ -428,7 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           profileImage: userData?.profileImage,
           createdAt: userData?.createdAt
         },
-        playdates: userPlaydates.map(playdate => ({
+        playdates: userPlaydates.map((playdate: any) => ({
           id: playdate.id,
           title: playdate.title,
           description: playdate.description,
@@ -437,18 +438,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           location: playdate.location,
           createdAt: playdate.createdAt
         })),
-        places: userPlaces.map(place => ({
+        favoritePlaces: userFavoritesList.map((place: any) => ({
           id: place.id,
           name: place.name,
           description: place.description,
           address: place.address,
-          category: place.category,
+          type: place.type,
           createdAt: place.createdAt
         })),
         chatMessages: userChatMessages.map(message => ({
           id: message.id,
           content: message.content,
-          timestamp: message.timestamp
+          sentAt: message.sentAt
         })),
         pushSubscriptions: userSubscriptions.length,
         dataProcessingConsent: {
@@ -462,6 +463,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error exporting user data:", error);
       res.status(500).json({ error: "Failed to export user data" });
+    }
+  });
+
+  // GDPR Account Deletion endpoint
+  app.delete("/api/user/delete-account", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      // Delete user data in correct order to maintain referential integrity
+      await db.delete(pushSubscriptions).where(eq(pushSubscriptions.userId, userId));
+      await db.delete(chatMessages).where(eq(chatMessages.senderId, userId));
+      await db.delete(playdateParticipants).where(eq(playdateParticipants.userId, userId));
+      await db.delete(playdates).where(eq(playdates.creatorId, userId));
+      await db.delete(userFavorites).where(eq(userFavorites.userId, userId));
+      await db.delete(ratings).where(eq(ratings.userId, userId));
+      
+      // Finally delete the user account
+      const success = await storage.deleteUser(userId);
+      
+      if (success) {
+        // Destroy the session
+        req.session.destroy((err) => {
+          if (err) {
+            console.error("Session destruction error:", err);
+          }
+        });
+        
+        res.json({ success: true, message: "Account deleted successfully" });
+      } else {
+        res.status(500).json({ error: "Failed to delete account" });
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      res.status(500).json({ error: "Failed to delete account" });
     }
   });
 

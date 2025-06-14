@@ -70,9 +70,14 @@ export default function DeleteAccountPage() {
 
     setIsDeleting(true);
     try {
-      await apiRequest('/api/user/delete-account', {
-        method: 'DELETE'
+      const response = await fetch('/api/user/delete-account', {
+        method: 'DELETE',
+        credentials: 'include'
       });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete account');
+      }
 
       toast({
         title: t('deleteAccount.success', 'Account Deleted'),
