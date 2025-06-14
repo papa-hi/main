@@ -116,6 +116,7 @@ export default function CommunityPage() {
   const [commentingOn, setCommentingOn] = useState<number | null>(null);
   const [editingPost, setEditingPost] = useState<number | null>(null);
   const [editingComment, setEditingComment] = useState<number | null>(null);
+  const [postMenuOpen, setPostMenuOpen] = useState<number | null>(null);
 
   // Fetch community posts
   const { data: posts = [], isLoading: postsLoading, error: postsError } = useQuery({
@@ -297,7 +298,12 @@ export default function CommunityPage() {
     const hashtags = extractHashtags(data.content);
     const postData = { ...data, hashtags };
     console.log('Post data being sent:', postData);
-    createPostMutation.mutate(postData);
+    
+    if (editingPost) {
+      editPostMutation.mutate({ postId: editingPost, data: postData });
+    } else {
+      createPostMutation.mutate(postData);
+    }
   };
 
   // Handle comment submission
@@ -356,7 +362,13 @@ export default function CommunityPage() {
             <p className="text-gray-600 mt-1">{t('community.subtitle')}</p>
           </div>
           
-          <Dialog open={showCreatePost} onOpenChange={setShowCreatePost}>
+          <Dialog open={showCreatePost || !!editingPost} onOpenChange={(open) => {
+            if (!open) {
+              setShowCreatePost(false);
+              setEditingPost(null);
+              postForm.reset();
+            }
+          }}>
             <DialogTrigger asChild>
               <Button className="bg-blue-600 hover:bg-blue-700">
                 <Plus className="h-4 w-4 mr-2" />
@@ -365,7 +377,7 @@ export default function CommunityPage() {
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>{t('community.createPost')}</DialogTitle>
+                <DialogTitle>{editingPost ? t('community.editPost') : t('community.createPost')}</DialogTitle>
               </DialogHeader>
               <Form {...postForm}>
                 <form onSubmit={postForm.handleSubmit(onSubmitPost)} className="space-y-4">
@@ -430,11 +442,18 @@ export default function CommunityPage() {
                   />
                   
                   <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" onClick={() => setShowCreatePost(false)}>
+                    <Button type="button" variant="outline" onClick={() => {
+                      setShowCreatePost(false);
+                      setEditingPost(null);
+                      postForm.reset();
+                    }}>
                       {t('common.cancel')}
                     </Button>
-                    <Button type="submit" disabled={createPostMutation.isPending}>
-                      {createPostMutation.isPending ? t('common.publishing') : t('common.publish')}
+                    <Button type="submit" disabled={createPostMutation.isPending || editPostMutation.isPending}>
+                      {editingPost 
+                        ? (editPostMutation.isPending ? t('common.saving') : t('community.saveChanges'))
+                        : (createPostMutation.isPending ? t('common.publishing') : t('common.publish'))
+                      }
                     </Button>
                   </div>
                 </form>
@@ -625,37 +644,41 @@ export default function CommunityPage() {
                               size="sm"
                               className="h-8 w-8 p-0"
                               onClick={() => {
-                                // Toggle dropdown or show options
+                                setPostMenuOpen(postMenuOpen === post.id ? null : post.id);
                               }}
                             >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
-                            <div className="absolute right-0 top-8 bg-white border rounded-md shadow-lg py-1 z-10 min-w-[120px]">
-                              <button
-                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
-                                onClick={() => {
-                                  setEditingPost(post.id);
-                                  postForm.setValue('title', post.title || '');
-                                  postForm.setValue('content', post.content);
-                                  postForm.setValue('category', post.category);
-                                  postForm.setValue('hashtags', post.hashtags || []);
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                                {t('common.edit')}
-                              </button>
-                              <button
-                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 text-red-600 flex items-center gap-2"
-                                onClick={() => {
-                                  if (confirm(t('community.confirmDeletePost'))) {
-                                    deletePostMutation.mutate(post.id);
-                                  }
-                                }}
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                                {t('common.delete')}
-                              </button>
-                            </div>
+                            {postMenuOpen === post.id && (
+                              <div className="absolute right-0 top-8 bg-white border rounded-md shadow-lg py-1 z-10 min-w-[120px]">
+                                <button
+                                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
+                                  onClick={() => {
+                                    setEditingPost(post.id);
+                                    postForm.setValue('title', post.title || '');
+                                    postForm.setValue('content', post.content);
+                                    postForm.setValue('category', post.category);
+                                    postForm.setValue('hashtags', post.hashtags || []);
+                                    setPostMenuOpen(null);
+                                  }}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                  {t('common.edit')}
+                                </button>
+                                <button
+                                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 text-red-600 flex items-center gap-2"
+                                  onClick={() => {
+                                    if (confirm(t('community.confirmDeletePost'))) {
+                                      deletePostMutation.mutate(post.id);
+                                    }
+                                    setPostMenuOpen(null);
+                                  }}
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  {t('common.delete')}
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
