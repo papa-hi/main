@@ -323,6 +323,43 @@ export default function CommunityPage() {
     setShowComments(prev => ({ ...prev, [postId]: !prev[postId] }));
   };
 
+  // Handle share functionality
+  const handleShare = async (post: any) => {
+    const shareData = {
+      title: post.title || 'Community Post',
+      text: post.content.substring(0, 100) + (post.content.length > 100 ? '...' : ''),
+      url: window.location.href + '#post-' + post.id
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        // User cancelled or error occurred
+        fallbackShare(shareData);
+      }
+    } else {
+      fallbackShare(shareData);
+    }
+  };
+
+  // Fallback share function
+  const fallbackShare = (shareData: { title: string; text: string; url: string }) => {
+    // Copy to clipboard
+    navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${shareData.url}`).then(() => {
+      toast({
+        title: t('community.linkCopied'),
+        description: t('community.linkCopiedDesc'),
+      });
+    }).catch(() => {
+      // Fallback if clipboard API fails
+      toast({
+        title: t('community.sharePost'),
+        description: shareData.url,
+      });
+    });
+  };
+
   // Format user display name
   const formatUserName = (user: { firstName: string; lastName: string; username: string }) => {
     return `${user.firstName} ${user.lastName}`;
@@ -743,6 +780,7 @@ export default function CommunityPage() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => handleShare(post)}
                           className="flex items-center gap-2 text-gray-600"
                         >
                           <Share2 className="h-4 w-4" />
