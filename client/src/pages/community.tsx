@@ -142,7 +142,7 @@ export default function CommunityPage() {
   // Create post mutation
   const createPostMutation = useMutation({
     mutationFn: (data: z.infer<typeof postSchema>) => 
-      apiRequest('/api/community/posts', { method: 'POST', body: data }),
+      apiRequest('POST', '/api/community/posts', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/community/posts'] });
       setShowCreatePost(false);
@@ -165,7 +165,7 @@ export default function CommunityPage() {
   // Create comment mutation
   const createCommentMutation = useMutation({
     mutationFn: ({ postId, data }: { postId: number; data: z.infer<typeof commentSchema> }) =>
-      apiRequest(`/api/community/posts/${postId}/comments`, { method: 'POST', body: data }),
+      apiRequest('POST', `/api/community/posts/${postId}/comments`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/community/posts'] });
       setCommentingOn(null);
@@ -176,7 +176,7 @@ export default function CommunityPage() {
   // Reaction mutation
   const reactionMutation = useMutation({
     mutationFn: ({ postId, commentId, type }: { postId?: number; commentId?: number; type: string }) =>
-      apiRequest('/api/community/reactions', { method: 'POST', body: { postId, commentId, type } }),
+      apiRequest('POST', '/api/community/reactions', { postId, commentId, type }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/community/posts'] });
     },
