@@ -114,16 +114,20 @@ export default function CommunityPage() {
   const [commentingOn, setCommentingOn] = useState<number | null>(null);
 
   // Fetch community posts
-  const { data: posts = [], isLoading: postsLoading } = useQuery({
+  const { data: posts = [], isLoading: postsLoading, error: postsError } = useQuery({
     queryKey: ['/api/community/posts', activeTab, selectedCategory, searchQuery, selectedHashtag],
-    queryFn: () => {
+    queryFn: async () => {
       const params = new URLSearchParams({
         feed: activeTab,
         ...(selectedCategory && { category: selectedCategory }),
         ...(searchQuery && { search: searchQuery }),
         ...(selectedHashtag && { hashtag: selectedHashtag }),
       });
-      return fetch(`/api/community/posts?${params}`).then(res => res.json());
+      const response = await fetch(`/api/community/posts?${params}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.status}`);
+      }
+      return response.json();
     },
   });
 
@@ -439,7 +443,29 @@ export default function CommunityPage() {
 
             {/* Posts */}
             <div className="space-y-6">
-              {postsLoading ? (
+              {postsError ? (
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center py-8">
+                      <div className="text-red-500 mb-4">
+                        <i className="fas fa-exclamation-triangle text-3xl"></i>
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        {t('common.error', 'Error')}
+                      </h3>
+                      <p className="text-gray-600 mb-4">
+                        {t('community.errorLoading', 'Failed to load community posts')}
+                      </p>
+                      <Button 
+                        onClick={() => window.location.reload()}
+                        variant="outline"
+                      >
+                        {t('common.retry', 'Try Again')}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : postsLoading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin h-8 w-8 border-b-2 border-blue-600 rounded-full mx-auto"></div>
                   <p className="mt-2 text-gray-600">{t('common.loading')}</p>
