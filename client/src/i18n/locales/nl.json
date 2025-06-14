@@ -374,10 +374,11 @@
     "hashtags": "Hashtags",
     "categories": {
       "general": "Algemene Discussie",
-      "parenting": "Opvoedingstips",
-      "activities": "Activiteiten & Evenementen",
-      "recommendations": "Aanbevelingen",
-      "support": "Ondersteuning & Advies"
+      "parenting-tips": "Opvoedingstips",
+      "activities": "Kinderactiviteiten",
+      "health": "Gezondheid & Welzijn",
+      "education": "Onderwijs",
+      "local": "Lokale Gemeenschap"
     },
     "subtitle": "Verbind, deel, en doe mee met mede-vaders",
     "loginRequired": "Word lid van de Community",

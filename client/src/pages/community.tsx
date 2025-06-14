@@ -314,7 +314,7 @@ export default function CommunityPage() {
                           <SelectContent>
                             {categories.map((category) => (
                               <SelectItem key={category.id} value={category.id}>
-                                {category.name}
+                                {t(`community.categories.${category.id}`, category.name)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -388,7 +388,7 @@ export default function CommunityPage() {
                         <SelectItem value="all">{t('community.allCategories')}</SelectItem>
                         {categories.map((category) => (
                           <SelectItem key={category.id} value={category.id}>
-                            {category.name}
+                            {t(`community.categories.${category.id}`, category.name)}
                           </SelectItem>
                         ))}
                       </SelectContent>

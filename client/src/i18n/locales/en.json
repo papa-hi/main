@@ -373,10 +373,11 @@
     "hashtags": "Hashtags",
     "categories": {
       "general": "General Discussion",
-      "parenting": "Parenting Tips",
-      "activities": "Activities & Events",
-      "recommendations": "Recommendations",
-      "support": "Support & Advice"
+      "parenting-tips": "Parenting Tips",
+      "activities": "Kids Activities",
+      "health": "Health & Wellness",
+      "education": "Education",
+      "local": "Local Community"
     },
     "subtitle": "Connect, share, and engage with fellow dads",
     "loginRequired": "Join the Community",
