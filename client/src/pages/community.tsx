@@ -338,11 +338,9 @@ export default function CommunityPage() {
     setShowComments(prev => ({ ...prev, [postId]: !prev[postId] }));
   };
 
-  // Comments Section Component
-  const CommentsSection = ({ postId, showComments }: { postId: number; showComments: boolean }) => {
-    const { data: comments = [], isLoading } = usePostComments(postId, showComments);
-
-    if (!showComments) return null;
+  // Post Comments Component
+  const PostComments = ({ postId }: { postId: number }) => {
+    const { data: comments = [], isLoading } = usePostComments(postId, true);
 
     if (isLoading) {
       return (
@@ -402,6 +400,8 @@ export default function CommunityPage() {
       </div>
     );
   };
+
+
 
   // Handle share functionality
   const handleShare = async (post: any) => {
@@ -924,8 +924,10 @@ export default function CommunityPage() {
                             </form>
                           </Form>
                           
-                          {/* Comments list */}
-                          <CommentsSection postId={post.id} showComments={showComments[post.id]} />
+                          {/* Comments list - placeholder for now */}
+                          <div className="text-center py-4">
+                            <p className="text-gray-500 text-sm">{t('community.commentsSection', 'Comments will load here')}</p>
+                          </div>
                         </div>
                       )}
                     </CardContent>
