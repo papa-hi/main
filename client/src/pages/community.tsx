@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { apiRequest } from '@/lib/queryClient';
+import { CommentsDisplay } from '@/components/comments-display';
 
 // Types for community features
 interface CommunityPost {
@@ -142,20 +143,7 @@ export default function CommunityPage() {
     queryFn: () => fetch('/api/community/categories').then(res => res.json()),
   });
 
-  // Fetch comments for a specific post
-  const usePostComments = (postId: number, enabled: boolean = false) => {
-    return useQuery({
-      queryKey: ['/api/community/posts', postId, 'comments'],
-      queryFn: async () => {
-        const response = await fetch(`/api/community/posts/${postId}/comments`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch comments: ${response.status}`);
-        }
-        return response.json();
-      },
-      enabled,
-    });
-  };
+
 
   // Create post mutation
   const createPostMutation = useMutation({
@@ -337,6 +325,8 @@ export default function CommunityPage() {
   const toggleComments = (postId: number) => {
     setShowComments(prev => ({ ...prev, [postId]: !prev[postId] }));
   };
+
+
 
 
 
@@ -863,10 +853,11 @@ export default function CommunityPage() {
                             </form>
                           </Form>
                           
-                          {/* Comments list - placeholder for now */}
-                          <div className="text-center py-4">
-                            <p className="text-gray-500 text-sm">{t('community.commentsSection', 'Comments will load here')}</p>
-                          </div>
+                          {/* Comments list */}
+                          <CommentsDisplay 
+                            postId={post.id} 
+                            onReaction={(commentId) => handleReaction(undefined, commentId)} 
+                          />
                         </div>
                       )}
                     </CardContent>
