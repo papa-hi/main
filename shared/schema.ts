@@ -23,11 +23,135 @@ export const users = pgTable("users", {
   lastLogin: timestamp("last_login"),
 });
 
+// Community Posts schema
+export const communityPosts = pgTable("community_posts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: text("title"),
+  content: text("content").notNull(),
+  category: text("category").default("general"), // "parenting-tips", "activities", "health", "general"
+  hashtags: text("hashtags").array().default([]),
+  isEdited: boolean("is_edited").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Community Comments schema  
+export const communityComments = pgTable("community_comments", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").notNull().references(() => communityPosts.id, { onDelete: "cascade" }),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  parentCommentId: integer("parent_comment_id").references(() => communityComments.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  isEdited: boolean("is_edited").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Community Reactions schema
+export const communityReactions = pgTable("community_reactions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  postId: integer("post_id").references(() => communityPosts.id, { onDelete: "cascade" }),
+  commentId: integer("comment_id").references(() => communityComments.id, { onDelete: "cascade" }),
+  type: text("type").notNull(), // "like", "love", "helpful", "funny"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  uniqueUserPostReaction: unique().on(table.userId, table.postId),
+  uniqueUserCommentReaction: unique().on(table.userId, table.commentId),
+}));
+
+// Community Mentions schema
+export const communityMentions = pgTable("community_mentions", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").references(() => communityPosts.id, { onDelete: "cascade" }),
+  commentId: integer("comment_id").references(() => communityComments.id, { onDelete: "cascade" }),
+  mentionedUserId: integer("mentioned_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  mentioningUserId: integer("mentioning_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Define user relations
 export const usersRelations = relations(users, ({ many }) => ({
   createdPlaydates: many(playdates),
   playdateParticipations: many(playdateParticipants),
   favorites: many(userFavorites),
+  communityPosts: many(communityPosts),
+  communityComments: many(communityComments),
+  communityReactions: many(communityReactions),
+  mentionsReceived: many(communityMentions, { relationName: "mentionedUser" }),
+  mentionsGiven: many(communityMentions, { relationName: "mentioningUser" }),
+}));
+
+// Community Posts relations
+export const communityPostsRelations = relations(communityPosts, ({ one, many }) => ({
+  author: one(users, {
+    fields: [communityPosts.userId],
+    references: [users.id],
+  }),
+  comments: many(communityComments),
+  reactions: many(communityReactions),
+  mentions: many(communityMentions, { relationName: "postMentions" }),
+}));
+
+// Community Comments relations
+export const communityCommentsRelations = relations(communityComments, ({ one, many }) => ({
+  post: one(communityPosts, {
+    fields: [communityComments.postId],
+    references: [communityPosts.id],
+  }),
+  author: one(users, {
+    fields: [communityComments.userId],
+    references: [users.id],
+  }),
+  parentComment: one(communityComments, {
+    fields: [communityComments.parentCommentId],
+    references: [communityComments.id],
+    relationName: "parentChild",
+  }),
+  replies: many(communityComments, { relationName: "parentChild" }),
+  reactions: many(communityReactions),
+  mentions: many(communityMentions, { relationName: "commentMentions" }),
+}));
+
+// Community Reactions relations
+export const communityReactionsRelations = relations(communityReactions, ({ one }) => ({
+  user: one(users, {
+    fields: [communityReactions.userId],
+    references: [users.id],
+  }),
+  post: one(communityPosts, {
+    fields: [communityReactions.postId],
+    references: [communityPosts.id],
+  }),
+  comment: one(communityComments, {
+    fields: [communityReactions.commentId],
+    references: [communityComments.id],
+  }),
+}));
+
+// Community Mentions relations
+export const communityMentionsRelations = relations(communityMentions, ({ one }) => ({
+  post: one(communityPosts, {
+    fields: [communityMentions.postId],
+    references: [communityPosts.id],
+    relationName: "postMentions",
+  }),
+  comment: one(communityComments, {
+    fields: [communityMentions.commentId],
+    references: [communityComments.id],
+    relationName: "commentMentions",
+  }),
+  mentionedUser: one(users, {
+    fields: [communityMentions.mentionedUserId],
+    references: [users.id],
+    relationName: "mentionedUser",
+  }),
+  mentioningUser: one(users, {
+    fields: [communityMentions.mentioningUserId],
+    references: [users.id],
+    relationName: "mentioningUser",
+  }),
 }));
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -167,6 +291,79 @@ export type Place = typeof places.$inferSelect & {
   distance: number;
   isSaved: boolean;
 };
+
+// Community schema insert and types
+export const insertCommunityPostSchema = createInsertSchema(communityPosts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  isEdited: true,
+});
+
+export const insertCommunityCommentSchema = createInsertSchema(communityComments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  isEdited: true,
+});
+
+export const insertCommunityReactionSchema = createInsertSchema(communityReactions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCommunityMentionSchema = createInsertSchema(communityMentions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCommunityPost = z.infer<typeof insertCommunityPostSchema>;
+export type InsertCommunityComment = z.infer<typeof insertCommunityCommentSchema>;
+export type InsertCommunityReaction = z.infer<typeof insertCommunityReactionSchema>;
+export type InsertCommunityMention = z.infer<typeof insertCommunityMentionSchema>;
+
+export type CommunityPost = typeof communityPosts.$inferSelect & {
+  author: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    profileImage: string | null;
+    username: string;
+  };
+  comments: CommunityComment[];
+  reactions: CommunityReaction[];
+  _count: {
+    comments: number;
+    reactions: number;
+  };
+};
+
+export type CommunityComment = typeof communityComments.$inferSelect & {
+  author: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    profileImage: string | null;
+    username: string;
+  };
+  replies: CommunityComment[];
+  reactions: CommunityReaction[];
+  _count: {
+    replies: number;
+    reactions: number;
+  };
+};
+
+export type CommunityReaction = typeof communityReactions.$inferSelect & {
+  user: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    username: string;
+  };
+};
+
+export type CommunityMention = typeof communityMentions.$inferSelect;
 
 // Chat schema
 export const chats = pgTable("chats", {

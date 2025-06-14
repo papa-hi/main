@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings } from "@shared/schema";
+import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings, communityPosts, communityComments, communityReactions, communityMentions, insertCommunityPostSchema, insertCommunityCommentSchema, insertCommunityReactionSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
@@ -12,7 +12,7 @@ import fs from "fs";
 import { WebSocketServer, WebSocket } from 'ws';
 import { fetchNearbyPlaygrounds } from "./maps-service";
 import { db } from "./db";
-import { eq, and, gte, asc, count } from "drizzle-orm";
+import { eq, and, gte, asc, count, desc, like, or, sql, isNull } from "drizzle-orm";
 import crypto from "crypto";
 import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate } from "./push-notifications";
 import { pushSubscriptions } from "@shared/schema";
@@ -2479,6 +2479,344 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting places by name:", error);
       res.status(500).json({ error: "Failed to delete places" });
+    }
+  });
+
+  // ===== COMMUNITY API ROUTES =====
+
+  // Get community posts with different feed types
+  app.get("/api/community/posts", async (req: Request, res: Response) => {
+    try {
+      const { 
+        feed = 'latest', // 'latest', 'trending', 'popular'
+        category, 
+        search, 
+        hashtag, 
+        userId,
+        limit = 20, 
+        offset = 0 
+      } = req.query;
+
+      let query = db
+        .select({
+          id: communityPosts.id,
+          title: communityPosts.title,
+          content: communityPosts.content,
+          category: communityPosts.category,
+          hashtags: communityPosts.hashtags,
+          isEdited: communityPosts.isEdited,
+          createdAt: communityPosts.createdAt,
+          updatedAt: communityPosts.updatedAt,
+          author: {
+            id: users.id,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            profileImage: users.profileImage,
+            username: users.username,
+          },
+        })
+        .from(communityPosts)
+        .leftJoin(users, eq(communityPosts.userId, users.id));
+
+      // Apply filters
+      if (category) {
+        query = query.where(eq(communityPosts.category, category as string));
+      }
+
+      if (search) {
+        query = query.where(
+          or(
+            like(communityPosts.title, `%${search}%`),
+            like(communityPosts.content, `%${search}%`)
+          )
+        );
+      }
+
+      if (hashtag) {
+        query = query.where(
+          sql`${communityPosts.hashtags} @> ARRAY[${hashtag}]::text[]`
+        );
+      }
+
+      if (userId) {
+        query = query.where(eq(communityPosts.userId, parseInt(userId as string)));
+      }
+
+      // Apply ordering based on feed type
+      if (feed === 'latest') {
+        query = query.orderBy(desc(communityPosts.createdAt));
+      } else if (feed === 'trending' || feed === 'popular') {
+        // For trending/popular, we'll order by recent posts with more engagement
+        query = query.orderBy(desc(communityPosts.createdAt));
+      }
+
+      query = query.limit(parseInt(limit as string)).offset(parseInt(offset as string));
+
+      const posts = await query;
+
+      // Get comment and reaction counts for each post
+      const postsWithCounts = await Promise.all(
+        posts.map(async (post) => {
+          const [commentCount] = await db
+            .select({ count: count() })
+            .from(communityComments)
+            .where(eq(communityComments.postId, post.id));
+
+          const [reactionCount] = await db
+            .select({ count: count() })
+            .from(communityReactions)
+            .where(eq(communityReactions.postId, post.id));
+
+          return {
+            ...post,
+            _count: {
+              comments: commentCount.count,
+              reactions: reactionCount.count,
+            },
+          };
+        })
+      );
+
+      res.json(postsWithCounts);
+    } catch (error) {
+      console.error("Error fetching community posts:", error);
+      res.status(500).json({ error: "Failed to fetch community posts" });
+    }
+  });
+
+  // Create a new community post
+  app.post("/api/community/posts", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const validatedData = insertCommunityPostSchema.parse({
+        ...req.body,
+        userId,
+      });
+
+      const [newPost] = await db
+        .insert(communityPosts)
+        .values(validatedData)
+        .returning();
+
+      // Get the post with author info
+      const [postWithAuthor] = await db
+        .select({
+          id: communityPosts.id,
+          title: communityPosts.title,
+          content: communityPosts.content,
+          category: communityPosts.category,
+          hashtags: communityPosts.hashtags,
+          isEdited: communityPosts.isEdited,
+          createdAt: communityPosts.createdAt,
+          updatedAt: communityPosts.updatedAt,
+          author: {
+            id: users.id,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            profileImage: users.profileImage,
+            username: users.username,
+          },
+        })
+        .from(communityPosts)
+        .leftJoin(users, eq(communityPosts.userId, users.id))
+        .where(eq(communityPosts.id, newPost.id));
+
+      res.status(201).json({
+        ...postWithAuthor,
+        _count: { comments: 0, reactions: 0 }
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const readableError = fromZodError(error);
+        return res.status(400).json({ error: readableError.message });
+      }
+      console.error("Error creating community post:", error);
+      res.status(500).json({ error: "Failed to create community post" });
+    }
+  });
+
+  // Create a comment on a post
+  app.post("/api/community/posts/:id/comments", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const postId = parseInt(req.params.id);
+      if (isNaN(postId)) {
+        return res.status(400).json({ error: "Invalid post ID" });
+      }
+
+      const validatedData = insertCommunityCommentSchema.parse({
+        ...req.body,
+        postId,
+        userId,
+      });
+
+      const [newComment] = await db
+        .insert(communityComments)
+        .values(validatedData)
+        .returning();
+
+      // Get the comment with author info
+      const [commentWithAuthor] = await db
+        .select({
+          id: communityComments.id,
+          content: communityComments.content,
+          isEdited: communityComments.isEdited,
+          createdAt: communityComments.createdAt,
+          updatedAt: communityComments.updatedAt,
+          parentCommentId: communityComments.parentCommentId,
+          author: {
+            id: users.id,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            profileImage: users.profileImage,
+            username: users.username,
+          },
+        })
+        .from(communityComments)
+        .leftJoin(users, eq(communityComments.userId, users.id))
+        .where(eq(communityComments.id, newComment.id));
+
+      res.status(201).json({
+        ...commentWithAuthor,
+        replies: [],
+        _count: { replies: 0, reactions: 0 }
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const readableError = fromZodError(error);
+        return res.status(400).json({ error: readableError.message });
+      }
+      console.error("Error creating comment:", error);
+      res.status(500).json({ error: "Failed to create comment" });
+    }
+  });
+
+  // Add or remove reaction to post/comment
+  app.post("/api/community/reactions", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { postId, commentId, type } = req.body;
+
+      if (!type || (!postId && !commentId)) {
+        return res.status(400).json({ error: "Type and either postId or commentId are required" });
+      }
+
+      // Check if reaction already exists
+      let existingReaction;
+      if (postId) {
+        [existingReaction] = await db
+          .select()
+          .from(communityReactions)
+          .where(and(
+            eq(communityReactions.userId, userId),
+            eq(communityReactions.postId, postId)
+          ));
+      } else {
+        [existingReaction] = await db
+          .select()
+          .from(communityReactions)
+          .where(and(
+            eq(communityReactions.userId, userId),
+            eq(communityReactions.commentId, commentId)
+          ));
+      }
+
+      if (existingReaction) {
+        if (existingReaction.type === type) {
+          // Remove reaction if same type
+          await db
+            .delete(communityReactions)
+            .where(eq(communityReactions.id, existingReaction.id));
+          
+          res.json({ action: 'removed', type });
+        } else {
+          // Update reaction type
+          await db
+            .update(communityReactions)
+            .set({ type })
+            .where(eq(communityReactions.id, existingReaction.id));
+          
+          res.json({ action: 'updated', type });
+        }
+      } else {
+        // Create new reaction
+        const reactionData = {
+          userId,
+          type,
+          ...(postId ? { postId } : { commentId }),
+        };
+
+        await db.insert(communityReactions).values(reactionData);
+        res.json({ action: 'added', type });
+      }
+    } catch (error) {
+      console.error("Error handling reaction:", error);
+      res.status(500).json({ error: "Failed to handle reaction" });
+    }
+  });
+
+  // Get community categories
+  app.get("/api/community/categories", async (req: Request, res: Response) => {
+    try {
+      const categories = [
+        { id: 'general', name: 'General Discussion', description: 'General parenting topics and conversations' },
+        { id: 'parenting-tips', name: 'Parenting Tips', description: 'Share and discover parenting advice' },
+        { id: 'activities', name: 'Kids Activities', description: 'Fun activities and ideas for children' },
+        { id: 'health', name: 'Health & Wellness', description: 'Health tips and wellness discussions' },
+        { id: 'education', name: 'Education', description: 'School, learning, and educational resources' },
+        { id: 'local', name: 'Local Community', description: 'Local events and neighborhood discussions' },
+      ];
+
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ error: "Failed to fetch categories" });
+    }
+  });
+
+  // Search users for mentions
+  app.get("/api/community/users/search", async (req: Request, res: Response) => {
+    try {
+      const { q } = req.query;
+      
+      if (!q || typeof q !== 'string' || q.length < 2) {
+        return res.json([]);
+      }
+
+      const searchResults = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage,
+        })
+        .from(users)
+        .where(
+          or(
+            like(users.username, `%${q}%`),
+            like(users.firstName, `%${q}%`),
+            like(users.lastName, `%${q}%`)
+          )
+        )
+        .limit(10);
+
+      res.json(searchResults);
+    } catch (error) {
+      console.error("Error searching users:", error);
+      res.status(500).json({ error: "Failed to search users" });
     }
   });
 
