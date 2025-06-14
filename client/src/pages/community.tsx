@@ -429,7 +429,7 @@ export default function CommunityPage() {
                           : 'hover:bg-gray-100'
                       }`}
                     >
-                      <div className="font-medium">{category.name}</div>
+                      <div className="font-medium">{t(`community.categories.${category.id}`, category.name)}</div>
                       <div className="text-sm text-gray-500">{category.description}</div>
                     </button>
                   ))}
