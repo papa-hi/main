@@ -582,6 +582,65 @@
       "contactText": "Wenn du Fragen zu dieser Datenschutzerklärung hast, kontaktiere uns bitte über die Support-Funktionen der App.",
       "backToApp": "Zurück zur App"
     },
+    "privacy": {
+      "title": "Datenschutzerklärung",
+      "lastUpdated": "Zuletzt aktualisiert: Januar 2025",
+      "dataController": {
+        "title": "Datenverantwortlicher",
+        "company": "PaPa-Hi B.V.",
+        "address": "Amsterdam, Niederlande",
+        "email": "E-Mail: privacy@papa-hi.nl"
+      },
+      "dataCollection": {
+        "title": "Daten, Die Wir Sammeln",
+        "personal": "Persönliche Informationen",
+        "name": "Name und E-Mail-Adresse",
+        "profile": "Profilinformationen und Fotos",
+        "children": "Kinderinformationen (Namen und Alter)",
+        "location": "Standortdaten (wenn erlaubt)",
+        "usage": "Nutzungsdaten",
+        "places": "Orte, die du besuchst und bewertest",
+        "playdates": "Spieltreffen, die du erstellst oder an denen du teilnimmst",
+        "preferences": "App-Einstellungen und Präferenzen"
+      },
+      "legalBasis": {
+        "title": "Rechtsgrundlage für die Verarbeitung",
+        "consent": "Einwilligung",
+        "consentDesc": "Standortdienste, Analytics und Marketing-Kommunikation",
+        "contract": "Vertragserfüllung",
+        "contractDesc": "Bereitstellung des PaPa-Hi-Services und Verwaltung deines Kontos",
+        "interest": "Berechtigtes Interesse",
+        "interestDesc": "Verbesserung unseres Services und Gewährleistung der Sicherheit"
+      },
+      "rights": {
+        "title": "Deine Rechte Unter der DSGVO",
+        "access": "Recht auf Zugang",
+        "accessDesc": "Fordere eine Kopie deiner persönlichen Daten an",
+        "rectification": "Recht auf Berichtigung",
+        "rectificationDesc": "Korrigiere unrichtige persönliche Daten",
+        "erasure": "Recht auf Löschung",
+        "erasureDesc": "Beantrage die Löschung deiner Daten",
+        "portability": "Recht auf Datenübertragbarkeit",
+        "portabilityDesc": "Exportiere deine Daten in einem Standardformat",
+        "exercise": "Wie Du Deine Rechte Ausübst",
+        "exerciseDesc": "Kontaktiere uns unter privacy@papa-hi.nl oder nutze die Datenverwaltungstools in deinen Kontoeinstellungen.",
+        "manageData": "Meine Daten Verwalten"
+      },
+      "retention": {
+        "title": "Datenspeicherung",
+        "account": "Kontodaten",
+        "accountDesc": "Gespeichert, solange dein Konto aktiv ist und 2 Jahre nach Löschung für rechtliche Compliance",
+        "location": "Standortdaten",
+        "locationDesc": "In Echtzeit verarbeitet und nicht gespeichert, es sei denn, du speicherst bestimmte Orte",
+        "analytics": "Analytics-Daten",
+        "analyticsDesc": "Aggregierte und anonymisierte Daten für 26 Monate gespeichert"
+      },
+      "contact": {
+        "title": "Kontakt & Beschwerden",
+        "desc": "Für datenschutzbezogene Fragen oder zur Ausübung deiner Rechte:",
+        "authority": "Du hast das Recht, eine Beschwerde bei der deutschen Datenschutzbehörde einzureichen, wenn du glaubst, dass deine Datenschutzrechte verletzt wurden."
+      }
+    },
     "help": {
       "title": "Hilfe & Support",
       "subtitle": "Hilfe und häufig gestellte Fragen",
