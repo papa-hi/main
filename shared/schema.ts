@@ -41,7 +41,7 @@ export const communityComments = pgTable("community_comments", {
   id: serial("id").primaryKey(),
   postId: integer("post_id").notNull().references(() => communityPosts.id, { onDelete: "cascade" }),
   authorId: integer("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  parentCommentId: integer("parent_comment_id").references(() => communityComments.id, { onDelete: "cascade" }),
+  parentCommentId: integer("parent_comment_id"),
   content: text("content").notNull(),
   isEdited: boolean("is_edited").default(false),
   likesCount: integer("likes_count").default(0),
@@ -105,12 +105,7 @@ export const communityCommentsRelations = relations(communityComments, ({ one, m
     fields: [communityComments.authorId],
     references: [users.id],
   }),
-  parentComment: one(communityComments, {
-    fields: [communityComments.parentCommentId],
-    references: [communityComments.id],
-    relationName: "parentChild",
-  }),
-  replies: many(communityComments, { relationName: "parentChild" }),
+  replies: many(communityComments),
   reactions: many(communityReactions),
   mentions: many(communityMentions, { relationName: "commentMentions" }),
 }));
@@ -306,6 +301,7 @@ export const insertCommunityCommentSchema = createInsertSchema(communityComments
   createdAt: true,
   updatedAt: true,
   isEdited: true,
+  likesCount: true,
 });
 
 export const insertCommunityReactionSchema = createInsertSchema(communityReactions).omit({

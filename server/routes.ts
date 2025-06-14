@@ -2681,7 +2681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
         })
         .from(communityComments)
-        .leftJoin(users, eq(communityComments.userId, users.id))
+        .leftJoin(users, eq(communityComments.authorId, users.id))
         .where(eq(communityComments.id, newComment.id));
 
       res.status(201).json({
@@ -2734,7 +2734,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if (existingReaction) {
-        if (existingReaction.type === type) {
+        if (existingReaction.reactionType === type) {
           // Remove reaction if same type
           await db
             .delete(communityReactions)
@@ -2745,7 +2745,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Update reaction type
           await db
             .update(communityReactions)
-            .set({ type })
+            .set({ reactionType: type })
             .where(eq(communityReactions.id, existingReaction.id));
           
           res.json({ action: 'updated', type });
@@ -2754,7 +2754,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Create new reaction
         const reactionData = {
           userId,
-          type,
+          reactionType: type,
           ...(postId ? { postId } : { commentId }),
         };
 
