@@ -11,6 +11,7 @@ import PlacesPage from "./pages/places";
 import ProfilePage from "./pages/profile";
 import UserProfilePage from "./pages/user-profile";
 import DiscoverPage from "./pages/discover";
+import CommunityPage from "./pages/community";
 import CreatePage from "./pages/create";
 import EditPlaydatePage from "./pages/edit-playdate";
 import ChatPage from "./pages/chat";
@@ -62,6 +63,7 @@ function Router() {
       <ProtectedRoute path="/chat" component={ChatPage} />
       <ProtectedRoute path="/chat/:id" component={ChatPage} />
       <ProtectedRoute path="/discover" component={DiscoverPage} />
+      <ProtectedRoute path="/community" component={CommunityPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
       <ProtectedRoute path="/settings/delete-account" component={DeleteAccountPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
