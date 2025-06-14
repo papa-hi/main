@@ -370,7 +370,10 @@ export default function CommunityPage() {
             }
           }}>
             <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={() => setShowCreatePost(true)}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 {t('community.createPost')}
               </Button>

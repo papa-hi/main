@@ -129,6 +129,7 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 - June 14, 2025: Fixed critical community publish button bug by correcting apiRequest parameter order in all mutations
 - June 14, 2025: Implemented comprehensive multilingual support for community features with full English and Dutch translations
 - June 14, 2025: Resolved category translation mapping issue - categories now display properly translated text instead of objects throughout community interface
+- June 14, 2025: Implemented complete edit/delete functionality for posts and comments with proper user permissions and multilingual support
 
 ## User Preferences
 
