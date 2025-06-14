@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -104,6 +105,7 @@ export default function CommunityPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   const [activeTab, setActiveTab] = useState('latest');
   const [searchQuery, setSearchQuery] = useState('');
@@ -145,6 +147,18 @@ export default function CommunityPage() {
       queryClient.invalidateQueries({ queryKey: ['/api/community/posts'] });
       setShowCreatePost(false);
       postForm.reset();
+      toast({ 
+        title: t('community.postCreated', 'Post created successfully!'),
+        description: t('community.postCreatedDesc', 'Your post has been published to the community.'),
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error creating post:', error);
+      toast({
+        title: t('common.error', 'Error'),
+        description: error?.message || t('community.postError', 'Failed to create post. Please try again.'),
+        variant: 'destructive',
+      });
     },
   });
 
@@ -195,8 +209,11 @@ export default function CommunityPage() {
 
   // Handle post submission
   const onSubmitPost = (data: z.infer<typeof postSchema>) => {
+    console.log('Form submission data:', data);
     const hashtags = extractHashtags(data.content);
-    createPostMutation.mutate({ ...data, hashtags });
+    const postData = { ...data, hashtags };
+    console.log('Post data being sent:', postData);
+    createPostMutation.mutate(postData);
   };
 
   // Handle comment submission
