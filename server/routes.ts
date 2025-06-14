@@ -2820,6 +2820,173 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Edit post
+  app.patch("/api/community/posts/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const postId = parseInt(req.params.id);
+      const { title, content, category, hashtags } = req.body;
+
+      if (!content?.trim()) {
+        return res.status(400).json({ error: "Content is required" });
+      }
+
+      // Check if user owns the post
+      const [existingPost] = await db
+        .select()
+        .from(communityPosts)
+        .where(eq(communityPosts.id, postId));
+
+      if (!existingPost) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+
+      if (existingPost.userId !== userId) {
+        return res.status(403).json({ error: "You can only edit your own posts" });
+      }
+
+      // Update the post
+      await db
+        .update(communityPosts)
+        .set({
+          title: title?.trim() || existingPost.title,
+          content: content.trim(),
+          category: category || existingPost.category,
+          hashtags: hashtags || existingPost.hashtags,
+          isEdited: true,
+          updatedAt: new Date()
+        })
+        .where(eq(communityPosts.id, postId));
+
+      res.json({ message: "Post updated successfully" });
+    } catch (error) {
+      console.error("Error updating post:", error);
+      res.status(500).json({ error: "Failed to update post" });
+    }
+  });
+
+  // Delete post
+  app.delete("/api/community/posts/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const postId = parseInt(req.params.id);
+
+      // Check if user owns the post
+      const [existingPost] = await db
+        .select()
+        .from(communityPosts)
+        .where(eq(communityPosts.id, postId));
+
+      if (!existingPost) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+
+      if (existingPost.userId !== userId) {
+        return res.status(403).json({ error: "You can only delete your own posts" });
+      }
+
+      // Delete the post (cascading will delete comments and reactions)
+      await db
+        .delete(communityPosts)
+        .where(eq(communityPosts.id, postId));
+
+      res.json({ message: "Post deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      res.status(500).json({ error: "Failed to delete post" });
+    }
+  });
+
+  // Edit comment
+  app.patch("/api/community/comments/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const commentId = parseInt(req.params.id);
+      const { content } = req.body;
+
+      if (!content?.trim()) {
+        return res.status(400).json({ error: "Content is required" });
+      }
+
+      // Check if user owns the comment
+      const [existingComment] = await db
+        .select()
+        .from(communityComments)
+        .where(eq(communityComments.id, commentId));
+
+      if (!existingComment) {
+        return res.status(404).json({ error: "Comment not found" });
+      }
+
+      if (existingComment.userId !== userId) {
+        return res.status(403).json({ error: "You can only edit your own comments" });
+      }
+
+      // Update the comment
+      await db
+        .update(communityComments)
+        .set({
+          content: content.trim(),
+          isEdited: true,
+          updatedAt: new Date()
+        })
+        .where(eq(communityComments.id, commentId));
+
+      res.json({ message: "Comment updated successfully" });
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      res.status(500).json({ error: "Failed to update comment" });
+    }
+  });
+
+  // Delete comment
+  app.delete("/api/community/comments/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const commentId = parseInt(req.params.id);
+
+      // Check if user owns the comment
+      const [existingComment] = await db
+        .select()
+        .from(communityComments)
+        .where(eq(communityComments.id, commentId));
+
+      if (!existingComment) {
+        return res.status(404).json({ error: "Comment not found" });
+      }
+
+      if (existingComment.userId !== userId) {
+        return res.status(403).json({ error: "You can only delete your own comments" });
+      }
+
+      // Delete the comment (cascading will delete replies and reactions)
+      await db
+        .delete(communityComments)
+        .where(eq(communityComments.id, commentId));
+
+      res.json({ message: "Comment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ error: "Failed to delete comment" });
+    }
+  });
+
   // Create HTTP server
   const httpServer = createServer(app);
   

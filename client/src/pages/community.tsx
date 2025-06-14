@@ -114,6 +114,8 @@ export default function CommunityPage() {
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [showComments, setShowComments] = useState<Record<number, boolean>>({});
   const [commentingOn, setCommentingOn] = useState<number | null>(null);
+  const [editingPost, setEditingPost] = useState<number | null>(null);
+  const [editingComment, setEditingComment] = useState<number | null>(null);
 
   // Fetch community posts
   const { data: posts = [], isLoading: postsLoading, error: postsError } = useQuery({
@@ -179,6 +181,88 @@ export default function CommunityPage() {
       apiRequest('POST', '/api/community/reactions', { postId, commentId, type }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/community/posts'] });
+    },
+  });
+
+  // Edit post mutation
+  const editPostMutation = useMutation({
+    mutationFn: ({ postId, data }: { postId: number; data: z.infer<typeof postSchema> }) =>
+      apiRequest('PATCH', `/api/community/posts/${postId}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/community/posts'] });
+      setEditingPost(null);
+      toast({
+        title: t('community.postUpdated'),
+        description: t('community.postUpdatedDesc'),
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: t('common.error'),
+        description: t('community.postUpdateError'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Delete post mutation
+  const deletePostMutation = useMutation({
+    mutationFn: (postId: number) =>
+      apiRequest('DELETE', `/api/community/posts/${postId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/community/posts'] });
+      toast({
+        title: t('community.postDeleted'),
+        description: t('community.postDeletedDesc'),
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: t('common.error'),
+        description: t('community.postDeleteError'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Edit comment mutation
+  const editCommentMutation = useMutation({
+    mutationFn: ({ commentId, content }: { commentId: number; content: string }) =>
+      apiRequest('PATCH', `/api/community/comments/${commentId}`, { content }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/community/posts'] });
+      setEditingComment(null);
+      toast({
+        title: t('community.commentUpdated'),
+        description: t('community.commentUpdatedDesc'),
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: t('common.error'),
+        description: t('community.commentUpdateError'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Delete comment mutation
+  const deleteCommentMutation = useMutation({
+    mutationFn: (commentId: number) =>
+      apiRequest('DELETE', `/api/community/comments/${commentId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/community/posts'] });
+      toast({
+        title: t('community.commentDeleted'),
+        description: t('community.commentDeletedDesc'),
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: t('common.error'),
+        description: t('community.commentDeleteError'),
+        variant: 'destructive',
+      });
     },
   });
 
@@ -532,6 +616,48 @@ export default function CommunityPage() {
                             {categories.find(c => c.id === post.category)?.name || post.category}
                           </Badge>
                         </div>
+                        
+                        {/* Post options for owner */}
+                        {user && post.author.id === user.id && (
+                          <div className="relative">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              onClick={() => {
+                                // Toggle dropdown or show options
+                              }}
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                            <div className="absolute right-0 top-8 bg-white border rounded-md shadow-lg py-1 z-10 min-w-[120px]">
+                              <button
+                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
+                                onClick={() => {
+                                  setEditingPost(post.id);
+                                  postForm.setValue('title', post.title || '');
+                                  postForm.setValue('content', post.content);
+                                  postForm.setValue('category', post.category);
+                                  postForm.setValue('hashtags', post.hashtags || []);
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                                {t('common.edit')}
+                              </button>
+                              <button
+                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 text-red-600 flex items-center gap-2"
+                                onClick={() => {
+                                  if (confirm(t('community.confirmDeletePost'))) {
+                                    deletePostMutation.mutate(post.id);
+                                  }
+                                }}
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                {t('common.delete')}
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Post content */}
