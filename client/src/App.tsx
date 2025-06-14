@@ -17,6 +17,7 @@ import ChatPage from "./pages/chat";
 import AuthPage from "./pages/auth-page";
 import PlaceDetailsPage from "./pages/place-details";
 import SettingsPage from "./pages/SettingsPage";
+import PrivacyPolicyPage from "./pages/privacy-policy";
 
 import AdminDashboard from "./pages/admin";
 import AdminCheck from "./pages/admin-check";
@@ -62,6 +63,7 @@ function Router() {
       <ProtectedRoute path="/discover" component={DiscoverPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
+      <Route path="/privacy" component={PrivacyPolicyPage} />
 
       <ProtectedRoute path="/admin" component={AdminDashboard} />
       <Route path="/admin-check" component={AdminCheck} />

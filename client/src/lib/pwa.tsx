@@ -81,7 +81,7 @@ export function PrivacyConsentDialog({ onAccept, onReject }: PrivacyConsentDialo
           </Button>
         </DialogFooter>
         <div className="text-center">
-          <a href="#" className="text-primary text-xs hover:underline">
+          <a href="/privacy" className="text-primary text-xs hover:underline">
             {t('privacy.viewPrivacyPolicy', 'View Privacy Policy')}
           </a>
         </div>

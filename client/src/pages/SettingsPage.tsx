@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import { Settings, User as UserIcon, Bell, Shield, HelpCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import NotificationSettings from '@/components/NotificationSettings';
 import { useQuery } from '@tanstack/react-query';
 import { getQueryFn } from '@/lib/queryClient';
@@ -14,6 +16,18 @@ export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState('notifications');
   const { t } = useTranslation();
   const [_, navigate] = useLocation();
+  const { toast } = useToast();
+  
+  // GDPR consent states
+  const [analyticsConsent, setAnalyticsConsent] = useState(
+    localStorage.getItem('analytics_consent') === 'true'
+  );
+  const [marketingConsent, setMarketingConsent] = useState(
+    localStorage.getItem('marketing_consent') === 'true'
+  );
+  const [locationConsent, setLocationConsent] = useState(
+    localStorage.getItem('location_consent') === 'true'
+  );
 
   const { data: user } = useQuery<User>({
     queryKey: ['/api/user'],
@@ -127,9 +141,60 @@ export default function SettingsPage() {
                   <p className="text-sm text-muted-foreground mb-3">
                     {t('settings.privacy.locationDataDesc')}
                   </p>
-                  <Button variant="outline" size="sm">
-                    {t('settings.privacy.manageData')}
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="outline" size="sm" onClick={() => window.open('/privacy', '_blank')}>
+                      {t('settings.privacy.viewPolicy', 'View Privacy Policy')}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => handleDataExport()}>
+                      {t('settings.privacy.exportData', 'Export My Data')}
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteAccount()}>
+                      {t('settings.privacy.deleteAccount', 'Delete Account')}
+                    </Button>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div>
+                  <h4 className="font-medium mb-2">{t('settings.privacy.consent', 'Consent Management')}</h4>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t('settings.privacy.consentDesc', 'Manage your data processing preferences')}
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-sm">{t('settings.privacy.analytics', 'Analytics')}</p>
+                        <p className="text-xs text-muted-foreground">{t('settings.privacy.analyticsDesc', 'Help improve the app')}</p>
+                      </div>
+                      <Switch 
+                        checked={analyticsConsent}
+                        onCheckedChange={setAnalyticsConsent}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-sm">{t('settings.privacy.marketing', 'Marketing Communications')}</p>
+                        <p className="text-xs text-muted-foreground">{t('settings.privacy.marketingDesc', 'Receive updates and tips')}</p>
+                      </div>
+                      <Switch 
+                        checked={marketingConsent}
+                        onCheckedChange={setMarketingConsent}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-sm">{t('settings.privacy.location', 'Location Services')}</p>
+                        <p className="text-xs text-muted-foreground">{t('settings.privacy.locationDesc', 'Find places near you')}</p>
+                      </div>
+                      <Switch 
+                        checked={locationConsent}
+                        onCheckedChange={setLocationConsent}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
