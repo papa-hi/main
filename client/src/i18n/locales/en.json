@@ -715,6 +715,7 @@
     "search": "Search",
     "searchPlaceholder": "Search posts, users, or hashtags...",
     "categories": "Categories",
+    "categoriesHeading": "Categories",
     "activeHashtag": "Active Hashtag",
     "latest": "Latest",
     "trending": "Trending",
