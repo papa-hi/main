@@ -574,65 +574,6 @@
       "contactText": "Si tienes preguntas sobre esta política de privacidad, por favor contáctanos a través de las funciones de soporte de la aplicación.",
       "backToApp": "Volver a la Aplicación"
     },
-    "privacy": {
-      "title": "Política de Privacidad",
-      "lastUpdated": "Última actualización: enero 2025",
-      "dataController": {
-        "title": "Responsable del Tratamiento",
-        "company": "PaPa-Hi B.V.",
-        "address": "Ámsterdam, Países Bajos",
-        "email": "Correo: privacy@papa-hi.nl"
-      },
-      "dataCollection": {
-        "title": "Datos Que Recopilamos",
-        "personal": "Información Personal",
-        "name": "Nombre y dirección de correo electrónico",
-        "profile": "Información y fotos de perfil",
-        "children": "Información de niños (nombres y edades)",
-        "location": "Datos de ubicación (si se permite)",
-        "usage": "Datos de Uso",
-        "places": "Lugares que visitas y calificas",
-        "playdates": "Citas de juego que creas o a las que te unes",
-        "preferences": "Preferencias y configuraciones de la aplicación"
-      },
-      "legalBasis": {
-        "title": "Base Legal para el Procesamiento",
-        "consent": "Consentimiento",
-        "consentDesc": "Servicios de ubicación, analíticas y comunicaciones de marketing",
-        "contract": "Ejecución del Contrato",
-        "contractDesc": "Proporcionar el servicio PaPa-Hi y gestionar tu cuenta",
-        "interest": "Interés Legítimo",
-        "interestDesc": "Mejorar nuestro servicio y garantizar la seguridad"
-      },
-      "rights": {
-        "title": "Tus Derechos Bajo el GDPR",
-        "access": "Derecho de Acceso",
-        "accessDesc": "Solicita una copia de tus datos personales",
-        "rectification": "Derecho de Rectificación",
-        "rectificationDesc": "Corrige datos personales inexactos",
-        "erasure": "Derecho al Borrado",
-        "erasureDesc": "Solicita la eliminación de tus datos",
-        "portability": "Derecho a la Portabilidad",
-        "portabilityDesc": "Exporta tus datos en un formato estándar",
-        "exercise": "Cómo Ejercer Tus Derechos",
-        "exerciseDesc": "Contáctanos en privacy@papa-hi.nl o usa las herramientas de gestión de datos en la configuración de tu cuenta.",
-        "manageData": "Gestionar Mis Datos"
-      },
-      "retention": {
-        "title": "Retención de Datos",
-        "account": "Datos de Cuenta",
-        "accountDesc": "Retenidos mientras tu cuenta esté activa y 2 años después de la eliminación para cumplimiento legal",
-        "location": "Datos de Ubicación",
-        "locationDesc": "Procesados en tiempo real y no almacenados a menos que guardes lugares específicos",
-        "analytics": "Datos de Analíticas",
-        "analyticsDesc": "Datos agregados y anonimizados retenidos por 26 meses"
-      },
-      "contact": {
-        "title": "Contacto y Quejas",
-        "desc": "Para preguntas relacionadas con la privacidad o para ejercer tus derechos:",
-        "authority": "Tienes derecho a presentar una queja ante la autoridad española de protección de datos si crees que tus derechos de privacidad han sido violados."
-      }
-    },
     "help": {
       "title": "Ayuda y Soporte",
       "subtitle": "Ayuda y preguntas frecuentes",
