@@ -43,10 +43,10 @@ export default function PrivacyPolicyPage() {
             <div>
               <h4 className="font-semibold mb-2">{t('privacy.dataController.company', 'PaPa-Hi B.V.')}</h4>
               <p className="text-sm text-muted-foreground">
-                {t('privacy.dataController.address', 'Amsterdam, Netherlands')}
+                {t('privacy.dataController.address', 'Haarlem, Netherlands')}
               </p>
               <p className="text-sm text-muted-foreground">
-                {t('privacy.dataController.email', 'Email: privacy@papa-hi.nl')}
+                {t('privacy.dataController.email', 'Email: papa@papa-hi.com')}
               </p>
             </div>
           </CardContent>
