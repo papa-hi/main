@@ -118,7 +118,7 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
   const [mentionSuggestions, setMentionSuggestions] = useState<User[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>();
 
   const replyForm = useForm<z.infer<typeof replySchema>>({
     resolver: zodResolver(replySchema),
@@ -283,10 +283,14 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
                         <FormControl>
                           <div className="relative">
                             <Textarea
-                              ref={textareaRef}
                               placeholder={t('community.replyPlaceholder', 'Write a reply... Use @username to mention someone')}
                               className="min-h-[60px] resize-none"
-                              {...field}
+                              value={field.value}
+                              name={field.name}
+                              ref={(el) => {
+                                textareaRef.current = el;
+                                if (field.ref) field.ref(el);
+                              }}
                               onChange={(e) => {
                                 field.onChange(e);
                                 handleTextareaChange(e.target.value, e.target);
