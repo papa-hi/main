@@ -130,6 +130,10 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 - June 14, 2025: Implemented comprehensive multilingual support for community features with full English and Dutch translations
 - June 14, 2025: Resolved category translation mapping issue - categories now display properly translated text instead of objects throughout community interface
 - June 14, 2025: Implemented complete edit/delete functionality for posts and comments with proper user permissions and multilingual support
+- June 15, 2025: Completed nested comments system with up to 3 levels of threading and reply functionality
+- June 15, 2025: Implemented @username mention system with automatic detection, database storage, and blue text highlighting
+- June 15, 2025: Added @username autocomplete suggestions with dropdown menu showing user avatars, usernames, and full names
+- June 15, 2025: Created community_mentions table and integrated real-time user search for mention functionality
 
 ## User Preferences
 

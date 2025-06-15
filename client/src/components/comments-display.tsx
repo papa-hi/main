@@ -115,6 +115,10 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const [mentionSuggestions, setMentionSuggestions] = useState<User[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const replyForm = useForm<z.infer<typeof replySchema>>({
     resolver: zodResolver(replySchema),
@@ -145,6 +149,69 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
       });
     },
   });
+
+  // Search users for mentions
+  const searchUsers = async (query: string): Promise<User[]> => {
+    if (query.length < 2) return [];
+    try {
+      const response = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`);
+      if (response.ok) {
+        const users = await response.json();
+        return users.slice(0, 5); // Limit to 5 suggestions
+      }
+    } catch (error) {
+      console.error('Error searching users:', error);
+    }
+    return [];
+  };
+
+  // Handle textarea input for mention detection
+  const handleTextareaChange = async (value: string, textareaElement: HTMLTextAreaElement) => {
+    const cursorPosition = textareaElement.selectionStart;
+    const textBeforeCursor = value.substring(0, cursorPosition);
+    const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+    
+    if (mentionMatch) {
+      const query = mentionMatch[1];
+      const suggestions = await searchUsers(query);
+      
+      if (suggestions.length > 0) {
+        // Calculate position for dropdown
+        const textareaRect = textareaElement.getBoundingClientRect();
+        const position = {
+          top: textareaRect.bottom + window.scrollY,
+          left: textareaRect.left + window.scrollX
+        };
+        
+        setMentionSuggestions(suggestions);
+        setSuggestionPosition(position);
+        setShowSuggestions(true);
+      } else {
+        setShowSuggestions(false);
+      }
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  // Handle mention selection
+  const handleMentionSelect = (username: string) => {
+    const currentValue = replyForm.getValues('content');
+    const cursorPosition = textareaRef.current?.selectionStart || 0;
+    const textBeforeCursor = currentValue.substring(0, cursorPosition);
+    const textAfterCursor = currentValue.substring(cursorPosition);
+    
+    // Replace the partial mention with the selected username
+    const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+    if (mentionMatch) {
+      const beforeMention = textBeforeCursor.substring(0, mentionMatch.index);
+      const newValue = `${beforeMention}@${username} ${textAfterCursor}`;
+      replyForm.setValue('content', newValue);
+    }
+    
+    setShowSuggestions(false);
+    textareaRef.current?.focus();
+  };
 
   const onSubmitReply = (data: z.infer<typeof replySchema>) => {
     createReplyMutation.mutate(data);
@@ -214,11 +281,27 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Textarea
-                            placeholder={t('community.replyPlaceholder', 'Write a reply... Use @username to mention someone')}
-                            className="min-h-[60px] resize-none"
-                            {...field}
-                          />
+                          <div className="relative">
+                            <Textarea
+                              ref={textareaRef}
+                              placeholder={t('community.replyPlaceholder', 'Write a reply... Use @username to mention someone')}
+                              className="min-h-[60px] resize-none"
+                              {...field}
+                              onChange={(e) => {
+                                field.onChange(e);
+                                handleTextareaChange(e.target.value, e.target);
+                              }}
+                              onBlur={() => {
+                                setTimeout(() => setShowSuggestions(false), 100);
+                              }}
+                            />
+                            <MentionSuggestions
+                              suggestions={mentionSuggestions}
+                              onSelect={handleMentionSelect}
+                              visible={showSuggestions}
+                              position={suggestionPosition}
+                            />
+                          </div>
                         </FormControl>
                       </FormItem>
                     )}
