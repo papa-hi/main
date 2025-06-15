@@ -559,10 +559,12 @@ function generateProfileReminderEmailHTML(firstName: string, username: string, m
         <p>It only takes 2 minutes to complete your profile. Once done, you can:</p>
         <ul>
           <li>Browse and join exciting playdates</li>
-          <li>Create your own family activities</li>
-          <li>Connect with like-minded fathers</li>
+          <li>Create your own family activities and playdates</li>
+          <li>Connect with like-minded fathers in your area</li>
           <li>Discover family-friendly places</li>
         </ul>
+        
+        <p><strong>💡 Pro tip:</strong> After completing your profile, create your first playdate! It's the best way to start connecting with other parents and building meaningful relationships in the PaPa-Hi community.</p>
         
         <p>Thanks for being part of the PaPa-Hi community!</p>
         
@@ -606,6 +608,8 @@ Why complete your profile?
 Complete your profile here: https://papa-hi.com/profile
 
 It only takes 2 minutes! Once done, you can browse playdates, create activities, and connect with other fathers.
+
+Pro tip: After completing your profile, create your first playdate! It's the best way to start connecting with other parents and building meaningful relationships in the PaPa-Hi community.
 
 Thanks for being part of the PaPa-Hi community!
 
