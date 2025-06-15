@@ -5,7 +5,7 @@ import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSch
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
-import { setupAdminRoutes } from "./admin";
+import { setupAdminRoutes, logUserActivity } from "./admin";
 import { upload, getFileUrl, deleteProfileImage, storeImageInDatabase } from "./upload";
 import path from "path";
 import fs from "fs";
@@ -2602,6 +2602,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Handle mentions in the post content
       await createMentions(validatedData.content, newPost.id, null, userId);
+
+      // Log user activity
+      await logUserActivity("create_post", {
+        postId: newPost.id,
+        category: validatedData.category,
+        hasTitle: !!validatedData.title,
+        contentLength: validatedData.content.length,
+        hashtagCount: validatedData.hashtags?.length || 0
+      }, req);
 
       // Get the post with author info
       const [postWithAuthor] = await db

@@ -40,6 +40,13 @@ export interface IStorage {
   logFeatureUsage(usage: InsertFeatureUsage): Promise<FeatureUsage>;
   logAdminAction(log: InsertAdminLog): Promise<AdminLog>;
   getRecentUserActivity(limit?: number): Promise<UserActivity[]>;
+  getUserActivityStats(days?: number): Promise<{
+    totalActions: number;
+    uniqueUsers: number;
+    topActions: { action: string; count: number }[];
+    activityByDay: { date: string; count: number }[];
+    activeUsers: { userId: number; username: string; firstName: string; lastName: string; activityCount: number }[];
+  }>;
   getTopPages(days?: number): Promise<{ path: string, count: number }[]>;
   getFeatureUsageStats(days?: number): Promise<{ feature: string, count: number }[]>;
   getAdminLogs(limit?: number): Promise<AdminLog[]>;
@@ -1068,12 +1075,111 @@ export class DatabaseStorage implements IStorage {
   
   async getRecentUserActivity(limit: number = 100): Promise<UserActivity[]> {
     const result = await db
-      .select()
+      .select({
+        id: userActivity.id,
+        userId: userActivity.userId,
+        action: userActivity.action,
+        timestamp: userActivity.timestamp,
+        details: userActivity.details,
+        ipAddress: userActivity.ipAddress,
+        userAgent: userActivity.userAgent,
+        user: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          username: users.username,
+          email: users.email,
+          profileImage: users.profileImage,
+        }
+      })
       .from(userActivity)
+      .leftJoin(users, eq(userActivity.userId, users.id))
       .orderBy(desc(userActivity.timestamp))
       .limit(limit);
       
-    return result;
+    return result as any;
+  }
+
+  async getUserActivityStats(days: number = 7): Promise<{
+    totalActions: number;
+    uniqueUsers: number;
+    topActions: { action: string; count: number }[];
+    activityByDay: { date: string; count: number }[];
+    activeUsers: { userId: number; username: string; firstName: string; lastName: string; activityCount: number }[];
+  }> {
+    const daysAgo = new Date();
+    daysAgo.setDate(daysAgo.getDate() - days);
+
+    // Get total actions in period
+    const [{ count: totalActions }] = await db
+      .select({ count: count() })
+      .from(userActivity)
+      .where(gte(userActivity.timestamp, daysAgo));
+
+    // Get unique users in period
+    const [{ count: uniqueUsers }] = await db
+      .select({ count: sql<number>`COUNT(DISTINCT ${userActivity.userId})` })
+      .from(userActivity)
+      .where(gte(userActivity.timestamp, daysAgo));
+
+    // Get top actions
+    const topActions = await db
+      .select({
+        action: userActivity.action,
+        count: count()
+      })
+      .from(userActivity)
+      .where(gte(userActivity.timestamp, daysAgo))
+      .groupBy(userActivity.action)
+      .orderBy(desc(count()))
+      .limit(10);
+
+    // Get activity by day
+    const activityByDay = await db
+      .select({
+        date: sql<string>`DATE(${userActivity.timestamp})`,
+        count: count()
+      })
+      .from(userActivity)
+      .where(gte(userActivity.timestamp, daysAgo))
+      .groupBy(sql`DATE(${userActivity.timestamp})`)
+      .orderBy(sql`DATE(${userActivity.timestamp})`);
+
+    // Get most active users
+    const activeUsers = await db
+      .select({
+        userId: userActivity.userId,
+        username: users.username,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        activityCount: count()
+      })
+      .from(userActivity)
+      .leftJoin(users, eq(userActivity.userId, users.id))
+      .where(gte(userActivity.timestamp, daysAgo))
+      .groupBy(userActivity.userId, users.username, users.firstName, users.lastName)
+      .orderBy(desc(count()))
+      .limit(20);
+
+    return {
+      totalActions: Number(totalActions) || 0,
+      uniqueUsers: Number(uniqueUsers) || 0,
+      topActions: topActions.map(item => ({ 
+        action: item.action, 
+        count: Number(item.count) 
+      })),
+      activityByDay: activityByDay.map(item => ({ 
+        date: item.date, 
+        count: Number(item.count) 
+      })),
+      activeUsers: activeUsers.map(item => ({
+        userId: item.userId || 0,
+        username: item.username || 'Unknown',
+        firstName: item.firstName || 'Unknown',
+        lastName: item.lastName || 'User',
+        activityCount: Number(item.activityCount)
+      }))
+    };
   }
   
   async getTopPages(days: number = 7): Promise<{ path: string, count: number }[]> {

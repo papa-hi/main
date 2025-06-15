@@ -224,6 +224,21 @@ export function setupAdminRoutes(app: Express) {
     }
   });
 
+  // Get detailed user activity statistics
+  app.get('/api/admin/activity/stats', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const days = req.query.days ? parseInt(req.query.days as string) : 7;
+      const stats = await storage.getUserActivityStats(days);
+      res.json(stats);
+      
+      // Log admin action
+      await logAdminAction("View user activity statistics", { days }, req);
+    } catch (error) {
+      console.error("Error fetching user activity stats:", error);
+      res.status(500).json({ error: "Failed to fetch user activity statistics" });
+    }
+  });
+
   // Get page view statistics
   app.get('/api/admin/stats/pages', isAdmin, async (req: Request, res: Response) => {
     try {
