@@ -2604,13 +2604,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await createMentions(validatedData.content, newPost.id, null, userId);
 
       // Log user activity
-      await logUserActivity("create_post", {
-        postId: newPost.id,
-        category: validatedData.category,
-        hasTitle: !!validatedData.title,
-        contentLength: validatedData.content.length,
-        hashtagCount: validatedData.hashtags?.length || 0
-      }, req);
+      await storage.logUserActivity({
+        userId: userId,
+        action: "create_post",
+        details: JSON.stringify({
+          postId: newPost.id,
+          category: validatedData.category,
+          hasTitle: !!validatedData.title,
+          contentLength: validatedData.content.length,
+          hashtagCount: validatedData.hashtags?.length || 0
+        }),
+        ipAddress: req.ip || req.connection.remoteAddress || 'unknown',
+        userAgent: req.get('User-Agent') || 'unknown'
+      });
 
       // Get the post with author info
       const [postWithAuthor] = await db

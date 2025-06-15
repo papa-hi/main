@@ -3,12 +3,13 @@ import { Link, useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { ChevronLeft, Users, BarChart, ClipboardList, MapPin } from "lucide-react";
+import { ChevronLeft, Users, BarChart, ClipboardList, MapPin, TrendingUp } from "lucide-react";
 
 import UsersManagement from "@/components/admin/users-management";
 import DashboardStats from "@/components/admin/dashboard-stats";
 import ActivityLogs from "@/components/admin/activity-logs";
 import { PlacesManagement } from "@/components/admin/places-management";
+import { ActivityAnalytics } from "@/components/admin/activity-analytics";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -36,10 +37,14 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-4 max-w-2xl">
+        <TabsList className="grid grid-cols-5 max-w-3xl">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <BarChart className="h-4 w-4" />
             <span className="hidden sm:inline">Dashboard</span>
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            <span className="hidden sm:inline">Analytics</span>
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
@@ -57,6 +62,10 @@ export default function AdminPage() {
 
         <TabsContent value="dashboard" className="space-y-6">
           <DashboardStats />
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-6">
+          <ActivityAnalytics />
         </TabsContent>
 
         <TabsContent value="users" className="space-y-6">
