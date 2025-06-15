@@ -1,9 +1,18 @@
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Heart } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
+import { Heart, Reply, Send } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { apiRequest } from '@/lib/queryClient';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
 
 interface Comment {
   id: number;
@@ -31,8 +40,181 @@ interface CommentsDisplayProps {
   onReaction?: (commentId: number) => void;
 }
 
+const replySchema = z.object({
+  content: z.string().min(1, 'Reply is required').max(1000, 'Reply is too long'),
+  parentCommentId: z.number(),
+});
+
 function getUserInitials(user: { firstName: string; lastName: string }) {
   return `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase();
+}
+
+// Helper function to highlight @mentions in text
+function highlightMentions(text: string) {
+  const mentionRegex = /@(\w+)/g;
+  return text.replace(mentionRegex, '<span class="text-blue-600 font-medium">@$1</span>');
+}
+
+function CommentItem({ comment, postId, onReaction, depth = 0 }: { 
+  comment: Comment; 
+  postId: number; 
+  onReaction?: (commentId: number) => void;
+  depth?: number;
+}) {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [showReplyForm, setShowReplyForm] = useState(false);
+
+  const replyForm = useForm<z.infer<typeof replySchema>>({
+    resolver: zodResolver(replySchema),
+    defaultValues: {
+      content: '',
+      parentCommentId: comment.id,
+    },
+  });
+
+  // Create reply mutation
+  const createReplyMutation = useMutation({
+    mutationFn: (data: z.infer<typeof replySchema>) =>
+      apiRequest('POST', `/api/community/posts/${postId}/comments`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/community/posts', postId, 'comments'] });
+      setShowReplyForm(false);
+      replyForm.reset();
+      toast({
+        title: t('community.replyCreated', 'Reply posted!'),
+        description: t('community.replyCreatedDesc', 'Your reply has been added to the conversation.'),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('common.error', 'Error'),
+        description: error?.message || t('community.replyError', 'Failed to post reply. Please try again.'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const onSubmitReply = (data: z.infer<typeof replySchema>) => {
+    createReplyMutation.mutate(data);
+  };
+
+  const maxDepth = 3; // Limit nesting depth to avoid layout issues
+
+  return (
+    <div className={`${depth > 0 ? 'ml-8 mt-3' : ''}`}>
+      <div className="flex gap-3">
+        <Avatar className="h-8 w-8 flex-shrink-0">
+          <AvatarImage src={comment.author?.profileImage || undefined} />
+          <AvatarFallback>
+            {comment.author ? getUserInitials(comment.author) : 'U'}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <div className="bg-gray-50 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-semibold text-sm">
+                {comment.author?.firstName} {comment.author?.lastName}
+              </span>
+              <span className="text-xs text-blue-600">@{comment.author?.username}</span>
+              <span className="text-xs text-gray-500">
+                {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+              </span>
+              {comment.isEdited && (
+                <span className="text-xs text-gray-400">({t('community.edited', 'edited')})</span>
+              )}
+            </div>
+            <div 
+              className="text-sm"
+              dangerouslySetInnerHTML={{ __html: highlightMentions(comment.content) }}
+            />
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onReaction?.(comment.id)}
+              className="text-xs text-gray-500 hover:text-red-600 h-6 px-2"
+            >
+              <Heart className="h-3 w-3 mr-1" />
+              {comment._count?.reactions || 0}
+            </Button>
+            {user && depth < maxDepth && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowReplyForm(!showReplyForm)}
+                className="text-xs text-gray-500 hover:text-blue-600 h-6 px-2"
+              >
+                <Reply className="h-3 w-3 mr-1" />
+                {t('community.reply', 'Reply')}
+              </Button>
+            )}
+          </div>
+
+          {/* Reply form */}
+          {showReplyForm && user && (
+            <div className="mt-3 ml-2">
+              <Form {...replyForm}>
+                <form onSubmit={replyForm.handleSubmit(onSubmitReply)} className="space-y-2">
+                  <FormField
+                    control={replyForm.control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Textarea
+                            placeholder={t('community.replyPlaceholder', 'Write a reply... Use @username to mention someone')}
+                            className="min-h-[60px] resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowReplyForm(false)}
+                    >
+                      {t('common.cancel', 'Cancel')}
+                    </Button>
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={createReplyMutation.isPending}
+                    >
+                      <Send className="h-3 w-3 mr-1" />
+                      {createReplyMutation.isPending ? t('common.posting', 'Posting...') : t('community.postReply', 'Post Reply')}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </div>
+          )}
+
+          {/* Nested replies */}
+          {comment.replies && comment.replies.length > 0 && (
+            <div className="mt-3">
+              {comment.replies.map((reply) => (
+                <CommentItem
+                  key={reply.id}
+                  comment={reply}
+                  postId={postId}
+                  onReaction={onReaction}
+                  depth={depth + 1}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function CommentsDisplay({ postId, onReaction }: CommentsDisplayProps) {
@@ -68,41 +250,12 @@ export function CommentsDisplay({ postId, onReaction }: CommentsDisplayProps) {
   return (
     <div className="space-y-4">
       {comments.map((comment: Comment) => (
-        <div key={comment.id} className="flex gap-3">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={comment.author?.profileImage || undefined} />
-            <AvatarFallback>
-              {comment.author ? getUserInitials(comment.author) : 'U'}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <div className="bg-gray-50 rounded-lg px-3 py-2">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-semibold text-sm">
-                  {comment.author?.firstName} {comment.author?.lastName}
-                </span>
-                <span className="text-xs text-gray-500">
-                  {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-                </span>
-                {comment.isEdited && (
-                  <span className="text-xs text-gray-400">({t('community.edited', 'edited')})</span>
-                )}
-              </div>
-              <p className="text-sm">{comment.content}</p>
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onReaction?.(comment.id)}
-                className="text-xs text-gray-500 hover:text-red-600 h-6 px-2"
-              >
-                <Heart className="h-3 w-3 mr-1" />
-                {comment._count?.reactions || 0}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <CommentItem
+          key={comment.id}
+          comment={comment}
+          postId={postId}
+          onReaction={onReaction}
+        />
       ))}
     </div>
   );

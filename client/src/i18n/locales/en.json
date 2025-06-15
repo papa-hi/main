@@ -749,7 +749,14 @@
     "comment": "Comment",
     "commentsLoading": "Loading comments...",
     "publishing": "Publishing...",
-    "publish": "Publish"
+    "publish": "Publish",
+    "reply": "Reply",
+    "replyCreated": "Reply posted!",
+    "replyCreatedDesc": "Your reply has been added to the conversation.",
+    "replyError": "Failed to post reply. Please try again.",
+    "replyPlaceholder": "Write a reply... Use @username to mention someone",
+    "postReply": "Post Reply",
+    "commentPlaceholder": "Write a comment... Use @username to mention someone"
   },
   "common": {
     "loading": "Loading...",

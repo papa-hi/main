@@ -2687,8 +2687,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
 
       // Build nested comment structure
-      const commentMap = new Map();
-      const rootComments = [];
+      const commentMap = new Map<number, any>();
+      const rootComments: any[] = [];
 
       // First pass: create map of all comments
       commentsWithCounts.forEach(comment => {
@@ -2718,12 +2718,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Helper function to extract mentions from text
   const extractMentions = (text: string): string[] => {
     const mentionRegex = /@(\w+)/g;
-    const mentions = [];
+    const mentions: string[] = [];
     let match;
     while ((match = mentionRegex.exec(text)) !== null) {
       mentions.push(match[1]); // Extract username without @
     }
-    return [...new Set(mentions)]; // Remove duplicates
+    return Array.from(new Set(mentions)); // Remove duplicates
   };
 
   // Helper function to create mention records
