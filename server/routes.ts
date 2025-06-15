@@ -2777,6 +2777,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create mentions if any
       await createMentions(validatedData.content, postId, newComment.id, userId);
 
+      // Send notifications
+      if (!validatedData.parentCommentId) {
+        // This is a top-level comment - notify the post author
+        const [post] = await db
+          .select({
+            authorId: communityPosts.userId,
+            title: communityPosts.title,
+          })
+          .from(communityPosts)
+          .where(eq(communityPosts.id, postId));
+
+        // Only send notification if the commenter is not the post author
+        if (post && post.authorId !== userId) {
+          const [commenter] = await db
+            .select({
+              firstName: users.firstName,
+              lastName: users.lastName,
+            })
+            .from(users)
+            .where(eq(users.id, userId));
+
+          if (commenter) {
+            await sendNotificationToUser(post.authorId, {
+              title: 'New comment on your post',
+              body: `${commenter.firstName} ${commenter.lastName} commented on "${post.title}"`,
+              icon: '/icon-192x192.png',
+              data: {
+                type: 'post_comment',
+                postId: postId,
+                commentId: newComment.id,
+              },
+            });
+          }
+        }
+      } else {
+        // This is a reply - notify the parent comment author
+        const [parentComment] = await db
+          .select({
+            authorId: communityComments.authorId,
+            content: communityComments.content,
+          })
+          .from(communityComments)
+          .where(eq(communityComments.id, validatedData.parentCommentId));
+
+        // Only send notification if the replier is not the parent comment author
+        if (parentComment && parentComment.authorId !== userId) {
+          const [replier] = await db
+            .select({
+              firstName: users.firstName,
+              lastName: users.lastName,
+            })
+            .from(users)
+            .where(eq(users.id, userId));
+
+          if (replier) {
+            // Get post title for context
+            const [post] = await db
+              .select({
+                title: communityPosts.title,
+              })
+              .from(communityPosts)
+              .where(eq(communityPosts.id, postId));
+
+            await sendNotificationToUser(parentComment.authorId, {
+              title: 'New reply to your comment',
+              body: `${replier.firstName} ${replier.lastName} replied to your comment${post ? ` on "${post.title}"` : ''}`,
+              icon: '/icon-192x192.png',
+              data: {
+                type: 'comment_reply',
+                postId: postId,
+                commentId: newComment.id,
+                parentCommentId: validatedData.parentCommentId,
+              },
+            });
+          }
+        }
+      }
+
       // Get the comment with author info
       const [commentWithAuthor] = await db
         .select({
