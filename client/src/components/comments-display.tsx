@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
-import { Heart, Reply, Send } from 'lucide-react';
+import { Heart, Reply, Send, Edit, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/use-auth';
@@ -114,6 +114,7 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const [mentionSuggestions, setMentionSuggestions] = useState<User[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>();
@@ -123,6 +124,13 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
     defaultValues: {
       content: '',
       parentCommentId: comment.id,
+    },
+  });
+
+  const editForm = useForm<z.infer<typeof replySchema>>({
+    resolver: zodResolver(replySchema),
+    defaultValues: {
+      content: comment.content,
     },
   });
 
@@ -143,6 +151,47 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
       toast({
         title: t('common.error', 'Error'),
         description: error?.message || t('community.replyError', 'Failed to post reply. Please try again.'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Edit comment mutation
+  const editCommentMutation = useMutation({
+    mutationFn: (data: { content: string }) =>
+      apiRequest('PATCH', `/api/community/comments/${comment.id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/community/posts', postId, 'comments'] });
+      setShowEditForm(false);
+      toast({
+        title: t('community.commentUpdated', 'Comment updated!'),
+        description: t('community.commentUpdatedDesc', 'Your comment has been updated.'),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('common.error', 'Error'),
+        description: error?.message || t('community.editError', 'Failed to update comment. Please try again.'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Delete comment mutation
+  const deleteCommentMutation = useMutation({
+    mutationFn: () =>
+      apiRequest('DELETE', `/api/community/comments/${comment.id}`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/community/posts', postId, 'comments'] });
+      toast({
+        title: t('community.commentDeleted', 'Comment deleted!'),
+        description: t('community.commentDeletedDesc', 'Your comment has been removed.'),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('common.error', 'Error'),
+        description: error?.message || t('community.deleteError', 'Failed to delete comment. Please try again.'),
         variant: 'destructive',
       });
     },
@@ -210,6 +259,16 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
     createReplyMutation.mutate(data);
   };
 
+  const onSubmitEdit = (data: z.infer<typeof replySchema>) => {
+    editCommentMutation.mutate({ content: data.content });
+  };
+
+  const handleDeleteComment = () => {
+    if (window.confirm(t('community.confirmDelete', 'Are you sure you want to delete this comment?'))) {
+      deleteCommentMutation.mutate();
+    }
+  };
+
   const maxDepth = 3; // Limit nesting depth to avoid layout issues
 
   return (
@@ -222,24 +281,83 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <div className="bg-gray-50 rounded-lg px-3 py-2">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-sm">
-                {comment.author?.firstName} {comment.author?.lastName}
-              </span>
-              <span className="text-xs text-blue-600">@{comment.author?.username}</span>
-              <span className="text-xs text-gray-500">
-                {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-              </span>
-              {comment.isEdited && (
-                <span className="text-xs text-gray-400">({t('community.edited', 'edited')})</span>
-              )}
+          {!showEditForm ? (
+            <div className="bg-gray-50 rounded-lg px-3 py-2">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-semibold text-sm">
+                  {comment.author?.firstName} {comment.author?.lastName}
+                </span>
+                <span className="text-xs text-blue-600">@{comment.author?.username}</span>
+                <span className="text-xs text-gray-500">
+                  {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                </span>
+                {comment.isEdited && (
+                  <span className="text-xs text-gray-400">({t('community.edited', 'edited')})</span>
+                )}
+              </div>
+              <div 
+                className="text-sm"
+                dangerouslySetInnerHTML={{ __html: highlightMentions(comment.content) }}
+              />
             </div>
-            <div 
-              className="text-sm"
-              dangerouslySetInnerHTML={{ __html: highlightMentions(comment.content) }}
-            />
-          </div>
+          ) : (
+            <div className="bg-gray-50 rounded-lg px-3 py-2">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-semibold text-sm">
+                  {comment.author?.firstName} {comment.author?.lastName}
+                </span>
+                <span className="text-xs text-blue-600">@{comment.author?.username}</span>
+                <span className="text-xs text-gray-500">{t('community.editing', 'Editing...')}</span>
+              </div>
+              <Form {...editForm}>
+                <form onSubmit={editForm.handleSubmit(onSubmitEdit)} className="space-y-2">
+                  <FormField
+                    control={editForm.control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Textarea
+                            placeholder={t('community.editPlaceholder', 'Edit your comment...')}
+                            className="min-h-[60px] resize-none"
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setShowEditForm(false);
+                        editForm.reset({ content: comment.content });
+                      }}
+                    >
+                      {t('common.cancel', 'Cancel')}
+                    </Button>
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={editCommentMutation.isPending}
+                    >
+                      {editCommentMutation.isPending ? (
+                        <>{t('community.updating', 'Updating...')}</>
+                      ) : (
+                        <>
+                          <Send className="h-3 w-3 mr-1" />
+                          {t('community.update', 'Update')}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </div>
+          )}
           <div className="flex items-center gap-2 mt-1">
             <Button
               variant="ghost"
@@ -260,6 +378,28 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
                 <Reply className="h-3 w-3 mr-1" />
                 {t('community.reply', 'Reply')}
               </Button>
+            )}
+            {user && user.id === comment.author?.id && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowEditForm(!showEditForm)}
+                  className="text-xs text-gray-500 hover:text-blue-600 h-6 px-2"
+                >
+                  <Edit className="h-3 w-3 mr-1" />
+                  {t('community.edit', 'Edit')}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDeleteComment()}
+                  className="text-xs text-gray-500 hover:text-red-600 h-6 px-2"
+                >
+                  <Trash2 className="h-3 w-3 mr-1" />
+                  {t('community.delete', 'Delete')}
+                </Button>
+              </>
             )}
           </div>
 
