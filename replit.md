@@ -123,6 +123,13 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 
 ## Recent Changes
 
+### June 15, 2025 - Advanced User Activity Analytics System
+- **Comprehensive Activity Tracking**: Detailed logging of all user interactions including post creation, comments, replies, and content engagement
+- **Real-time Analytics Dashboard**: Visual charts showing activity trends, user behavior patterns, and engagement metrics
+- **Advanced Statistics**: Activity breakdowns by day, top user actions, most active users, and detailed behavioral insights
+- **Admin Analytics Interface**: Interactive dashboard with multiple chart types (line, bar, pie) for comprehensive data visualization
+- **User Behavior Monitoring**: Complete tracking of user journeys with IP addresses, user agents, and detailed action context
+
 ### June 15, 2025 - Comprehensive Notification System
 - **Mention Notifications**: Users receive push notifications when mentioned with @username in posts, comments, or edited content
 - **Comment Notifications**: Post authors receive notifications when someone comments on their posts

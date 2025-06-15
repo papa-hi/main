@@ -2849,6 +2849,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create mentions if any
       await createMentions(validatedData.content, postId, newComment.id, userId);
 
+      // Log user activity
+      await storage.logUserActivity({
+        userId: userId,
+        action: validatedData.parentCommentId ? "reply_to_comment" : "create_comment",
+        details: JSON.stringify({
+          commentId: newComment.id,
+          postId: validatedData.postId,
+          parentCommentId: validatedData.parentCommentId,
+          contentLength: validatedData.content.length,
+          hasParent: !!validatedData.parentCommentId
+        }),
+        ipAddress: req.ip || req.connection.remoteAddress || 'unknown',
+        userAgent: req.get('User-Agent') || 'unknown'
+      });
+
       // Send notifications
       if (!validatedData.parentCommentId) {
         // This is a top-level comment - notify the post author
