@@ -8,7 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
-import { Heart, Reply, Send, Edit, Trash2 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Heart, Reply, Send, Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/use-auth';
@@ -358,51 +359,51 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
               </Form>
             </div>
           )}
-          <div className="flex items-center flex-wrap gap-1 sm:gap-2 mt-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onReaction?.(comment.id)}
-              className="text-xs text-gray-500 hover:text-red-600 h-6 px-1 sm:px-2"
-            >
-              <Heart className="h-3 w-3 mr-0.5 sm:mr-1" />
-              {comment._count?.reactions || 0}
-            </Button>
-            {user && depth < maxDepth && (
+          <div className="flex items-center justify-between mt-1">
+            <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setShowReplyForm(!showReplyForm)}
-                className="text-xs text-gray-500 hover:text-blue-600 h-6 px-1 sm:px-2"
+                onClick={() => onReaction?.(comment.id)}
+                className="text-xs text-gray-500 hover:text-red-600 h-6 px-2"
               >
-                <Reply className="h-3 w-3 mr-0.5 sm:mr-1" />
-                <span className="hidden sm:inline">{t('community.reply', 'Reply')}</span>
-                <span className="sm:hidden">Reply</span>
+                <Heart className="h-3 w-3 mr-1" />
+                {comment._count?.reactions || 0}
               </Button>
-            )}
+              {user && depth < maxDepth && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowReplyForm(!showReplyForm)}
+                  className="text-xs text-gray-500 hover:text-blue-600 h-6 px-2"
+                >
+                  <Reply className="h-3 w-3 mr-1" />
+                  {t('community.reply', 'Reply')}
+                </Button>
+              )}
+            </div>
             {user && user.id === comment.author?.id && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowEditForm(!showEditForm)}
-                  className="text-xs text-gray-500 hover:text-blue-600 h-6 px-1 sm:px-2"
-                >
-                  <Edit className="h-3 w-3 mr-0.5 sm:mr-1" />
-                  <span className="hidden sm:inline">{t('community.edit', 'Edit')}</span>
-                  <span className="sm:hidden">Edit</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteComment()}
-                  className="text-xs text-gray-500 hover:text-red-600 h-6 px-1 sm:px-2"
-                >
-                  <Trash2 className="h-3 w-3 mr-0.5 sm:mr-1" />
-                  <span className="hidden sm:inline">{t('community.delete', 'Delete')}</span>
-                  <span className="sm:hidden">Del</span>
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-gray-500 hover:text-gray-700 h-6 w-6 p-0"
+                  >
+                    <MoreHorizontal className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-32">
+                  <DropdownMenuItem onClick={() => setShowEditForm(!showEditForm)}>
+                    <Edit className="h-3 w-3 mr-2" />
+                    {t('community.edit', 'Edit')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDeleteComment()} className="text-red-600">
+                    <Trash2 className="h-3 w-3 mr-2" />
+                    {t('community.delete', 'Delete')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
 
