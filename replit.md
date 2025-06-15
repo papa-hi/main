@@ -121,21 +121,32 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 - **Admin Logs**: Audit trail for administrative actions
 - **Performance**: Query optimization and response monitoring
 
+## Recent Changes
+
+### June 15, 2025 - Comprehensive Notification System
+- **Mention Notifications**: Users receive push notifications when mentioned with @username in posts, comments, or edited content
+- **Comment Notifications**: Post authors receive notifications when someone comments on their posts
+- **Reply Notifications**: Users receive notifications when someone replies to their comments
+- **Smart Filtering**: Prevents self-notifications when users interact with their own content
+- **Context-Rich Messages**: Notifications include relevant context like post titles and commenter names
+
+### Community Features Completion
+- **Nested Comments**: Up to 3 levels of comment threading with reply functionality
+- **@Username Mentions**: Automatic detection, database storage, and blue text highlighting
+- **Autocomplete Suggestions**: Dropdown menu with user avatars, usernames, and full names during mention typing
+- **Real-time User Search**: Integrated search functionality for mention suggestions
+- **Edit/Delete System**: Complete post and comment editing with proper user permissions
+
+### GDPR & Internationalization
+- **Multi-language Support**: Full translations across 5 languages (English, Dutch, German, French, Spanish)
+- **GDPR Compliance**: Comprehensive privacy implementation with multilingual support
+- **Company Details**: Updated to Haarlem, Netherlands with contact email papa@papa-hi.com
+
 ## Changelog
 
-- June 14, 2025: Initial setup
-- June 14, 2025: Completed comprehensive GDPR compliance implementation with multilingual support across 5 languages (English, Dutch, German, French, Spanish)
-- June 14, 2025: Updated company information to Haarlem, Netherlands with contact email papa@papa-hi.com throughout all privacy features and translations
-- June 14, 2025: Fixed critical community publish button bug by correcting apiRequest parameter order in all mutations
-- June 14, 2025: Implemented comprehensive multilingual support for community features with full English and Dutch translations
-- June 14, 2025: Resolved category translation mapping issue - categories now display properly translated text instead of objects throughout community interface
-- June 14, 2025: Implemented complete edit/delete functionality for posts and comments with proper user permissions and multilingual support
-- June 15, 2025: Completed nested comments system with up to 3 levels of threading and reply functionality
-- June 15, 2025: Implemented @username mention system with automatic detection, database storage, and blue text highlighting
-- June 15, 2025: Added @username autocomplete suggestions with dropdown menu showing user avatars, usernames, and full names
-- June 15, 2025: Created community_mentions table and integrated real-time user search for mention functionality
-- June 15, 2025: Implemented complete mention notification system - users receive push notifications when mentioned in posts, comments, or edited content
-- June 15, 2025: Added comprehensive post and comment notification system including mention notifications, comment notifications, and reply notifications
+- June 14, 2025: Initial setup and GDPR compliance implementation
+- June 14, 2025: Fixed critical community publish button bug and implemented multilingual support
+- June 15, 2025: Completed advanced community features with notification system
 
 ## User Preferences
 
