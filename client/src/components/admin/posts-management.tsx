@@ -39,15 +39,15 @@ export default function PostsManagement() {
 
   const { data: posts, isLoading, error } = useQuery({
     queryKey: ["/api/admin/posts"],
-    queryFn: () => apiRequest("/api/admin/posts")
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/admin/posts");
+      return response.json();
+    }
   });
 
   const deletePostMutation = useMutation({
     mutationFn: async ({ postId, reason }: { postId: number; reason: string }) => {
-      return apiRequest(`/api/admin/posts/${postId}`, {
-        method: "DELETE",
-        body: { reason }
-      });
+      return apiRequest("DELETE", `/api/admin/posts/${postId}`, { reason });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/posts"] });
