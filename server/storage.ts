@@ -10,10 +10,11 @@ import {
   PageView, InsertPageView, pageViews,
   FeatureUsage, InsertFeatureUsage, featureUsage,
   AdminLog, InsertAdminLog, adminLogs,
-  Rating, InsertRating, ratings
+  Rating, InsertRating, ratings,
+  communityPosts, communityComments, communityReactions
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not, inArray } from "drizzle-orm";
+import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not, inArray, like, or } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -84,6 +85,11 @@ export interface IStorage {
   createChat(participants: number[]): Promise<Chat>;
   getChatMessages(chatId: number, limit?: number, offset?: number): Promise<ChatMessage[]>;
   sendMessage(chatId: number, senderId: number, content: string): Promise<ChatMessage>;
+  
+  // Community posts methods
+  getCommunityPosts(options?: { limit?: number; offset?: number }): Promise<any[]>;
+  getCommunityPostById(postId: number): Promise<any | undefined>;
+  deleteCommunityPost(postId: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -2480,6 +2486,102 @@ export class DatabaseStorage implements IStorage {
       );
     
     return result.rowCount ? result.rowCount > 0 : true;
+  }
+
+  // Community posts methods
+  async getCommunityPosts(options?: { limit?: number; offset?: number }): Promise<any[]> {
+    const limit = options?.limit || 100;
+    const offset = options?.offset || 0;
+
+    const posts = await db
+      .select({
+        id: communityPosts.id,
+        userId: communityPosts.userId,
+        title: communityPosts.title,
+        content: communityPosts.content,
+        category: communityPosts.category,
+        hashtags: communityPosts.hashtags,
+        isEdited: communityPosts.isEdited,
+        createdAt: communityPosts.createdAt,
+        updatedAt: communityPosts.updatedAt,
+        author: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage,
+          username: users.username,
+        },
+      })
+      .from(communityPosts)
+      .leftJoin(users, eq(communityPosts.userId, users.id))
+      .orderBy(desc(communityPosts.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    // Get comment and reaction counts for each post
+    const postsWithCounts = await Promise.all(
+      posts.map(async (post) => {
+        const [commentCount] = await db
+          .select({ count: count() })
+          .from(communityComments)
+          .where(eq(communityComments.postId, post.id));
+
+        const [reactionCount] = await db
+          .select({ count: count() })
+          .from(communityReactions)
+          .where(eq(communityReactions.postId, post.id));
+
+        return {
+          ...post,
+          _count: {
+            comments: commentCount.count,
+            reactions: reactionCount.count,
+          },
+        };
+      })
+    );
+
+    return postsWithCounts;
+  }
+
+  async getCommunityPostById(postId: number): Promise<any | undefined> {
+    const [post] = await db
+      .select({
+        id: communityPosts.id,
+        userId: communityPosts.userId,
+        title: communityPosts.title,
+        content: communityPosts.content,
+        category: communityPosts.category,
+        hashtags: communityPosts.hashtags,
+        isEdited: communityPosts.isEdited,
+        createdAt: communityPosts.createdAt,
+        updatedAt: communityPosts.updatedAt,
+        author: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage,
+          username: users.username,
+        },
+      })
+      .from(communityPosts)
+      .leftJoin(users, eq(communityPosts.userId, users.id))
+      .where(eq(communityPosts.id, postId));
+
+    return post || undefined;
+  }
+
+  async deleteCommunityPost(postId: number): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(communityPosts)
+        .where(eq(communityPosts.id, postId));
+
+      return result.rowCount ? result.rowCount > 0 : false;
+    } catch (error) {
+      console.error("Error deleting community post:", error);
+      return false;
+    }
   }
 }
 
