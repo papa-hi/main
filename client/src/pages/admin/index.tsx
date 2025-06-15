@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { ChevronLeft, Users, BarChart, ClipboardList, MapPin, TrendingUp, FileText } from "lucide-react";
+import { ChevronLeft, Users, BarChart, ClipboardList, MapPin, TrendingUp, FileText, Mail } from "lucide-react";
 
 import UsersManagement from "@/components/admin/users-management";
 import DashboardStats from "@/components/admin/dashboard-stats";
@@ -11,6 +11,7 @@ import ActivityLogs from "@/components/admin/activity-logs";
 import { PlacesManagement } from "@/components/admin/places-management";
 import PostsManagement from "@/components/admin/posts-management";
 import { ActivityAnalytics } from "@/components/admin/activity-analytics";
+import { ProfileReminders } from "@/components/admin/profile-reminders";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -38,7 +39,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-6 max-w-4xl">
+        <TabsList className="grid grid-cols-7 max-w-5xl">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <BarChart className="h-4 w-4" />
             <span className="hidden sm:inline">Dashboard</span>
@@ -62,6 +63,10 @@ export default function AdminPage() {
           <TabsTrigger value="activity" className="flex items-center gap-2">
             <ClipboardList className="h-4 w-4" />
             <span className="hidden sm:inline">Activity</span>
+          </TabsTrigger>
+          <TabsTrigger value="reminders" className="flex items-center gap-2">
+            <Mail className="h-4 w-4" />
+            <span className="hidden sm:inline">Reminders</span>
           </TabsTrigger>
         </TabsList>
 
@@ -87,6 +92,10 @@ export default function AdminPage() {
 
         <TabsContent value="activity" className="space-y-6">
           <ActivityLogs />
+        </TabsContent>
+
+        <TabsContent value="reminders" className="space-y-6">
+          <ProfileReminders />
         </TabsContent>
       </Tabs>
     </div>

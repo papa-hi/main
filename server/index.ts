@@ -123,5 +123,12 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Start the weekly profile reminder scheduler
+    if (process.env.NODE_ENV === "production") {
+      const { weeklyScheduler } = require("./weekly-scheduler");
+      weeklyScheduler.start();
+      log("Weekly profile reminder scheduler started");
+    }
   });
 })();
