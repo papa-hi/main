@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
@@ -35,6 +35,14 @@ interface Comment {
   };
 }
 
+interface User {
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  profileImage: string | null;
+}
+
 interface CommentsDisplayProps {
   postId: number;
   onReaction?: (commentId: number) => void;
@@ -47,6 +55,47 @@ const replySchema = z.object({
 
 function getUserInitials(user: { firstName: string; lastName: string }) {
   return `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase();
+}
+
+// Mention suggestion component
+function MentionSuggestions({ 
+  suggestions, 
+  onSelect, 
+  visible, 
+  position 
+}: {
+  suggestions: User[];
+  onSelect: (username: string) => void;
+  visible: boolean;
+  position: { top: number; left: number };
+}) {
+  if (!visible || suggestions.length === 0) return null;
+
+  return (
+    <div 
+      className="absolute z-50 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto min-w-[200px]"
+      style={{ top: position.top, left: position.left }}
+    >
+      {suggestions.map((user) => (
+        <button
+          key={user.id}
+          className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 border-b border-gray-100 last:border-b-0"
+          onClick={() => onSelect(user.username)}
+        >
+          <Avatar className="h-6 w-6">
+            <AvatarImage src={user.profileImage || undefined} />
+            <AvatarFallback className="text-xs">
+              {getUserInitials({ firstName: user.firstName, lastName: user.lastName })}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="font-medium text-sm">@{user.username}</div>
+            <div className="text-xs text-gray-500">{user.firstName} {user.lastName}</div>
+          </div>
+        </button>
+      ))}
+    </div>
+  );
 }
 
 // Helper function to highlight @mentions in text
