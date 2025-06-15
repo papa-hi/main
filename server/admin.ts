@@ -323,4 +323,43 @@ export function setupAdminRoutes(app: Express) {
       res.status(500).json({ error: "Failed to delete place" });
     }
   });
+
+  // Admin community post management
+  app.get('/api/admin/posts', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const posts = await storage.getCommunityPosts({ limit: 100 });
+      await logAdminAction("View community posts", { postCount: posts.length }, req);
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching admin posts:", error);
+      res.status(500).json({ error: "Failed to fetch posts" });
+    }
+  });
+
+  app.delete('/api/admin/posts/:postId', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const postId = parseInt(req.params.postId);
+      const post = await storage.getCommunityPostById(postId);
+      
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+
+      const success = await storage.deleteCommunityPost(postId);
+      if (success) {
+        await logAdminAction("Delete harmful post", { 
+          postId, 
+          postTitle: post.title,
+          authorId: post.userId,
+          reason: req.body.reason || "Harmful content removal"
+        }, req);
+        res.json({ success: true });
+      } else {
+        res.status(500).json({ error: "Failed to delete post" });
+      }
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      res.status(500).json({ error: "Failed to delete post" });
+    }
+  });
 }
