@@ -150,9 +150,9 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
 
   // Search users for mentions
   const searchUsers = async (query: string): Promise<User[]> => {
-    if (query.length < 2) return [];
+    if (query.length < 1) return [];
     try {
-      const response = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`/api/users/search?query=${encodeURIComponent(query)}`);
       if (response.ok) {
         const users = await response.json();
         return users.slice(0, 5); // Limit to 5 suggestions
