@@ -745,50 +745,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         offset 
       } = req.query;
       
-      // Convert query parameters to the right format
-      const searchParams: any = {};
+      let searchQuery = query as string;
+      console.log("Search query:", searchQuery);
       
-      if (query) {
-        searchParams.searchQuery = query as string;
+      // If no query provided, return empty array to avoid returning all users
+      if (!searchQuery || searchQuery.trim() === '') {
+        return res.json([]);
       }
       
-      if (city) {
-        searchParams.city = city as string;
-      }
+      // Get all users first
+      const allUsers = await storage.getAllUsers({});
       
-      // Handle child age range if both min and max are provided
-      if (childMinAge && childMaxAge) {
-        const minAge = parseInt(childMinAge as string);
-        const maxAge = parseInt(childMaxAge as string);
+      // Filter users based on username, firstName, or lastName matching the query
+      const filteredUsers = allUsers.filter(user => {
+        const lowerQuery = searchQuery.toLowerCase();
+        const username = user.username?.toLowerCase() || '';
+        const firstName = user.firstName?.toLowerCase() || '';
+        const lastName = user.lastName?.toLowerCase() || '';
         
-        if (!isNaN(minAge) && !isNaN(maxAge)) {
-          searchParams.childAgeRange = [minAge, maxAge];
-        }
-      }
+        return username.includes(lowerQuery) || 
+               firstName.includes(lowerQuery) || 
+               lastName.includes(lowerQuery) ||
+               `${firstName} ${lastName}`.includes(lowerQuery);
+      });
       
-      // Handle pagination
+      // Apply limit if specified
+      let limitValue = 10; // Default limit
       if (limit) {
         const parsedLimit = parseInt(limit as string);
-        if (!isNaN(parsedLimit)) {
-          searchParams.limit = parsedLimit;
+        if (!isNaN(parsedLimit) && parsedLimit > 0) {
+          limitValue = parsedLimit;
         }
       }
       
-      if (offset) {
-        const parsedOffset = parseInt(offset as string);
-        if (!isNaN(parsedOffset)) {
-          searchParams.offset = parsedOffset;
-        }
-      }
-      
-      const users = await storage.getAllUsers(searchParams);
+      const limitedUsers = filteredUsers.slice(0, limitValue);
       
       // Remove sensitive information
-      const sanitizedUsers = users.map(user => {
+      const sanitizedUsers = limitedUsers.map(user => {
         const { password, email, phoneNumber, ...rest } = user;
         return rest;
       });
       
+      console.log(`Found ${sanitizedUsers.length} users matching query: ${searchQuery}`);
       res.json(sanitizedUsers);
     } catch (error) {
       console.error("Error searching users:", error);
