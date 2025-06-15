@@ -22,6 +22,13 @@ interface WelcomeEmailData {
   username: string;
 }
 
+interface ProfileReminderEmailData {
+  to: string;
+  firstName: string;
+  username: string;
+  missingFields: string[];
+}
+
 export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmailData): Promise<boolean> {
   try {
     const resendClient = getResendClient();
@@ -413,4 +420,202 @@ export async function sendTestEmail(to: string): Promise<boolean> {
     console.error('Failed to send test email:', error);
     return false;
   }
+}
+
+export async function sendProfileReminderEmail({ to, firstName, username, missingFields }: ProfileReminderEmailData): Promise<boolean> {
+  try {
+    const resendClient = getResendClient();
+    
+    if (!resendClient) {
+      console.warn('RESEND_API_KEY is not configured - skipping profile reminder email');
+      console.log(`Profile reminder email would be sent to: ${to}`);
+      console.log('Subject: Complete Your PaPa-Hi Profile 📝');
+      console.log('Content: Reminder to complete profile fields');
+      return true;
+    }
+
+    console.log(`Sending profile reminder email to: ${to}`);
+
+    const { data, error } = await resendClient.emails.send({
+      from: 'PaPa-Hi <papa@papa-hi.com>',
+      to: [to],
+      subject: 'Complete Your PaPa-Hi Profile 📝',
+      html: generateProfileReminderEmailHTML(firstName, username, missingFields),
+      text: generateProfileReminderEmailText(firstName, username, missingFields),
+      headers: {
+        'X-Entity-Ref-ID': `profile-reminder-${Date.now()}`,
+        'X-Priority': '3',
+        'Importance': 'normal'
+      }
+    });
+
+    if (error) {
+      console.error('Profile reminder email error:', error);
+      return false;
+    }
+
+    console.log('Profile reminder email sent successfully:', data?.id);
+    return true;
+  } catch (error) {
+    console.error('Failed to send profile reminder email:', error);
+    return false;
+  }
+}
+
+function generateProfileReminderEmailHTML(firstName: string, username: string, missingFields: string[]): string {
+  const fieldLabels: Record<string, string> = {
+    'profileImage': 'Profile Photo',
+    'bio': 'Bio/About Me',
+    'city': 'City/Location',
+    'phoneNumber': 'Phone Number',
+    'childrenInfo': 'Children Information'
+  };
+
+  const missingFieldsList = missingFields.map(field => fieldLabels[field] || field).join(', ');
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Complete Your Profile</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+        body {
+          font-family: 'Varela Round', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #f8f9fa;
+        }
+        .container {
+          background-color: white;
+          border-radius: 12px;
+          padding: 40px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 30px;
+        }
+        .logo {
+          font-family: 'Varela Round', sans-serif;
+          font-size: 32px;
+          font-weight: bold;
+          color: #FF6B35;
+          margin-bottom: 10px;
+        }
+        .cta-button {
+          display: inline-block;
+          background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+          color: white;
+          text-decoration: none;
+          padding: 15px 30px;
+          border-radius: 8px;
+          font-weight: bold;
+          margin: 20px 0;
+          transition: transform 0.2s;
+        }
+        .missing-fields {
+          background-color: #fff3cd;
+          border: 1px solid #ffeaa7;
+          border-radius: 8px;
+          padding: 15px;
+          margin: 20px 0;
+        }
+        .footer { margin-top: 30px; text-align: center; color: #666; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <div class="logo">PaPa-Hi</div>
+          <h1>Complete Your Profile</h1>
+        </div>
+        
+        <p>Hi ${firstName},</p>
+        
+        <p>We noticed your PaPa-Hi profile is missing some important information. A complete profile helps other fathers connect with you and makes it easier to organize playdates!</p>
+        
+        <div class="missing-fields">
+          <strong>Missing Information:</strong><br>
+          ${missingFieldsList}
+        </div>
+        
+        <p>Why complete your profile?</p>
+        <ul>
+          <li>🤝 <strong>Better Connections:</strong> Other parents can learn about you and your family</li>
+          <li>📅 <strong>More Playdates:</strong> Complete profiles get more playdate invitations</li>
+          <li>🏆 <strong>Trust & Safety:</strong> Complete profiles build trust in our community</li>
+          <li>📍 <strong>Local Matches:</strong> Help us connect you with nearby families</li>
+        </ul>
+        
+        <div style="text-align: center;">
+          <a href="https://papa-hi.com/profile" class="cta-button">Complete My Profile</a>
+        </div>
+        
+        <p>It only takes 2 minutes to complete your profile. Once done, you can:</p>
+        <ul>
+          <li>Browse and join exciting playdates</li>
+          <li>Create your own family activities</li>
+          <li>Connect with like-minded fathers</li>
+          <li>Discover family-friendly places</li>
+        </ul>
+        
+        <p>Thanks for being part of the PaPa-Hi community!</p>
+        
+        <p>Best regards,<br>The PaPa-Hi Team</p>
+        
+        <div class="footer">
+          <p>PaPa-Hi - Connecting Fathers, Building Communities</p>
+          <p>If you don't want to receive these reminders, <a href="https://papa-hi.com/unsubscribe">unsubscribe here</a></p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function generateProfileReminderEmailText(firstName: string, username: string, missingFields: string[]): string {
+  const fieldLabels: Record<string, string> = {
+    'profileImage': 'Profile Photo',
+    'bio': 'Bio/About Me',
+    'city': 'City/Location',
+    'phoneNumber': 'Phone Number',
+    'childrenInfo': 'Children Information'
+  };
+
+  const missingFieldsList = missingFields.map(field => fieldLabels[field] || field).join(', ');
+
+  return `
+PaPa-Hi - Complete Your Profile
+
+Hi ${firstName},
+
+We noticed your PaPa-Hi profile is missing some important information: ${missingFieldsList}
+
+A complete profile helps other fathers connect with you and makes it easier to organize playdates!
+
+Why complete your profile?
+• Better Connections: Other parents can learn about you and your family
+• More Playdates: Complete profiles get more playdate invitations  
+• Trust & Safety: Complete profiles build trust in our community
+• Local Matches: Help us connect you with nearby families
+
+Complete your profile here: https://papa-hi.com/profile
+
+It only takes 2 minutes! Once done, you can browse playdates, create activities, and connect with other fathers.
+
+Thanks for being part of the PaPa-Hi community!
+
+Best regards,
+The PaPa-Hi Team
+
+---
+PaPa-Hi - Connecting Fathers, Building Communities
+Unsubscribe: https://papa-hi.com/unsubscribe
+  `.trim();
 }

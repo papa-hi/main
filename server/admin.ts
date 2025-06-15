@@ -362,4 +362,68 @@ export function setupAdminRoutes(app: Express) {
       res.status(500).json({ error: "Failed to delete post" });
     }
   });
+
+  // Profile reminder system endpoints
+  app.get('/api/admin/profile-reminders/status', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { weeklyScheduler } = await import('./weekly-scheduler');
+      const status = weeklyScheduler.getStatus();
+      await logAdminAction("Check profile reminder status", status, req);
+      res.json(status);
+    } catch (error) {
+      console.error("Error getting scheduler status:", error);
+      res.status(500).json({ error: "Failed to get scheduler status" });
+    }
+  });
+
+  app.get('/api/admin/profile-reminders/check', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { findUsersWithIncompleteProfiles } = await import('./profile-reminder-scheduler');
+      const incompleteUsers = await findUsersWithIncompleteProfiles();
+      
+      await logAdminAction("Check incomplete profiles", { 
+        totalIncomplete: incompleteUsers.length 
+      }, req);
+      
+      res.json({
+        totalIncomplete: incompleteUsers.length,
+        users: incompleteUsers.map(user => ({
+          id: user.id,
+          firstName: user.firstName,
+          username: user.username,
+          email: user.email,
+          missingFields: user.missingFields
+        }))
+      });
+    } catch (error) {
+      console.error("Error checking incomplete profiles:", error);
+      res.status(500).json({ error: "Failed to check incomplete profiles" });
+    }
+  });
+
+  app.post('/api/admin/profile-reminders/send', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { weeklyScheduler } = await import('./weekly-scheduler');
+      
+      // Run the reminders in the background
+      weeklyScheduler.forceRun().then(() => {
+        console.log('Manual profile reminders completed');
+      }).catch((error) => {
+        console.error('Error in manual profile reminders:', error);
+      });
+
+      await logAdminAction("Trigger profile reminders", { 
+        triggeredBy: "manual",
+        timestamp: new Date().toISOString()
+      }, req);
+      
+      res.json({ 
+        success: true, 
+        message: "Profile reminders are being sent in the background" 
+      });
+    } catch (error) {
+      console.error("Error triggering profile reminders:", error);
+      res.status(500).json({ error: "Failed to trigger profile reminders" });
+    }
+  });
 }
