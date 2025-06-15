@@ -272,9 +272,9 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
   const maxDepth = 3; // Limit nesting depth to avoid layout issues
 
   return (
-    <div className={`${depth > 0 ? 'ml-8 mt-3' : ''}`}>
-      <div className="flex gap-3">
-        <Avatar className="h-8 w-8 flex-shrink-0">
+    <div className={`${depth > 0 ? 'ml-4 sm:ml-8 mt-3 pl-3 sm:pl-0 border-l-2 border-gray-200' : ''}`}>
+      <div className="flex gap-2 sm:gap-3">
+        <Avatar className={`${depth > 0 ? 'h-6 w-6' : 'h-8 w-8'} flex-shrink-0`}>
           <AvatarImage src={comment.author?.profileImage || undefined} />
           <AvatarFallback>
             {comment.author ? getUserInitials(comment.author) : 'U'}
@@ -282,9 +282,9 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
         </Avatar>
         <div className="flex-1 min-w-0">
           {!showEditForm ? (
-            <div className="bg-gray-50 rounded-lg px-3 py-2">
+            <div className={`${depth > 0 ? 'bg-blue-50 border-l-2 border-blue-200' : 'bg-gray-50'} rounded-lg px-3 py-2`}>
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-semibold text-sm">
+                <span className={`font-semibold ${depth > 0 ? 'text-xs' : 'text-sm'}`}>
                   {comment.author?.firstName} {comment.author?.lastName}
                 </span>
                 <span className="text-xs text-blue-600">@{comment.author?.username}</span>
