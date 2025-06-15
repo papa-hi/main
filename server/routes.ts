@@ -2600,6 +2600,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .values(validatedData)
         .returning();
 
+      // Handle mentions in the post content
+      await createMentions(validatedData.content, newPost.id, null, userId);
+
       // Get the post with author info
       const [postWithAuthor] = await db
         .select({
@@ -2731,7 +2734,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     // Find users by username
     const mentionedUsers = await db
-      .select({ id: users.id, username: users.username })
+      .select({ 
+        id: users.id, 
+        username: users.username,
+        firstName: users.firstName,
+        lastName: users.lastName 
+      })
       .from(users)
       .where(inArray(users.username, usernames));
 
@@ -2745,6 +2753,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     if (mentionRecords.length > 0) {
       await db.insert(communityMentions).values(mentionRecords);
+    }
+
+    // Send notifications to mentioned users
+    if (mentionedUsers.length > 0) {
+      // Get the person who made the mention
+      const [mentioner] = await db
+        .select({
+          firstName: users.firstName,
+          lastName: users.lastName,
+        })
+        .from(users)
+        .where(eq(users.id, mentioningUserId));
+
+      if (mentioner) {
+        // Get context (post title or comment content)
+        let contextInfo = '';
+        if (commentId) {
+          // This is a mention in a comment
+          const [post] = await db
+            .select({ title: communityPosts.title })
+            .from(communityPosts)
+            .where(eq(communityPosts.id, postId));
+          contextInfo = post ? ` in a comment on "${post.title}"` : ' in a comment';
+        } else {
+          // This is a mention in a post
+          const [post] = await db
+            .select({ title: communityPosts.title })
+            .from(communityPosts)
+            .where(eq(communityPosts.id, postId));
+          contextInfo = post ? ` in "${post.title}"` : ' in a post';
+        }
+
+        // Send notification to each mentioned user (but not to themselves)
+        for (const mentionedUser of mentionedUsers) {
+          if (mentionedUser.id !== mentioningUserId) {
+            await sendNotificationToUser(mentionedUser.id, {
+              title: 'You were mentioned!',
+              body: `${mentioner.firstName} ${mentioner.lastName} mentioned you${contextInfo}`,
+              icon: '/icon-192x192.png',
+              data: {
+                type: 'mention',
+                postId: postId,
+                commentId: commentId,
+                mentionedBy: mentioningUserId,
+              },
+            });
+          }
+        }
+      }
     }
 
     return mentionedUsers;
@@ -3054,6 +3111,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .where(eq(communityPosts.id, postId));
 
+      // Handle mentions in the updated content
+      await createMentions(content.trim(), postId, null, userId);
+
       res.json({ message: "Post updated successfully" });
     } catch (error) {
       console.error("Error updating post:", error);
@@ -3135,6 +3195,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           updatedAt: new Date()
         })
         .where(eq(communityComments.id, commentId));
+
+      // Handle mentions in the updated comment content
+      await createMentions(content.trim(), existingComment.postId, commentId, userId);
 
       res.json({ message: "Comment updated successfully" });
     } catch (error) {
