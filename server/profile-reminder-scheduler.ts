@@ -31,11 +31,10 @@ async function findUsersWithIncompleteProfiles(): Promise<IncompleteUser[]> {
     for (const user of allUsers) {
       const missingFields: string[] = [];
 
-      // Check each required field
+      // Check each essential field (phone number is optional)
       if (!user.profileImage) missingFields.push('profileImage');
       if (!user.bio || user.bio.trim() === '') missingFields.push('bio');
       if (!user.city || user.city.trim() === '') missingFields.push('city');
-      if (!user.phoneNumber || user.phoneNumber.trim() === '') missingFields.push('phoneNumber');
       if (!user.childrenInfo || (Array.isArray(user.childrenInfo) && user.childrenInfo.length === 0)) {
         missingFields.push('childrenInfo');
       }

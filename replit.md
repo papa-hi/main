@@ -131,10 +131,10 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 - **User Behavior Monitoring**: Complete tracking of user journeys with IP addresses, user agents, and detailed action context
 
 ### June 15, 2025 - Complete Weekly Email Reminder System
-- **Automated Profile Completion Checker**: Identifies users missing essential profile fields (bio, profileImage, phoneNumber, childrenInfo, city)
+- **Automated Profile Completion Checker**: Identifies users missing essential profile fields (profileImage, bio, city, childrenInfo) - phone number is now optional
 - **Weekly Email Scheduler**: Automatically sends personalized reminder emails every Monday at 10:00 AM using existing Resend service
 - **Admin Management Interface**: New "Profile Reminders" tab in admin dashboard with full monitoring and control capabilities
-- **Real-time Statistics**: Shows 26 users currently needing profile completion reminders with detailed missing field breakdown
+- **Real-time Statistics**: Shows users currently needing profile completion reminders with detailed missing field breakdown
 - **Manual Trigger System**: Admins can manually send reminders and monitor scheduler status with comprehensive logging
 - **Production Integration**: Weekly scheduler automatically starts with server in production environment
 

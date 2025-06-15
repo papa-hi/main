@@ -467,7 +467,6 @@ function generateProfileReminderEmailHTML(firstName: string, username: string, m
     'profileImage': 'Profile Photo',
     'bio': 'Bio/About Me',
     'city': 'City/Location',
-    'phoneNumber': 'Phone Number',
     'childrenInfo': 'Children Information'
   };
 
@@ -584,7 +583,6 @@ function generateProfileReminderEmailText(firstName: string, username: string, m
     'profileImage': 'Profile Photo',
     'bio': 'Bio/About Me',
     'city': 'City/Location',
-    'phoneNumber': 'Phone Number',
     'childrenInfo': 'Children Information'
   };
 
