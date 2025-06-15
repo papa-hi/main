@@ -2740,7 +2740,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       postId: commentId ? null : postId,
       commentId,
       mentionedUserId: user.id,
-      mentionedByUserId: mentioningUserId,
+      mentioningUserId,
     }));
 
     if (mentionRecords.length > 0) {
