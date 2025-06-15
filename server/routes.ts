@@ -12,7 +12,7 @@ import fs from "fs";
 import { WebSocketServer, WebSocket } from 'ws';
 import { fetchNearbyPlaygrounds } from "./maps-service";
 import { db } from "./db";
-import { eq, and, gte, asc, count, desc, like, or, sql, isNull } from "drizzle-orm";
+import { eq, and, gte, asc, count, desc, like, or, sql, isNull, inArray } from "drizzle-orm";
 import crypto from "crypto";
 import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate } from "./push-notifications";
 import { pushSubscriptions } from "@shared/schema";
@@ -2639,7 +2639,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get comments for a post
+  // Get comments for a post with nested structure
   app.get("/api/community/posts/:id/comments", async (req: Request, res: Response) => {
     try {
       const postId = parseInt(req.params.id);
@@ -2680,17 +2680,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ...comment,
             _count: {
               reactions: reactionCount.count,
+              replies: 0, // Will be calculated when building nested structure
             },
           };
         })
       );
 
-      res.json(commentsWithCounts);
+      // Build nested comment structure
+      const commentMap = new Map();
+      const rootComments = [];
+
+      // First pass: create map of all comments
+      commentsWithCounts.forEach(comment => {
+        commentMap.set(comment.id, { ...comment, replies: [] });
+      });
+
+      // Second pass: build nested structure
+      commentsWithCounts.forEach(comment => {
+        if (comment.parentCommentId) {
+          const parent = commentMap.get(comment.parentCommentId);
+          if (parent) {
+            parent.replies.push(commentMap.get(comment.id));
+            parent._count.replies = parent.replies.length;
+          }
+        } else {
+          rootComments.push(commentMap.get(comment.id));
+        }
+      });
+
+      res.json(rootComments);
     } catch (error) {
       console.error("Error fetching comments:", error);
       res.status(500).json({ error: "Failed to fetch comments" });
     }
   });
+
+  // Helper function to extract mentions from text
+  const extractMentions = (text: string): string[] => {
+    const mentionRegex = /@(\w+)/g;
+    const mentions = [];
+    let match;
+    while ((match = mentionRegex.exec(text)) !== null) {
+      mentions.push(match[1]); // Extract username without @
+    }
+    return [...new Set(mentions)]; // Remove duplicates
+  };
+
+  // Helper function to create mention records
+  const createMentions = async (content: string, postId: number, commentId: number | null, mentioningUserId: number) => {
+    const usernames = extractMentions(content);
+    if (usernames.length === 0) return;
+
+    // Find users by username
+    const mentionedUsers = await db
+      .select({ id: users.id, username: users.username })
+      .from(users)
+      .where(inArray(users.username, usernames));
+
+    // Create mention records
+    const mentionRecords = mentionedUsers.map(user => ({
+      postId: commentId ? null : postId,
+      commentId,
+      mentionedUserId: user.id,
+      mentioningUserId,
+    }));
+
+    if (mentionRecords.length > 0) {
+      await db.insert(communityMentions).values(mentionRecords);
+    }
+
+    return mentionedUsers;
+  };
 
   // Create a comment on a post
   app.post("/api/community/posts/:id/comments", isAuthenticated, async (req: Request, res: Response) => {
@@ -2715,6 +2775,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .insert(communityComments)
         .values(validatedData)
         .returning();
+
+      // Create mentions if any
+      await createMentions(validatedData.content, postId, newComment.id, userId);
 
       // Get the comment with author info
       const [commentWithAuthor] = await db
