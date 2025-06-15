@@ -358,14 +358,14 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
               </Form>
             </div>
           )}
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center flex-wrap gap-1 sm:gap-2 mt-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onReaction?.(comment.id)}
-              className="text-xs text-gray-500 hover:text-red-600 h-6 px-2"
+              className="text-xs text-gray-500 hover:text-red-600 h-6 px-1 sm:px-2"
             >
-              <Heart className="h-3 w-3 mr-1" />
+              <Heart className="h-3 w-3 mr-0.5 sm:mr-1" />
               {comment._count?.reactions || 0}
             </Button>
             {user && depth < maxDepth && (
@@ -373,10 +373,11 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowReplyForm(!showReplyForm)}
-                className="text-xs text-gray-500 hover:text-blue-600 h-6 px-2"
+                className="text-xs text-gray-500 hover:text-blue-600 h-6 px-1 sm:px-2"
               >
-                <Reply className="h-3 w-3 mr-1" />
-                {t('community.reply', 'Reply')}
+                <Reply className="h-3 w-3 mr-0.5 sm:mr-1" />
+                <span className="hidden sm:inline">{t('community.reply', 'Reply')}</span>
+                <span className="sm:hidden">Reply</span>
               </Button>
             )}
             {user && user.id === comment.author?.id && (
@@ -385,19 +386,21 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowEditForm(!showEditForm)}
-                  className="text-xs text-gray-500 hover:text-blue-600 h-6 px-2"
+                  className="text-xs text-gray-500 hover:text-blue-600 h-6 px-1 sm:px-2"
                 >
-                  <Edit className="h-3 w-3 mr-1" />
-                  {t('community.edit', 'Edit')}
+                  <Edit className="h-3 w-3 mr-0.5 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('community.edit', 'Edit')}</span>
+                  <span className="sm:hidden">Edit</span>
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => handleDeleteComment()}
-                  className="text-xs text-gray-500 hover:text-red-600 h-6 px-2"
+                  className="text-xs text-gray-500 hover:text-red-600 h-6 px-1 sm:px-2"
                 >
-                  <Trash2 className="h-3 w-3 mr-1" />
-                  {t('community.delete', 'Delete')}
+                  <Trash2 className="h-3 w-3 mr-0.5 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('community.delete', 'Delete')}</span>
+                  <span className="sm:hidden">Del</span>
                 </Button>
               </>
             )}
