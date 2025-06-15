@@ -61,20 +61,19 @@ function getUserInitials(user: { firstName: string; lastName: string }) {
 function MentionSuggestions({ 
   suggestions, 
   onSelect, 
-  visible, 
-  position 
+  visible 
 }: {
   suggestions: User[];
   onSelect: (username: string) => void;
   visible: boolean;
-  position: { top: number; left: number };
 }) {
+  console.log('MentionSuggestions render:', { visible, suggestionsCount: suggestions.length });
+  
   if (!visible || suggestions.length === 0) return null;
 
   return (
     <div 
-      className="absolute z-50 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto min-w-[200px]"
-      style={{ top: position.top, left: position.left }}
+      className="absolute top-full left-0 z-50 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto min-w-[200px] mt-1"
     >
       {suggestions.map((user) => (
         <button
@@ -117,7 +116,6 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [mentionSuggestions, setMentionSuggestions] = useState<User[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
   const textareaRef = useRef<HTMLTextAreaElement>();
 
   const replyForm = useForm<z.infer<typeof replySchema>>({
@@ -173,19 +171,14 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
     
     if (mentionMatch) {
       const query = mentionMatch[1];
+      console.log('Searching for users with query:', query);
       const suggestions = await searchUsers(query);
+      console.log('Found suggestions:', suggestions);
       
       if (suggestions.length > 0) {
-        // Calculate position for dropdown
-        const textareaRect = textareaElement.getBoundingClientRect();
-        const position = {
-          top: textareaRect.bottom + window.scrollY,
-          left: textareaRect.left + window.scrollX
-        };
-        
         setMentionSuggestions(suggestions);
-        setSuggestionPosition(position);
         setShowSuggestions(true);
+        console.log('Showing suggestions dropdown');
       } else {
         setShowSuggestions(false);
       }
@@ -296,15 +289,32 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
                                 handleTextareaChange(e.target.value, e.target);
                               }}
                               onBlur={() => {
-                                setTimeout(() => setShowSuggestions(false), 100);
+                                setTimeout(() => setShowSuggestions(false), 200);
                               }}
                             />
-                            <MentionSuggestions
-                              suggestions={mentionSuggestions}
-                              onSelect={handleMentionSelect}
-                              visible={showSuggestions}
-                              position={suggestionPosition}
-                            />
+                            {showSuggestions && mentionSuggestions.length > 0 && (
+                              <div className="absolute top-full left-0 z-50 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto min-w-[200px] mt-1">
+                                {mentionSuggestions.map((user) => (
+                                  <button
+                                    key={user.id}
+                                    className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 border-b border-gray-100 last:border-b-0"
+                                    onClick={() => handleMentionSelect(user.username)}
+                                    onMouseDown={(e) => e.preventDefault()}
+                                  >
+                                    <Avatar className="h-6 w-6">
+                                      <AvatarImage src={user.profileImage || undefined} />
+                                      <AvatarFallback className="text-xs">
+                                        {getUserInitials({ firstName: user.firstName, lastName: user.lastName })}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                      <div className="font-medium text-sm">@{user.username}</div>
+                                      <div className="text-xs text-gray-500">{user.firstName} {user.lastName}</div>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </FormControl>
                       </FormItem>
