@@ -45,7 +45,7 @@ export function ProfileReminders() {
 
   // Send reminders mutation
   const sendRemindersMutation = useMutation({
-    mutationFn: () => apiRequest("/api/admin/profile-reminders/send", { method: "POST" }),
+    mutationFn: () => apiRequest("POST", "/api/admin/profile-reminders/send"),
     onSuccess: () => {
       toast({
         title: "Profile Reminders Sent",
