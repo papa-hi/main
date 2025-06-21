@@ -61,6 +61,7 @@ let museumImageCounter = 0;
 // Helper function to get a playground image with variety
 function getRandomPlaygroundImage(): string {
   const playgroundImages = [
+    "/assets/playground1.png",
     "/assets/playground2.png",
     "/assets/playground3.png", 
     "/assets/playground4.png"
