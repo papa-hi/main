@@ -11,13 +11,8 @@ app.use(express.urlencoded({ extended: false }));
 // Serve files from the uploads directory
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// Serve static assets (playground images, etc.) - with no cache to force refresh
-app.use('/assets', express.static(path.join(process.cwd(), 'public', 'assets'), {
-  maxAge: 0,
-  etag: false,
-  lastModified: false,
-  cacheControl: false
-}));
+// Serve static assets (playground images, etc.)
+app.use('/assets', express.static(path.join(process.cwd(), 'public', 'assets')));
 
 // Serve place images in multiple formats for maximum compatibility
 // This allows images saved with any path format to work

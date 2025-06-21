@@ -92,7 +92,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
     >
       <div className="relative">
         <img 
-          src={`${place.imageUrl}?v=${Date.now()}`} 
+          src={place.imageUrl} 
           alt={place.name} 
           onError={(e) => {
             // If image fails to load, fallback to your provided asset images
