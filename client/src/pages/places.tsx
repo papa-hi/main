@@ -22,7 +22,6 @@ export default function PlacesPage() {
   const { latitude, longitude } = useGeoLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
-  const [showWaterFeatures, setShowWaterFeatures] = useState(false);
   
   // Parse query params to set initial tab
   useEffect(() => {
@@ -56,11 +55,6 @@ export default function PlacesPage() {
     if (activeTab === 'restaurants' && place.type !== 'restaurant') return false;
     if (activeTab === 'playgrounds' && place.type !== 'playground') return false;
     if (activeTab === 'museums' && place.type !== 'museum') return false;
-    
-    // Filter by water features
-    if (showWaterFeatures && (!place.features || !place.features.includes('water_features'))) {
-      return false;
-    }
     
     // Filter by search term
     if (searchTerm) {
@@ -232,32 +226,6 @@ export default function PlacesPage() {
           </Button>
         </div>
       </form>
-      
-      {/* Water Features Filter */}
-      {(activeTab === 'playgrounds' || activeTab === 'all') && (
-        <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="water-features"
-              checked={showWaterFeatures}
-              onChange={(e) => setShowWaterFeatures(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
-            />
-            <label htmlFor="water-features" className="text-sm font-medium text-blue-900">
-              💧 {t('places.waterFeatures', 'Show only water playgrounds')}
-            </label>
-            {showWaterFeatures && (
-              <span className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">
-                {filteredPlaces?.length || 0} water playgrounds found
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-blue-600 mt-1">
-            Find playgrounds with splash zones, water pumps, and water play areas
-          </p>
-        </div>
-      )}
       
       {/* Tabs for filtering */}
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-6">
