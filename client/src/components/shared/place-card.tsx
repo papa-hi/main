@@ -101,7 +101,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
             const target = e.target as HTMLImageElement;
             target.onerror = null; // Prevent infinite loop
             if (place.type === 'playground') {
-              target.src = '/assets/playground.png';
+              target.src = '/assets/playground1.png';
             } else if (place.type === 'restaurant') {
               target.src = '/assets/restaurant1.png';
             } else if (place.type === 'museum') {
