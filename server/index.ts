@@ -11,8 +11,12 @@ app.use(express.urlencoded({ extended: false }));
 // Serve files from the uploads directory
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// Serve static assets (playground images, etc.)
-app.use('/assets', express.static(path.join(process.cwd(), 'public', 'assets')));
+// Serve static assets (playground images, etc.) - with proper headers
+app.use('/assets', express.static(path.join(process.cwd(), 'public', 'assets'), {
+  maxAge: '1d',
+  etag: false,
+  lastModified: false
+}));
 
 // Serve place images in multiple formats for maximum compatibility
 // This allows images saved with any path format to work
