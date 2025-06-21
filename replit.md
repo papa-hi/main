@@ -127,7 +127,7 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 - **Complete Places Import**: Successfully imported 77 family-friendly locations across Netherlands including playgrounds, restaurants, and museums
 - **Targeted Water Features**: Exactly 77 imported places tagged with water_features for enhanced discovery
 - **Enhanced Place Discovery**: Users can search for "water" to find the specific 77 imported locations
-- **Visual Water Indicators**: Imported place cards display prominent "💧 Water" badges for easy identification
+- **Search-Only Water Features**: Water features are searchable but have no visual indicators on place cards
 - **Geocoded Locations**: All places include accurate coordinates and complete addresses for precise location services
 - **Profile Reminder Enhancement**: Updated email system to encourage playdate creation after profile completion
 
