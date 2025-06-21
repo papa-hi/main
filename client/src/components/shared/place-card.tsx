@@ -143,7 +143,16 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
       </div>
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="font-heading font-medium text-base">{place.name}</h3>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-heading font-medium text-base">{place.name}</h3>
+              {place.features && place.features.includes('water_features') && (
+                <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                  💧 Water
+                </span>
+              )}
+            </div>
+          </div>
           <div>
             {/* Show debug info */}
             <span className="text-xs text-gray-400 mr-2">
