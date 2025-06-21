@@ -22,6 +22,7 @@ export default function PlacesPage() {
   const { latitude, longitude } = useGeoLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [showWaterFeatures, setShowWaterFeatures] = useState(false);
   
   // Parse query params to set initial tab
   useEffect(() => {

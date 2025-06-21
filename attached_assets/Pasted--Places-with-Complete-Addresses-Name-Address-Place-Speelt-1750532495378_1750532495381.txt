@@ -1,0 +1,81 @@
+# Places with Complete Addresses
+
+| Name | Address | Place |
+|------|---------|-------|
+| Speeltuin | Zittardsestraat 31, 5507 KR Veldhoven | Playground |
+| Oerrr natuurspeeltuin | Van Tienhovenlaan 4, 5062 SK Oisterwijk | Playground |
+| Speeltuin | Sint Bonifaciuslaan 83, 5643 RS Eindhoven | Playground |
+| Speeltuin de Klimbim | Eikenlaan 11, 5581 VC Waalre | Playground |
+| Natuurspeeltuin | Kanterseveldenweg, 5681 PG Best | Playground |
+| Speelpark de Splinter | 2, Rode Kruislaan, 5628 GM Eindhoven | Playground |
+| Speeltuinvereniging Philipsdorp | Anthony van Leeuwenhoeklaan 30, 5612 PB Eindhoven | Playground |
+| Speeltuin st. Trudo | Schoenerstraat 10A, 5616 KE Eindhoven | Playground |
+| Speeltuinvereniging St. Joseph | Sint Josephlaan 1, 5642 HA Eindhoven | Playground |
+| Speeltuin 't Genieten' (In- en Outdoor) | Roestelbergseweg 3, 5171 RL Kaatsheuvel | Playground |
+| Splesj | Oude Antwerpsepostbaan 81B, 4741 SG Hoeven | Playground |
+| Vrouwenhof speeltuin en pannenkoekenrestaurant | Vrouwenhoflaan 3, 4701 EJ Roosendaal | Playground |
+| Playground De Kievit | Kerkstraat 10, 5671 GP Nuenen | Playground |
+| Restaurant Charlie Schaijk | Hermanusweg 4, 5374 RW Schaijk | Restaurant |
+| Het Gouden Woud B.V. | Hamsestraat 18, 5298 NA Liempde | Playground |
+| Geenhoven playground | Hoppenbrouwers 15, 5552 SB Valkenswaard | Playground |
+| Playground Elckerlyc | Anna van Schuurmanstraat 604, 5344 TX Oss | Playground |
+| Docus de Das Avonturenpad | RK, Udensedreef, 5374 RD Schaijk | Playground |
+| Hullie in Uden | Canadasweg 3A, 5406 TS Uden | Playground |
+| Speeltuin De Woeste Weide | Burg. Feitsmapark 1, 3362 BZ Sliedrecht | Playground |
+| Kienehoef park | Klothal 1, 5491 LR Sint-Oedenrode | Playground |
+| Natuurspeelpark Deken van Miert | Unnamed Road, 5462 CR Veghel | Playground |
+| Natuurspeeltuin De Zwarte Molen Nistelrode | Baansteen 10, 5388 DB Nistelrode | Playground |
+| Speelbos Herperduin | Schaijkseweg 10, 5373 KL Herpen | Playground |
+| Natuurspeeltuin | Het Oliemeulen 1, 5374 HX Schaijk | Playground |
+| Speelbos Uden | Bosdreef, 5406 VW Uden | Playground |
+| Nature Playground Sint-Michielsgestel | Meanderplein 1, 5271 GC Sint-Michielsgestel | Playground |
+| Stichting Speelbos Bladel | Egyptischedijk 15, 5531 NE Bladel | Playground |
+| Houten Speeltuin Eendenmeer | Ceresweg 13, 5854 PK Bergen | Playground |
+| De Bosspeeltuin | Uilenboslaan 2, 3451 GB Utrecht | Playground |
+| Avonturenhof | Miggelenbergweg 65, 7351 BP Hoenderloo | Playground |
+| Boscafé de Beken | Nieuwe Keijenbergseweg 174, 6871 VZ Renkum | Restaurant |
+| WOODZ | Bovenallee 1, 6881 AJ Velp | Restaurant |
+| Spelderveld | Elderhofseweg 28, 6843 NH Arnhem | Playground |
+| Speelbos De Schuytgraaf | Marasingel 19, 6846 DX Arnhem | Playground |
+| Waterrad | Notenlaantje Park Lingezegen, De Park 10, 6661 NW Elst | Playground |
+| Waterspeeltuin | Hegdambroek 1325, 6546 ED Nijmegen | Playground |
+| Speeltuin met waterpomp | Burgemeester Raijmakerslaan 36, 5361 KE Grave | Playground |
+| Waterspeeltuin aan het badstrand | Kerkeveld 6, 5437 BH Beers | Playground |
+| Speeltuin De Bucht | Buchtdwarsstraat 17d, 5571 CS Bergeijk | Playground |
+| Waterspeeltuin | Akkerwinde 67, 5374 DH Schaijk | Playground |
+| Waterspeeltuin Stadspark Huizen | Want 3, 1276 HC Huizen | Playground |
+| Waterspeeltuin Cronestein | Kanaalweg 130, 2321 JZ Leiden | Playground |
+| Water playground Delftsehout | Korftlaan 3A, 2616 LJ Delft | Playground |
+| Waterspeelzone speeltuin | Leistertweg 2, 6088 NW Roggel | Playground |
+| Speeltuin Kitskensberg | Oude Keulsebaan 150, 6045 GB Roermond | Playground |
+| Stichting Speeltuin de Paddestoel | Florianstraat 3a, 6121 MA Born | Playground |
+| Speeltuin Hunsel | Jacobusstraat 18, 6013 RK Hunsel | Playground |
+| Natuur en Milieucentrum De IJzeren Man | Geurtsvenweg 4, 6006 SN Weert | Museum |
+| de Bosuil | Bosuilstraat 4, 3910 Neerpelt, Belgium | Playground |
+| Natuurspeelpark | IJsselsingel 103, 6991 ZR Rheden | Playground |
+| Speeltuin De Viking | Speeltuinpad 2, 5666 TD Geldrop | Playground |
+| Brasserie Cis | Eindhovenseweg 39, 5283 RA Boxtel | Restaurant |
+| Pukkemuk Dongen | Vaartweg 192A, 5106 NG Dongen | Playground |
+| Uitspanning De Zeven Geitjes | Reeshofdijk 18, 5044 VB Tilburg | Restaurant |
+| Zandziebar | Valburgsestraat 45, 6677 PC Slijk-Ewijk | Playground |
+| Steinerbos | Stadhouderslaan 220, 6171 KP Stein | Playground |
+| 't Kwekkeltje | Sportlaan 14a, 5242 CR Rosmalen | Playground |
+| Foundation Playground "Helmond-West" | Arbergstraat 85, 5707 TK Helmond | Playground |
+| Speeltuin Leonardus | Monseigneur Swinkelsstraat 24, 5701 XM Helmond | Playground |
+| the Speuldries | Rembrandt van Rijnstraat 5, 5753 BE Deurne | Playground |
+| The playground Rijpelroets | Theo Driessenhof 75, 5709 BB Helmond | Playground |
+| Speeltuinvereniging Het Zonnehoekje | Doctor Douvenstraat 13, 5421 JR Gemert | Playground |
+| Speeltuinvereniging "Bijdorp" | Krelagehove 2, 2172 VE Sassenheim | Playground |
+| De Kievit Playground | Wilgenlaan 5, 2651 TA Berkel en Rodenrijs | Playground |
+| Boscafé Molenvelden | Banstraat 25, 5506 LA Veldhoven | Restaurant |
+| Eetcafe Zout | Het Louwtje 10, 2691 KR 's-Gravenzande | Restaurant |
+| Plaswijckpark | Ringdijk 20, 3054 KW Rotterdam | Playground |
+| Impuls Bouwspeelplaats Het Landje | Staalmeesterslaan 197 A, 1057 NT Amsterdam | Playground |
+| Landschapspark met speeleiland | Nieuwe Zeeweg, 2202 EG Noordwijk | Playground |
+| Speeltuinvereniging "Vogelenwijk" | Nachtegaallaan 25, 2333 XT Leiden | Playground |
+| Jip En Janneke Speeltuin | Baambruggestraat, 2546 SK Den Haag | Playground |
+| Water playground Trekvliet | Trekweg 121, 2516 SB Den Haag | Playground |
+| BatensteinBuiten | Van Helvoortlaan 40, 3443 AP Woerden | Playground |
+| Restaurant Café Soesterdal | Verlengde Tempellaan 2, 3768 SB Soesterberg | Restaurant |
+| Restaurant Nationaal Militair Museum | Verlengde Paltzerweg 1, 3768 MX Soest | Playground |
+| playground Westerkwartier | Ten Katestraat 10-A, 2321 AW Leiden | Playground |
