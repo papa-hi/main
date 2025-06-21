@@ -92,9 +92,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
     >
       <div className="relative">
         <img 
-          src={place.type === 'playground' && place.imageUrl?.includes('place-images') 
-            ? `/playground-image/${place.imageUrl.split('/').pop()}` 
-            : place.imageUrl} 
+          src={place.imageUrl} 
           alt={place.name} 
           onError={(e) => {
             // If image fails to load, fallback to your provided asset images
