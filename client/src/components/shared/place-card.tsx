@@ -103,7 +103,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
             if (place.type === 'playground') {
               target.src = '/assets/playground2.png';
             } else if (place.type === 'restaurant') {
-              target.src = '/assets/restaurant.png';
+              target.src = '/assets/restaurant1.png';
             } else if (place.type === 'museum') {
               target.src = '/assets/museum1.png';
             }

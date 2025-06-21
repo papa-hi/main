@@ -128,7 +128,7 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 - **Targeted Water Features**: Exactly 77 imported places tagged with water_features for enhanced discovery
 - **Enhanced Place Discovery**: Users can search for "water" to find the specific 77 imported locations
 - **Search-Only Water Features**: Water features are searchable but have no visual indicators on place cards
-- **Asset Image Integration**: All imported places now use the provided playground, museum, and restaurant asset images with proper rotation for variety
+- **Asset Image Integration**: All imported places now use only the provided asset images (playground2-4.png, restaurant1-4.png, museum1-4.png) with proper rotation for variety
 - **Geocoded Locations**: All places include accurate coordinates and complete addresses for precise location services
 - **Profile Reminder Enhancement**: Updated email system to encourage playdate creation after profile completion
 
