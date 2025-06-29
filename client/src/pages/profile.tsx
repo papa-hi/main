@@ -53,6 +53,42 @@ type EditProfileFormValues = {
   childrenInfo?: { name: string; age: number }[];
 };
 
+interface DadMatch {
+  id: number;
+  dadId1: number;
+  dadId2: number;
+  matchScore: number;
+  distanceKm: number;
+  commonAgeRanges: Array<{ minAge: number; maxAge: number; overlap: number }>;
+  matchStatus: string;
+  createdAt: string;
+  dad1: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    profileImage: string | null;
+    city: string | null;
+    childrenInfo: Array<{ name: string; age: number }> | null;
+  };
+  dad2: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    profileImage: string | null;
+    city: string | null;
+    childrenInfo: Array<{ name: string; age: number }> | null;
+  };
+}
+
+interface MatchPreferences {
+  id: number;
+  userId: number;
+  maxDistanceKm: number;
+  ageFlexibility: number;
+  isEnabled: boolean;
+  lastMatchRun: string | null;
+}
+
 function DadMatchesSection() {
   const { toast } = useToast();
   const { user } = useAuth();
@@ -206,7 +242,7 @@ function DadMatchesSection() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {matches.map((match: DadMatch) => {
+          {matches.map((match) => {
             const otherDad = getOtherDad(match, user?.id || 0);
             const isPending = match.matchStatus === 'pending';
             
@@ -246,7 +282,7 @@ function DadMatchesSection() {
                               <span className="text-sm font-medium text-gray-700">Children:</span>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                              {otherDad.childrenInfo.map((child, index) => (
+                              {otherDad.childrenInfo.map((child: any, index: number) => (
                                 <Badge key={index} variant="outline" className="text-xs">
                                   {child.name} ({child.age}y)
                                 </Badge>
