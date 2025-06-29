@@ -94,16 +94,18 @@ function DadMatchesSection() {
   const { user } = useAuth();
 
   // Fetch matches
-  const { data: matches = [], isLoading: matchesLoading, refetch: refetchMatches } = useQuery<DadMatch[]>({
-    queryKey: ["/api/matches"],
-    queryFn: () => apiRequest("GET", "/api/matches")
+  const { data: matchesResponse, isLoading: matchesLoading, refetch: refetchMatches } = useQuery({
+    queryKey: ["/api/matches"]
   });
 
   // Fetch preferences
-  const { data: preferences, isLoading: preferencesLoading, refetch: refetchPreferences } = useQuery<MatchPreferences>({
-    queryKey: ["/api/match-preferences"],
-    queryFn: () => apiRequest("GET", "/api/match-preferences")
+  const { data: preferencesResponse, isLoading: preferencesLoading, refetch: refetchPreferences } = useQuery({
+    queryKey: ["/api/match-preferences"]
   });
+
+  // Ensure proper typing and fallbacks
+  const matches: DadMatch[] = Array.isArray(matchesResponse) ? matchesResponse : [];
+  const preferences = preferencesResponse as MatchPreferences | undefined;
 
   // Run matching mutation
   const runMatchingMutation = useMutation({
@@ -193,11 +195,11 @@ function DadMatchesSection() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="font-medium">Max Distance:</span>
-                <span className="ml-2">{preferences.maxDistanceKm}km</span>
+                <span className="ml-2">{preferences?.maxDistanceKm || 20}km</span>
               </div>
               <div>
                 <span className="font-medium">Age Flexibility:</span>
-                <span className="ml-2">±{preferences.ageFlexibility} years</span>
+                <span className="ml-2">±{preferences?.ageFlexibility || 2} years</span>
               </div>
             </div>
             
@@ -212,7 +214,7 @@ function DadMatchesSection() {
               </Button>
             </div>
             
-            {preferences.lastMatchRun && (
+            {preferences?.lastMatchRun && (
               <p className="text-sm text-gray-500 mt-2">
                 Last match run: {new Date(preferences.lastMatchRun).toLocaleDateString()}
               </p>
