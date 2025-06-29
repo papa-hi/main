@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -161,18 +161,14 @@ export default function SettingsPage() {
     });
   };
 
-  // Update state when preferences load
-  if (matchPrefs && !preferencesLoading) {
-    if (maxDistance !== matchPrefs.maxDistanceKm) {
+  // Update state when preferences load using useEffect
+  useEffect(() => {
+    if (matchPrefs && !preferencesLoading) {
       setMaxDistance(matchPrefs.maxDistanceKm);
-    }
-    if (ageFlexibility !== matchPrefs.ageFlexibility) {
       setAgeFlexibility(matchPrefs.ageFlexibility);
-    }
-    if (matchingEnabled !== matchPrefs.isEnabled) {
       setMatchingEnabled(matchPrefs.isEnabled);
     }
-  }
+  }, [matchPrefs, preferencesLoading]);
 
   const sections = [
     {
@@ -255,7 +251,7 @@ export default function SettingsPage() {
                       <Label htmlFor="maxDistance">
                         Maximum Distance: {maxDistance} km
                       </Label>
-                      <Input
+                      <input
                         id="maxDistance"
                         type="range"
                         min="5"
@@ -263,8 +259,12 @@ export default function SettingsPage() {
                         step="5"
                         value={maxDistance}
                         onChange={(e) => setMaxDistance(Number(e.target.value))}
-                        className="w-full"
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                       />
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>5km</span>
+                        <span>50km</span>
+                      </div>
                       <p className="text-sm text-muted-foreground">
                         We'll look for other dads within {maxDistance} km of your location
                       </p>
@@ -274,7 +274,7 @@ export default function SettingsPage() {
                       <Label htmlFor="ageFlexibility">
                         Age Flexibility: ±{ageFlexibility} years
                       </Label>
-                      <Input
+                      <input
                         id="ageFlexibility"
                         type="range"
                         min="1"
@@ -282,8 +282,12 @@ export default function SettingsPage() {
                         step="1"
                         value={ageFlexibility}
                         onChange={(e) => setAgeFlexibility(Number(e.target.value))}
-                        className="w-full"
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                       />
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>±1 year</span>
+                        <span>±5 years</span>
+                      </div>
                       <p className="text-sm text-muted-foreground">
                         Match with dads whose children are within ±{ageFlexibility} years of your children's ages
                       </p>
