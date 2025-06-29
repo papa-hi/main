@@ -171,7 +171,7 @@ export default function MatchesPage() {
       ) : (
         <div className="space-y-4">
           {matches.map((match) => {
-            const otherDad = getOtherDad(match, match.dadId1); // We'd need current user ID here
+            const otherDad = getOtherDad(match, user?.id || 0);
             const isPending = match.matchStatus === 'pending';
             
             return (
