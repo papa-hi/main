@@ -18,7 +18,7 @@ import ChatPage from "./pages/chat";
 import MatchesPage from "./pages/matches";
 import AuthPage from "./pages/auth-page";
 import PlaceDetailsPage from "./pages/place-details";
-import SettingsPage from "./pages/SettingsPage";
+import SettingsPage from "./pages/settings";
 import DeleteAccountPage from "./pages/delete-account";
 import PrivacyPolicyPage from "./pages/privacy-policy";
 

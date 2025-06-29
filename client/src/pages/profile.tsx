@@ -42,6 +42,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { useTranslation } from "react-i18next";
 import { NotificationSettings } from "@/components/notifications/notification-settings";
+import { Link } from "wouter";
 
 type EditProfileFormValues = {
   firstName: string;
@@ -179,49 +180,37 @@ function DadMatchesSection() {
         </Card>
       )}
 
-      {/* Preferences Card */}
-      {preferences && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Match Preferences
-            </CardTitle>
-            <CardDescription>
-              Your current matching settings and status
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Max Distance:</span>
-                <span className="ml-2">{preferences?.maxDistanceKm || 20}km</span>
-              </div>
-              <div>
-                <span className="font-medium">Age Flexibility:</span>
-                <span className="ml-2">±{preferences?.ageFlexibility || 2} years</span>
-              </div>
+      {/* Find New Matches Action */}
+      <Card>
+        <CardContent className="text-center py-6">
+          <div className="flex flex-col items-center gap-4">
+            <div className="text-center">
+              <h3 className="font-semibold text-lg">Discover Dad Connections</h3>
+              <p className="text-gray-600 text-sm">Find other fathers near you with children of similar ages</p>
             </div>
             
-            <div className="flex items-center gap-3 mt-4">
-              <Button
-                onClick={() => runMatchingMutation.mutate()}
-                disabled={runMatchingMutation.isPending || !canRunMatching}
-                className="flex items-center gap-2"
-              >
-                <RefreshCw className={`h-4 w-4 ${runMatchingMutation.isPending ? 'animate-spin' : ''}`} />
-                {runMatchingMutation.isPending ? "Finding Matches..." : "Find New Matches"}
-              </Button>
-            </div>
+            <Button
+              onClick={() => runMatchingMutation.mutate()}
+              disabled={runMatchingMutation.isPending || !canRunMatching}
+              className="flex items-center gap-2 min-w-40"
+              size="lg"
+            >
+              <RefreshCw className={`h-4 w-4 ${runMatchingMutation.isPending ? 'animate-spin' : ''}`} />
+              {runMatchingMutation.isPending ? "Finding Matches..." : "Find New Matches"}
+            </Button>
             
-            {preferences?.lastMatchRun && (
-              <p className="text-sm text-gray-500 mt-2">
-                Last match run: {new Date(preferences.lastMatchRun).toLocaleDateString()}
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      )}
+            <div className="text-xs text-gray-500 flex items-center gap-4">
+              <span>Distance: {preferences?.maxDistanceKm || 20}km</span>
+              <span>•</span>
+              <span>Age flexibility: ±{preferences?.ageFlexibility || 2} years</span>
+              <span>•</span>
+              <Link href="/settings" className="text-primary hover:underline">
+                Adjust Settings
+              </Link>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Matches List */}
       {matches.length === 0 ? (
