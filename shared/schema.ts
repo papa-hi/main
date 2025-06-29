@@ -72,6 +72,34 @@ export const communityMentions = pgTable("community_mentions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Dad Matches schema - tracks potential matches between dads
+export const dadMatches = pgTable("dad_matches", {
+  id: serial("id").primaryKey(),
+  dadId1: integer("dad_id_1").notNull().references(() => users.id, { onDelete: "cascade" }),
+  dadId2: integer("dad_id_2").notNull().references(() => users.id, { onDelete: "cascade" }),
+  matchScore: integer("match_score").notNull(), // 0-100 based on compatibility
+  distanceKm: integer("distance_km"), // Distance between users in kilometers
+  commonAgeRanges: jsonb("common_age_ranges"), // Array of age ranges where children overlap
+  matchStatus: text("match_status").default("pending").notNull(), // pending, accepted, declined, expired
+  notificationSent: boolean("notification_sent").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(), // Matches expire after 30 days
+}, (table) => ({
+  // Ensure no duplicate matches between same users
+  uniqueDadPair: unique().on(table.dadId1, table.dadId2),
+}));
+
+// Match Preferences schema - user preferences for matching
+export const matchPreferences = pgTable("match_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+  maxDistanceKm: integer("max_distance_km").default(25), // Max distance for matches in km
+  ageFlexibility: integer("age_flexibility").default(2), // +/- years for age matching
+  isEnabled: boolean("is_enabled").default(true),
+  lastMatchRun: timestamp("last_match_run"),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Define user relations
 export const usersRelations = relations(users, ({ many }) => ({
   createdPlaydates: many(playdates),
@@ -82,6 +110,9 @@ export const usersRelations = relations(users, ({ many }) => ({
   communityReactions: many(communityReactions),
   mentionsReceived: many(communityMentions, { relationName: "mentionedUser" }),
   mentionsGiven: many(communityMentions, { relationName: "mentioningUser" }),
+  matchesAsDad1: many(dadMatches, { relationName: "dad1Matches" }),
+  matchesAsDad2: many(dadMatches, { relationName: "dad2Matches" }),
+  matchPreferences: many(matchPreferences),
 }));
 
 // Community Posts relations
@@ -616,6 +647,27 @@ export const insertRatingSchema = createInsertSchema(ratings).pick({
 // Rating type definitions
 export type InsertRating = z.infer<typeof insertRatingSchema>;
 export type Rating = typeof ratings.$inferSelect;
+
+// Dad Matches schema types
+export const insertDadMatchSchema = createInsertSchema(dadMatches).omit({
+  id: true,
+  createdAt: true,
+  notificationSent: true,
+});
+
+export const insertMatchPreferencesSchema = createInsertSchema(matchPreferences).omit({
+  id: true,
+  updatedAt: true,
+  lastMatchRun: true,
+});
+
+export type InsertDadMatch = z.infer<typeof insertDadMatchSchema>;
+export type InsertMatchPreferences = z.infer<typeof insertMatchPreferencesSchema>;
+export type DadMatch = typeof dadMatches.$inferSelect & {
+  dad1: Pick<User, 'id' | 'firstName' | 'lastName' | 'profileImage' | 'city' | 'childrenInfo'>;
+  dad2: Pick<User, 'id' | 'firstName' | 'lastName' | 'profileImage' | 'city' | 'childrenInfo'>;
+};
+export type MatchPreferences = typeof matchPreferences.$inferSelect;
 
 // Push notification subscriptions
 export const pushSubscriptions = pgTable("push_subscriptions", {
