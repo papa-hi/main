@@ -3438,5 +3438,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }));
   });
 
+  // Dad Matching API endpoints
+  app.get("/api/matches", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { getUserMatches } = await import("./dad-matching-service");
+      const matches = await getUserMatches(userId);
+      
+      res.json(matches);
+    } catch (error) {
+      console.error("Error fetching matches:", error);
+      res.status(500).json({ error: "Failed to fetch matches" });
+    }
+  });
+
+  app.post("/api/matches/run", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { runDadMatchingForUser } = await import("./dad-matching-service");
+      const matchesCreated = await runDadMatchingForUser(userId);
+      
+      res.json({ 
+        success: true, 
+        matchesCreated,
+        message: `Found ${matchesCreated} new matches!`
+      });
+    } catch (error) {
+      console.error("Error running matching:", error);
+      res.status(500).json({ error: "Failed to run matching" });
+    }
+  });
+
+  app.patch("/api/matches/:matchId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const matchId = parseInt(req.params.matchId);
+      const { status } = req.body;
+
+      if (!status || !['accepted', 'declined'].includes(status)) {
+        return res.status(400).json({ error: "Invalid status" });
+      }
+
+      const { updateMatchStatus } = await import("./dad-matching-service");
+      const success = await updateMatchStatus(matchId, userId, status);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Match not found or not authorized" });
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating match status:", error);
+      res.status(500).json({ error: "Failed to update match status" });
+    }
+  });
+
+  app.get("/api/match-preferences", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const [preferences] = await db
+        .select()
+        .from(matchPreferences)
+        .where(eq(matchPreferences.userId, userId));
+
+      if (!preferences) {
+        // Create default preferences
+        const [newPrefs] = await db
+          .insert(matchPreferences)
+          .values({
+            userId,
+            maxDistanceKm: 25,
+            ageFlexibility: 2,
+            isEnabled: true,
+          })
+          .returning();
+        
+        return res.json(newPrefs);
+      }
+
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error fetching match preferences:", error);
+      res.status(500).json({ error: "Failed to fetch preferences" });
+    }
+  });
+
+  app.patch("/api/match-preferences", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { maxDistanceKm, ageFlexibility, isEnabled } = req.body;
+
+      await db
+        .update(matchPreferences)
+        .set({
+          maxDistanceKm,
+          ageFlexibility,
+          isEnabled,
+          updatedAt: new Date(),
+        })
+        .where(eq(matchPreferences.userId, userId));
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating match preferences:", error);
+      res.status(500).json({ error: "Failed to update preferences" });
+    }
+  });
+
   return httpServer;
 }

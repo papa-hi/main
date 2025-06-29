@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { users, dadMatches, matchPreferences, type User, type DadMatch, type MatchPreferences } from "@shared/schema";
 import { eq, and, or, sql, ne, isNull } from "drizzle-orm";
-import { sendDadMatchNotificationEmail, sendDadMatchPushNotification } from "./dad-match-notifications";
+// We'll implement notifications inline for now
 
 interface ChildInfo {
   name: string;
@@ -188,7 +188,7 @@ async function findMatchCandidates(userId: number): Promise<MatchCandidate[]> {
     );
 
     // Check if within distance preference
-    if (distance > preferences.maxDistanceKm) {
+    if (distance > (preferences.maxDistanceKm || 25)) {
       continue;
     }
 
@@ -196,7 +196,7 @@ async function findMatchCandidates(userId: number): Promise<MatchCandidate[]> {
     const commonAgeRanges = findCommonAgeRanges(
       user.childrenInfo as ChildInfo[],
       otherUser.childrenInfo as ChildInfo[],
-      preferences.ageFlexibility
+      preferences.ageFlexibility || 2
     );
 
     // Skip if no age compatibility
@@ -222,7 +222,7 @@ async function findMatchCandidates(userId: number): Promise<MatchCandidate[]> {
     const matchScore = calculateMatchScore(distance, commonAgeRanges);
 
     candidates.push({
-      user: otherUser,
+      user: otherUser as User,
       distance: Math.round(distance),
       commonAgeRanges,
       matchScore
@@ -260,12 +260,8 @@ async function createDadMatch(userId1: number, userId2: number, candidate: Match
 
   // Send notifications to both users
   try {
-    await Promise.all([
-      sendDadMatchNotificationEmail(dadId1, dadId2, candidate),
-      sendDadMatchNotificationEmail(dadId2, dadId1, candidate),
-      sendDadMatchPushNotification(dadId1, dadId2, candidate),
-      sendDadMatchPushNotification(dadId2, dadId1, candidate)
-    ]);
+    await sendDadMatchNotifications(dadId1, dadId2, candidate);
+    await sendDadMatchNotifications(dadId2, dadId1, candidate);
 
     // Mark notifications as sent
     await db
@@ -424,4 +420,31 @@ export async function updateMatchStatus(matchId: number, userId: number, status:
     .where(eq(dadMatches.id, matchId));
 
   return true;
+}
+
+/**
+ * Send dad match notifications (email and push)
+ */
+async function sendDadMatchNotifications(userId: number, matchedUserId: number, candidate: MatchCandidate): Promise<void> {
+  try {
+    // Get user details
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (!user) return;
+
+    const matchedUser = candidate.user;
+    const distance = candidate.distance || 0;
+
+    // Simple console logging for now - in production you'd integrate with email/push services
+    console.log(`=== DAD MATCH NOTIFICATION ===`);
+    console.log(`To: ${user.firstName} (${user.email})`);
+    console.log(`Match: ${matchedUser.firstName} ${matchedUser.lastName} from ${matchedUser.city}`);
+    console.log(`Distance: ${distance}km | Score: ${candidate.matchScore}%`);
+    console.log(`Common age ranges: ${JSON.stringify(candidate.commonAgeRanges)}`);
+    console.log(`==============================`);
+
+    // Here you would integrate with your email service and push notification service
+    // For now, we'll just log the notification
+  } catch (error) {
+    console.error('Error sending dad match notifications:', error);
+  }
 }
