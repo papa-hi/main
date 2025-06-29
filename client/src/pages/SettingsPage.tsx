@@ -3,14 +3,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { Settings, User as UserIcon, Bell, Shield, HelpCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Settings, User as UserIcon, Bell, Shield, HelpCircle, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import NotificationSettings from '@/components/NotificationSettings';
-import { useQuery } from '@tanstack/react-query';
-import { getQueryFn } from '@/lib/queryClient';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { getQueryFn, apiRequest, queryClient } from '@/lib/queryClient';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'wouter';
 import type { User } from '@shared/schema';
+
+interface MatchPreferences {
+  id: number;
+  userId: number;
+  maxDistanceKm: number;
+  ageFlexibility: number;
+  isEnabled: boolean;
+  lastMatchRun: string | null;
+}
 
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState('notifications');
@@ -28,6 +39,11 @@ export default function SettingsPage() {
   const [locationConsent, setLocationConsent] = useState(
     localStorage.getItem('location_consent') === 'true'
   );
+
+  // Dad matching preferences states
+  const [maxDistance, setMaxDistance] = useState(20);
+  const [ageFlexibility, setAgeFlexibility] = useState(2);
+  const [matchingEnabled, setMatchingEnabled] = useState(true);
 
   // GDPR data management functions
   const handleDataExport = async () => {
@@ -109,7 +125,62 @@ export default function SettingsPage() {
     queryFn: getQueryFn({ on401: 'returnNull' })
   });
 
+  // Fetch match preferences
+  const { data: preferences, isLoading: preferencesLoading, refetch: refetchPreferences } = useQuery({
+    queryKey: ["/api/match-preferences"]
+  });
+
+  const matchPrefs = preferences as MatchPreferences | undefined;
+
+  // Update preferences mutation
+  const updatePreferencesMutation = useMutation({
+    mutationFn: (data: { maxDistanceKm: number; ageFlexibility: number; isEnabled: boolean }) =>
+      apiRequest("PATCH", "/api/match-preferences", data),
+    onSuccess: () => {
+      toast({
+        title: "Settings Updated",
+        description: "Your dad matching preferences have been saved."
+      });
+      refetchPreferences();
+      queryClient.invalidateQueries({ queryKey: ["/api/match-preferences"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update preferences",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleSavePreferences = () => {
+    updatePreferencesMutation.mutate({
+      maxDistanceKm: maxDistance,
+      ageFlexibility: ageFlexibility,
+      isEnabled: matchingEnabled
+    });
+  };
+
+  // Update state when preferences load
+  if (matchPrefs && !preferencesLoading) {
+    if (maxDistance !== matchPrefs.maxDistanceKm) {
+      setMaxDistance(matchPrefs.maxDistanceKm);
+    }
+    if (ageFlexibility !== matchPrefs.ageFlexibility) {
+      setAgeFlexibility(matchPrefs.ageFlexibility);
+    }
+    if (matchingEnabled !== matchPrefs.isEnabled) {
+      setMatchingEnabled(matchPrefs.isEnabled);
+    }
+  }
+
   const sections = [
+    {
+      id: 'dadMatching',
+      title: 'Dad Matching',
+      icon: Heart,
+      description: 'Configure how you find other dads'
+    },
     {
       id: 'notifications',
       title: t('settings.notifications.title'),
