@@ -15,7 +15,7 @@ import { db } from "./db";
 import { eq, and, gte, asc, count, desc, like, or, sql, isNull, inArray } from "drizzle-orm";
 import crypto from "crypto";
 import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate } from "./push-notifications";
-import { pushSubscriptions } from "@shared/schema";
+import { pushSubscriptions, matchPreferences } from "@shared/schema";
 import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified } from "./notification-scheduler";
 
 // Helper function to geocode address and get coordinates

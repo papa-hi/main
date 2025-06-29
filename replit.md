@@ -50,6 +50,7 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 - Playdate creation and management
 - User discovery and connection features
 - Rating and review system for places
+- Dad matching system based on location proximity and children's age compatibility
 
 ### Progressive Web App Features
 - Web push notifications with VAPID keys
@@ -122,6 +123,16 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 - **Performance**: Query optimization and response monitoring
 
 ## Recent Changes
+
+### June 29, 2025 - Dad Matching System Implementation
+- **Location-Based Matching**: Comprehensive dad matching system using Netherlands city coordinates for distance calculations
+- **Age Compatibility Logic**: Children's age matching with ±2 years flexibility for finding compatible playdate partners
+- **Smart Match Scoring**: Algorithm combines distance proximity (up to 50km) and age overlap for match quality scores
+- **Dual Notification System**: Email and push notifications sent to both dads when matches are found
+- **Match Management Interface**: Complete frontend for viewing matches, accepting/declining, and configuring preferences
+- **Database Integration**: New tables for dad_matches and match_preferences with expiration handling
+- **API Endpoints**: Full REST API for match discovery, preference management, and match status updates
+- **Automated Matching**: Background service capable of processing all eligible users for optimal match discovery
 
 ### June 21, 2025 - Comprehensive Places Database with Water Features
 - **Complete Places Import**: Successfully imported 77 family-friendly locations across Netherlands including playgrounds, restaurants, and museums
