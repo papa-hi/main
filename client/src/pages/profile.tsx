@@ -90,259 +90,7 @@ interface MatchPreferences {
   lastMatchRun: string | null;
 }
 
-function DadMatchesSection() {
-  const { toast } = useToast();
-  const { user } = useAuth();
 
-  // Fetch matches
-  const { data: matchesResponse, isLoading: matchesLoading, refetch: refetchMatches } = useQuery({
-    queryKey: ["/api/matches"]
-  });
-
-  // Fetch preferences
-  const { data: preferencesResponse, isLoading: preferencesLoading, refetch: refetchPreferences } = useQuery({
-    queryKey: ["/api/match-preferences"]
-  });
-
-  // Ensure proper typing and fallbacks
-  const matches: DadMatch[] = Array.isArray(matchesResponse) ? matchesResponse : [];
-  const preferences = preferencesResponse as MatchPreferences | undefined;
-
-  // Run matching mutation
-  const runMatchingMutation = useMutation({
-    mutationFn: () => apiRequest("POST", "/api/matches/run"),
-    onSuccess: (data: any) => {
-      toast({
-        title: "Matches Updated",
-        description: `Found ${data.newMatches || 0} new matches!`
-      });
-      refetchMatches();
-      refetchPreferences();
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to find matches",
-        variant: "destructive"
-      });
-    }
-  });
-
-  // Update match status mutation
-  const updateMatchMutation = useMutation({
-    mutationFn: ({ matchId, status }: { matchId: number; status: 'accepted' | 'declined' }) =>
-      apiRequest("PATCH", `/api/matches/${matchId}`, { status }),
-    onSuccess: () => {
-      toast({
-        title: "Match Updated",
-        description: "Match status updated successfully"
-      });
-      refetchMatches();
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update match",
-        variant: "destructive"
-      });
-    }
-  });
-
-  const getOtherDad = (match: DadMatch, currentUserId: number) => {
-    return match.dadId1 === currentUserId ? match.dad2 : match.dad1;
-  };
-
-  const canRunMatching = user?.city && user?.childrenInfo && user?.childrenInfo.length > 0;
-
-  if (matchesLoading || preferencesLoading) {
-    return <div className="space-y-4">
-      <Skeleton className="h-32 w-full" />
-      <Skeleton className="h-48 w-full" />
-    </div>;
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Profile Requirements Check */}
-      {!canRunMatching && (
-        <Card className="border-amber-200 bg-amber-50">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <Settings className="h-5 w-5 text-amber-600 mt-0.5" />
-              <div>
-                <h3 className="font-medium text-amber-800">Complete Your Profile</h3>
-                <p className="text-sm text-amber-700 mt-1">
-                  To find dad matches, please add your city and children's information to your profile.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Find New Matches Action */}
-      <Card>
-        <CardContent className="text-center py-6">
-          <div className="flex flex-col items-center gap-4">
-            <div className="text-center">
-              <h3 className="font-semibold text-lg">Discover Dad Connections</h3>
-              <p className="text-gray-600 text-sm">Find other fathers near you with children of similar ages</p>
-            </div>
-            
-            <Button
-              onClick={() => runMatchingMutation.mutate()}
-              disabled={runMatchingMutation.isPending || !canRunMatching}
-              className="flex items-center gap-2 min-w-40"
-              size="lg"
-            >
-              <RefreshCw className={`h-4 w-4 ${runMatchingMutation.isPending ? 'animate-spin' : ''}`} />
-              {runMatchingMutation.isPending ? "Finding Matches..." : "Find New Matches"}
-            </Button>
-            
-            <div className="text-xs text-gray-500 flex items-center gap-4">
-              <span>Distance: {preferences?.maxDistanceKm || 20}km</span>
-              <span>•</span>
-              <span>Age flexibility: ±{preferences?.ageFlexibility || 2} years</span>
-              <span>•</span>
-              <Link href="/settings" className="text-primary hover:underline">
-                Adjust Settings
-              </Link>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Matches List */}
-      {matches.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-12">
-            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Matches Yet</h3>
-            <p className="text-gray-600 mb-4">
-              {!canRunMatching 
-                ? "Complete your profile to start finding dad matches."
-                : "We haven't found any dad matches for you yet. Click 'Find New Matches' to discover connections."
-              }
-            </p>
-            {canRunMatching && (
-              <Button onClick={() => runMatchingMutation.mutate()}>
-                Find My First Matches
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {matches.map((match) => {
-            const otherDad = getOtherDad(match, user?.id || 0);
-            const isPending = match.matchStatus === 'pending';
-            
-            return (
-              <Card key={match.id} className="overflow-hidden">
-                <CardContent className="p-6">
-                  <div className="flex flex-col sm:flex-row gap-6">
-                    {/* Dad Profile */}
-                    <div className="flex items-start gap-4 flex-1">
-                      <Avatar className="h-16 w-16">
-                        <AvatarImage src={otherDad.profileImage || ""} />
-                        <AvatarFallback className="text-lg">
-                          {otherDad.firstName[0]}{otherDad.lastName[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-gray-900">
-                          {otherDad.firstName} {otherDad.lastName}
-                        </h3>
-                        
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" />
-                            {otherDad.city}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <span>~{Math.round(match.distanceKm)}km away</span>
-                          </div>
-                        </div>
-                        
-                        {/* Children Info */}
-                        {otherDad.childrenInfo && otherDad.childrenInfo.length > 0 && (
-                          <div className="mt-3">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Baby className="h-4 w-4 text-gray-500" />
-                              <span className="text-sm font-medium text-gray-700">Children:</span>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              {otherDad.childrenInfo.map((child: any, index: number) => (
-                                <Badge key={index} variant="outline" className="text-xs">
-                                  {child.name} ({child.age}y)
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Match Details */}
-                        <div className="mt-3">
-                          <Badge variant="secondary" className="text-xs">
-                            {match.matchScore}% match
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Action Buttons */}
-                    {isPending && (
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                        <Button
-                          size="sm"
-                          onClick={() => updateMatchMutation.mutate({ 
-                            matchId: match.id, 
-                            status: 'accepted' 
-                          })}
-                          disabled={updateMatchMutation.isPending}
-                          className="flex items-center gap-2"
-                        >
-                          <Heart className="h-4 w-4" />
-                          Accept
-                        </Button>
-                        
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateMatchMutation.mutate({ 
-                            matchId: match.id, 
-                            status: 'declined' 
-                          })}
-                          disabled={updateMatchMutation.isPending}
-                          className="flex items-center gap-2"
-                        >
-                          <X className="h-4 w-4" />
-                          Decline
-                        </Button>
-                      </div>
-                    )}
-                    
-                    {!isPending && (
-                      <div className="flex items-center">
-                        <Badge 
-                          variant={match.matchStatus === 'accepted' ? 'default' : 'secondary'}
-                          className="capitalize"
-                        >
-                          {match.matchStatus}
-                        </Badge>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function ProfilePage() {
   const { t } = useTranslation();
@@ -1080,7 +828,45 @@ export default function ProfilePage() {
           </TabsContent>
 
           <TabsContent value="matches" className="mt-4">
-            <DadMatchesSection />
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Heart className="h-5 w-5" />
+                  Dad Matches
+                </CardTitle>
+                <CardDescription>
+                  Connect with other dads based on location and children's ages
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 space-y-4">
+                  <Users className="h-12 w-12 text-gray-400 mx-auto" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Discover Dad Matches</h3>
+                    <p className="text-gray-600 text-sm mt-2">
+                      Find and connect with other fathers in your area with children of similar ages.
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+                    <Link to="/matches">
+                      <Button className="w-full">
+                        <Heart className="h-4 w-4 mr-2" />
+                        View All Matches
+                      </Button>
+                    </Link>
+                    <Link to="/settings">
+                      <Button variant="outline" className="w-full">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Match Settings
+                      </Button>
+                    </Link>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Configure distance and age preferences in settings
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="notifications" className="mt-4">

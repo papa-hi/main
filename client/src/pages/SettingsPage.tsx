@@ -209,6 +209,114 @@ export default function SettingsPage() {
 
   const renderContent = () => {
     switch (activeSection) {
+      case 'dadMatching':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Heart className="h-5 w-5" />
+                Dad Matching Preferences
+              </CardTitle>
+              <CardDescription>
+                Configure how we help you find other dads in your area with children of similar ages.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {preferencesLoading ? (
+                <div className="space-y-4">
+                  <div className="animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+                    <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                  <div className="animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+                    <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Enable Dad Matching</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Allow the system to find other dads for you
+                      </p>
+                    </div>
+                    <Switch
+                      checked={matchingEnabled}
+                      onCheckedChange={setMatchingEnabled}
+                    />
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="maxDistance">
+                        Maximum Distance: {maxDistance} km
+                      </Label>
+                      <Input
+                        id="maxDistance"
+                        type="range"
+                        min="5"
+                        max="50"
+                        step="5"
+                        value={maxDistance}
+                        onChange={(e) => setMaxDistance(Number(e.target.value))}
+                        className="w-full"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        We'll look for other dads within {maxDistance} km of your location
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="ageFlexibility">
+                        Age Flexibility: ±{ageFlexibility} years
+                      </Label>
+                      <Input
+                        id="ageFlexibility"
+                        type="range"
+                        min="1"
+                        max="5"
+                        step="1"
+                        value={ageFlexibility}
+                        onChange={(e) => setAgeFlexibility(Number(e.target.value))}
+                        className="w-full"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Match with dads whose children are within ±{ageFlexibility} years of your children's ages
+                      </p>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">Current Settings</p>
+                      <p className="text-sm text-muted-foreground">
+                        {matchingEnabled ? 'Enabled' : 'Disabled'} • {maxDistance}km radius • ±{ageFlexibility} year age range
+                      </p>
+                      {matchPrefs?.lastMatchRun && (
+                        <p className="text-xs text-muted-foreground">
+                          Last match run: {new Date(matchPrefs.lastMatchRun).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                    <Button 
+                      onClick={handleSavePreferences}
+                      disabled={updatePreferencesMutation.isPending}
+                    >
+                      {updatePreferencesMutation.isPending ? 'Saving...' : 'Save Preferences'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        );
+
       case 'notifications':
         return <NotificationSettings />;
       
