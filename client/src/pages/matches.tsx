@@ -1,13 +1,13 @@
-import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, Users, Heart, X, RefreshCw, Settings, Baby } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
 
 interface DadMatch {
   id: number;
@@ -36,29 +36,17 @@ interface DadMatch {
   };
 }
 
-interface MatchPreferences {
-  id: number;
-  userId: number;
-  maxDistanceKm: number;
-  ageFlexibility: number;
-  isEnabled: boolean;
-  lastMatchRun: string | null;
-}
+
 
 export default function MatchesPage() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [showPreferences, setShowPreferences] = useState(false);
+  const { user } = useAuth();
 
   // Fetch user matches
   const { data: matches = [], isLoading: matchesLoading } = useQuery<DadMatch[]>({
     queryKey: ["/api/matches"],
-  });
-
-  // Fetch match preferences
-  const { data: preferences } = useQuery<MatchPreferences>({
-    queryKey: ["/api/match-preferences"],
   });
 
   // Run matching algorithm
@@ -139,14 +127,15 @@ export default function MatchesPage() {
         </div>
         
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setShowPreferences(!showPreferences)}
-            className="flex items-center gap-2"
-          >
-            <Settings className="h-4 w-4" />
-            Preferences
-          </Button>
+          <Link to="/settings">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              Settings
+            </Button>
+          </Link>
           
           <Button
             onClick={() => runMatchingMutation.mutate()}
@@ -163,51 +152,7 @@ export default function MatchesPage() {
         </div>
       </div>
 
-      {/* Preferences Panel */}
-      {showPreferences && preferences && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Matching Preferences</CardTitle>
-            <CardDescription>
-              Customize how we find potential dad matches for you
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Max Distance</label>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-primary">
-                    {preferences.maxDistanceKm}km
-                  </span>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Age Flexibility</label>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-primary">
-                    ±{preferences.ageFlexibility} years
-                  </span>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Status</label>
-                <Badge variant={preferences.isEnabled ? "default" : "secondary"}>
-                  {preferences.isEnabled ? "Enabled" : "Disabled"}
-                </Badge>
-              </div>
-            </div>
-            
-            {preferences.lastMatchRun && (
-              <p className="text-sm text-gray-500">
-                Last match run: {new Date(preferences.lastMatchRun).toLocaleDateString()}
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Matches List */}
       {matches.length === 0 ? (
