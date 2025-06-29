@@ -93,7 +93,7 @@ export const dadMatches = pgTable("dad_matches", {
 export const matchPreferences = pgTable("match_preferences", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
-  maxDistanceKm: integer("max_distance_km").default(25), // Max distance for matches in km
+  maxDistanceKm: integer("max_distance_km").default(20), // Max distance for matches in km
   ageFlexibility: integer("age_flexibility").default(2), // +/- years for age matching
   isEnabled: boolean("is_enabled").default(true),
   lastMatchRun: timestamp("last_match_run"),

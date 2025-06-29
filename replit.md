@@ -127,7 +127,7 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 ### June 29, 2025 - Dad Matching System Implementation
 - **Location-Based Matching**: Comprehensive dad matching system using Netherlands city coordinates for distance calculations
 - **Age Compatibility Logic**: Children's age matching with ±2 years flexibility for finding compatible playdate partners
-- **Smart Match Scoring**: Algorithm combines distance proximity (up to 50km) and age overlap for match quality scores
+- **Smart Match Scoring**: Algorithm combines distance proximity (default 20km) and age overlap for match quality scores
 - **Dual Notification System**: Email and push notifications sent to both dads when matches are found
 - **Match Management Interface**: Complete frontend for viewing matches, accepting/declining, and configuring preferences
 - **Database Integration**: New tables for dad_matches and match_preferences with expiration handling

@@ -129,7 +129,7 @@ async function getMatchPreferences(userId: number): Promise<MatchPreferences> {
     .insert(matchPreferences)
     .values({
       userId,
-      maxDistanceKm: 25,
+      maxDistanceKm: 20,
       ageFlexibility: 2,
       isEnabled: true,
     })
@@ -188,7 +188,7 @@ async function findMatchCandidates(userId: number): Promise<MatchCandidate[]> {
     );
 
     // Check if within distance preference
-    if (distance > (preferences.maxDistanceKm || 25)) {
+    if (distance > (preferences.maxDistanceKm || 20)) {
       continue;
     }
 

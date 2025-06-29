@@ -3523,7 +3523,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .insert(matchPreferences)
           .values({
             userId,
-            maxDistanceKm: 25,
+            maxDistanceKm: 20,
             ageFlexibility: 2,
             isEnabled: true,
           })
