@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,74 +17,176 @@ const PaPaHiLogo = () => (
 );
 
 interface PrivacyConsentDialogProps {
-  onAccept: () => void;
+  onAccept: (preferences: ConsentPreferences) => void;
   onReject: () => void;
+}
+
+interface ConsentPreferences {
+  essential: boolean;
+  location: boolean;
+  analytics: boolean;
+  marketing: boolean;
 }
 
 export function PrivacyConsentDialog({ onAccept, onReject }: PrivacyConsentDialogProps) {
   const { t } = useTranslation('pwa');
+  const [showCustom, setShowCustom] = useState(false);
+  const [preferences, setPreferences] = useState<ConsentPreferences>({
+    essential: true,
+    location: true,
+    analytics: false,
+    marketing: false
+  });
+
+  const handleAcceptAll = () => {
+    const allConsent = {
+      essential: true,
+      location: true,
+      analytics: true,
+      marketing: true
+    };
+    onAccept(allConsent);
+  };
+
+  const handleEssentialOnly = () => {
+    const essentialOnly = {
+      essential: true,
+      location: false,
+      analytics: false,
+      marketing: false
+    };
+    onAccept(essentialOnly);
+  };
+
+  const handleCustomAccept = () => {
+    onAccept(preferences);
+  };
+
+  const updatePreference = (key: keyof ConsentPreferences, value: boolean) => {
+    setPreferences(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
   
   return (
     <Dialog open={true}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t('privacy.title', 'Privacy Settings')}</DialogTitle>
+          <DialogTitle>{t('privacy.title', 'Privacy & Cookie Settings')}</DialogTitle>
           <DialogDescription>
-            {t('privacy.description', 'To provide you with the best experience, we use location services and save your preferences. We care about your privacy and don\'t share your data with third parties.')}
+            {t('privacy.description', 'We use cookies and similar technologies to provide you with the best experience. Choose your preferences below or accept all to continue.')}
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-3 my-4">
-          <div className="flex items-start space-x-2">
-            <Checkbox id="essentialCookies" defaultChecked disabled />
-            <div className="grid gap-1.5">
-              <Label htmlFor="essentialCookies" className="font-medium">
-                {t('privacy.essentialCookies', 'Essential Cookies')}
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                {t('privacy.essentialCookiesDesc', 'Necessary for the app to function.')}
-              </p>
+        {!showCustom ? (
+          // Simple three-button interface
+          <div className="space-y-4 my-6">
+            <div className="text-sm text-muted-foreground">
+              {t('privacy.choose', 'Choose how we can use cookies and process your data:')}
+            </div>
+            
+            <div className="grid gap-3">
+              <Button onClick={handleAcceptAll} className="bg-primary hover:bg-primary/90 text-white">
+                {t('privacy.acceptAll', 'Accept All')}
+              </Button>
+              
+              <Button onClick={handleEssentialOnly} variant="outline">
+                {t('privacy.essentialOnly', 'Essential Only')}
+              </Button>
+              
+              <Button onClick={() => setShowCustom(true)} variant="outline">
+                {t('privacy.customPreferences', 'Custom Preferences')}
+              </Button>
             </div>
           </div>
-          
-          <div className="flex items-start space-x-2">
-            <Checkbox id="locationServices" defaultChecked />
-            <div className="grid gap-1.5">
-              <Label htmlFor="locationServices" className="font-medium">
-                {t('privacy.locationServices', 'Location Services')}
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                {t('privacy.locationServicesDesc', 'Allow finding places near you.')}
-              </p>
+        ) : (
+          // Custom preferences interface
+          <div className="space-y-4 my-4">
+            <div className="space-y-3">
+              <div className="flex items-start space-x-2">
+                <Checkbox 
+                  id="essentialCookies" 
+                  checked={preferences.essential}
+                  disabled 
+                />
+                <div className="grid gap-1.5">
+                  <Label htmlFor="essentialCookies" className="font-medium">
+                    {t('privacy.essentialCookies', 'Essential Cookies')}
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    {t('privacy.essentialCookiesDesc', 'Necessary for the app to function properly.')}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-2">
+                <Checkbox 
+                  id="locationServices" 
+                  checked={preferences.location}
+                  onCheckedChange={(checked) => updatePreference('location', checked as boolean)}
+                />
+                <div className="grid gap-1.5">
+                  <Label htmlFor="locationServices" className="font-medium">
+                    {t('privacy.locationServices', 'Location Services')}
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    {t('privacy.locationServicesDesc', 'Find places and connect with people near you.')}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-2">
+                <Checkbox 
+                  id="analyticsConsent" 
+                  checked={preferences.analytics}
+                  onCheckedChange={(checked) => updatePreference('analytics', checked as boolean)}
+                />
+                <div className="grid gap-1.5">
+                  <Label htmlFor="analyticsConsent" className="font-medium">
+                    {t('privacy.analytics', 'Analytics & Performance')}
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    {t('privacy.analyticsDesc', 'Help us improve the app by collecting usage data.')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <Checkbox 
+                  id="marketingConsent" 
+                  checked={preferences.marketing}
+                  onCheckedChange={(checked) => updatePreference('marketing', checked as boolean)}
+                />
+                <div className="grid gap-1.5">
+                  <Label htmlFor="marketingConsent" className="font-medium">
+                    {t('privacy.marketing', 'Marketing & Communications')}
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    {t('privacy.marketingDesc', 'Receive updates, tips, and promotional content.')}
+                  </p>
+                </div>
+              </div>
             </div>
+            
+            <DialogFooter className="flex flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setShowCustom(false)} className="flex-1">
+                {t('privacy.back', 'Back')}
+              </Button>
+              <Button onClick={handleCustomAccept} className="bg-primary hover:bg-primary/90 text-white flex-1">
+                {t('privacy.savePreferences', 'Save Preferences')}
+              </Button>
+            </DialogFooter>
           </div>
-          
-          <div className="flex items-start space-x-2">
-            <Checkbox id="analyticsConsent" />
-            <div className="grid gap-1.5">
-              <Label htmlFor="analyticsConsent" className="font-medium">
-                {t('privacy.analytics', 'Analytics')}
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                {t('privacy.analyticsDesc', 'Helps us improve the app.')}
-              </p>
-            </div>
-          </div>
-        </div>
+        )}
         
-        <DialogFooter className="flex flex-col sm:flex-row gap-2">
-          <Button variant="outline" onClick={onReject} className="flex-1">
-            {t('privacy.reject', 'Reject')}
-          </Button>
-          <Button onClick={onAccept} className="bg-primary hover:bg-accent text-white flex-1">
-            {t('privacy.accept', 'Accept')}
-          </Button>
-        </DialogFooter>
-        <div className="text-center">
-          <a href="/privacy" className="text-primary text-xs hover:underline">
-            {t('privacy.viewPrivacyPolicy', 'View Privacy Policy')}
-          </a>
-        </div>
+        {!showCustom && (
+          <div className="text-center">
+            <a href="/privacy" className="text-primary text-xs hover:underline">
+              {t('privacy.viewPrivacyPolicy', 'View Privacy Policy')}
+            </a>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

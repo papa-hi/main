@@ -137,13 +137,19 @@ function App() {
     };
   }, []);
 
-  const handleAcceptPrivacy = () => {
+  const handleAcceptPrivacy = (preferences: any) => {
     localStorage.setItem('privacy_consent', 'true');
+    localStorage.setItem('analytics_consent', preferences.analytics.toString());
+    localStorage.setItem('marketing_consent', preferences.marketing.toString());
+    localStorage.setItem('location_consent', preferences.location.toString());
     setShowPrivacyConsent(false);
   };
 
   const handleRejectPrivacy = () => {
     localStorage.setItem('privacy_consent', 'false');
+    localStorage.setItem('analytics_consent', 'false');
+    localStorage.setItem('marketing_consent', 'false');
+    localStorage.setItem('location_consent', 'false');
     setShowPrivacyConsent(false);
   };
 
