@@ -158,6 +158,12 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
             <i className="fas fa-map-marker-alt ml-3 mr-1 text-xs"></i>
             <span>{playdate.location}</span>
           </div>
+          <div className="flex items-center text-sm mb-2">
+            <i className="fas fa-euro-sign mr-1 text-xs text-primary"></i>
+            <span className={`${playdate.cost?.toLowerCase() === 'free' ? 'text-green-600 font-medium' : 'text-dark/70'}`}>
+              {playdate.cost || 'Free'}
+            </span>
+          </div>
           <div className="flex items-center mb-3">
             <div className="flex space-x-1 mr-3">
               {playdate.participants.map((participant, index) => {

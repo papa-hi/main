@@ -206,6 +206,7 @@ export const playdates = pgTable("playdates", {
   endTime: timestamp("end_time").notNull(),
   creatorId: integer("creator_id").notNull().references(() => users.id),
   maxParticipants: integer("max_participants").default(5).notNull(),
+  cost: text("cost").default("free"), // "free", "paid", or specific amount like "€5 per child"
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

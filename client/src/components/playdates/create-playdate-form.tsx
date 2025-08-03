@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Clock, Users, MapPin } from "lucide-react";
+import { Calendar, Clock, Users, MapPin, Euro } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +17,7 @@ import { format } from "date-fns";
 const createPlaydateFormSchema = insertPlaydateSchema.extend({
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
+  cost: z.string().optional().default("Free"),
 });
 
 type CreatePlaydateFormData = z.infer<typeof createPlaydateFormSchema>;
@@ -48,6 +49,7 @@ export function CreatePlaydateForm({
       startTime: "",
       endTime: "",
       maxParticipants: 6,
+      cost: "Free",
     },
   });
 
@@ -224,6 +226,27 @@ export function CreatePlaydateForm({
           {form.formState.errors.maxParticipants && (
             <p className="text-sm text-red-500 mt-1">
               {form.formState.errors.maxParticipants.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <Label htmlFor="cost" className="flex items-center gap-2">
+            <Euro className="h-4 w-4" />
+            Cost
+          </Label>
+          <Input
+            id="cost"
+            {...form.register("cost")}
+            placeholder="e.g., Free, €5 per child, €10 entry fee"
+            className="mt-1"
+          />
+          <p className="text-sm text-muted-foreground mt-1">
+            Enter "Free" for no cost, or specify the amount (e.g., "€5 per child")
+          </p>
+          {form.formState.errors.cost && (
+            <p className="text-sm text-red-500 mt-1">
+              {form.formState.errors.cost.message}
             </p>
           )}
         </div>

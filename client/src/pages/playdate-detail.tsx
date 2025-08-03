@@ -261,6 +261,16 @@ export default function PlaydateDetailPage() {
                 </p>
               </div>
             </div>
+            
+            <div className="flex items-start">
+              <i className="fas fa-euro-sign mt-1 mr-3 text-primary"></i>
+              <div>
+                <p className="font-medium">{t('playdates.cost', 'Cost')}</p>
+                <p className={`${playdate.cost?.toLowerCase() === 'free' ? 'text-green-600' : 'text-muted-foreground'}`}>
+                  {playdate.cost || 'Free'}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         
