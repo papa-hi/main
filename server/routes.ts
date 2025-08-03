@@ -1086,7 +1086,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ...req.body,
           // Convert ISO strings to Date objects
           startTime: req.body.startTime ? new Date(req.body.startTime) : undefined,
-          endTime: req.body.endTime ? new Date(req.body.endTime) : undefined
+          endTime: req.body.endTime ? new Date(req.body.endTime) : undefined,
+          recurringEndDate: req.body.recurringEndDate ? new Date(req.body.recurringEndDate) : undefined
         };
         
         console.log("Processed dates:", {
