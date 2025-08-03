@@ -1108,13 +1108,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log("REGULAR ENDPOINT: Final playdate data with creatorId:", playdateDataWithCreator);
         
-        const newPlaydate = await storage.createPlaydate(playdateDataWithCreator);
-        
-        // Schedule push notification reminders for the new playdate
-        await schedulePlaydateReminders(newPlaydate.id);
-        
-        console.log("Successfully created new playdate:", newPlaydate);
-        return res.status(201).json(newPlaydate);
+        // Check if this is a recurring playdate
+        if (playdateDataWithCreator.isRecurring && playdateDataWithCreator.recurringType === "daily" && playdateDataWithCreator.recurringEndDate) {
+          console.log("Creating recurring daily playdates");
+          
+          const startDate = new Date(playdateDataWithCreator.startTime);
+          const endDate = new Date(playdateDataWithCreator.endTime);
+          const recurringEndDate = new Date(playdateDataWithCreator.recurringEndDate);
+          
+          // Calculate the duration of the original playdate
+          const playdateDuration = endDate.getTime() - startDate.getTime();
+          
+          const createdPlaydates = [];
+          const currentDate = new Date(startDate);
+          
+          // Create the first playdate (original)
+          const firstPlaydate = await storage.createPlaydate(playdateDataWithCreator);
+          createdPlaydates.push(firstPlaydate);
+          
+          // Create daily playdates until the end date
+          while (currentDate < recurringEndDate) {
+            currentDate.setDate(currentDate.getDate() + 1);
+            
+            if (currentDate <= recurringEndDate) {
+              const newStartTime = new Date(currentDate);
+              const newEndTime = new Date(currentDate.getTime() + playdateDuration);
+              
+              const recurringPlaydateData = {
+                ...playdateDataWithCreator,
+                startTime: newStartTime,
+                endTime: newEndTime,
+                parentPlaydateId: firstPlaydate.id,
+                isRecurring: true,
+                recurringType: "daily",
+                recurringEndDate: playdateDataWithCreator.recurringEndDate
+              };
+              
+              const recurringPlaydate = await storage.createPlaydate(recurringPlaydateData);
+              createdPlaydates.push(recurringPlaydate);
+              
+              // Schedule reminders for each recurring playdate
+              await schedulePlaydateReminders(recurringPlaydate.id);
+            }
+          }
+          
+          console.log(`Successfully created ${createdPlaydates.length} recurring playdates`);
+          return res.status(201).json({
+            message: `Created ${createdPlaydates.length} recurring playdates`,
+            playdates: createdPlaydates,
+            mainPlaydate: firstPlaydate
+          });
+          
+        } else {
+          // Create a single playdate
+          const newPlaydate = await storage.createPlaydate(playdateDataWithCreator);
+          
+          // Schedule push notification reminders for the new playdate
+          await schedulePlaydateReminders(newPlaydate.id);
+          
+          console.log("Successfully created new playdate:", newPlaydate);
+          return res.status(201).json(newPlaydate);
+        }
       } catch (validationErr) {
         if (validationErr instanceof ZodError) {
           console.error("Validation error:", validationErr.errors);

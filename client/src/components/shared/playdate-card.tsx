@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { Repeat } from "lucide-react";
 import { useLocation } from "wouter";
 
 interface PlaydateCardProps {
@@ -163,6 +164,12 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
             <span className={`${playdate.cost?.toLowerCase() === 'free' ? 'text-green-600 font-medium' : 'text-dark/70'}`}>
               {playdate.cost || 'Free'}
             </span>
+            {playdate.isRecurring && (
+              <div className="ml-3 flex items-center text-blue-600">
+                <Repeat className="h-3 w-3 mr-1" />
+                <span className="text-xs font-medium">Recurring</span>
+              </div>
+            )}
           </div>
           <div className="flex items-center mb-3">
             <div className="flex space-x-1 mr-3">

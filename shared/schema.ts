@@ -207,6 +207,10 @@ export const playdates = pgTable("playdates", {
   creatorId: integer("creator_id").notNull().references(() => users.id),
   maxParticipants: integer("max_participants").default(5).notNull(),
   cost: text("cost").default("free"), // "free", "paid", or specific amount like "€5 per child"
+  isRecurring: boolean("is_recurring").default(false),
+  recurringEndDate: timestamp("recurring_end_date"),
+  recurringType: text("recurring_type").default("none"), // "none", "daily", "weekly", "monthly"
+  parentPlaydateId: integer("parent_playdate_id"), // For recurring instances, points to the original
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -229,6 +233,11 @@ export const insertPlaydateSchema = createInsertSchema(playdates).pick({
   startTime: true,
   endTime: true,
   maxParticipants: true,
+  cost: true,
+  isRecurring: true,
+  recurringType: true,
+  recurringEndDate: true,
+  parentPlaydateId: true,
 });
 
 // Playdate participants schema

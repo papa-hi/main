@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Clock, Users, MapPin, Euro } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Clock, Users, MapPin, Euro, Repeat } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +20,17 @@ const createPlaydateFormSchema = insertPlaydateSchema.extend({
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
   cost: z.string().optional().default("Free"),
+  isRecurring: z.boolean().optional().default(false),
+  recurringType: z.string().optional().default("none"),
+  recurringEndDate: z.string().optional(),
+}).refine((data) => {
+  if (data.isRecurring && data.recurringType === "daily" && !data.recurringEndDate) {
+    return false;
+  }
+  return true;
+}, {
+  message: "End date is required for daily recurring playdates",
+  path: ["recurringEndDate"],
 });
 
 type CreatePlaydateFormData = z.infer<typeof createPlaydateFormSchema>;
@@ -37,6 +50,7 @@ export function CreatePlaydateForm({
 }: CreatePlaydateFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [isRecurring, setIsRecurring] = useState(false);
   
   const form = useForm<CreatePlaydateFormData>({
     resolver: zodResolver(createPlaydateFormSchema),
@@ -50,6 +64,9 @@ export function CreatePlaydateForm({
       endTime: "",
       maxParticipants: 6,
       cost: "Free",
+      isRecurring: false,
+      recurringType: "none",
+      recurringEndDate: "",
     },
   });
 
@@ -248,6 +265,66 @@ export function CreatePlaydateForm({
             <p className="text-sm text-red-500 mt-1">
               {form.formState.errors.cost.message}
             </p>
+          )}
+        </div>
+
+        <div className="space-y-4 border-t pt-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="isRecurring" 
+              checked={isRecurring}
+              onCheckedChange={(checked) => {
+                setIsRecurring(checked as boolean);
+                form.setValue("isRecurring", checked as boolean);
+                if (!checked) {
+                  form.setValue("recurringType", "none");
+                  form.setValue("recurringEndDate", "");
+                }
+              }}
+            />
+            <Label htmlFor="isRecurring" className="flex items-center gap-2">
+              <Repeat className="h-4 w-4" />
+              Recurring Playdate
+            </Label>
+          </div>
+
+          {isRecurring && (
+            <div className="space-y-4 ml-6">
+              <div>
+                <Label htmlFor="recurringType">Repeat</Label>
+                <Select
+                  value={form.watch("recurringType")}
+                  onValueChange={(value) => form.setValue("recurringType", value)}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select repeat option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="recurringEndDate">End Date</Label>
+                <Input
+                  id="recurringEndDate"
+                  type="date"
+                  {...form.register("recurringEndDate")}
+                  className="mt-1"
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  The last date for this recurring playdate
+                </p>
+                {form.formState.errors.recurringEndDate && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {form.formState.errors.recurringEndDate.message}
+                  </p>
+                )}
+              </div>
+            </div>
           )}
         </div>
 
