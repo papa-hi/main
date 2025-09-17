@@ -57,6 +57,7 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 - Service worker for offline capabilities
 - App manifest for mobile installation
 - Privacy-compliant notification system
+- Location-based playdate notifications for nearby events
 
 ### Admin Dashboard
 - User management and role assignment
@@ -143,6 +144,16 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 - **Fixed Technical Issues**: Resolved user ID handling in getOtherDad function and removed unused state/imports
 - **Improved User Experience**: Clear navigation paths between match viewing, match discovery, and preference configuration
 - **Working API Integration**: Confirmed dad matching algorithm runs successfully (returns 0 matches when no compatible users exist)
+
+### September 17, 2025 - Location-Based Playdate Notifications
+- **Proximity-Based Notifications**: Automatic push notifications sent to users when new playdates are created within their preferred distance (default 20km)
+- **Smart User Filtering**: Optimized database queries that exclude admin users and only notify users with active push subscriptions
+- **Distance-Based Matching**: Uses Haversine formula for accurate distance calculations between user locations and new playdate coordinates
+- **Respect User Preferences**: Honors each user's maxDistanceKm setting from their dad matching preferences for notification radius
+- **Rich Notification Content**: Push notifications include playdate title, location, distance, and action buttons for immediate engagement
+- **Seamless Integration**: Works with both single playdates and recurring daily events, ensuring all users get timely notifications
+- **Performance Optimized**: Single JOIN query replaces N+1 database calls for efficient user lookup and notification delivery
+- **Error Resilient**: Comprehensive error handling ensures playdate creation never fails due to notification issues
 
 ### June 29, 2025 - Dad Matching System Implementation
 - **Location-Based Matching**: Comprehensive dad matching system using Netherlands city coordinates for distance calculations
