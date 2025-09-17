@@ -18,7 +18,7 @@ interface MatchCandidate {
 /**
  * Calculate distance between two coordinates using Haversine formula
  */
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Earth's radius in kilometers
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -34,7 +34,7 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
  * Get coordinates for a city using a simple mapping
  * In production, this would use a geocoding service
  */
-function getCityCoordinates(city: string): { lat: number; lon: number } | null {
+export function getCityCoordinates(city: string): { lat: number; lon: number } | null {
   // Netherlands major cities coordinates
   const cityCoords: Record<string, { lat: number; lon: number }> = {
     'amsterdam': { lat: 52.3676, lon: 4.9041 },

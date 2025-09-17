@@ -17,6 +17,7 @@ import crypto from "crypto";
 import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate } from "./push-notifications";
 import { pushSubscriptions, matchPreferences } from "@shared/schema";
 import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified } from "./notification-scheduler";
+import { calculateDistance, getCityCoordinates } from "./dad-matching-service";
 
 // Helper function to geocode address and get coordinates
 async function geocodeAddress(address: string): Promise<{ latitude: number; longitude: number } | null> {
@@ -104,6 +105,144 @@ function getRandomMuseumImage(): string {
   museumImageCounter++;
   
   return selectedImage;
+}
+
+// Helper function to notify nearby users about new playdates
+async function notifyNearbyUsers(playdateId: number): Promise<void> {
+  try {
+    console.log(`Starting location-based notifications for playdate ${playdateId}`);
+    
+    // Get the playdate details
+    const playdate = await storage.getPlaydateById(playdateId);
+    if (!playdate) {
+      console.error(`Playdate ${playdateId} not found for notifications`);
+      return;
+    }
+
+    // Check if playdate has valid coordinates with robust validation
+    const playdateLat = parseFloat(playdate.latitude || "0");
+    const playdateLon = parseFloat(playdate.longitude || "0");
+    
+    // Add isFinite checks to prevent NaN distance calculations
+    if (!isFinite(playdateLat) || !isFinite(playdateLon) || (playdateLat === 0 && playdateLon === 0)) {
+      console.log(`Playdate ${playdateId} has invalid coordinates (${playdateLat}, ${playdateLon}), skipping location-based notifications`);
+      return;
+    }
+
+    console.log(`Playdate location: ${playdateLat}, ${playdateLon}`);
+
+    // Optimized query: Fetch users with their matchPreferences and pushSubscriptions in one query
+    // This eliminates the N+1 query problem and filters out unwanted users upfront
+    const eligibleUsersQuery = await db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        city: users.city,
+        role: users.role,
+        maxDistanceKm: matchPreferences.maxDistanceKm,
+        hasPushSubscription: sql<boolean>`CASE WHEN ${pushSubscriptions.userId} IS NOT NULL THEN true ELSE false END`.as('has_push_subscription'),
+      })
+      .from(users)
+      .leftJoin(matchPreferences, eq(matchPreferences.userId, users.id))
+      .leftJoin(pushSubscriptions, eq(pushSubscriptions.userId, users.id))
+      .where(
+        and(
+          // Filter out the playdate creator
+          sql`${users.id} != ${playdate.creatorId}`,
+          // Filter out admin users
+          sql`${users.role} != 'admin'`,
+          // Only include users with a city
+          sql`${users.city} IS NOT NULL AND ${users.city} != ''`,
+          // Only include users with push subscriptions
+          sql`${pushSubscriptions.userId} IS NOT NULL`
+        )
+      );
+
+    console.log(`Found ${eligibleUsersQuery.length} eligible users with push subscriptions to check for proximity`);
+
+    let notificationsSent = 0;
+    let usersChecked = 0;
+
+    for (const user of eligibleUsersQuery) {
+      try {
+        // Get user's city coordinates
+        const userCoords = getCityCoordinates(user.city);
+        if (!userCoords) {
+          continue;
+        }
+
+        usersChecked++;
+
+        // Calculate distance between playdate and user's city
+        const distance = calculateDistance(
+          playdateLat, playdateLon,
+          userCoords.lat, userCoords.lon
+        );
+
+        // Validate distance calculation result
+        if (!isFinite(distance) || distance < 0) {
+          console.warn(`Invalid distance calculation for user ${user.id}: ${distance}`);
+          continue;
+        }
+
+        // Use user's distance preference (default 20km if not set)
+        const maxDistance = user.maxDistanceKm || 20;
+
+        // Check if user is within range
+        if (distance <= maxDistance) {
+          console.log(`User ${user.firstName} (${user.city}) is ${distance.toFixed(1)}km away, sending notification`);
+          
+          // Safe startTime serialization - handle both Date objects and strings
+          let startTimeString: string | undefined;
+          try {
+            if (playdate.startTime) {
+              startTimeString = playdate.startTime instanceof Date 
+                ? playdate.startTime.toISOString()
+                : new Date(playdate.startTime).toISOString();
+            }
+          } catch (dateError) {
+            console.warn(`Error serializing startTime for playdate ${playdateId}:`, dateError);
+            startTimeString = undefined;
+          }
+          
+          // Send notification
+          await sendNotificationToUser(user.id, {
+            title: "New playdate near you!",
+            body: `Someone created a playdate '${playdate.title}' in ${playdate.location}`,
+            icon: "/icons/icon-192x192.png",
+            badge: "/icons/icon-192x192.png",
+            data: {
+              type: "new_playdate_nearby",
+              playdateId: playdate.id,
+              playdateTitle: playdate.title,
+              location: playdate.location,
+              distance: Math.round(distance),
+              startTime: startTimeString
+            },
+            actions: [
+              {
+                action: "view",
+                title: "View Playdate"
+              }
+            ]
+          });
+
+          notificationsSent++;
+        } else {
+          console.log(`User ${user.firstName} (${user.city}) is ${distance.toFixed(1)}km away (outside ${maxDistance}km range)`);
+        }
+      } catch (userError) {
+        console.error(`Error processing user ${user.id} for playdate notifications:`, userError);
+        // Continue with other users even if one fails
+      }
+    }
+
+    console.log(`Location-based notifications completed for playdate ${playdateId}: ${notificationsSent} notifications sent to nearby users out of ${usersChecked} users checked`);
+
+  } catch (error) {
+    console.error(`Error sending location-based notifications for playdate ${playdateId}:`, error);
+    // Don't throw the error - we don't want to fail playdate creation if notifications fail
+  }
 }
 
 // Middleware to check if user is authenticated
@@ -1127,6 +1266,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const firstPlaydate = await storage.createPlaydate(playdateDataWithCreator);
           createdPlaydates.push(firstPlaydate);
           
+          // Send location-based notifications for the first playdate
+          await notifyNearbyUsers(firstPlaydate.id);
+          
           // Create daily playdates until the end date
           while (currentDate < recurringEndDate) {
             currentDate.setDate(currentDate.getDate() + 1);
@@ -1150,6 +1292,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               // Schedule reminders for each recurring playdate
               await schedulePlaydateReminders(recurringPlaydate.id);
+              
+              // Send location-based notifications for each recurring playdate
+              await notifyNearbyUsers(recurringPlaydate.id);
             }
           }
           
@@ -1166,6 +1311,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Schedule push notification reminders for the new playdate
           await schedulePlaydateReminders(newPlaydate.id);
+          
+          // Send location-based notifications to nearby users
+          await notifyNearbyUsers(newPlaydate.id);
           
           console.log("Successfully created new playdate:", newPlaydate);
           return res.status(201).json(newPlaydate);
