@@ -168,6 +168,125 @@ export function setupAuth(app: Express) {
     });
   });
 
+  // Password reset endpoints
+  app.post("/api/forgot-password", async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      
+      // Always return success message (security - don't reveal if email exists)
+      const successMessage = "If an account with that email exists, a password reset link has been sent.";
+      
+      if (!user) {
+        return res.status(200).json({ message: successMessage });
+      }
+
+      // Generate secure reset token
+      const token = randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+
+      // Store token in database
+      await storage.createPasswordResetToken({
+        userId: user.id,
+        token,
+        expiresAt,
+        used: false
+      });
+
+      // Send password reset email
+      const emailSent = await sendPasswordResetEmail({
+        to: email,
+        firstName: user.firstName,
+        resetToken: token
+      });
+
+      if (!emailSent) {
+        console.error('Failed to send password reset email to:', email);
+      }
+
+      res.status(200).json({ message: successMessage });
+    } catch (error) {
+      console.error('Error in forgot-password:', error);
+      next(error);
+    }
+  });
+
+  app.get("/api/verify-reset-token/:token", async (req, res, next) => {
+    try {
+      const { token } = req.params;
+
+      if (!token) {
+        return res.status(400).json({ error: "Invalid reset token", valid: false });
+      }
+
+      // Find token in database
+      const resetToken = await storage.getPasswordResetToken(token);
+
+      // Return generic error message - don't reveal if token exists, is expired, or was used
+      if (!resetToken || new Date() > new Date(resetToken.expiresAt) || resetToken.used) {
+        return res.status(400).json({ error: "Invalid or expired reset token", valid: false });
+      }
+
+      res.status(200).json({ valid: true });
+    } catch (error) {
+      console.error('Error in verify-reset-token:', error);
+      // Return generic error on exception
+      res.status(400).json({ error: "Invalid or expired reset token", valid: false });
+    }
+  });
+
+  app.post("/api/reset-password", async (req, res, next) => {
+    try {
+      const { token, newPassword } = req.body;
+
+      if (!token || !newPassword) {
+        return res.status(400).json({ error: "Token and new password are required" });
+      }
+
+      // Validate password length
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters long" });
+      }
+
+      // Find and validate token
+      const resetToken = await storage.getPasswordResetToken(token);
+
+      if (!resetToken) {
+        return res.status(400).json({ error: "Invalid or expired reset token" });
+      }
+
+      // Check if token is expired
+      if (new Date() > new Date(resetToken.expiresAt)) {
+        return res.status(400).json({ error: "Reset token has expired" });
+      }
+
+      // Check if token has been used
+      if (resetToken.used) {
+        return res.status(400).json({ error: "Reset token has already been used" });
+      }
+
+      // Hash the new password
+      const hashedPassword = await hashPassword(newPassword);
+
+      // Update user password
+      await storage.updateUserPassword(resetToken.userId, hashedPassword);
+
+      // Mark token as used
+      await storage.markTokenAsUsed(token);
+
+      res.status(200).json({ message: "Password has been reset successfully" });
+    } catch (error) {
+      console.error('Error in reset-password:', error);
+      next(error);
+    }
+  });
+
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ error: "Not authenticated" });
     const userWithoutPassword = { ...req.user } as Partial<SelectUser>;
