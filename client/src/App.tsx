@@ -17,6 +17,8 @@ import EditPlaydatePage from "./pages/edit-playdate";
 import ChatPage from "./pages/chat";
 import MatchesPage from "./pages/matches";
 import AuthPage from "./pages/auth-page";
+import ForgotPasswordPage from "./pages/forgot-password";
+import ResetPasswordPage from "./pages/reset-password";
 import PlaceDetailsPage from "./pages/place-details";
 import SettingsPage from "./pages/SettingsPage";
 import DeleteAccountPage from "./pages/delete-account";
@@ -74,6 +76,8 @@ function Router() {
       <ProtectedRoute path="/admin" component={AdminDashboard} />
       <Route path="/admin-check" component={AdminCheck} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/forgot-password" component={ForgotPasswordPage} />
+      <Route path="/reset-password" component={ResetPasswordPage} />
       <Route path="/test-create" component={TestCreatePlaydate} />
       <Route path="/simple-test" component={SimpleTestPage} />
       {/* Fallback to 404 */}

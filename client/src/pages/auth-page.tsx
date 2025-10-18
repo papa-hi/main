@@ -242,6 +242,16 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
+                    <div className="text-right">
+                      <button
+                        type="button"
+                        onClick={() => navigate("/forgot-password")}
+                        className="text-sm text-orange-600 hover:text-orange-700 dark:text-orange-500 dark:hover:text-orange-400 font-medium"
+                        data-testid="link-forgot-password"
+                      >
+                        {t("auth:forgotPassword", "Forgot password?")}
+                      </button>
+                    </div>
                     <AnimatedButton 
                       type="submit" 
                       className="w-full" 
