@@ -17,6 +17,15 @@ async function hashPassword(password) {
 
 async function createAdminUser() {
   try {
+    // Get admin password from environment variable
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    
+    if (!adminPassword) {
+      console.error('ERROR: ADMIN_PASSWORD environment variable is not set!');
+      console.error('Please set ADMIN_PASSWORD in Replit Secrets before running this script.');
+      process.exit(1);
+    }
+    
     // Connect to database
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
     const db = drizzle(pool);
@@ -29,7 +38,7 @@ async function createAdminUser() {
     if (existingAdmin) {
       console.log('Admin user already exists, updating password and role...');
       // Hash the password
-      const hashedPassword = await hashPassword('admin123');
+      const hashedPassword = await hashPassword(adminPassword);
       
       // Update the admin user
       await db.execute(
@@ -44,7 +53,7 @@ async function createAdminUser() {
     } else {
       console.log('Creating new admin user...');
       // Hash the password
-      const hashedPassword = await hashPassword('admin123');
+      const hashedPassword = await hashPassword(adminPassword);
       
       // Create admin user
       await db.execute(
