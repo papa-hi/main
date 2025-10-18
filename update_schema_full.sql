@@ -64,27 +64,3 @@ CREATE TABLE IF NOT EXISTS feature_usage (
     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     details JSONB
 );
-
--- Update an existing user to admin or create an admin user if none exists
-DO $$
-DECLARE
-    admin_exists BOOLEAN;
-BEGIN
-    -- Check if admin already exists
-    SELECT EXISTS(SELECT 1 FROM users WHERE role = 'admin') INTO admin_exists;
-    
-    IF NOT admin_exists THEN
-        -- Try to update the first user to admin
-        UPDATE users SET role = 'admin' WHERE id = 1;
-        
-        -- Check if update succeeded
-        SELECT EXISTS(SELECT 1 FROM users WHERE role = 'admin') INTO admin_exists;
-        
-        -- If no users were updated, create a new admin user
-        IF NOT admin_exists THEN
-            INSERT INTO users (username, password, first_name, last_name, email, role, created_at, last_login)
-            VALUES ('admin', '$2b$10$Lcj1Cq9ldVUwMn0L1hxUIe1Bz4QB/OUrW9l/P/QRqfBu.PVSW2ggq', 'Admin', 'User', 'admin@papahi.com', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-        END IF;
-    END IF;
-END
-$$;
