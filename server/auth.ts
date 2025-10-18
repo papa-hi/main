@@ -8,8 +8,9 @@ import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
-import { sendWelcomeEmail } from "./email-service";
+import { sendWelcomeEmail, sendPasswordResetEmail } from "./email-service";
 import { emailQueue } from "./email-queue";
+import { passwordResetTokens } from "@shared/schema";
 
 declare global {
   namespace Express {
@@ -19,7 +20,7 @@ declare global {
 
 const scryptAsync = promisify(scrypt);
 
-async function hashPassword(password: string) {
+export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
   const buf = (await scryptAsync(password, salt, 64)) as Buffer;
   return `${buf.toString("hex")}.${salt}`;
@@ -278,6 +279,139 @@ export function setupAuth(app: Express) {
     } catch (error) {
       console.error("Firebase authentication error:", error);
       res.status(500).json({ error: "Internal server error during authentication" });
+    }
+  });
+
+  // Password reset endpoints
+  app.post("/api/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      
+      // Always return success to prevent email enumeration
+      if (!user) {
+        return res.status(200).json({ 
+          message: "If an account with that email exists, a password reset link has been sent." 
+        });
+      }
+
+      // Generate a secure random token
+      const token = randomBytes(32).toString("hex");
+      
+      // Set expiration to 1 hour from now
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 1);
+
+      // Store the token in the database
+      await storage.createPasswordResetToken({
+        userId: user.id,
+        token,
+        expiresAt
+      });
+
+      // Create reset link
+      const resetLink = `${req.protocol}://${req.get('host')}/reset-password?token=${token}`;
+      
+      // Send password reset email
+      const emailSent = await sendPasswordResetEmail({
+        to: user.email,
+        firstName: user.firstName,
+        resetLink
+      });
+
+      if (!emailSent) {
+        console.error(`Failed to send password reset email to ${email}`);
+      }
+
+      res.status(200).json({ 
+        message: "If an account with that email exists, a password reset link has been sent." 
+      });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ error: "Failed to process password reset request" });
+    }
+  });
+
+  app.get("/api/verify-reset-token/:token", async (req, res) => {
+    try {
+      const { token } = req.params;
+
+      if (!token) {
+        return res.status(400).json({ error: "Token is required" });
+      }
+
+      // Find the token in the database
+      const resetToken = await storage.getPasswordResetToken(token);
+
+      if (!resetToken) {
+        return res.status(400).json({ error: "Invalid or expired reset token" });
+      }
+
+      // Check if token is expired
+      if (new Date() > new Date(resetToken.expiresAt)) {
+        return res.status(400).json({ error: "Reset token has expired" });
+      }
+
+      // Check if token has already been used
+      if (resetToken.used) {
+        return res.status(400).json({ error: "Reset token has already been used" });
+      }
+
+      res.status(200).json({ valid: true });
+    } catch (error) {
+      console.error("Verify reset token error:", error);
+      res.status(500).json({ error: "Failed to verify reset token" });
+    }
+  });
+
+  app.post("/api/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+
+      if (!token || !newPassword) {
+        return res.status(400).json({ error: "Token and new password are required" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters long" });
+      }
+
+      // Find the token in the database
+      const resetToken = await storage.getPasswordResetToken(token);
+
+      if (!resetToken) {
+        return res.status(400).json({ error: "Invalid or expired reset token" });
+      }
+
+      // Check if token is expired
+      if (new Date() > new Date(resetToken.expiresAt)) {
+        return res.status(400).json({ error: "Reset token has expired" });
+      }
+
+      // Check if token has already been used
+      if (resetToken.used) {
+        return res.status(400).json({ error: "Reset token has already been used" });
+      }
+
+      // Hash the new password
+      const hashedPassword = await hashPassword(newPassword);
+
+      // Update user's password
+      await storage.updateUserPassword(resetToken.userId, hashedPassword);
+
+      // Mark token as used
+      await storage.markPasswordResetTokenAsUsed(token);
+
+      res.status(200).json({ message: "Password reset successful" });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      res.status(500).json({ error: "Failed to reset password" });
     }
   });
 }

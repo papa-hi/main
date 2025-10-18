@@ -11,7 +11,8 @@ import {
   FeatureUsage, InsertFeatureUsage, featureUsage,
   AdminLog, InsertAdminLog, adminLogs,
   Rating, InsertRating, ratings,
-  communityPosts, communityComments, communityReactions
+  communityPosts, communityComments, communityReactions,
+  PasswordResetToken, InsertPasswordResetToken, passwordResetTokens
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not, inArray, like, or } from "drizzle-orm";
@@ -28,6 +29,12 @@ export interface IStorage {
   updateUser(id: number, userData: Partial<User>): Promise<User>;
   deleteUser(id: number): Promise<boolean>;
   getFeaturedUser(): Promise<User | undefined>;
+  
+  // Password reset methods
+  createPasswordResetToken(data: InsertPasswordResetToken): Promise<PasswordResetToken>;
+  getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
+  updateUserPassword(userId: number, hashedPassword: string): Promise<void>;
+  markPasswordResetTokenAsUsed(token: string): Promise<void>;
   
   // Admin methods
   getAdminUsers(): Promise<User[]>;
@@ -1342,6 +1349,39 @@ export class DatabaseStorage implements IStorage {
       .from(users)
       .limit(1);
     return user || undefined;
+  }
+
+  // Password reset methods
+  async createPasswordResetToken(data: InsertPasswordResetToken): Promise<PasswordResetToken> {
+    const [token] = await db
+      .insert(passwordResetTokens)
+      .values(data)
+      .returning();
+    
+    return token;
+  }
+
+  async getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+    const [resetToken] = await db
+      .select()
+      .from(passwordResetTokens)
+      .where(eq(passwordResetTokens.token, token));
+    
+    return resetToken || undefined;
+  }
+
+  async updateUserPassword(userId: number, hashedPassword: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, userId));
+  }
+
+  async markPasswordResetTokenAsUsed(token: string): Promise<void> {
+    await db
+      .update(passwordResetTokens)
+      .set({ used: true })
+      .where(eq(passwordResetTokens.token, token));
   }
 
   // Playdate methods
