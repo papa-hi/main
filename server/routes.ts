@@ -2735,8 +2735,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if (hashtag) {
+        // Use parameterized query to prevent SQL injection
+        const hashtagValue = String(hashtag);
         query = query.where(
-          sql`${communityPosts.hashtags} @> ARRAY[${hashtag}]::text[]`
+          sql`${hashtagValue} = ANY(${communityPosts.hashtags})`
         );
       }
 
