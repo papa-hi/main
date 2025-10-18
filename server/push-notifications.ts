@@ -156,6 +156,67 @@ export async function sendPlaydateUpdate(userId: number, playdateTitle: string, 
   });
 }
 
+export async function sendNewCommunityPostNotification(
+  authorId: number,
+  authorName: string,
+  postTitle: string,
+  postId: number,
+  category?: string
+): Promise<void> {
+  try {
+    // Get all users with push subscriptions (excluding the author and admin users)
+    const usersWithSubscriptions = await db
+      .selectDistinct({ userId: pushSubscriptions.userId })
+      .from(pushSubscriptions)
+      .leftJoin(users, eq(pushSubscriptions.userId, users.id))
+      .where(eq(users.role, 'user'));
+
+    // Extract unique user IDs and filter out the post author
+    const userIdSet = new Set(usersWithSubscriptions.map(u => u.userId));
+    const uniqueUserIds = Array.from(userIdSet);
+    const notifyUserIds = uniqueUserIds.filter(id => id !== authorId);
+
+    if (notifyUserIds.length === 0) {
+      console.log('No users to notify about new community post');
+      return;
+    }
+
+    // Construct notification message
+    const categoryText = category ? ` in ${category}` : '';
+    const body = postTitle 
+      ? `${authorName} posted "${postTitle}"${categoryText}` 
+      : `${authorName} shared a new post${categoryText}`;
+
+    // Send notification to all eligible users
+    const notificationPromises = notifyUserIds.map(userId =>
+      sendNotificationToUser(userId, {
+        title: 'New Community Post',
+        body,
+        icon: '/icons/icon-192x192.png',
+        badge: '/icons/badge-72x72.png',
+        data: {
+          type: 'new_community_post',
+          postId,
+          authorId,
+          category
+        },
+        actions: [
+          {
+            action: 'view',
+            title: 'View Post'
+          }
+        ]
+      })
+    );
+
+    await Promise.allSettled(notificationPromises);
+    console.log(`Sent new post notifications to ${notifyUserIds.length} users`);
+  } catch (error) {
+    console.error('Error sending new community post notifications:', error);
+    // Don't throw - we don't want notification failures to break post creation
+  }
+}
+
 export async function generateVapidKeys(): Promise<{ publicKey: string; privateKey: string }> {
   return webpush.generateVAPIDKeys();
 }

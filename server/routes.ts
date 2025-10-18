@@ -14,7 +14,7 @@ import { fetchNearbyPlaygrounds } from "./maps-service";
 import { db } from "./db";
 import { eq, and, gte, asc, count, desc, like, or, sql, isNull, inArray } from "drizzle-orm";
 import crypto from "crypto";
-import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate } from "./push-notifications";
+import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate, sendNewCommunityPostNotification } from "./push-notifications";
 import { pushSubscriptions, matchPreferences } from "@shared/schema";
 import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified } from "./notification-scheduler";
 import { calculateDistance, getCityCoordinates } from "./dad-matching-service";
@@ -2844,6 +2844,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(communityPosts)
         .leftJoin(users, eq(communityPosts.userId, users.id))
         .where(eq(communityPosts.id, newPost.id));
+
+      // Send push notifications to all users about the new post
+      if (postWithAuthor?.author) {
+        const authorFullName = `${postWithAuthor.author.firstName} ${postWithAuthor.author.lastName}`;
+        sendNewCommunityPostNotification(
+          userId,
+          authorFullName,
+          postWithAuthor.title || '',
+          newPost.id,
+          postWithAuthor.category || undefined
+        ).catch(error => {
+          console.error('Failed to send new post notifications:', error);
+          // Don't fail the request if notifications fail
+        });
+      }
 
       res.status(201).json({
         ...postWithAuthor,
