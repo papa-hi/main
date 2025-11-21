@@ -12,7 +12,8 @@ import {
   AdminLog, InsertAdminLog, adminLogs,
   Rating, InsertRating, ratings,
   communityPosts, communityComments, communityReactions,
-  PasswordResetToken, InsertPasswordResetToken, passwordResetTokens
+  PasswordResetToken, InsertPasswordResetToken, passwordResetTokens,
+  FamilyEvent, InsertFamilyEvent, familyEvents
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not, inArray, like, or } from "drizzle-orm";
@@ -97,6 +98,13 @@ export interface IStorage {
   getCommunityPosts(options?: { limit?: number; offset?: number }): Promise<any[]>;
   getCommunityPostById(postId: number): Promise<any | undefined>;
   deleteCommunityPost(postId: number): Promise<boolean>;
+  
+  // Family Events methods
+  getEvents(options?: { latitude?: number; longitude?: number; category?: string; upcoming?: boolean }): Promise<FamilyEvent[]>;
+  getEventById(id: number): Promise<FamilyEvent | undefined>;
+  createEvent(event: InsertFamilyEvent): Promise<FamilyEvent>;
+  updateEvent(id: number, event: Partial<FamilyEvent>): Promise<FamilyEvent>;
+  deleteEvent(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -2620,6 +2628,94 @@ export class DatabaseStorage implements IStorage {
       return result.rowCount ? result.rowCount > 0 : false;
     } catch (error) {
       console.error("Error deleting community post:", error);
+      return false;
+    }
+  }
+
+  // Family Events methods
+  async getEvents(options?: { latitude?: number; longitude?: number; category?: string; upcoming?: boolean }): Promise<FamilyEvent[]> {
+    let query = db.select().from(familyEvents);
+
+    // Filter by category if specified
+    if (options?.category) {
+      query = query.where(eq(familyEvents.category, options.category)) as any;
+    }
+
+    // Filter by upcoming events (events that haven't ended yet)
+    if (options?.upcoming) {
+      const now = new Date();
+      query = query.where(gte(familyEvents.startDate, now)) as any;
+    }
+
+    // Only show active events
+    query = query.where(eq(familyEvents.isActive, true)) as any;
+
+    // Order by start date
+    query = query.orderBy(asc(familyEvents.startDate)) as any;
+
+    const events = await query;
+
+    // Calculate distance if coordinates provided
+    if (options?.latitude && options?.longitude) {
+      const eventsWithDistance = events.map(event => {
+        const distance = this.calculateDistance(
+          options.latitude!,
+          options.longitude!,
+          parseFloat(event.latitude),
+          parseFloat(event.longitude)
+        );
+        return { ...event, distance };
+      });
+
+      // Sort by distance
+      eventsWithDistance.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+      return eventsWithDistance;
+    }
+
+    return events;
+  }
+
+  async getEventById(id: number): Promise<FamilyEvent | undefined> {
+    const [event] = await db
+      .select()
+      .from(familyEvents)
+      .where(eq(familyEvents.id, id));
+
+    return event || undefined;
+  }
+
+  async createEvent(event: InsertFamilyEvent): Promise<FamilyEvent> {
+    const [newEvent] = await db
+      .insert(familyEvents)
+      .values(event)
+      .returning();
+
+    return newEvent;
+  }
+
+  async updateEvent(id: number, eventData: Partial<FamilyEvent>): Promise<FamilyEvent> {
+    const [updatedEvent] = await db
+      .update(familyEvents)
+      .set({ ...eventData, updatedAt: new Date() })
+      .where(eq(familyEvents.id, id))
+      .returning();
+
+    if (!updatedEvent) {
+      throw new Error("Event not found");
+    }
+
+    return updatedEvent;
+  }
+
+  async deleteEvent(id: number): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(familyEvents)
+        .where(eq(familyEvents.id, id));
+
+      return result.rowCount ? result.rowCount > 0 : false;
+    } catch (error) {
+      console.error("Error deleting event:", error);
       return false;
     }
   }

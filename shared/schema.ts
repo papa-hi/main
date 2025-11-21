@@ -292,6 +292,42 @@ export const insertPlaceSchema = createInsertSchema(places).pick({
   features: true,
 });
 
+// Family Events schema
+export const familyEvents = pgTable("family_events", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  location: text("location").notNull(),
+  latitude: text("latitude").notNull(),
+  longitude: text("longitude").notNull(),
+  imageUrl: text("image_url"),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  ageRange: text("age_range"), // e.g., "0-3", "4-8", "All ages"
+  category: text("category").notNull(), // "workshop", "festival", "outdoor", "indoor", "educational", "sports"
+  cost: text("cost").default("free"), // "free", "paid", or specific amount
+  organizer: text("organizer"),
+  contactInfo: text("contact_info"),
+  registrationUrl: text("registration_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Define family events relations
+export const familyEventsRelations = relations(familyEvents, ({ }) => ({}));
+
+export const insertFamilyEventSchema = createInsertSchema(familyEvents).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFamilyEvent = z.infer<typeof insertFamilyEventSchema>;
+export type FamilyEvent = typeof familyEvents.$inferSelect & {
+  distance?: number;
+};
+
 // User favorites schema
 export const userFavorites = pgTable("user_favorites", {
   id: serial("id").primaryKey(),
