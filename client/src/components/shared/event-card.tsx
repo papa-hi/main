@@ -3,16 +3,35 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Users } from "lucide-react";
 import { format } from "date-fns";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 
 interface EventCardProps {
   event: FamilyEvent;
 }
 
 export function EventCard({ event }: EventCardProps) {
+  const [, setLocation] = useLocation();
+
+  const handleCardClick = () => {
+    setLocation(`/events/${event.id}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setLocation(`/events/${event.id}`);
+    }
+  };
+
   return (
-    <Link href={`/events/${event.id}`}>
-      <Card className="flex-shrink-0 w-80 hover:shadow-lg transition-shadow cursor-pointer" data-testid={`card-event-${event.id}`}>
+    <Card 
+      className="flex-shrink-0 w-80 hover:shadow-lg transition-shadow cursor-pointer" 
+      data-testid={`card-event-${event.id}`}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+    >
       {event.imageUrl && (
         <img 
           src={event.imageUrl} 
@@ -65,7 +84,7 @@ export function EventCard({ event }: EventCardProps) {
               href={event.registrationUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-blue-600 hover:underline"
+              className="text-xs text-blue-600 hover:underline z-10 relative"
               data-testid={`link-event-register-${event.id}`}
               onClick={(e) => e.stopPropagation()}
             >
@@ -75,6 +94,5 @@ export function EventCard({ event }: EventCardProps) {
         </div>
       </CardContent>
     </Card>
-    </Link>
   );
 }
