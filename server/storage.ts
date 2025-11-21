@@ -2658,17 +2658,26 @@ export class DatabaseStorage implements IStorage {
     // Calculate distance if coordinates provided
     if (options?.latitude && options?.longitude) {
       const eventsWithDistance = events.map(event => {
-        const distance = this.calculateDistance(
-          options.latitude!,
-          options.longitude!,
-          parseFloat(event.latitude),
-          parseFloat(event.longitude)
-        );
-        return { ...event, distance };
+        // Only calculate distance if event has coordinates
+        if (event.latitude && event.longitude) {
+          const distance = this.calculateDistance(
+            options.latitude!,
+            options.longitude!,
+            parseFloat(event.latitude),
+            parseFloat(event.longitude)
+          );
+          return { ...event, distance };
+        }
+        // Return event without distance if coordinates are missing
+        return { ...event, distance: undefined };
       });
 
-      // Sort by distance
-      eventsWithDistance.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+      // Sort by distance (events without distance appear at the end)
+      eventsWithDistance.sort((a, b) => {
+        if (a.distance === undefined) return 1;
+        if (b.distance === undefined) return -1;
+        return a.distance - b.distance;
+      });
       return eventsWithDistance;
     }
 
@@ -2718,6 +2727,19 @@ export class DatabaseStorage implements IStorage {
       console.error("Error deleting event:", error);
       return false;
     }
+  }
+
+  // Helper method for distance calculation using Haversine formula
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
   }
 }
 
