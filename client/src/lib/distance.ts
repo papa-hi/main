@@ -77,14 +77,15 @@ export function getCurrentLocation(): Promise<Location> {
 
 /**
  * Geocode an address to get latitude and longitude coordinates
+ * Uses server-side endpoint to avoid CORS issues
  */
 export async function geocodeAddress(address: string): Promise<Location | null> {
   try {
-    // Using OpenStreetMap Nominatim API for free geocoding
+    if (!address || address.trim() === '') return null;
+    
+    // Use server-side geocoding endpoint to avoid CORS issues
     const encodedAddress = encodeURIComponent(address);
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1&addressdetails=1`
-    );
+    const response = await fetch(`/api/geocode?address=${encodedAddress}`);
     
     if (!response.ok) {
       throw new Error('Geocoding request failed');
@@ -92,11 +93,10 @@ export async function geocodeAddress(address: string): Promise<Location | null> 
     
     const data = await response.json();
     
-    if (data && data.length > 0) {
-      const result = data[0];
+    if (data && data.latitude && data.longitude) {
       return {
-        latitude: parseFloat(result.lat),
-        longitude: parseFloat(result.lon),
+        latitude: data.latitude,
+        longitude: data.longitude,
       };
     }
     
