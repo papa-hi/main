@@ -497,10 +497,13 @@ export function setupAdminRoutes(app: Express) {
       // Geocode the location if lat/lon not provided
       if (!validatedData.latitude || !validatedData.longitude) {
         const coordinates = await geocodeAddress(validatedData.location);
-        if (coordinates) {
-          validatedData.latitude = coordinates.latitude;
-          validatedData.longitude = coordinates.longitude;
+        if (!coordinates) {
+          return res.status(400).json({ 
+            error: `Unable to geocode location "${validatedData.location}". Please verify the address or provide coordinates manually.`
+          });
         }
+        validatedData.latitude = coordinates.latitude;
+        validatedData.longitude = coordinates.longitude;
       }
       
       const newEvent = await storage.createEvent(validatedData);
@@ -536,12 +539,16 @@ export function setupAdminRoutes(app: Express) {
       const validatedData = updateFamilyEventSchema.parse(req.body);
       
       // If location changed, re-geocode unless lat/lon explicitly provided
-      if (validatedData.location && (!validatedData.latitude || !validatedData.longitude)) {
+      if (validatedData.location && validatedData.location !== event.location && (!validatedData.latitude || !validatedData.longitude)) {
         const coordinates = await geocodeAddress(validatedData.location);
-        if (coordinates) {
-          validatedData.latitude = coordinates.latitude;
-          validatedData.longitude = coordinates.longitude;
+        if (!coordinates) {
+          // Block update if location changed but geocoding failed (prevents coordinate/location mismatch)
+          return res.status(400).json({ 
+            error: `Unable to geocode new location "${validatedData.location}". Please verify the address. The event location was not updated.`
+          });
         }
+        validatedData.latitude = coordinates.latitude;
+        validatedData.longitude = coordinates.longitude;
       }
       
       const updatedEvent = await storage.updateEvent(eventId, validatedData);

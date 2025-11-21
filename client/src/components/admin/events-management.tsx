@@ -359,7 +359,7 @@ export function EventsManagement() {
                   </Button>
                   <Button
                     onClick={handleCreateEvent}
-                    disabled={createEventMutation.isPending || !formData.title || !formData.description || !formData.location || !formData.latitude || !formData.longitude || !formData.startDate || !formData.category}
+                    disabled={createEventMutation.isPending || !formData.title || !formData.description || !formData.location || !formData.startDate || !formData.category}
                     data-testid="button-submit-create"
                   >
                     {createEventMutation.isPending ? "Creating..." : "Create Event"}
