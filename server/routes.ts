@@ -20,7 +20,7 @@ import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified
 import { calculateDistance, getCityCoordinates } from "./dad-matching-service";
 
 // Helper function to geocode address and get coordinates
-async function geocodeAddress(address: string): Promise<{ latitude: number; longitude: number } | null> {
+export async function geocodeAddress(address: string): Promise<{ latitude: number; longitude: number } | null> {
   try {
     if (!address || address.trim() === '') return null;
     
@@ -432,6 +432,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Public geocoding endpoint to avoid CORS issues
+  app.get('/api/geocode', async (req: Request, res: Response) => {
+    try {
+      const address = req.query.address as string;
+      
+      if (!address) {
+        return res.status(400).json({ error: 'Address parameter is required' });
+      }
+      
+      const coordinates = await geocodeAddress(address);
+      
+      if (!coordinates) {
+        return res.status(404).json({ error: 'Could not geocode address' });
+      }
+      
+      res.json(coordinates);
+    } catch (error) {
+      console.error('Error in geocoding endpoint:', error);
+      res.status(500).json({ error: 'Geocoding failed' });
+    }
+  });
+
   // Serve images from database
   app.get('/api/images/:filename', async (req, res) => {
     try {
