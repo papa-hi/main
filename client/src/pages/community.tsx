@@ -625,7 +625,7 @@ export default function CommunityPage() {
                 </TabsTrigger>
                 <TabsTrigger value="events" className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  Events
+                  {t('community.eventsTab')}
                 </TabsTrigger>
               </TabsList>
 
@@ -648,10 +648,10 @@ export default function CommunityPage() {
                       <div className="text-center py-12">
                         <Calendar className="h-16 w-16 mx-auto text-gray-400 mb-4" />
                         <h3 className="text-lg font-medium text-gray-900 mb-2">
-                          No Events Available
+                          {t('community.noEventsAvailable')}
                         </h3>
                         <p className="text-gray-600">
-                          Check back later for upcoming family events and activities.
+                          {t('community.noEventsDescription')}
                         </p>
                       </div>
                     </CardContent>
