@@ -33,11 +33,14 @@ import {
   Reply,
   ChevronDown,
   ChevronUp,
-  Send
+  Send,
+  Calendar
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { apiRequest } from '@/lib/queryClient';
 import { CommentsDisplay } from '@/components/comments-display';
+import { EventCard } from '@/components/shared/event-card';
+import { FamilyEvent } from '@shared/schema';
 
 // Types for community features
 interface CommunityPost {
@@ -141,6 +144,19 @@ export default function CommunityPage() {
   const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ['/api/community/categories'],
     queryFn: () => fetch('/api/community/categories').then(res => res.json()),
+  });
+
+  // Fetch events when Events tab is active
+  const { data: events = [], isLoading: eventsLoading } = useQuery<FamilyEvent[]>({
+    queryKey: ['/api/events'],
+    queryFn: async () => {
+      const response = await fetch('/api/events?upcoming=true');
+      if (!response.ok) {
+        throw new Error('Failed to fetch events');
+      }
+      return response.json();
+    },
+    enabled: activeTab === 'events',
   });
 
 
@@ -594,7 +610,7 @@ export default function CommunityPage() {
           <div className="lg:col-span-3">
             {/* Feed tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="latest" className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
                   {t('community.latest')}
@@ -607,7 +623,47 @@ export default function CommunityPage() {
                   <Star className="h-4 w-4" />
                   {t('community.popular')}
                 </TabsTrigger>
+                <TabsTrigger value="events" className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Events
+                </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="events" className="mt-6">
+                {eventsLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[1, 2, 3].map((i) => (
+                      <Card key={i} className="animate-pulse">
+                        <div className="h-48 bg-gray-200 rounded-t-xl"></div>
+                        <CardContent className="pt-4">
+                          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : events.length === 0 ? (
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-center py-12">
+                        <Calendar className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                          No Events Available
+                        </h3>
+                        <p className="text-gray-600">
+                          Check back later for upcoming family events and activities.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {events.map((event) => (
+                      <EventCard key={event.id} event={event} />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
             </Tabs>
 
             {/* Posts */}
