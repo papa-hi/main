@@ -631,16 +631,18 @@ export default function CommunityPage() {
 
               <TabsContent value="events" className="mt-6">
                 {eventsLoading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[1, 2, 3].map((i) => (
-                      <Card key={i} className="animate-pulse">
-                        <div className="h-48 bg-gray-200 rounded-t-xl"></div>
-                        <CardContent className="pt-4">
-                          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                  <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+                    <div className="flex space-x-4 pb-4 w-max">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="bg-white rounded-xl shadow-sm flex-shrink-0 w-80 animate-pulse">
+                          <div className="h-48 bg-gray-200 rounded-t-xl"></div>
+                          <div className="p-4">
+                            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ) : events.length === 0 ? (
                   <Card>
@@ -657,10 +659,12 @@ export default function CommunityPage() {
                     </CardContent>
                   </Card>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {events.map((event) => (
-                      <EventCard key={event.id} event={event} />
-                    ))}
+                  <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+                    <div className="flex space-x-4 pb-4 w-max">
+                      {events.map((event) => (
+                        <EventCard key={event.id} event={event} />
+                      ))}
+                    </div>
                   </div>
                 )}
               </TabsContent>
