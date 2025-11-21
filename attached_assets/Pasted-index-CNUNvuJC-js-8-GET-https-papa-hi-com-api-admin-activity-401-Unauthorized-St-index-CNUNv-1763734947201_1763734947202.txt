@@ -1,0 +1,69 @@
+index-CNUNvuJC.js:8 
+ GET https://papa-hi.com/api/admin/activity 401 (Unauthorized)
+St	@	index-CNUNvuJC.js:8
+queryFn	@	index-CNUNvuJC.js:113
+i	@	index-CNUNvuJC.js:8
+_	@	index-CNUNvuJC.js:8
+start	@	index-CNUNvuJC.js:8
+fetch	@	index-CNUNvuJC.js:8
+#d	@	index-CNUNvuJC.js:8
+onSubscribe	@	index-CNUNvuJC.js:8
+subscribe	@	index-CNUNvuJC.js:8
+(anonymous)	@	index-CNUNvuJC.js:8
+mR	@	index-CNUNvuJC.js:6
+Vx	@	index-CNUNvuJC.js:8
+Lf	@	index-CNUNvuJC.js:8
+d2	@	index-CNUNvuJC.js:8
+sc	@	index-CNUNvuJC.js:6
+oee	@	index-CNUNvuJC.js:8
+$u	@	index-CNUNvuJC.js:8
+u2	@	index-CNUNvuJC.js:8
+E	@	index-CNUNvuJC.js:1
+q	@	index-CNUNvuJC.js:1
+index-CNUNvuJC.js:8 
+ GET https://papa-hi.com/api/admin/logs 401 (Unauthorized)
+St	@	index-CNUNvuJC.js:8
+queryFn	@	index-CNUNvuJC.js:113
+i	@	index-CNUNvuJC.js:8
+_	@	index-CNUNvuJC.js:8
+start	@	index-CNUNvuJC.js:8
+fetch	@	index-CNUNvuJC.js:8
+#d	@	index-CNUNvuJC.js:8
+onSubscribe	@	index-CNUNvuJC.js:8
+subscribe	@	index-CNUNvuJC.js:8
+(anonymous)	@	index-CNUNvuJC.js:8
+mR	@	index-CNUNvuJC.js:6
+Vx	@	index-CNUNvuJC.js:8
+Lf	@	index-CNUNvuJC.js:8
+d2	@	index-CNUNvuJC.js:8
+sc	@	index-CNUNvuJC.js:6
+oee	@	index-CNUNvuJC.js:8
+$u	@	index-CNUNvuJC.js:8
+u2	@	index-CNUNvuJC.js:8
+E	@	index-CNUNvuJC.js:1
+q	@	index-CNUNvuJC.js:1
+index-CNUNvuJC.js:8 
+ GET https://papa-hi.com/api/admin/stats/features 401 (Unauthorized)
+St	@	index-CNUNvuJC.js:8
+queryFn	@	index-CNUNvuJC.js:113
+i	@	index-CNUNvuJC.js:8
+_	@	index-CNUNvuJC.js:8
+start	@	index-CNUNvuJC.js:8
+fetch	@	index-CNUNvuJC.js:8
+#d	@	index-CNUNvuJC.js:8
+onSubscribe	@	index-CNUNvuJC.js:8
+subscribe	@	index-CNUNvuJC.js:8
+(anonymous)	@	index-CNUNvuJC.js:8
+mR	@	index-CNUNvuJC.js:6
+Vx	@	index-CNUNvuJC.js:8
+Lf	@	index-CNUNvuJC.js:8
+d2	@	index-CNUNvuJC.js:8
+sc	@	index-CNUNvuJC.js:6
+oee	@	index-CNUNvuJC.js:8
+$u	@	index-CNUNvuJC.js:8
+u2	@	index-CNUNvuJC.js:8
+E	@	index-CNUNvuJC.js:1
+q	@	index-CNUNvuJC.js:1
+index-CNUNvuJC.js:8 
+ GET https://papa-hi.com/api/user 401 (Unauthorized)
+auth:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.

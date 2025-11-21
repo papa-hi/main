@@ -134,7 +134,7 @@ export default function EventDetailsPage() {
                 <span>{getCategoryIcon(event.category)}</span>
                 {event.category}
               </Badge>
-              {event.isRecurring && (
+              {'isRecurring' in event && event.isRecurring && (
                 <Badge variant="secondary">
                   <i className="fas fa-repeat mr-1"></i>
                   {t('events.recurring')}
@@ -322,7 +322,7 @@ export default function EventDetailsPage() {
               {event.registrationUrl && (
                 <Button 
                   className="w-full justify-start"
-                  onClick={() => window.open(ensureProtocol(event.registrationUrl), '_blank')}
+                  onClick={() => window.open(ensureProtocol(event.registrationUrl!), '_blank')}
                   data-testid="button-register"
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />

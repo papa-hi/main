@@ -123,13 +123,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       if (!res.ok) throw new Error("Failed to fetch user stats");
       return await res.json();
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to load user statistics: ${error.message}`,
-        variant: "destructive",
-      });
-    },
+    enabled: !!user,
+    retry: false,
   });
 
   // Page stats query
@@ -144,13 +139,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       if (!res.ok) throw new Error("Failed to fetch page stats");
       return await res.json();
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to load page statistics: ${error.message}`,
-        variant: "destructive",
-      });
-    },
+    enabled: !!user,
+    retry: false,
   });
 
   // Feature stats query
@@ -165,13 +155,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       if (!res.ok) throw new Error("Failed to fetch feature stats");
       return await res.json();
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to load feature statistics: ${error.message}`,
-        variant: "destructive",
-      });
-    },
+    enabled: !!user,
+    retry: false,
   });
 
   // Activity logs query
@@ -186,13 +171,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       if (!res.ok) throw new Error("Failed to fetch activity logs");
       return await res.json();
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to load activity logs: ${error.message}`,
-        variant: "destructive",
-      });
-    },
+    enabled: !!user,
+    retry: false,
   });
 
   // Admin logs query
@@ -207,13 +187,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       if (!res.ok) throw new Error("Failed to fetch admin logs");
       return await res.json();
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to load admin logs: ${error.message}`,
-        variant: "destructive",
-      });
-    },
+    enabled: !!user,
+    retry: false,
   });
 
   // Change user role mutation
