@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { WelcomeSection } from "../components/home/welcome-section";
 import { QuickActions } from "../components/home/quick-actions";
 import { UpcomingPlaydates } from "../components/home/upcoming-playdates";
+import { NearbyEvents } from "../components/home/nearby-events";
 import { NearbyPlaces } from "../components/home/nearby-places";
 import { DadSpotlight } from "../components/home/dad-spotlight";
 import { useLocation } from "@/hooks/use-location";
@@ -55,6 +56,7 @@ export default function HomePage() {
       <WelcomeSection userName={user?.firstName || "Bezoeker"} />
       <QuickActions />
       <UpcomingPlaydates />
+      <NearbyEvents />
       <NearbyPlaces />
       <DadSpotlight />
     </div>
