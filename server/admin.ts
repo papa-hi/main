@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction, Express } from "express";
 import { storage } from "./storage";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { insertFamilyEventSchema } from "@shared/schema";
+import { insertFamilyEventSchema, updateFamilyEventSchema } from "@shared/schema";
 
 // Middleware to check if user is an admin
 export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
@@ -489,12 +489,14 @@ export function setupAdminRoutes(app: Express) {
         return res.status(404).json({ error: "Event not found" });
       }
 
-      const updatedEvent = await storage.updateEvent(eventId, req.body);
+      // Validate the update data using update schema (no defaults)
+      const validatedData = updateFamilyEventSchema.parse(req.body);
+      const updatedEvent = await storage.updateEvent(eventId, validatedData);
       
       await logAdminAction("Update event", { 
         eventId, 
         title: updatedEvent.title,
-        changes: req.body 
+        changes: validatedData 
       }, req);
       
       res.json(updatedEvent);

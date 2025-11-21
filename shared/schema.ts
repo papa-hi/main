@@ -317,13 +317,64 @@ export const familyEvents = pgTable("family_events", {
 // Define family events relations
 export const familyEventsRelations = relations(familyEvents, ({ }) => ({}));
 
+// Base validation rules without defaults (for updates)
+const familyEventValidations = {
+  title: z.string().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
+  description: z.string().min(1, "Description is required"),
+  location: z.string().min(1, "Location is required"),
+  latitude: z.string().refine((val) => {
+    const num = parseFloat(val);
+    return !isNaN(num) && num >= -90 && num <= 90;
+  }, "Latitude must be a valid number between -90 and 90"),
+  longitude: z.string().refine((val) => {
+    const num = parseFloat(val);
+    return !isNaN(num) && num >= -180 && num <= 180;
+  }, "Longitude must be a valid number between -180 and 180"),
+  category: z.enum(["workshop", "festival", "outdoor", "indoor", "educational", "sports"], {
+    errorMap: () => ({ message: "Category must be one of: workshop, festival, outdoor, indoor, educational, sports" })
+  }),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date().nullable().optional(),
+  cost: z.string().optional(),
+  isActive: z.boolean().optional(),
+};
+
+// Insert schema with defaults
 export const insertFamilyEventSchema = createInsertSchema(familyEvents).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  ...familyEventValidations,
+  cost: z.string().optional().default("free"),
+  isActive: z.boolean().optional().default(true),
+}).refine((data) => {
+  if (data.endDate && data.startDate) {
+    return new Date(data.endDate) >= new Date(data.startDate);
+  }
+  return true;
+}, {
+  message: "End date must be after start date",
+  path: ["endDate"]
+});
+
+// Update schema without defaults (prevents default injection on partial updates)
+export const updateFamilyEventSchema = createInsertSchema(familyEvents).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend(familyEventValidations).partial().refine((data) => {
+  if (data.endDate && data.startDate) {
+    return new Date(data.endDate) >= new Date(data.startDate);
+  }
+  return true;
+}, {
+  message: "End date must be after start date",
+  path: ["endDate"]
 });
 
 export type InsertFamilyEvent = z.infer<typeof insertFamilyEventSchema>;
+export type UpdateFamilyEvent = z.infer<typeof updateFamilyEventSchema>;
 export type FamilyEvent = typeof familyEvents.$inferSelect & {
   distance?: number;
 };

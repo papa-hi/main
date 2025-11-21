@@ -14,8 +14,27 @@ export function NearbyEvents() {
   const [activeFilter, setActiveFilter] = useState<EventCategory>("all");
   const { t } = useTranslation();
 
-  const { data: events, isLoading, error } = useQuery<FamilyEvent[]>({
-    queryKey: ['/api/events', locationState.latitude, locationState.longitude, activeFilter === "all" ? undefined : activeFilter],
+  // Build query string with location and category parameters
+  const eventsUrl = (() => {
+    const params = new URLSearchParams();
+    if (locationState.latitude) params.append('latitude', locationState.latitude.toString());
+    if (locationState.longitude) params.append('longitude', locationState.longitude.toString());
+    if (activeFilter !== "all") params.append('category', activeFilter);
+    params.append('upcoming', 'true'); // Only show upcoming events
+    
+    const queryString = params.toString();
+    return queryString ? `/api/events?${queryString}` : '/api/events?upcoming=true';
+  })();
+
+  const { data: events, isLoading, error} = useQuery<FamilyEvent[]>({
+    queryKey: ['/api/events', locationState.latitude, locationState.longitude, activeFilter],
+    queryFn: async () => {
+      const res = await fetch(eventsUrl, { credentials: "include" });
+      if (!res.ok) {
+        throw new Error(`${res.status}: ${res.statusText}`);
+      }
+      return await res.json();
+    }
   });
 
   const handleFilterChange = (filter: EventCategory) => {
@@ -65,10 +84,6 @@ export function NearbyEvents() {
     );
   }
 
-  const filteredEvents = events && activeFilter !== "all" 
-    ? events.filter(event => event.category === activeFilter)
-    : events;
-
   const eventCategories = [
     { value: "all", label: "All" },
     { value: "workshop", label: "Workshops" },
@@ -101,8 +116,8 @@ export function NearbyEvents() {
       
       <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
         <div className="flex space-x-4 pb-4 w-max">
-          {filteredEvents && filteredEvents.length > 0 ? (
-            filteredEvents.map((event) => (
+          {events && events.length > 0 ? (
+            events.map((event) => (
               <EventCard key={event.id} event={event} />
             ))
           ) : (

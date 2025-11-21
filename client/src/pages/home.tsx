@@ -13,7 +13,7 @@ import { useCanonical } from "@/hooks/use-canonical";
 export default function HomePage() {
   useCanonical("/");
   const { toast } = useToast();
-  const { location, error: locationError, isLoading } = useLocation();
+  const { latitude, longitude, error: locationError, isLoading } = useLocation();
   const { user } = useAuth();
   
   // Request location permission if not already granted
@@ -21,24 +21,16 @@ export default function HomePage() {
     // Only ask for location permission if the user hasn't seen this toast
     const hasAskedForLocation = localStorage.getItem('location_permission_asked');
     
-    if (!hasAskedForLocation && !location && !isLoading) {
+    if (!hasAskedForLocation && !latitude && !longitude && !isLoading) {
       localStorage.setItem('location_permission_asked', 'true');
       
       toast({
         title: "Locatie delen",
         description: "Papa-Hi werkt het beste wanneer je locatie gedeeld wordt voor het vinden van nabije locaties.",
-        action: (
-          <button 
-            className="bg-primary text-white hover:bg-secondary py-1 px-3 rounded text-xs font-medium"
-            onClick={() => location}
-          >
-            Toestaan
-          </button>
-        ),
         duration: 10000, // 10 seconds
       });
     }
-  }, [location, isLoading, toast]);
+  }, [latitude, longitude, isLoading, toast]);
 
   // Show an error toast if location access was denied
   useEffect(() => {
