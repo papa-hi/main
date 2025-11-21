@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Users } from "lucide-react";
 import { format } from "date-fns";
+import { Link } from "wouter";
 
 interface EventCardProps {
   event: FamilyEvent;
@@ -10,7 +11,8 @@ interface EventCardProps {
 
 export function EventCard({ event }: EventCardProps) {
   return (
-    <Card className="flex-shrink-0 w-80 hover:shadow-lg transition-shadow" data-testid={`card-event-${event.id}`}>
+    <Link href={`/events/${event.id}`}>
+      <Card className="flex-shrink-0 w-80 hover:shadow-lg transition-shadow cursor-pointer" data-testid={`card-event-${event.id}`}>
       {event.imageUrl && (
         <img 
           src={event.imageUrl} 
@@ -65,6 +67,7 @@ export function EventCard({ event }: EventCardProps) {
               rel="noopener noreferrer"
               className="text-xs text-blue-600 hover:underline"
               data-testid={`link-event-register-${event.id}`}
+              onClick={(e) => e.stopPropagation()}
             >
               Register →
             </a>
@@ -72,5 +75,6 @@ export function EventCard({ event }: EventCardProps) {
         </div>
       </CardContent>
     </Card>
+    </Link>
   );
 }

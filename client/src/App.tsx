@@ -20,6 +20,7 @@ import AuthPage from "./pages/auth-page";
 import ForgotPasswordPage from "./pages/forgot-password";
 import ResetPasswordPage from "./pages/reset-password";
 import PlaceDetailsPage from "./pages/place-details";
+import EventDetailsPage from "./pages/event-details";
 import SettingsPage from "./pages/SettingsPage";
 import DeleteAccountPage from "./pages/delete-account";
 import PrivacyPolicyPage from "./pages/privacy-policy";
@@ -60,6 +61,7 @@ function Router() {
       <ProtectedRoute path="/playdates" component={PlaydatesPage} />
       <ProtectedRoute path="/places/:id" component={PlaceDetailsPage} />
       <ProtectedRoute path="/places" component={PlacesPage} />
+      <ProtectedRoute path="/events/:id" component={EventDetailsPage} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
       <ProtectedRoute path="/create" component={CreatePage} />
       <ProtectedRoute path="/edit-playdate/:id" component={EditPlaydatePage} />
