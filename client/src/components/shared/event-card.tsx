@@ -23,6 +23,15 @@ export function EventCard({ event }: EventCardProps) {
     }
   };
 
+  // Ensure URL has protocol
+  const ensureProtocol = (url: string) => {
+    if (!url) return url;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return `https://${url}`;
+  };
+
   return (
     <Card 
       className="flex-shrink-0 w-80 hover:shadow-lg transition-shadow cursor-pointer" 
@@ -81,7 +90,7 @@ export function EventCard({ event }: EventCardProps) {
           </Badge>
           {event.registrationUrl && (
             <a 
-              href={event.registrationUrl}
+              href={ensureProtocol(event.registrationUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-blue-600 hover:underline z-10 relative"

@@ -98,6 +98,15 @@ export default function EventDetailsPage() {
   const startDate = new Date(event.startDate);
   const endDate = event.endDate ? new Date(event.endDate) : null;
 
+  // Ensure URL has protocol
+  const ensureProtocol = (url: string) => {
+    if (!url) return url;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return `https://${url}`;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Header */}
@@ -310,7 +319,7 @@ export default function EventDetailsPage() {
               {event.registrationUrl && (
                 <Button 
                   className="w-full justify-start"
-                  onClick={() => window.open(event.registrationUrl, '_blank')}
+                  onClick={() => window.open(ensureProtocol(event.registrationUrl), '_blank')}
                   data-testid="button-register"
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
