@@ -14,21 +14,19 @@ export function NearbyEvents() {
   const [activeFilter, setActiveFilter] = useState<EventCategory>("all");
   const { t } = useTranslation();
 
-  // Build query string with location and category parameters
-  const eventsUrl = (() => {
-    const params = new URLSearchParams();
-    if (locationState.latitude) params.append('latitude', locationState.latitude.toString());
-    if (locationState.longitude) params.append('longitude', locationState.longitude.toString());
-    if (activeFilter !== "all") params.append('category', activeFilter);
-    params.append('upcoming', 'true'); // Only show upcoming events
-    
-    const queryString = params.toString();
-    return queryString ? `/api/events?${queryString}` : '/api/events?upcoming=true';
-  })();
-
   const { data: events, isLoading, error} = useQuery<FamilyEvent[]>({
     queryKey: ['/api/events', locationState.latitude, locationState.longitude, activeFilter],
     queryFn: async () => {
+      // Build query string with location and category parameters
+      const params = new URLSearchParams();
+      if (locationState.latitude) params.append('latitude', locationState.latitude.toString());
+      if (locationState.longitude) params.append('longitude', locationState.longitude.toString());
+      if (activeFilter !== "all") params.append('category', activeFilter);
+      params.append('upcoming', 'true'); // Only show upcoming events
+      
+      const queryString = params.toString();
+      const eventsUrl = queryString ? `/api/events?${queryString}` : '/api/events?upcoming=true';
+      
       const res = await fetch(eventsUrl, { credentials: "include" });
       if (!res.ok) {
         throw new Error(`${res.status}: ${res.statusText}`);
