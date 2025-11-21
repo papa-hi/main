@@ -762,6 +762,21 @@
     "postReply": "Post Reply",
     "commentPlaceholder": "Write a comment... Use @username to mention someone"
   },
+  "events": {
+    "familyEventsNearby": "Family Events Nearby",
+    "noEventsNearby": "No events found nearby",
+    "checkBackLater": "Check back later for upcoming family activities",
+    "register": "Register",
+    "categories": {
+      "all": "All",
+      "workshop": "Workshops",
+      "festival": "Festivals",
+      "outdoor": "Outdoor",
+      "indoor": "Indoor",
+      "educational": "Educational",
+      "sports": "Sports"
+    }
+  },
   "common": {
     "loading": "Loading...",
     "cancel": "Cancel",

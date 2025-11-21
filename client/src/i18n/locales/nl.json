@@ -698,6 +698,21 @@
     "osmSource": "Speeltuingegevens zijn afkomstig van OpenStreetMap, een gezamenlijk mapping project. Dit geeft ons up-to-date informatie over openbaar bekende speeltuinen.",
     "userSource": "Aanvullende speeltuingegevens komen van onze community die speeltuinen toevoegen die nog niet op openbare kaarten staan."
   },
+  "events": {
+    "familyEventsNearby": "Familie Evenementen Dichtbij",
+    "noEventsNearby": "Geen evenementen gevonden in de buurt",
+    "checkBackLater": "Kom later terug voor aankomende familie-activiteiten",
+    "register": "Registreren",
+    "categories": {
+      "all": "Alles",
+      "workshop": "Workshops",
+      "festival": "Festivals",
+      "outdoor": "Buitenactiviteiten",
+      "indoor": "Binnenactiviteiten",
+      "educational": "Educatief",
+      "sports": "Sport"
+    }
+  },
   "pwa": {
     "privacy": {
       "title": "Privacy Instellingen",

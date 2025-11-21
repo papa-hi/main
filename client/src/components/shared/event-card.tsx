@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Users } from "lucide-react";
 import { format } from "date-fns";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 
 interface EventCardProps {
   event: FamilyEvent;
@@ -11,6 +12,7 @@ interface EventCardProps {
 
 export function EventCard({ event }: EventCardProps) {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   const handleCardClick = () => {
     setLocation(`/events/${event.id}`);
@@ -97,7 +99,7 @@ export function EventCard({ event }: EventCardProps) {
               data-testid={`link-event-register-${event.id}`}
               onClick={(e) => e.stopPropagation()}
             >
-              Register →
+              {t('events.register')} →
             </a>
           )}
         </div>
