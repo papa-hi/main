@@ -23,8 +23,6 @@ export function EventsManagement() {
     title: "",
     description: "",
     location: "",
-    latitude: "",
-    longitude: "",
     imageUrl: "",
     startDate: "",
     endDate: "",
@@ -112,8 +110,6 @@ export function EventsManagement() {
       title: "",
       description: "",
       location: "",
-      latitude: "",
-      longitude: "",
       imageUrl: "",
       startDate: "",
       endDate: "",
@@ -133,8 +129,6 @@ export function EventsManagement() {
       title: event.title,
       description: event.description,
       location: event.location,
-      latitude: event.latitude,
-      longitude: event.longitude,
       imageUrl: event.imageUrl || "",
       startDate: event.startDate ? format(new Date(event.startDate), "yyyy-MM-dd'T'HH:mm") : "",
       endDate: event.endDate ? format(new Date(event.endDate), "yyyy-MM-dd'T'HH:mm") : "",
@@ -269,28 +263,9 @@ export function EventsManagement() {
                       onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
                       placeholder="Community Center Amsterdam"
                     />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="latitude">Latitude*</Label>
-                    <Input
-                      id="latitude"
-                      data-testid="input-event-latitude"
-                      value={formData.latitude}
-                      onChange={(e) => setFormData(prev => ({ ...prev, latitude: e.target.value }))}
-                      placeholder="52.3676"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="longitude">Longitude*</Label>
-                    <Input
-                      id="longitude"
-                      data-testid="input-event-longitude"
-                      value={formData.longitude}
-                      onChange={(e) => setFormData(prev => ({ ...prev, longitude: e.target.value }))}
-                      placeholder="4.9041"
-                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Coordinates will be automatically geocoded from the location address
+                    </p>
                   </div>
 
                   <div>
@@ -508,24 +483,9 @@ export function EventsManagement() {
                               value={formData.location}
                               onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
                             />
-                          </div>
-
-                          <div>
-                            <Label htmlFor="edit-latitude">Latitude*</Label>
-                            <Input
-                              id="edit-latitude"
-                              value={formData.latitude}
-                              onChange={(e) => setFormData(prev => ({ ...prev, latitude: e.target.value }))}
-                            />
-                          </div>
-
-                          <div>
-                            <Label htmlFor="edit-longitude">Longitude*</Label>
-                            <Input
-                              id="edit-longitude"
-                              value={formData.longitude}
-                              onChange={(e) => setFormData(prev => ({ ...prev, longitude: e.target.value }))}
-                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Coordinates will be automatically geocoded from the location address
+                            </p>
                           </div>
 
                           <div>
