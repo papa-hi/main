@@ -298,8 +298,8 @@ export const familyEvents = pgTable("family_events", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   location: text("location").notNull(),
-  latitude: text("latitude").notNull(),
-  longitude: text("longitude").notNull(),
+  latitude: text("latitude"),
+  longitude: text("longitude"),
   imageUrl: text("image_url"),
   startDate: timestamp("start_date").notNull(),
   endDate: timestamp("end_date"),
@@ -325,11 +325,11 @@ const familyEventValidations = {
   latitude: z.string().refine((val) => {
     const num = parseFloat(val);
     return !isNaN(num) && num >= -90 && num <= 90;
-  }, "Latitude must be a valid number between -90 and 90"),
+  }, "Latitude must be a valid number between -90 and 90").nullable().optional(),
   longitude: z.string().refine((val) => {
     const num = parseFloat(val);
     return !isNaN(num) && num >= -180 && num <= 180;
-  }, "Longitude must be a valid number between -180 and 180"),
+  }, "Longitude must be a valid number between -180 and 180").nullable().optional(),
   category: z.enum(["workshop", "festival", "outdoor", "indoor", "educational", "sports"], {
     errorMap: () => ({ message: "Category must be one of: workshop, festival, outdoor, indoor, educational, sports" })
   }),
