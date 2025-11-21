@@ -4,6 +4,39 @@ import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { insertFamilyEventSchema, updateFamilyEventSchema } from "@shared/schema";
 
+// Helper function to geocode address to coordinates
+async function geocodeAddress(address: string): Promise<{ latitude: string; longitude: string } | null> {
+  try {
+    if (!address || address.trim() === '') return null;
+    
+    const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=nl`;
+    const response = await fetch(geocodeUrl, {
+      headers: {
+        'User-Agent': 'PaPa-Hi Family App (development)'
+      }
+    });
+    
+    if (!response.ok) {
+      console.error(`Geocoding failed: HTTP ${response.status} for address: ${address}`);
+      return null;
+    }
+    
+    const data = await response.json();
+
+    if (data && data.length > 0) {
+      const result = {
+        latitude: data[0].lat,
+        longitude: data[0].lon
+      };
+      console.log(`Geocoded "${address}" to coordinates: ${result.latitude}, ${result.longitude}`);
+      return result;
+    }
+  } catch (error) {
+    console.error(`[GEOCODE] Error:`, error);
+  }
+  return null;
+}
+
 // Middleware to check if user is an admin
 export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.isAuthenticated()) {
@@ -460,6 +493,16 @@ export function setupAdminRoutes(app: Express) {
   app.post('/api/admin/events', isAdmin, async (req: Request, res: Response) => {
     try {
       const validatedData = insertFamilyEventSchema.parse(req.body);
+      
+      // Geocode the location if lat/lon not provided
+      if (!validatedData.latitude || !validatedData.longitude) {
+        const coordinates = await geocodeAddress(validatedData.location);
+        if (coordinates) {
+          validatedData.latitude = coordinates.latitude;
+          validatedData.longitude = coordinates.longitude;
+        }
+      }
+      
       const newEvent = await storage.createEvent(validatedData);
       
       await logAdminAction("Create event", { 
@@ -491,6 +534,16 @@ export function setupAdminRoutes(app: Express) {
 
       // Validate the update data using update schema (no defaults)
       const validatedData = updateFamilyEventSchema.parse(req.body);
+      
+      // If location changed, re-geocode unless lat/lon explicitly provided
+      if (validatedData.location && (!validatedData.latitude || !validatedData.longitude)) {
+        const coordinates = await geocodeAddress(validatedData.location);
+        if (coordinates) {
+          validatedData.latitude = coordinates.latitude;
+          validatedData.longitude = coordinates.longitude;
+        }
+      }
+      
       const updatedEvent = await storage.updateEvent(eventId, validatedData);
       
       await logAdminAction("Update event", { 
