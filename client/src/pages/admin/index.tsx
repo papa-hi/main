@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { ChevronLeft, Users, BarChart, ClipboardList, MapPin, TrendingUp, FileText, Mail } from "lucide-react";
+import { ChevronLeft, Users, BarChart, ClipboardList, MapPin, TrendingUp, FileText, Mail, Calendar } from "lucide-react";
 
 import UsersManagement from "@/components/admin/users-management";
 import DashboardStats from "@/components/admin/dashboard-stats";
@@ -12,6 +12,7 @@ import { PlacesManagement } from "@/components/admin/places-management";
 import PostsManagement from "@/components/admin/posts-management";
 import { ActivityAnalytics } from "@/components/admin/activity-analytics";
 import { ProfileReminders } from "@/components/admin/profile-reminders";
+import { EventsManagement } from "@/components/admin/events-management";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -39,7 +40,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-7 max-w-5xl">
+        <TabsList className="grid grid-cols-8 max-w-6xl">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <BarChart className="h-4 w-4" />
             <span className="hidden sm:inline">Dashboard</span>
@@ -59,6 +60,10 @@ export default function AdminPage() {
           <TabsTrigger value="places" className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             <span className="hidden sm:inline">Places</span>
+          </TabsTrigger>
+          <TabsTrigger value="events" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            <span className="hidden sm:inline">Events</span>
           </TabsTrigger>
           <TabsTrigger value="activity" className="flex items-center gap-2">
             <ClipboardList className="h-4 w-4" />
@@ -88,6 +93,10 @@ export default function AdminPage() {
 
         <TabsContent value="places" className="space-y-6">
           <PlacesManagement />
+        </TabsContent>
+
+        <TabsContent value="events" className="space-y-6">
+          <EventsManagement />
         </TabsContent>
 
         <TabsContent value="activity" className="space-y-6">
