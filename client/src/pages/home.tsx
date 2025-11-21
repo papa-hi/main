@@ -7,8 +7,10 @@ import { DadSpotlight } from "../components/home/dad-spotlight";
 import { useLocation } from "@/hooks/use-location";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { useCanonical } from "@/hooks/use-canonical";
 
 export default function HomePage() {
+  useCanonical("/");
   const { toast } = useToast();
   const { location, error: locationError, isLoading } = useLocation();
   const { user } = useAuth();

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useCanonical } from "@/hooks/use-canonical";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,6 +42,7 @@ type RegisterFormValues = {
 };
 
 export default function AuthPage() {
+  useCanonical("/auth");
   const [_, navigate] = useLocation();
   const { t } = useTranslation(["auth", "common"]);
   const { user, isLoading, loginMutation, registerMutation } = useAuth();
