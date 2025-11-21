@@ -1723,6 +1723,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Family Events routes
+  app.get("/api/events", async (req, res) => {
+    try {
+      const latitude = req.query.latitude ? parseFloat(req.query.latitude as string) : undefined;
+      const longitude = req.query.longitude ? parseFloat(req.query.longitude as string) : undefined;
+      const category = req.query.category as string | undefined;
+      const upcoming = req.query.upcoming === 'true';
+      
+      const events = await storage.getEvents({ 
+        latitude, 
+        longitude, 
+        category,
+        upcoming 
+      });
+      
+      res.json(events);
+    } catch (err) {
+      console.error("Error fetching events:", err);
+      res.status(500).json({ message: "Failed to fetch events" });
+    }
+  });
+
+  app.get("/api/events/:id", async (req, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      if (isNaN(eventId)) {
+        return res.status(400).json({ message: "Invalid event ID" });
+      }
+      
+      const event = await storage.getEventById(eventId);
+      
+      if (!event) {
+        return res.status(404).json({ message: "Event not found" });
+      }
+      
+      res.json(event);
+    } catch (err) {
+      console.error("Error fetching event:", err);
+      res.status(500).json({ message: "Failed to fetch event" });
+    }
+  });
+
   // Chat REST API endpoints
   app.get("/api/chats", isAuthenticated, async (req, res) => {
     try {
