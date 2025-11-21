@@ -26,6 +26,7 @@ export default function EventDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
+  const [showCreatePlaydate, setShowCreatePlaydate] = useState(false);
 
   const { data: event, isLoading, error } = useQuery<FamilyEvent>({
     queryKey: ['/api/events', id],
@@ -361,10 +362,44 @@ export default function EventDetailsPage() {
                 <i className="fas fa-share mr-2"></i>
                 {t('common.share', 'Share')}
               </Button>
+
+              <Button 
+                className="w-full justify-start"
+                onClick={() => setShowCreatePlaydate(true)}
+                data-testid="button-create-playdate"
+              >
+                <i className="fas fa-calendar-plus mr-2"></i>
+                Create Playdate for Event
+              </Button>
             </CardContent>
           </Card>
         </div>
       </div>
+      
+      {/* Create Playdate Dialog */}
+      {showCreatePlaydate && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50" style={{zIndex: 10000}}>
+          <div className="bg-white rounded-lg p-6 max-w-2xl max-h-[90vh] overflow-y-auto w-full mx-4" style={{zIndex: 10001}}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">
+                Create Playdate for {event.title}
+              </h2>
+              <button 
+                onClick={() => setShowCreatePlaydate(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <CreatePlaydateForm 
+              defaultLocation={event.location}
+              defaultLatitude={lat !== null && !isNaN(lat) ? lat : undefined}
+              defaultLongitude={lon !== null && !isNaN(lon) ? lon : undefined}
+              onSuccess={() => setShowCreatePlaydate(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
