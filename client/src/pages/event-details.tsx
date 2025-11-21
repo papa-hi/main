@@ -5,10 +5,12 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, MapPin, Users, DollarSign, ExternalLink, Clock } from "lucide-react";
+import { Calendar, MapPin, Users, DollarSign, ExternalLink, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { FamilyEvent } from "@shared/schema";
 import { format } from "date-fns";
+import { CreatePlaydateForm } from "@/components/playdates/create-playdate-form";
+import { useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
