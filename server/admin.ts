@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction, Express } from "express";
 import { storage } from "./storage";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { insertFamilyEventSchema } from "@shared/schema";
 
 // Middleware to check if user is an admin
 export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
@@ -424,6 +425,114 @@ export function setupAdminRoutes(app: Express) {
     } catch (error) {
       console.error("Error triggering profile reminders:", error);
       res.status(500).json({ error: "Failed to trigger profile reminders" });
+    }
+  });
+
+  // Family Events Management
+  app.get('/api/admin/events', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const events = await storage.getEvents();
+      await logAdminAction("View events", { eventCount: events.length }, req);
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching admin events:", error);
+      res.status(500).json({ error: "Failed to fetch events" });
+    }
+  });
+
+  app.get('/api/admin/events/:eventId', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const eventId = parseInt(req.params.eventId);
+      const event = await storage.getEventById(eventId);
+      
+      if (!event) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+
+      await logAdminAction("View event details", { eventId }, req);
+      res.json(event);
+    } catch (error) {
+      console.error("Error fetching event:", error);
+      res.status(500).json({ error: "Failed to fetch event" });
+    }
+  });
+
+  app.post('/api/admin/events', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertFamilyEventSchema.parse(req.body);
+      const newEvent = await storage.createEvent(validatedData);
+      
+      await logAdminAction("Create event", { 
+        eventId: newEvent.id, 
+        title: newEvent.title 
+      }, req);
+      
+      res.status(201).json(newEvent);
+    } catch (error) {
+      console.error("Error creating event:", error);
+      
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ error: validationError.message });
+      }
+      
+      res.status(500).json({ error: "Failed to create event" });
+    }
+  });
+
+  app.patch('/api/admin/events/:eventId', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const eventId = parseInt(req.params.eventId);
+      const event = await storage.getEventById(eventId);
+      
+      if (!event) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+
+      const updatedEvent = await storage.updateEvent(eventId, req.body);
+      
+      await logAdminAction("Update event", { 
+        eventId, 
+        title: updatedEvent.title,
+        changes: req.body 
+      }, req);
+      
+      res.json(updatedEvent);
+    } catch (error) {
+      console.error("Error updating event:", error);
+      
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ error: validationError.message });
+      }
+      
+      res.status(500).json({ error: "Failed to update event" });
+    }
+  });
+
+  app.delete('/api/admin/events/:eventId', isAdmin, async (req: Request, res: Response) => {
+    try {
+      const eventId = parseInt(req.params.eventId);
+      const event = await storage.getEventById(eventId);
+      
+      if (!event) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+
+      const success = await storage.deleteEvent(eventId);
+      
+      if (success) {
+        await logAdminAction("Delete event", { 
+          eventId, 
+          title: event.title 
+        }, req);
+        res.json({ success: true });
+      } else {
+        res.status(500).json({ error: "Failed to delete event" });
+      }
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      res.status(500).json({ error: "Failed to delete event" });
     }
   });
 }
