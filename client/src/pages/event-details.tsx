@@ -61,10 +61,10 @@ export default function EventDetailsPage() {
             <div className="text-center">
               <h2 className="text-xl font-semibold mb-2">{t('common.error', 'Error')}</h2>
               <p className="text-gray-600 mb-4">
-                Event not found or could not be loaded.
+                {t('events.eventNotFound')}
               </p>
               <Button onClick={() => setLocation('/')}>
-                {t('common.goBack', 'Go Back')}
+                {t('common.back', 'Back')}
               </Button>
             </div>
           </CardContent>
@@ -137,7 +137,7 @@ export default function EventDetailsPage() {
               {event.isRecurring && (
                 <Badge variant="secondary">
                   <i className="fas fa-repeat mr-1"></i>
-                  Recurring
+                  {t('events.recurring')}
                 </Badge>
               )}
             </div>
@@ -182,7 +182,7 @@ export default function EventDetailsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Event Details
+                {t('events.eventDetails')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -190,7 +190,7 @@ export default function EventDetailsPage() {
               <div className="flex items-start gap-3">
                 <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="font-medium text-sm">Date & Time</p>
+                  <p className="font-medium text-sm">{t('events.dateAndTime')}</p>
                   <p className="text-sm text-muted-foreground" data-testid="text-event-date">
                     {format(startDate, "EEEE, MMMM d, yyyy")}
                   </p>
@@ -205,7 +205,7 @@ export default function EventDetailsPage() {
               <div className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="font-medium text-sm">Location</p>
+                  <p className="font-medium text-sm">{t('events.location')}</p>
                   <p className="text-sm text-muted-foreground" data-testid="text-event-location">
                     {event.location}
                   </p>
@@ -217,7 +217,7 @@ export default function EventDetailsPage() {
                 <div className="flex items-start gap-3">
                   <Users className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
-                    <p className="font-medium text-sm">Age Range</p>
+                    <p className="font-medium text-sm">{t('events.ageRange')}</p>
                     <p className="text-sm text-muted-foreground" data-testid="text-event-age">
                       {event.ageRange}
                     </p>
@@ -229,7 +229,7 @@ export default function EventDetailsPage() {
               <div className="flex items-start gap-3">
                 <DollarSign className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="font-medium text-sm">Cost</p>
+                  <p className="font-medium text-sm">{t('events.cost')}</p>
                   <p className="text-sm text-muted-foreground" data-testid="text-event-cost">
                     {event.cost}
                   </p>
@@ -241,7 +241,7 @@ export default function EventDetailsPage() {
                 <div className="flex items-start gap-3">
                   <i className="fas fa-user-tie text-muted-foreground mt-1"></i>
                   <div>
-                    <p className="font-medium text-sm">Organizer</p>
+                    <p className="font-medium text-sm">{t('events.organizer')}</p>
                     <p className="text-sm text-muted-foreground" data-testid="text-event-organizer">
                       {event.organizer}
                     </p>
@@ -254,7 +254,7 @@ export default function EventDetailsPage() {
                 <div className="flex items-start gap-3">
                   <i className="fas fa-envelope text-muted-foreground mt-1"></i>
                   <div>
-                    <p className="font-medium text-sm">Contact</p>
+                    <p className="font-medium text-sm">{t('events.contact')}</p>
                     <p className="text-sm text-muted-foreground" data-testid="text-event-contact">
                       {event.contactInfo}
                     </p>
@@ -301,7 +301,7 @@ export default function EventDetailsPage() {
                     <div className="text-center text-gray-500">
                       <MapPin className="h-12 w-12 mx-auto mb-2 text-gray-400" />
                       <p className="text-sm">
-                        Location coordinates not available
+                        {t('events.locationNotAvailable')}
                       </p>
                       {event.location && (
                         <p className="text-xs mt-1">{event.location}</p>
@@ -316,7 +316,7 @@ export default function EventDetailsPage() {
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>{t('events.quickActions')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {event.registrationUrl && (
@@ -326,7 +326,7 @@ export default function EventDetailsPage() {
                   data-testid="button-register"
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
-                  Register for Event
+                  {t('events.registerForEvent')}
                 </Button>
               )}
               
@@ -340,7 +340,7 @@ export default function EventDetailsPage() {
                 data-testid="button-directions"
               >
                 <i className="fas fa-directions mr-2"></i>
-                Get Directions
+                {t('events.getDirections')}
               </Button>
               
               <Button 
@@ -369,7 +369,7 @@ export default function EventDetailsPage() {
                 data-testid="button-create-playdate"
               >
                 <i className="fas fa-calendar-plus mr-2"></i>
-                Create Playdate for Event
+                {t('events.createPlaydateForEvent')}
               </Button>
             </CardContent>
           </Card>
@@ -382,7 +382,7 @@ export default function EventDetailsPage() {
           <div className="bg-white rounded-lg p-6 max-w-2xl max-h-[90vh] overflow-y-auto w-full mx-4" style={{zIndex: 10001}}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">
-                Create Playdate for {event.title}
+                {t('events.createPlaydateFor', { eventTitle: event.title })}
               </h2>
               <button 
                 onClick={() => setShowCreatePlaydate(false)}

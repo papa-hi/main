@@ -161,10 +161,10 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
               <button 
                 onClick={() => onEdit(place)}
                 className="bg-primary text-white px-2 py-1 rounded-md text-xs hover:bg-primary/80 transition-colors"
-                aria-label={t('places.editPlace', 'Edit place')}
+                aria-label={t('common.edit', 'Edit')}
               >
                 <i className="fas fa-edit text-xs mr-1"></i>
-                Edit
+                {t('common.edit')}
               </button>
             )}
           </div>
