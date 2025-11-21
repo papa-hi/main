@@ -1,0 +1,94 @@
+Access to fetch at 'https://nominatim.openstreetmap.org/search?format=json&q=Reinaldapad%2010%2C%202033%20SX%20Haarlem&limit=1&addressdetails=1' from origin 'https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+distance.ts:85  GET https://nominatim.openstreetmap.org/search?format=json&q=Reinaldapad%2010%2C%202033%20SX%20Haarlem&limit=1&addressdetails=1 net::ERR_FAILED 503 (Service Unavailable)
+geocodeAddress @ distance.ts:85
+calculateDistanceToPlace @ distance.ts:134
+await in calculateDistanceToPlace
+calculateDistance @ use-distance.tsx:29
+(anonymous) @ use-distance.tsx:55
+commitHookEffectListMount @ chunk-NXESFFTV.js?v=33ca4232:16963
+commitPassiveMountOnFiber @ chunk-NXESFFTV.js?v=33ca4232:18206
+commitPassiveMountEffects_complete @ chunk-NXESFFTV.js?v=33ca4232:18179
+commitPassiveMountEffects_begin @ chunk-NXESFFTV.js?v=33ca4232:18169
+commitPassiveMountEffects @ chunk-NXESFFTV.js?v=33ca4232:18159
+flushPassiveEffectsImpl @ chunk-NXESFFTV.js?v=33ca4232:19543
+flushPassiveEffects @ chunk-NXESFFTV.js?v=33ca4232:19500
+commitRootImpl @ chunk-NXESFFTV.js?v=33ca4232:19469
+commitRoot @ chunk-NXESFFTV.js?v=33ca4232:19330
+performSyncWorkOnRoot @ chunk-NXESFFTV.js?v=33ca4232:18948
+flushSyncCallbacks @ chunk-NXESFFTV.js?v=33ca4232:9166
+(anonymous) @ chunk-NXESFFTV.js?v=33ca4232:18677
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=33ca4232:537
+flush @ @tanstack_react-query.js?v=33ca4232:551
+batch @ @tanstack_react-query.js?v=33ca4232:569
+#dispatch @ @tanstack_react-query.js?v=33ca4232:963
+setData @ @tanstack_react-query.js?v=33ca4232:672
+onSuccess @ @tanstack_react-query.js?v=33ca4232:865
+resolve @ @tanstack_react-query.js?v=33ca4232:442
+Promise.then
+run @ @tanstack_react-query.js?v=33ca4232:481
+start @ @tanstack_react-query.js?v=33ca4232:518
+fetch @ @tanstack_react-query.js?v=33ca4232:893
+#executeFetch @ @tanstack_react-query.js?v=33ca4232:1963
+setOptions @ @tanstack_react-query.js?v=33ca4232:1897
+(anonymous) @ @tanstack_react-query.js?v=33ca4232:2972
+commitHookEffectListMount @ chunk-NXESFFTV.js?v=33ca4232:16963
+commitPassiveMountOnFiber @ chunk-NXESFFTV.js?v=33ca4232:18206
+commitPassiveMountEffects_complete @ chunk-NXESFFTV.js?v=33ca4232:18179
+commitPassiveMountEffects_begin @ chunk-NXESFFTV.js?v=33ca4232:18169
+commitPassiveMountEffects @ chunk-NXESFFTV.js?v=33ca4232:18159
+flushPassiveEffectsImpl @ chunk-NXESFFTV.js?v=33ca4232:19543
+flushPassiveEffects @ chunk-NXESFFTV.js?v=33ca4232:19500
+(anonymous) @ chunk-NXESFFTV.js?v=33ca4232:19381
+workLoop @ chunk-NXESFFTV.js?v=33ca4232:197
+flushWork @ chunk-NXESFFTV.js?v=33ca4232:176
+performWorkUntilDeadline @ chunk-NXESFFTV.js?v=33ca4232:384Understand this error
+distance.ts:105 Geocoding failed for address: Reinaldapad 10, 2033 SX Haarlem TypeError: Failed to fetch
+    at geocodeAddress (distance.ts:85:28)
+    at calculateDistanceToPlace (distance.ts:134:29)
+    at async calculateDistance (use-distance.tsx:29:28)
+geocodeAddress @ distance.ts:105
+await in geocodeAddress
+calculateDistanceToPlace @ distance.ts:134
+await in calculateDistanceToPlace
+calculateDistance @ use-distance.tsx:29
+(anonymous) @ use-distance.tsx:55
+commitHookEffectListMount @ chunk-NXESFFTV.js?v=33ca4232:16963
+commitPassiveMountOnFiber @ chunk-NXESFFTV.js?v=33ca4232:18206
+commitPassiveMountEffects_complete @ chunk-NXESFFTV.js?v=33ca4232:18179
+commitPassiveMountEffects_begin @ chunk-NXESFFTV.js?v=33ca4232:18169
+commitPassiveMountEffects @ chunk-NXESFFTV.js?v=33ca4232:18159
+flushPassiveEffectsImpl @ chunk-NXESFFTV.js?v=33ca4232:19543
+flushPassiveEffects @ chunk-NXESFFTV.js?v=33ca4232:19500
+commitRootImpl @ chunk-NXESFFTV.js?v=33ca4232:19469
+commitRoot @ chunk-NXESFFTV.js?v=33ca4232:19330
+performSyncWorkOnRoot @ chunk-NXESFFTV.js?v=33ca4232:18948
+flushSyncCallbacks @ chunk-NXESFFTV.js?v=33ca4232:9166
+(anonymous) @ chunk-NXESFFTV.js?v=33ca4232:18677
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=33ca4232:537
+flush @ @tanstack_react-query.js?v=33ca4232:551
+batch @ @tanstack_react-query.js?v=33ca4232:569
+#dispatch @ @tanstack_react-query.js?v=33ca4232:963
+setData @ @tanstack_react-query.js?v=33ca4232:672
+onSuccess @ @tanstack_react-query.js?v=33ca4232:865
+resolve @ @tanstack_react-query.js?v=33ca4232:442
+Promise.then
+run @ @tanstack_react-query.js?v=33ca4232:481
+start @ @tanstack_react-query.js?v=33ca4232:518
+fetch @ @tanstack_react-query.js?v=33ca4232:893
+#executeFetch @ @tanstack_react-query.js?v=33ca4232:1963
+setOptions @ @tanstack_react-query.js?v=33ca4232:1897
+(anonymous) @ @tanstack_react-query.js?v=33ca4232:2972
+commitHookEffectListMount @ chunk-NXESFFTV.js?v=33ca4232:16963
+commitPassiveMountOnFiber @ chunk-NXESFFTV.js?v=33ca4232:18206
+commitPassiveMountEffects_complete @ chunk-NXESFFTV.js?v=33ca4232:18179
+commitPassiveMountEffects_begin @ chunk-NXESFFTV.js?v=33ca4232:18169
+commitPassiveMountEffects @ chunk-NXESFFTV.js?v=33ca4232:18159
+flushPassiveEffectsImpl @ chunk-NXESFFTV.js?v=33ca4232:19543
+flushPassiveEffects @ chunk-NXESFFTV.js?v=33ca4232:19500
+(anonymous) @ chunk-NXESFFTV.js?v=33ca4232:19381
+workLoop @ chunk-NXESFFTV.js?v=33ca4232:197
+flushWork @ chunk-NXESFFTV.js?v=33ca4232:176
+performWorkUntilDeadline @ chunk-NXESFFTV.js?v=33ca4232:384Understand this warning
+distance.ts:138 Could not get coordinates for place: {latitude: undefined, longitude: undefined, address: 'Reinaldapad 10, 2033 SX Haarlem'}
