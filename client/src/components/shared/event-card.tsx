@@ -8,9 +8,10 @@ import { useTranslation } from "react-i18next";
 
 interface EventCardProps {
   event: FamilyEvent;
+  layout?: 'horizontal' | 'grid';
 }
 
-export function EventCard({ event }: EventCardProps) {
+export function EventCard({ event, layout = 'horizontal' }: EventCardProps) {
   const [, setLocation] = useLocation();
   const { t } = useTranslation();
 
@@ -36,7 +37,7 @@ export function EventCard({ event }: EventCardProps) {
 
   return (
     <Card 
-      className="flex-shrink-0 w-80 hover:shadow-lg transition-shadow cursor-pointer" 
+      className={`hover:shadow-lg transition-shadow cursor-pointer ${layout === 'horizontal' ? 'flex-shrink-0 w-80' : ''}`}
       data-testid={`card-event-${event.id}`}
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}

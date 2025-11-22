@@ -631,18 +631,16 @@ export default function CommunityPage() {
 
               <TabsContent value="events" className="mt-6">
                 {eventsLoading ? (
-                  <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-                    <div className="flex space-x-4 pb-4 w-max">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="bg-white rounded-xl shadow-sm flex-shrink-0 w-80 animate-pulse">
-                          <div className="h-48 bg-gray-200 rounded-t-xl"></div>
-                          <div className="p-4">
-                            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                          </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <div key={i} className="bg-white rounded-xl shadow-sm animate-pulse">
+                        <div className="h-48 bg-gray-200 rounded-t-xl"></div>
+                        <div className="p-4">
+                          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
                 ) : events.length === 0 ? (
                   <Card>
@@ -659,18 +657,17 @@ export default function CommunityPage() {
                     </CardContent>
                   </Card>
                 ) : (
-                  <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-                    <div className="flex space-x-4 pb-4 w-max">
-                      {events.map((event) => (
-                        <EventCard key={event.id} event={event} />
-                      ))}
-                    </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                    {events.map((event) => (
+                      <EventCard key={event.id} event={event} layout="grid" />
+                    ))}
                   </div>
                 )}
               </TabsContent>
             </Tabs>
 
-            {/* Posts */}
+            {/* Posts - only show when not on Events tab */}
+            {activeTab !== 'events' && (
             <div className="space-y-6">
               {postsError ? (
                 <Card>
@@ -925,6 +922,7 @@ export default function CommunityPage() {
                 ))
               )}
             </div>
+            )}
           </div>
         </div>
       </div>
