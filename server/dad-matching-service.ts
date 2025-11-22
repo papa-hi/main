@@ -170,9 +170,31 @@ async function findMatchCandidates(userId: number): Promise<MatchCandidate[]> {
       )
     );
 
+  // OPTIMIZATION: Get all existing matches for this user in ONE query (prevents N+1)
+  const existingMatches = await db
+    .select()
+    .from(dadMatches)
+    .where(
+      or(
+        eq(dadMatches.dadId1, userId),
+        eq(dadMatches.dadId2, userId)
+      )
+    );
+
+  // Create a Set of matched user IDs for fast lookup
+  const matchedUserIds = new Set<number>();
+  existingMatches.forEach(match => {
+    matchedUserIds.add(match.dadId1 === userId ? match.dadId2 : match.dadId1);
+  });
+
   const candidates: MatchCandidate[] = [];
 
   for (const otherUser of potentialMatches) {
+    // Skip if match already exists (fast Set lookup instead of database query)
+    if (matchedUserIds.has(otherUser.id)) {
+      continue;
+    }
+
     if (!otherUser.city || !otherUser.childrenInfo || !Array.isArray(otherUser.childrenInfo)) {
       continue;
     }
@@ -202,21 +224,6 @@ async function findMatchCandidates(userId: number): Promise<MatchCandidate[]> {
     // Skip if no age compatibility
     if (commonAgeRanges.length === 0) {
       continue;
-    }
-
-    // Check if match already exists
-    const existingMatch = await db
-      .select()
-      .from(dadMatches)
-      .where(
-        or(
-          and(eq(dadMatches.dadId1, userId), eq(dadMatches.dadId2, otherUser.id)),
-          and(eq(dadMatches.dadId1, otherUser.id), eq(dadMatches.dadId2, userId))
-        )
-      );
-
-    if (existingMatch.length > 0) {
-      continue; // Skip if match already exists
     }
 
     const matchScore = calculateMatchScore(distance, commonAgeRanges);

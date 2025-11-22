@@ -2541,6 +2541,7 @@ export class DatabaseStorage implements IStorage {
     const limit = options?.limit || 100;
     const offset = options?.offset || 0;
 
+    // OPTIMIZATION: Use SQL subqueries to fetch counts in a single query (prevents N+1)
     const posts = await db
       .select({
         id: communityPosts.id,
@@ -2559,6 +2560,16 @@ export class DatabaseStorage implements IStorage {
           profileImage: users.profileImage,
           username: users.username,
         },
+        commentCount: sql<number>`(
+          SELECT COUNT(*)::int
+          FROM ${communityComments}
+          WHERE ${communityComments.postId} = ${communityPosts.id}
+        )`.as('comment_count'),
+        reactionCount: sql<number>`(
+          SELECT COUNT(*)::int
+          FROM ${communityReactions}
+          WHERE ${communityReactions.postId} = ${communityPosts.id}
+        )`.as('reaction_count'),
       })
       .from(communityPosts)
       .leftJoin(users, eq(communityPosts.userId, users.id))
@@ -2566,30 +2577,14 @@ export class DatabaseStorage implements IStorage {
       .limit(limit)
       .offset(offset);
 
-    // Get comment and reaction counts for each post
-    const postsWithCounts = await Promise.all(
-      posts.map(async (post) => {
-        const [commentCount] = await db
-          .select({ count: count() })
-          .from(communityComments)
-          .where(eq(communityComments.postId, post.id));
-
-        const [reactionCount] = await db
-          .select({ count: count() })
-          .from(communityReactions)
-          .where(eq(communityReactions.postId, post.id));
-
-        return {
-          ...post,
-          _count: {
-            comments: commentCount.count,
-            reactions: reactionCount.count,
-          },
-        };
-      })
-    );
-
-    return postsWithCounts;
+    // Transform to match expected format
+    return posts.map(post => ({
+      ...post,
+      _count: {
+        comments: post.commentCount || 0,
+        reactions: post.reactionCount || 0,
+      },
+    }));
   }
 
   async getCommunityPostById(postId: number): Promise<any | undefined> {
