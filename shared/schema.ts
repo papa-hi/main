@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar, unique, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -34,7 +34,10 @@ export const communityPosts = pgTable("community_posts", {
   isEdited: boolean("is_edited").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  createdAtIdx: index("community_posts_created_at_idx").on(table.createdAt),
+  categoryIdx: index("community_posts_category_idx").on(table.category),
+}));
 
 // Community Comments schema  
 export const communityComments = pgTable("community_comments", {
@@ -212,7 +215,10 @@ export const playdates = pgTable("playdates", {
   recurringType: text("recurring_type").default("none"), // "none", "daily", "weekly", "monthly"
   parentPlaydateId: integer("parent_playdate_id"), // For recurring instances, points to the original
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  startTimeIdx: index("playdates_start_time_idx").on(table.startTime),
+  creatorIdIdx: index("playdates_creator_id_idx").on(table.creatorId),
+}));
 
 // Define playdate relations
 export const playdatesRelations = relations(playdates, ({ one, many }) => ({
@@ -312,7 +318,11 @@ export const familyEvents = pgTable("family_events", {
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  startDateIdx: index("family_events_start_date_idx").on(table.startDate),
+  categoryIdx: index("family_events_category_idx").on(table.category),
+  isActiveIdx: index("family_events_is_active_idx").on(table.isActive),
+}));
 
 // Define family events relations
 export const familyEventsRelations = relations(familyEvents, ({ }) => ({}));
