@@ -3,39 +3,7 @@ import { storage } from "./storage";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { insertFamilyEventSchema, updateFamilyEventSchema } from "@shared/schema";
-
-// Helper function to geocode address to coordinates
-async function geocodeAddress(address: string): Promise<{ latitude: string; longitude: string } | null> {
-  try {
-    if (!address || address.trim() === '') return null;
-    
-    const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=nl`;
-    const response = await fetch(geocodeUrl, {
-      headers: {
-        'User-Agent': 'PaPa-Hi Family App (development)'
-      }
-    });
-    
-    if (!response.ok) {
-      console.error(`Geocoding failed: HTTP ${response.status} for address: ${address}`);
-      return null;
-    }
-    
-    const data = await response.json();
-
-    if (data && data.length > 0) {
-      const result = {
-        latitude: data[0].lat,
-        longitude: data[0].lon
-      };
-      console.log(`Geocoded "${address}" to coordinates: ${result.latitude}, ${result.longitude}`);
-      return result;
-    }
-  } catch (error) {
-    console.error(`[GEOCODE] Error:`, error);
-  }
-  return null;
-}
+import { geocodeAddress } from "./geocoding";
 
 // Middleware to check if user is an admin
 export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
@@ -502,8 +470,8 @@ export function setupAdminRoutes(app: Express) {
             error: `Unable to geocode location "${validatedData.location}". Please verify the address or provide coordinates manually.`
           });
         }
-        validatedData.latitude = coordinates.latitude;
-        validatedData.longitude = coordinates.longitude;
+        validatedData.latitude = coordinates.latitude.toString();
+        validatedData.longitude = coordinates.longitude.toString();
       }
       
       const newEvent = await storage.createEvent(validatedData);
@@ -547,8 +515,8 @@ export function setupAdminRoutes(app: Express) {
             error: `Unable to geocode new location "${validatedData.location}". Please verify the address. The event location was not updated.`
           });
         }
-        validatedData.latitude = coordinates.latitude;
-        validatedData.longitude = coordinates.longitude;
+        validatedData.latitude = coordinates.latitude.toString();
+        validatedData.longitude = coordinates.longitude.toString();
       }
       
       const updatedEvent = await storage.updateEvent(eventId, validatedData);
