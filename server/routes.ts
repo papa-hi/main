@@ -2254,11 +2254,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let latitude = parseFloat(req.body.latitude) || 0;
       let longitude = parseFloat(req.body.longitude) || 0;
       
+      console.log(`[CREATE PLACE] Initial coordinates: lat=${latitude}, lon=${longitude}`);
+      
       if ((latitude === 0 || longitude === 0) && req.body.address) {
+        console.log(`[CREATE PLACE] Geocoding address: ${req.body.address}`);
         const coords = await geocodeAddress(req.body.address);
         if (coords) {
           latitude = coords.latitude;
           longitude = coords.longitude;
+          console.log(`[CREATE PLACE] Geocoding successful: lat=${latitude}, lon=${longitude}`);
+        } else {
+          console.log(`[CREATE PLACE] Geocoding failed for address: ${req.body.address}`);
         }
       }
 
