@@ -50,6 +50,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 22, 2025 - Performance Optimizations
+- **Database Indexes**: Added indexes on frequently queried columns (community_posts.created_at, playdates.start_time, family_events.start_date, category columns) to significantly improve query performance
+- **N+1 Query Fixes**: 
+  - Dad matching service: Eliminated 100+ database queries by batching existing match checks into single query with Set-based lookups
+  - Community posts: Eliminated 200+ queries by using SQL subqueries for comment/reaction counts (100 posts × 2 queries each → 1 query total)
+- **Admin Pagination**: Implemented pagination for admin endpoints (/api/admin/users, /api/admin/activity, /api/admin/logs) with input validation, default limit of 50, max 200, returning metadata (total, offset, hasMore)
+- **Input Validation**: Added comprehensive validation for pagination parameters with defensive checks at both route and storage layers to prevent negative values and abuse
+- **Performance Impact**: Reduced database queries by ~300+ per page load in community section, improved response times for admin dashboard
+
 ### October 18, 2025 - Community Post Push Notifications
 - **Real-time Notifications**: Users now receive push notifications when new community posts are created
 - **Smart Filtering**: Automatically excludes the post author and admin users from notifications
