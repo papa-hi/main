@@ -155,8 +155,19 @@ export default function PlaceDetailsPage() {
   const lat = typeof place.latitude === 'string' ? parseFloat(place.latitude) : place.latitude;
   const lon = typeof place.longitude === 'string' ? parseFloat(place.longitude) : place.longitude;
   
+  // Debug logging
+  console.log('[PLACE DETAILS] Raw coordinates:', { latitude: place.latitude, longitude: place.longitude });
+  console.log('[PLACE DETAILS] Parsed coordinates:', { lat, lon });
+  console.log('[PLACE DETAILS] Validation:', { 
+    latIsNaN: isNaN(lat), 
+    lonIsNaN: isNaN(lon), 
+    latIsZero: lat === 0, 
+    lonIsZero: lon === 0 
+  });
+  
   // Check if coordinates are valid
   const hasValidCoordinates = !isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0;
+  console.log('[PLACE DETAILS] Has valid coordinates:', hasValidCoordinates);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
