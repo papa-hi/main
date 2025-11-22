@@ -13,6 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Edit, Trash2, MapPin, Star, Users } from "lucide-react";
+import { LocationMapPreview } from "@/components/shared/location-map-preview";
 
 // Component to show real rating data for each place
 function PlaceRatingDisplay({ placeId }: { placeId: number }) {
