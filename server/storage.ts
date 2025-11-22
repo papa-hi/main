@@ -2553,23 +2553,21 @@ export class DatabaseStorage implements IStorage {
         isEdited: communityPosts.isEdited,
         createdAt: communityPosts.createdAt,
         updatedAt: communityPosts.updatedAt,
-        author: {
-          id: users.id,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          profileImage: users.profileImage,
-          username: users.username,
-        },
+        authorId: users.id,
+        authorFirstName: users.firstName,
+        authorLastName: users.lastName,
+        authorProfileImage: users.profileImage,
+        authorUsername: users.username,
         commentCount: sql<number>`(
-          SELECT COUNT(*)::int
+          SELECT COALESCE(COUNT(*), 0)::int
           FROM ${communityComments}
           WHERE ${communityComments.postId} = ${communityPosts.id}
-        )`.as('comment_count'),
+        )`,
         reactionCount: sql<number>`(
-          SELECT COUNT(*)::int
+          SELECT COALESCE(COUNT(*), 0)::int
           FROM ${communityReactions}
           WHERE ${communityReactions.postId} = ${communityPosts.id}
-        )`.as('reaction_count'),
+        )`,
       })
       .from(communityPosts)
       .leftJoin(users, eq(communityPosts.userId, users.id))
@@ -2579,10 +2577,25 @@ export class DatabaseStorage implements IStorage {
 
     // Transform to match expected format
     return posts.map(post => ({
-      ...post,
+      id: post.id,
+      userId: post.userId,
+      title: post.title,
+      content: post.content,
+      category: post.category,
+      hashtags: post.hashtags,
+      isEdited: post.isEdited,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      author: {
+        id: post.authorId,
+        firstName: post.authorFirstName,
+        lastName: post.authorLastName,
+        profileImage: post.authorProfileImage,
+        username: post.authorUsername,
+      },
       _count: {
-        comments: post.commentCount || 0,
-        reactions: post.reactionCount || 0,
+        comments: Number(post.commentCount) || 0,
+        reactions: Number(post.reactionCount) || 0,
       },
     }));
   }
