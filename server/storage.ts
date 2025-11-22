@@ -38,7 +38,7 @@ export interface IStorage {
   markPasswordResetTokenAsUsed(token: string): Promise<void>;
   
   // Admin methods
-  getAdminUsers(): Promise<User[]>;
+  getAdminUsers(options?: { limit?: number; offset?: number }): Promise<{ users: User[]; total: number }>;
   setUserRole(userId: number, role: string): Promise<User>;
   getUsersByRole(role: string): Promise<User[]>;
   getUserStats(): Promise<{ total: number, newLastWeek: number, activeLastMonth: number }>;
@@ -48,7 +48,7 @@ export interface IStorage {
   logPageView(pageView: InsertPageView): Promise<PageView>;
   logFeatureUsage(usage: InsertFeatureUsage): Promise<FeatureUsage>;
   logAdminAction(log: InsertAdminLog): Promise<AdminLog>;
-  getRecentUserActivity(limit?: number): Promise<UserActivity[]>;
+  getRecentUserActivity(options?: { limit?: number; offset?: number }): Promise<{ activity: UserActivity[]; total: number }>;
   getUserActivityStats(days?: number): Promise<{
     totalActions: number;
     uniqueUsers: number;
@@ -58,7 +58,7 @@ export interface IStorage {
   }>;
   getTopPages(days?: number): Promise<{ path: string, count: number }[]>;
   getFeatureUsageStats(days?: number): Promise<{ feature: string, count: number }[]>;
-  getAdminLogs(limit?: number): Promise<AdminLog[]>;
+  getAdminLogs(options?: { limit?: number; offset?: number }): Promise<{ logs: AdminLog[]; total: number }>;
   
   // Playdate methods
   getUpcomingPlaydates(): Promise<Playdate[]>;
@@ -993,12 +993,33 @@ export class MemStorage implements IStorage {
 
 export class DatabaseStorage implements IStorage {
   // Admin methods
-  async getAdminUsers(): Promise<User[]> {
-    const result = await db.select().from(users);
-    return result.map(user => ({
+  async getAdminUsers(options?: { limit?: number; offset?: number }): Promise<{ users: User[]; total: number }> {
+    // Defensive: ensure positive integers
+    const limit = Math.min(Math.max(1, options?.limit || 50), 200);
+    const offset = Math.max(0, options?.offset || 0);
+    
+    // Get total count
+    const [{ count: totalCount }] = await db
+      .select({ count: count() })
+      .from(users);
+    
+    // Get paginated users
+    const result = await db
+      .select()
+      .from(users)
+      .orderBy(desc(users.createdAt))
+      .limit(limit)
+      .offset(offset);
+      
+    const usersWithTypedChildren = result.map(user => ({
       ...user,
       childrenInfo: user.childrenInfo as { name: string; age: number }[] | undefined,
     }));
+    
+    return {
+      users: usersWithTypedChildren,
+      total: Number(totalCount)
+    };
   }
   
   async setUserRole(userId: number, role: string): Promise<User> {
@@ -1094,7 +1115,17 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
   
-  async getRecentUserActivity(limit: number = 100): Promise<UserActivity[]> {
+  async getRecentUserActivity(options?: { limit?: number; offset?: number }): Promise<{ activity: UserActivity[]; total: number }> {
+    // Defensive: ensure positive integers
+    const limit = Math.min(Math.max(1, options?.limit || 50), 200);
+    const offset = Math.max(0, options?.offset || 0);
+    
+    // Get total count
+    const [{ count: totalCount }] = await db
+      .select({ count: count() })
+      .from(userActivity);
+    
+    // Get paginated activity
     const result = await db
       .select({
         id: userActivity.id,
@@ -1116,9 +1147,13 @@ export class DatabaseStorage implements IStorage {
       .from(userActivity)
       .leftJoin(users, eq(userActivity.userId, users.id))
       .orderBy(desc(userActivity.timestamp))
-      .limit(limit);
+      .limit(limit)
+      .offset(offset);
       
-    return result as any;
+    return {
+      activity: result as any,
+      total: Number(totalCount)
+    };
   }
 
   async getUserActivityStats(days: number = 7): Promise<{
@@ -1245,14 +1280,28 @@ export class DatabaseStorage implements IStorage {
     }));
   }
   
-  async getAdminLogs(limit: number = 100): Promise<AdminLog[]> {
+  async getAdminLogs(options?: { limit?: number; offset?: number }): Promise<{ logs: AdminLog[]; total: number }> {
+    // Defensive: ensure positive integers
+    const limit = Math.min(Math.max(1, options?.limit || 50), 200);
+    const offset = Math.max(0, options?.offset || 0);
+    
+    // Get total count
+    const [{ count: totalCount }] = await db
+      .select({ count: count() })
+      .from(adminLogs);
+    
+    // Get paginated logs
     const result = await db
       .select()
       .from(adminLogs)
       .orderBy(desc(adminLogs.timestamp))
-      .limit(limit);
+      .limit(limit)
+      .offset(offset);
       
-    return result;
+    return {
+      logs: result,
+      total: Number(totalCount)
+    };
   }
   
   // User methods

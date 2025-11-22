@@ -113,19 +113,37 @@ export const logFeatureUsage = async (
 
 // Set up admin routes
 export function setupAdminRoutes(app: Express) {
-  // Get all users (admin only)
+  // Get all users (admin only) with pagination
   app.get('/api/admin/users', isAdmin, async (req: Request, res: Response) => {
     try {
-      const users = await storage.getAdminUsers();
+      // Parse and validate pagination parameters
+      const rawLimit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const rawOffset = req.query.offset ? parseInt(req.query.offset as string) : 0;
+      
+      // Validate and clamp values
+      if (isNaN(rawLimit) || isNaN(rawOffset)) {
+        return res.status(400).json({ error: "Invalid pagination parameters" });
+      }
+      
+      const limit = Math.min(Math.max(1, rawLimit), 200); // Clamp between 1 and 200
+      const offset = Math.max(0, rawOffset); // Ensure non-negative
+      
+      const { users, total } = await storage.getAdminUsers({ limit, offset });
       const sanitizedUsers = users.map(user => {
         const { password, ...userWithoutPassword } = user;
         return userWithoutPassword;
       });
       
-      res.json(sanitizedUsers);
+      res.json({
+        users: sanitizedUsers,
+        total,
+        limit,
+        offset,
+        hasMore: offset + users.length < total
+      });
       
       // Log admin action
-      await logAdminAction("Get all users", null, req);
+      await logAdminAction("Get all users", { limit, offset }, req);
     } catch (error) {
       console.error("Error fetching admin users:", error);
       res.status(500).json({ error: "Failed to fetch users" });
@@ -211,15 +229,32 @@ export function setupAdminRoutes(app: Express) {
     }
   });
 
-  // Get user activity
+  // Get user activity with pagination
   app.get('/api/admin/activity', isAdmin, async (req: Request, res: Response) => {
     try {
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
-      const activity = await storage.getRecentUserActivity(limit);
-      res.json(activity);
+      // Parse and validate pagination parameters
+      const rawLimit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const rawOffset = req.query.offset ? parseInt(req.query.offset as string) : 0;
+      
+      // Validate and clamp values
+      if (isNaN(rawLimit) || isNaN(rawOffset)) {
+        return res.status(400).json({ error: "Invalid pagination parameters" });
+      }
+      
+      const limit = Math.min(Math.max(1, rawLimit), 200); // Clamp between 1 and 200
+      const offset = Math.max(0, rawOffset); // Ensure non-negative
+      
+      const { activity, total } = await storage.getRecentUserActivity({ limit, offset });
+      res.json({
+        activity,
+        total,
+        limit,
+        offset,
+        hasMore: offset + activity.length < total
+      });
       
       // Log admin action
-      await logAdminAction("View user activity", { limit }, req);
+      await logAdminAction("View user activity", { limit, offset }, req);
     } catch (error) {
       console.error("Error fetching user activity:", error);
       res.status(500).json({ error: "Failed to fetch user activity" });
@@ -271,15 +306,32 @@ export function setupAdminRoutes(app: Express) {
     }
   });
 
-  // Get admin logs
+  // Get admin logs with pagination
   app.get('/api/admin/logs', isAdmin, async (req: Request, res: Response) => {
     try {
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
-      const logs = await storage.getAdminLogs(limit);
-      res.json(logs);
+      // Parse and validate pagination parameters
+      const rawLimit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const rawOffset = req.query.offset ? parseInt(req.query.offset as string) : 0;
+      
+      // Validate and clamp values
+      if (isNaN(rawLimit) || isNaN(rawOffset)) {
+        return res.status(400).json({ error: "Invalid pagination parameters" });
+      }
+      
+      const limit = Math.min(Math.max(1, rawLimit), 200); // Clamp between 1 and 200
+      const offset = Math.max(0, rawOffset); // Ensure non-negative
+      
+      const { logs, total } = await storage.getAdminLogs({ limit, offset });
+      res.json({
+        logs,
+        total,
+        limit,
+        offset,
+        hasMore: offset + logs.length < total
+      });
       
       // Log admin action
-      await logAdminAction("View admin logs", { limit }, req);
+      await logAdminAction("View admin logs", { limit, offset }, req);
     } catch (error) {
       console.error("Error fetching admin logs:", error);
       res.status(500).json({ error: "Failed to fetch admin logs" });
