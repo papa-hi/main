@@ -403,24 +403,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Simple test endpoint to verify deployments are working
+  app.get('/api/test-deployment', (req: Request, res: Response) => {
+    console.log('[TEST_DEPLOYMENT] Endpoint hit successfully');
+    res.json({ 
+      success: true, 
+      message: 'Deployment is working!',
+      timestamp: new Date().toISOString()
+    });
+  });
+
   // Public geocoding endpoint to avoid CORS issues
   app.get('/api/geocode', async (req: Request, res: Response) => {
+    console.log('[GEOCODE_API] Endpoint hit - Address:', req.query.address);
+    console.log('[GEOCODE_API] Full URL:', req.url);
+    console.log('[GEOCODE_API] Request method:', req.method);
+    
     try {
       const address = req.query.address as string;
       
       if (!address) {
+        console.log('[GEOCODE_API] ERROR: No address parameter provided');
         return res.status(400).json({ error: 'Address parameter is required' });
       }
       
+      console.log('[GEOCODE_API] Calling geocodeAddress for:', address);
       const coordinates = await geocodeAddress(address);
       
       if (!coordinates) {
+        console.log('[GEOCODE_API] ERROR: Could not geocode address:', address);
         return res.status(404).json({ error: 'Could not geocode address' });
       }
       
+      console.log('[GEOCODE_API] SUCCESS: Coordinates found:', coordinates);
       res.json(coordinates);
     } catch (error) {
-      console.error('Error in geocoding endpoint:', error);
+      console.error('[GEOCODE_API] EXCEPTION:', error);
       res.status(500).json({ error: 'Geocoding failed' });
     }
   });
