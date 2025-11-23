@@ -2032,6 +2032,11 @@ export class DatabaseStorage implements IStorage {
     if (placeData.imageUrl !== undefined) updateData.image_url = placeData.imageUrl;
     if (placeData.features !== undefined) updateData.features = placeData.features;
     
+    console.log('[UPDATE DEBUG] Place ID:', id);
+    console.log('[UPDATE DEBUG] imageUrl from placeData:', placeData.imageUrl);
+    console.log('[UPDATE DEBUG] image_url in updateData:', updateData.image_url);
+    console.log('[UPDATE DEBUG] Full updateData:', JSON.stringify(updateData, null, 2));
+    
     // Update the place
     await db
       .update(places)
