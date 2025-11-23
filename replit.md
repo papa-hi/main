@@ -50,6 +50,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 23, 2025 - Places Loading Performance Optimization
+- **Overpass API Caching**: Implemented 12-hour in-memory cache for nearby playgrounds from OpenStreetMap
+  - Cache keyed by rounded lat/lon (~1km precision) and radius for maximum cache hit rate
+  - First request: 3-6 seconds (uncached Overpass API call)
+  - Subsequent requests: Instant (cache hit)
+  - LRU cache cleanup keeps last 100 entries to prevent memory bloat
+  - Dramatically improves places tab load time for repeat visitors
+- **Database Performance**: Added indexes on places table for faster queries
+  - `places_type_idx` on type column (restaurant/playground/museum filtering)
+  - `places_rating_idx` on rating column (sorting by rating)
+  - Significantly speeds up place listing and filtering operations
+- **Impact**: Places tab now loads instantly after first visit (within 12-hour cache window)
+
 ### November 23, 2025 - Data Retention & Archive System
 - **Soft Delete Architecture**: Implemented 2-tier data retention strategy for database optimization
   - After 90 days: Playdates and family events are automatically archived (soft delete)
