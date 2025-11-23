@@ -1,0 +1,53 @@
+chunk-NXESFFTV.js?v=33ca4232:521 Warning: validateDOMNesting(...): <button> cannot appear as a descendant of <button>.
+    at button
+    at button
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-FO6XDCMH.js?v=33ca4232:41:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-UT3DMAQH.js?v=33ca4232:52:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-UT3DMAQH.js?v=33ca4232:33:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-FO6XDCMH.js?v=33ca4232:41:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…ner/workspace/node_modules/.vite/deps/chunk-MOBG7LZD.js?v=33ca4232:1980:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=33ca4232:144:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=33ca4232:928:13
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-MBYXUAMD.js?v=33ca4232:37:15)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-MBYXUAMD.js?v=33ca4232:37:15)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…ner/workspace/node_modules/.vite/deps/chunk-MOBG7LZD.js?v=33ca4232:1915:15)
+    at Popper (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…ner/workspace/node_modules/.vite/deps/chunk-MOBG7LZD.js?v=33ca4232:1972:11)
+    at Menu (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=33ca4232:98:11)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-MBYXUAMD.js?v=33ca4232:37:15)
+    at DropdownMenu (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=33ca4232:894:5)
+    at div
+    at div
+    at div
+    at header
+    at Header (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/header.tsx:53:26)
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:22:32)
+    at AdminProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-admin.tsx:27:33)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at FirebaseAuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-firebase-auth.tsx:23:40)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=33ca4232:2747:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=x7WbPAlwsHQnpTMjvIuZz:224:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=x7WbPAlwsHQnpTMjvIuZz:25:3)
+chunk-NXESFFTV.js?v=33ca4232:521 Warning: validateDOMNesting(...): <a> cannot appear as a descendant of <a>.
+    at a
+    at a
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=33ca4232:336:18
+    at div
+    at div
+    at div
+    at header
+    at Header (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/header.tsx:53:26)
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:22:32)
+    at AdminProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-admin.tsx:27:33)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at FirebaseAuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-firebase-auth.tsx:23:40)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=33ca4232:2747:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx?v=x7WbPAlwsHQnpTMjvIuZz:224:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx?v=x7WbPAlwsHQnpTMjvIuZz:25:3)
