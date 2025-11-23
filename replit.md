@@ -64,6 +64,11 @@ Preferred communication style: Simple, everyday language.
   - Accepts address query parameter and returns coordinates
   - Uses the enhanced 4-level fallback geocoding system
   - Fixes map display issues when adding new places
+- **Geocoding Timeout & Retry Logic**: Enhanced reliability for production environment
+  - Increased timeout from 10s to 30s to handle slower network conditions
+  - Added automatic retry with exponential backoff (1s, 2s, 4s delays)
+  - Handles timeout errors gracefully with up to 3 attempts per address
+  - Prevents geocoding failures due to temporary network issues on production
 
 ### November 23, 2025 - Production Fixes
 - **Geocoding Production Fix**: Fixed and enhanced Nominatim geocoding service for production environment

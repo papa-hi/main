@@ -1,7 +1,10 @@
 // Track last geocoding request time to respect Nominatim's usage policy (1 req/sec)
 let lastGeocodeTime = 0;
 
-async function makeGeocodeRequest(query: string): Promise<any[] | null> {
+async function makeGeocodeRequest(query: string, retryCount = 0): Promise<any[] | null> {
+  const MAX_RETRIES = 2;
+  const TIMEOUT_MS = 30000; // 30 seconds
+  
   // Respect Nominatim's usage policy: max 1 request per second
   const now = Date.now();
   const timeSinceLastRequest = now - lastGeocodeTime;
@@ -14,34 +17,50 @@ async function makeGeocodeRequest(query: string): Promise<any[] | null> {
   const userAgent = `PaPa-Hi Family App (${environment}; contact: papa-hi.com)`;
   const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=3&countrycodes=nl`;
   
-  console.log(`[GEOCODE] Request: "${query}" with User-Agent: "${userAgent}"`);
+  console.log(`[GEOCODE] Request: "${query}" (attempt ${retryCount + 1}/${MAX_RETRIES + 1})`);
   
-  const response = await fetch(geocodeUrl, {
-    headers: {
-      'User-Agent': userAgent
+  try {
+    // Create an AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    
+    const response = await fetch(geocodeUrl, {
+      headers: {
+        'User-Agent': userAgent
+      },
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    console.log(`[GEOCODE] Response status: ${response.status} for "${query}"`);
+    
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unable to read error');
+      console.error(`[GEOCODE] HTTP ${response.status} for "${query}"`);
+      console.error(`[GEOCODE] Error details:`, errorText);
+      return null;
     }
-  });
-  
-  console.log(`[GEOCODE] Response status: ${response.status} for "${query}"`);
-  
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => 'Unable to read error');
-    console.error(`[GEOCODE] HTTP ${response.status} for "${query}"`);
-    console.error(`[GEOCODE] Error details:`, errorText);
-    console.error(`[GEOCODE] User-Agent used:`, userAgent);
-    console.error(`[GEOCODE] URL:`, geocodeUrl);
+    
+    const data = await response.json();
+    console.log(`[GEOCODE] Got ${data?.length || 0} results for "${query}"`);
+    
+    if (!data || data.length === 0) {
+      console.warn(`[GEOCODE] Empty results from Nominatim for "${query}"`);
+    }
+    
+    return data;
+  } catch (error: any) {
+    // Handle timeout and network errors with retry
+    if ((error.name === 'AbortError' || error.code === 'UND_ERR_CONNECT_TIMEOUT') && retryCount < MAX_RETRIES) {
+      const waitTime = Math.pow(2, retryCount) * 1000; // Exponential backoff: 1s, 2s, 4s
+      console.warn(`[GEOCODE] Timeout for "${query}", retrying in ${waitTime}ms...`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+      return makeGeocodeRequest(query, retryCount + 1);
+    }
+    
+    console.error(`[GEOCODE] Request failed for "${query}":`, error.message || error);
     return null;
   }
-  
-  const data = await response.json();
-  console.log(`[GEOCODE] Got ${data?.length || 0} results for "${query}"`);
-  
-  if (!data || data.length === 0) {
-    console.warn(`[GEOCODE] Empty results from Nominatim for "${query}"`);
-    console.warn(`[GEOCODE] This might mean the address is not in OpenStreetMap database`);
-  }
-  
-  return data;
 }
 
 // Geocoding utility using Nominatim API with fallback strategies for Netherlands addresses

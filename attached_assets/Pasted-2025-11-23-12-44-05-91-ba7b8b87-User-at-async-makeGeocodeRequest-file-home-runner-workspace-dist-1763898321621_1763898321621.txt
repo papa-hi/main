@@ -1,0 +1,168 @@
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at async makeGeocodeRequest (file:///home/runner/workspace/dist/index.js:3522:20)
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+[GEOCODE_API] ERROR: Could not geocode address: Westerstraat 102, Enkhuizen 1601AM
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at onConnectTimeout (node:internal/deps/undici/undici:2602:28)
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+[cause]: ConnectTimeoutError: Connect Timeout Error (attempted addresses: 2605:bc80:3010:700::8cd3:a764:443, 140.211.167.100:443, timeout: 10000ms)
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+}
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at async file:///home/runner/workspace/dist/index.js:4703:27 {
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at process.processImmediate (node:internal/timers:483:21) {
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at async makeGeocodeRequest (file:///home/runner/workspace/dist/index.js:3522:20)
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+code: 'UND_ERR_CONNECT_TIMEOUT'
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+[GEOCODE_API] ERROR: Could not geocode address: Reeshofdijk 18, 5044 VB Tilburg
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at onConnectTimeout (node:internal/deps/undici/undici:2602:28)
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at process.processImmediate (node:internal/timers:454:9)
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at async geocodeAddress (file:///home/runner/workspace/dist/index.js:3548:16)
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at node:internal/deps/undici/undici:13510:13
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at runNextTicks (node:internal/process/task_queues:64:3)
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+[GEOCODE_API] ERROR: Could not geocode address: Schagchelstraat 26, 2011 HZ Haarlem
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at process.processImmediate (node:internal/timers:483:21) {
+2025-11-23 12:44:05.91
+ba7b8b87
+User
+at async geocodeAddress (file:///home/runner/workspace/dist/index.js:3548:16)
+2025-11-23 12:44:11.11
+ba7b8b87
+User
+[GEOCODE] Request: "Het Louwtje 10, 2691 KR 's-Gravenzande" with User-Agent: "PaPa-Hi Family App (production; contact: papa-hi.com)"
+2025-11-23 12:44:12.13
+ba7b8b87
+User
+REQUEST BODY for POST /api/places: {"name":"Petit Pinguin","type":"restaurant","description":"","address":"Milaanstraat 115, 6135 LH Sittard","latitude":0,"longitude":0,"features":["playCorner","kidsMenu"]}
+2025-11-23 12:44:12.20
+ba7b8b87
+User
+[CREATE_PLACE] Attempting to geocode address: "Milaanstraat 115, 6135 LH Sittard"
+2025-11-23 12:44:12.20
+ba7b8b87
+User
+[CREATE_PLACE] Initial coords: lat=0, lon=0, address="Milaanstraat 115, 6135 LH Sittard"
+2025-11-23 12:44:12.20
+ba7b8b87
+User
+[GEOCODE] Request: "Milaanstraat 115, 6135 LH Sittard" with User-Agent: "PaPa-Hi Family App (production; contact: papa-hi.com)"
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+}
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+at async makeGeocodeRequest (file:///home/runner/workspace/dist/index.js:3522:20)
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+[GEOCODE_API] ERROR: Could not geocode address: Steenweg 2A, 3898 LJ Zeewolde
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+[GEOCODE] Error for "Steenweg 2A, 3898 LJ Zeewolde": TypeError: fetch failed
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+code: 'UND_ERR_CONNECT_TIMEOUT'
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+at async file:///home/runner/workspace/dist/index.js:4703:27 {
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+}
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+at Immediate._onImmediate (node:internal/deps/undici/undici:2583:11)
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+at async geocodeAddress (file:///home/runner/workspace/dist/index.js:3548:16)
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+at node:internal/deps/undici/undici:13510:13
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+at process.processImmediate (node:internal/timers:483:21) {
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+at onConnectTimeout (node:internal/deps/undici/undici:2602:28)
+2025-11-23 12:44:20.39
+ba7b8b87
+User
+[cause]: ConnectTimeoutError: Connect Timeout Error (attempted addresses: 2605:bc80:3010:700::8cd3:a764:443, 140.211.167.100:443, timeout: 10000ms)
+2025-11-23 12:44:20.43
+ba7b8b87
+User
+ERROR HEADERS for GET /api/geocode: {"cookie":"connect.sid=s%3APuKMOU-rE5WJmPXC3edJ0Uik6FgTkw3X.tFtQ871Ra0EXDR38vQKK8fXpU7T%2Fnyd%2BDFw%2BYvl1E5s","user-agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36","referer":"https://papa-hi.com/places?type=restaurant"}
+
+2025-11-23 12:44:20.43
+ba7b8b87
+User
