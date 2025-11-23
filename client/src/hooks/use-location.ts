@@ -113,9 +113,9 @@ export function useLocation(): LocationHookReturn {
             }
           },
           {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 60000
+            enableHighAccuracy: false, // Use false for faster response
+            timeout: 30000, // Increased to 30 seconds
+            maximumAge: 300000 // Cache location for 5 minutes
           }
         );
       } catch (error) {
