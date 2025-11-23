@@ -50,6 +50,21 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 23, 2025 - TypeScript Build & Service Worker Fixes
+- **TypeScript Compilation Errors Fixed**: Resolved 8 TypeScript errors preventing production builds
+  - Fixed null handling for `user.city` in playdate notification logic (line 137)
+  - Restructured Drizzle query builder in community posts endpoint to avoid type inference issues (lines 2725-2757)
+  - Build now completes successfully, allowing new code to deploy to production
+- **Service Worker Cache Bypass**: Configured service worker to never cache API requests
+  - All `/api/*` requests now bypass service worker cache and go directly to network
+  - Updated cache version to `v2` to force client updates
+  - Added aggressive auto-update mechanism that forces reload when new service worker detected
+  - Prevents caching of API responses that was causing 404 errors on production
+- **Public Geocoding Endpoint**: Added `/api/geocode` endpoint for frontend geocoding requests
+  - Accepts address query parameter and returns coordinates
+  - Uses the enhanced 4-level fallback geocoding system
+  - Fixes map display issues when adding new places
+
 ### November 23, 2025 - Production Fixes
 - **Geocoding Production Fix**: Fixed and enhanced Nominatim geocoding service for production environment
   - Updated User-Agent header to be environment-aware (development vs production with papa-hi.com domain)

@@ -134,6 +134,9 @@ async function notifyNearbyUsers(playdateId: number): Promise<void> {
     for (const user of eligibleUsersQuery) {
       try {
         // Get user's city coordinates
+        if (!user.city) {
+          continue;
+        }
         const userCoords = getCityCoordinates(user.city);
         if (!userCoords) {
           continue;
@@ -2699,6 +2702,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         offset = 0 
       } = req.query;
 
+      // Build filter conditions
+      const conditions = [];
+      
+      if (category) {
+        conditions.push(eq(communityPosts.category, category as string));
+      }
+      
+      if (search) {
+        conditions.push(
+          or(
+            like(communityPosts.title, `%${search}%`),
+            like(communityPosts.content, `%${search}%`)
+          )
+        );
+      }
+      
+      if (hashtag) {
+        const hashtagValue = String(hashtag);
+        conditions.push(sql`${hashtagValue} = ANY(${communityPosts.hashtags})`);
+      }
+      
+      if (userId) {
+        conditions.push(eq(communityPosts.userId, parseInt(userId as string)));
+      }
+
       let query = db
         .select({
           id: communityPosts.id,
@@ -2718,43 +2746,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
         })
         .from(communityPosts)
-        .leftJoin(users, eq(communityPosts.userId, users.id));
-
-      // Apply filters
-      if (category) {
-        query = query.where(eq(communityPosts.category, category as string));
-      }
-
-      if (search) {
-        query = query.where(
-          or(
-            like(communityPosts.title, `%${search}%`),
-            like(communityPosts.content, `%${search}%`)
-          )
-        );
-      }
-
-      if (hashtag) {
-        // Use parameterized query to prevent SQL injection
-        const hashtagValue = String(hashtag);
-        query = query.where(
-          sql`${hashtagValue} = ANY(${communityPosts.hashtags})`
-        );
-      }
-
-      if (userId) {
-        query = query.where(eq(communityPosts.userId, parseInt(userId as string)));
-      }
-
-      // Apply ordering based on feed type
-      if (feed === 'latest') {
-        query = query.orderBy(desc(communityPosts.createdAt));
-      } else if (feed === 'trending' || feed === 'popular') {
-        // For trending/popular, we'll order by recent posts with more engagement
-        query = query.orderBy(desc(communityPosts.createdAt));
-      }
-
-      query = query.limit(parseInt(limit as string)).offset(parseInt(offset as string));
+        .leftJoin(users, eq(communityPosts.userId, users.id))
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .orderBy(desc(communityPosts.createdAt))
+        .limit(parseInt(limit as string))
+        .offset(parseInt(offset as string));
 
       const posts = await query;
 
