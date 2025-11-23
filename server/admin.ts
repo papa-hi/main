@@ -353,7 +353,10 @@ export function setupAdminRoutes(app: Express) {
   app.patch('/api/admin/places/:placeId', isAdmin, async (req: Request, res: Response) => {
     try {
       const placeId = parseInt(req.params.placeId);
+      console.log('[ADMIN PLACE UPDATE] Place ID:', placeId);
+      console.log('[ADMIN PLACE UPDATE] Request body:', JSON.stringify(req.body, null, 2));
       const updatedPlace = await storage.updatePlace(placeId, req.body);
+      console.log('[ADMIN PLACE UPDATE] Updated place:', JSON.stringify(updatedPlace, null, 2));
       await logAdminAction("Edit place", { placeId, placeName: updatedPlace.name }, req);
       res.json(updatedPlace);
     } catch (error) {
