@@ -2038,16 +2038,20 @@ export class DatabaseStorage implements IStorage {
     console.log('[UPDATE DEBUG] Full updateData:', JSON.stringify(updateData, null, 2));
     
     // Update the place
-    await db
+    const updateResult = await db
       .update(places)
       .set(updateData)
       .where(eq(places.id, id));
+    
+    console.log('[UPDATE DEBUG] Update result:', updateResult);
     
     // Query to get the updated place (workaround for Drizzle .returning() issue)
     const [updatedPlace] = await db
       .select()
       .from(places)
       .where(eq(places.id, id));
+    
+    console.log('[UPDATE DEBUG] Place after update from DB:', JSON.stringify(updatedPlace, null, 2));
     
     if (!updatedPlace) {
       throw new Error(`Place with id ${id} not found`);
