@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from './use-auth';
 
 interface LocationState {
   latitude?: number;
@@ -21,89 +20,35 @@ interface LocationHookReturn {
 }
 
 export function useLocation(): LocationHookReturn {
-  const { user } = useAuth();
   const [locationState, setLocationState] = useState<LocationState>({
     isLoading: true
   });
 
   useEffect(() => {
     let isMounted = true;
-    console.log("Location hook initialized");
 
     const getLocation = async () => {
-      // Helper function to use profile city
-      const useProfileCity = async () => {
-        if (user?.city) {
-          console.log(`Using user profile city: ${user.city}`);
-          try {
-            // Get API key from server
-            const keyResponse = await axios.get('/api/env');
-            const apiKey = keyResponse.data.OPEN_WEATHER_API_KEY;
-            
-            // Geocode the user's city to get coordinates
-            const geocodeResponse = await axios.get(
-              `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(user.city)},NL&limit=1&appid=${apiKey}`
-            );
-            
-            if (geocodeResponse.data && geocodeResponse.data.length > 0) {
-              const location = geocodeResponse.data[0];
-              if (isMounted) {
-                setLocationState({
-                  latitude: location.lat,
-                  longitude: location.lon,
-                  city: location.name,
-                  country: location.country || "NL",
-                  isLoading: false
-                });
-                console.log(`Successfully geocoded profile city: ${location.name} at ${location.lat}, ${location.lon}`);
-                return true;
-              }
-            }
-          } catch (error) {
-            console.error("Error geocoding user profile city:", error);
-          }
-        }
-        
-        // Use Amsterdam as final fallback
+      if (!navigator.geolocation) {
         if (isMounted) {
-          console.log("Using Amsterdam fallback location");
           setLocationState({
-            latitude: 52.3676,
-            longitude: 4.9041,
-            city: "Amsterdam",
-            country: "NL",
+            error: "Geolocation is not supported by your browser",
             isLoading: false
           });
         }
-        return false;
-      };
-
-      // Check if geolocation is supported
-      if (!navigator.geolocation) {
-        console.log("Geolocation not supported by this browser");
-        // Try profile city as fallback
-        await useProfileCity();
         return;
       }
 
-      // Try device geolocation first (for PWA)
       try {
-        console.log("Requesting device geolocation permission...");
         navigator.geolocation.getCurrentPosition(
           async (position) => {
-            console.log("Geolocation permission granted");
             const { latitude, longitude } = position.coords;
-            console.log(`Location obtained: ${latitude}, ${longitude}`);
             
             try {
               // Get API key from server
-              console.log("Fetching API key from server");
               const keyResponse = await axios.get('/api/env');
               const apiKey = keyResponse.data.OPEN_WEATHER_API_KEY;
-              console.log("API key retrieved successfully");
               
               // Use OpenWeatherMap reverse geocoding to get city name
-              console.log("Fetching city name from coordinates...");
               const response = await axios.get(
                 `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${apiKey}`
               );
@@ -114,9 +59,6 @@ export function useLocation(): LocationHookReturn {
               if (response.data && response.data.length > 0) {
                 city = response.data[0].name;
                 country = response.data[0].country;
-                console.log(`City name found: ${city}, ${country}`);
-              } else {
-                console.log("No city data found in API response");
               }
               
               if (isMounted) {
@@ -141,21 +83,27 @@ export function useLocation(): LocationHookReturn {
               }
             }
           },
-          async (error) => {
-            console.log("Device geolocation failed:", error.message);
-            // Fall back to profile city
-            await useProfileCity();
+          (error) => {
+            if (isMounted) {
+              setLocationState({
+                error: error.message,
+                isLoading: false
+              });
+            }
           },
           {
-            enableHighAccuracy: false, // Use false for faster response (network-based)
-            timeout: 15000, // 15 seconds timeout
-            maximumAge: 300000 // Cache location for 5 minutes
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000
           }
         );
       } catch (error) {
-        console.error("Unexpected error in geolocation request:", error);
-        // Fall back to profile city
-        await useProfileCity();
+        if (isMounted) {
+          setLocationState({
+            error: "Failed to get location",
+            isLoading: false
+          });
+        }
       }
     };
 
@@ -164,7 +112,7 @@ export function useLocation(): LocationHookReturn {
     return () => {
       isMounted = false;
     };
-  }, [user?.city]); // Re-run when user's city changes
+  }, []);
 
   return locationState;
 }
