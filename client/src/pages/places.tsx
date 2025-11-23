@@ -21,7 +21,7 @@ export default function PlacesPage() {
   const [location, setLocation] = useLocation();
   const { latitude, longitude } = useGeoLocation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("playgrounds");
   
   // Parse query params to set initial tab
   useEffect(() => {
@@ -41,8 +41,8 @@ export default function PlacesPage() {
       setLocation('/places?type=restaurant', { replace: true });
     } else if (activeTab === 'playgrounds') {
       setLocation('/places?type=playground', { replace: true });
-    } else {
-      setLocation('/places', { replace: true });
+    } else if (activeTab === 'museums') {
+      setLocation('/places?type=museum', { replace: true });
     }
   }, [activeTab, setLocation]);
 
@@ -229,10 +229,9 @@ export default function PlacesPage() {
       
       {/* Tabs for filtering */}
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-6">
-        <TabsList className="mb-6 w-full grid grid-cols-4">
-          <TabsTrigger value="all" className="text-sm">{t('places.all')}</TabsTrigger>
-          <TabsTrigger value="restaurants" className="text-sm">{t('places.restaurant')}</TabsTrigger>
+        <TabsList className="mb-6 w-full grid grid-cols-3">
           <TabsTrigger value="playgrounds" className="text-sm">{t('places.playground')}</TabsTrigger>
+          <TabsTrigger value="restaurants" className="text-sm">{t('places.restaurant')}</TabsTrigger>
           <TabsTrigger value="museums" className="text-sm">{t('places.museum', 'Museums')}</TabsTrigger>
         </TabsList>
       </Tabs>
