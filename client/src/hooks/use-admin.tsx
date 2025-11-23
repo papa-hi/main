@@ -287,7 +287,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         isDeleting: deleteUserMutation.isPending,
         
         // Stats
-        userStats,
+        userStats: userStats || null,
         isLoadingUserStats,
         pageStats,
         isLoadingPageStats,
