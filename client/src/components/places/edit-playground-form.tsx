@@ -27,7 +27,7 @@ const playgroundEditSchema = z.object({
   address: z.string().optional().default(""),
   latitude: z.string().optional(),
   longitude: z.string().optional(),
-  // Image field removed
+  imageUrl: z.string().optional(),
   features: z.array(z.string()).default([]),
 });
 
@@ -58,6 +58,7 @@ export function EditPlaygroundForm({
       address: playground.address,
       latitude: playground.latitude,
       longitude: playground.longitude,
+      imageUrl: playground.imageUrl || "",
       features: playground.features || [],
     },
     mode: 'onChange',
@@ -72,6 +73,7 @@ export function EditPlaygroundForm({
         address: playground.address,
         latitude: playground.latitude,
         longitude: playground.longitude,
+        imageUrl: playground.imageUrl || "",
         features: playground.features || [],
       });
     }
@@ -104,7 +106,10 @@ export function EditPlaygroundForm({
         formData.append('features', JSON.stringify(data.features));
       }
       
-      // Image upload removed
+      // Add image URL if provided
+      if (data.imageUrl) {
+        formData.append('imageUrl', data.imageUrl);
+      }
       
       // Use fetch for FormData
       const response = await fetch(`/api/places/${playground.id}`, {
@@ -280,25 +285,35 @@ export function EditPlaygroundForm({
               )}
             />
             
-            {/* Playground image preview only - no upload capability */}
-            <FormItem>
-              <FormLabel>{t('places.playgroundImage', 'Playground Image')}</FormLabel>
-              <FormControl>
-                <div className="grid grid-cols-1 gap-3">
-                  {/* Current image preview */}
-                  <div className="w-full rounded-md overflow-hidden h-40 bg-muted mb-2">
-                    <img 
-                      src={playground.imageUrl}
-                      alt={playground.name}
-                      className="w-full h-full object-cover"
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('places.imageUrl', 'Image URL (Optional)')}</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="https://example.com/playground-image.jpg" 
+                      {...field} 
                     />
-                  </div>
-                  <p className="text-xs text-muted-foreground italic">
-                    {t('places.imageUploadDisabled', 'Image uploads have been disabled')}
-                  </p>
-                </div>
-              </FormControl>
-            </FormItem>
+                  </FormControl>
+                  <FormMessage />
+                  {field.value && (
+                    <div className="w-full rounded-md overflow-hidden h-40 bg-muted mt-2">
+                      <img 
+                        src={field.value}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                </FormItem>
+              )}
+            />
             
             <div className="flex justify-end gap-2 pt-4">
               <Button
