@@ -24,8 +24,11 @@ export function NearbyPlaces() {
     }
   }, [location]);
 
+  // Build query URL with parameters
+  const queryUrl = `/api/places/nearby?latitude=${locationState.latitude}&longitude=${locationState.longitude}&activeFilter=${activeFilter}`;
+  
   const { data: places, isLoading, error } = useQuery<Place[]>({
-    queryKey: ['/api/places/nearby', locationState.latitude, locationState.longitude, activeFilter],
+    queryKey: [queryUrl],
   });
 
   const handleFilterChange = (filter: PlaceType) => {
