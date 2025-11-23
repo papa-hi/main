@@ -50,6 +50,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 23, 2025 - Production Fixes
+- **Geocoding Production Fix**: Fixed Nominatim geocoding service for production environment
+  - Updated User-Agent header to be environment-aware (development vs production with papa-hi.com domain)
+  - Added rate limiting to respect Nominatim's 1 request per second usage policy
+  - Enhanced error logging for better production debugging
+  - Prevents API blocking/rate-limiting that was causing map display issues when adding new places
+- **Admin Dashboard Fix**: Fixed paginated API response handling in admin users hook
+  - Updated useAdmin hook to properly extract arrays from paginated responses ({users: [...]} format)
+  - Resolved "TypeError: i?.filter is not a function" error on admin users page
+  - All admin endpoints (users, activity, logs) now work correctly with pagination
+
 ### November 22, 2025 - Performance Optimizations
 - **Database Indexes**: Added indexes on frequently queried columns (community_posts.created_at, playdates.start_time, family_events.start_date, category columns) to significantly improve query performance
 - **N+1 Query Fixes**: 
