@@ -402,16 +402,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to upload profile image" });
     }
   });
-  
-  // Simple test endpoint to verify deployments are working
-  app.get('/api/test-deployment', (req: Request, res: Response) => {
-    console.log('[TEST_DEPLOYMENT] Endpoint hit successfully');
-    res.json({ 
-      success: true, 
-      message: 'Deployment is working!',
-      timestamp: new Date().toISOString()
-    });
-  });
 
   // Public geocoding endpoint to avoid CORS issues
   app.get('/api/geocode', async (req: Request, res: Response) => {
@@ -1079,64 +1069,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (err) {
       console.error("Error fetching upcoming playdates:", err);
       res.status(500).json({ message: "Failed to fetch upcoming playdates" });
-    }
-  });
-  
-  // Simple test endpoint for playdate creation
-  app.post("/api/playdates/test-create", isAuthenticated, async (req, res) => {
-    try {
-      console.log("TEST ENDPOINT: Creating playdate with data:", req.body);
-      console.log("TEST ENDPOINT: Authenticated user:", req.user);
-      console.log("TEST ENDPOINT: Session:", req.session);
-      
-      // Get the authenticated user's ID
-      const userId = req.user?.id;
-      
-      if (!userId) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-      
-      console.log("TEST ENDPOINT: Using userId:", userId);
-      
-      // Basic data validation
-      if (!req.body.title) {
-        return res.status(400).json({ error: "Title is required" });
-      }
-      
-      // Process dates from the request
-      let startTime = new Date();
-      let endTime = new Date(Date.now() + 3600000);
-      
-      // If startTime and endTime are provided in the request, use them
-      if (req.body.startTime) {
-        startTime = new Date(req.body.startTime);
-      }
-      
-      if (req.body.endTime) {
-        endTime = new Date(req.body.endTime);
-      }
-      
-      // Create a playdate with the authenticated user as creator
-      const playdateData = {
-        title: req.body.title,
-        description: req.body.description || "Test description",
-        location: req.body.location || "Test location",
-        startTime: startTime,
-        endTime: endTime,
-        creatorId: userId, // Use authenticated user's ID
-        maxParticipants: req.body.maxParticipants || 5
-      };
-      
-      console.log("TEST ENDPOINT: Playdate data being sent to storage:", playdateData);
-      console.log("TEST ENDPOINT: Creator ID specifically:", playdateData.creatorId);
-      
-      const newPlaydate = await storage.createPlaydate(playdateData);
-      
-      console.log("Successfully created test playdate:", newPlaydate);
-      return res.status(201).json(newPlaydate);
-    } catch (err) {
-      console.error("Error creating test playdate:", err);
-      return res.status(500).json({ error: "Failed to create test playdate", details: err instanceof Error ? err.message : String(err) });
     }
   });
 
@@ -2485,11 +2417,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Simple test endpoint with no authentication
-  app.get("/api/test", (req, res) => {
-    res.json({ message: "Test endpoint works!" });
-  });
-
   // Test email endpoint for admins
   app.post("/api/admin/test-email", isAuthenticated, async (req: Request, res: Response) => {
     try {
@@ -2517,15 +2444,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Endpoint to provide environment variables needed on the frontend
-  app.get("/api/env", (req, res) => {
-    res.json({
-      OPEN_WEATHER_API_KEY: process.env.OPEN_WEATHER_API_KEY,
-      VAPID_PUBLIC_KEY: getVapidPublicKey()
-    });
-  });
-  
-  // Delete place by name (for maintenance) - no auth required for maintenance
   // Update a place (playground or restaurant)
   app.patch("/api/places/:id", isAuthenticated, upload.single('placeImage'), async (req: Request, res: Response) => {
     try {
