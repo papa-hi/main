@@ -421,46 +421,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Geocoding failed' });
     }
   });
-
-  // Serve images from database
-  app.get('/api/images/:filename', async (req, res) => {
-    try {
-      const filename = req.params.filename;
-      
-      // Security check to prevent directory traversal
-      if (filename.includes('..') || filename.includes('/')) {
-        return res.status(403).send('Forbidden');
-      }
-      
-      console.log(`[DATABASE_IMAGE_SERVER] Request for: ${filename}`);
-      
-      // Fetch image from database
-      const imageRecord = await db.select().from(imageStorage).where(eq(imageStorage.filename, filename)).limit(1);
-      
-      if (imageRecord.length === 0) {
-        console.error(`[DATABASE_IMAGE_SERVER] Image not found: ${filename}`);
-        return res.status(404).send('Image not found');
-      }
-      
-      const image = imageRecord[0];
-      
-      // Convert base64 back to buffer
-      const imageBuffer = Buffer.from(image.dataBase64, 'base64');
-      
-      // Set appropriate headers
-      res.setHeader('Content-Type', image.mimeType);
-      res.setHeader('Content-Length', imageBuffer.length);
-      res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
-      
-      console.log(`[DATABASE_IMAGE_SERVER] Serving image: ${filename}, size: ${imageBuffer.length} bytes`);
-      
-      // Send the image
-      res.send(imageBuffer);
-    } catch (error) {
-      console.error(`[DATABASE_IMAGE_SERVER] Error serving image:`, error);
-      res.status(500).send('Error serving image');
-    }
-  });
   
   // Serve other uploaded files
   app.use('/uploads', (req, res, next) => {
