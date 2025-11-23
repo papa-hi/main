@@ -22,8 +22,63 @@ interface OverpassResponse {
   elements: OverpassNode[];
 }
 
+// In-memory cache for Overpass API results
+interface CacheEntry {
+  data: Place[];
+  timestamp: number;
+}
+
+const nearbyPlacesCache = new Map<string, CacheEntry>();
+const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+
+function getCacheKey(lat: number, lon: number, radius: number): string {
+  // Round to 2 decimal places (~1km precision) to increase cache hits
+  const roundedLat = Math.round(lat * 100) / 100;
+  const roundedLon = Math.round(lon * 100) / 100;
+  return `${roundedLat},${roundedLon},${radius}`;
+}
+
+function getCachedData(lat: number, lon: number, radius: number): Place[] | null {
+  const key = getCacheKey(lat, lon, radius);
+  const entry = nearbyPlacesCache.get(key);
+  
+  if (!entry) return null;
+  
+  // Check if cache entry is still valid
+  const age = Date.now() - entry.timestamp;
+  if (age > CACHE_TTL) {
+    nearbyPlacesCache.delete(key);
+    return null;
+  }
+  
+  return entry.data;
+}
+
+function setCachedData(lat: number, lon: number, radius: number, data: Place[]): void {
+  const key = getCacheKey(lat, lon, radius);
+  nearbyPlacesCache.set(key, {
+    data,
+    timestamp: Date.now()
+  });
+  
+  // Clean up old cache entries (simple LRU: keep only last 100 entries)
+  if (nearbyPlacesCache.size > 100) {
+    const firstKey = nearbyPlacesCache.keys().next().value;
+    if (firstKey) nearbyPlacesCache.delete(firstKey);
+  }
+}
+
 export async function fetchNearbyPlaygrounds(lat: number, lon: number, radius: number = 5000): Promise<Place[]> {
   try {
+    // Check cache first
+    const cachedData = getCachedData(lat, lon, radius);
+    if (cachedData) {
+      console.log(`Cache hit for nearby playgrounds at ${lat},${lon}`);
+      return cachedData;
+    }
+
+    console.log(`Cache miss - fetching from Overpass API for ${lat},${lon}`);
+    
     // Build Overpass query for playgrounds within the radius
     const query = `
       [out:json];
@@ -80,6 +135,9 @@ export async function fetchNearbyPlaygrounds(lat: number, lon: number, radius: n
         };
       });
 
+    // Cache the results before returning
+    setCachedData(lat, lon, radius, playgrounds);
+    
     return playgrounds;
   } catch (error) {
     console.error('Error fetching playgrounds from OpenStreetMap:', error);
