@@ -10,6 +10,13 @@ const ASSETS_TO_CACHE = [
   '/icons/icon-512x512.svg',
 ];
 
+// Listen for skip waiting message
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(

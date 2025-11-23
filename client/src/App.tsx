@@ -100,10 +100,34 @@ function App() {
         navigator.serviceWorker.register('/service-worker.js')
           .then(registration => {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            
+            // Force check for updates every time the page loads
+            registration.update();
+            
+            // When a new service worker is waiting, activate it immediately
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // New service worker available, force it to activate
+                    console.log('New service worker available, reloading...');
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    window.location.reload();
+                  }
+                });
+              }
+            });
           })
           .catch(error => {
             console.log('ServiceWorker registration failed: ', error);
           });
+      });
+      
+      // Listen for controller change and reload the page
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log('Service worker controller changed, reloading...');
+        window.location.reload();
       });
     }
 
