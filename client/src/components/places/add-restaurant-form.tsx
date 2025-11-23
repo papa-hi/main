@@ -117,8 +117,8 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
         address: data.address,
         latitude: data.latitude || 0,
         longitude: data.longitude || 0,
+        imageUrl: data.imageUrl || undefined,
         features: data.features,
-        // imageUrl is now handled by the server with random restaurant images
       };
 
       const response = await apiRequest('POST', '/api/places', restaurantData);
@@ -279,6 +279,23 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
           <i className="fas fa-location-arrow mr-2"></i>
           {t('places.useMyLocation', 'Use My Current Location')}
         </Button>
+        
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('places.imageUrl', 'Image URL (Optional)')}</FormLabel>
+              <FormControl>
+                <Input placeholder="https://example.com/restaurant-image.jpg" {...field} value={field.value || ''} />
+              </FormControl>
+              <FormDescription>
+                {t('places.imageUrlHelp', 'Provide a URL to an image of the restaurant')}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         
         <FormField
           control={form.control}

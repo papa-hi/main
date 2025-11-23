@@ -161,6 +161,7 @@ export function AddMuseumForm({ onSuccess }: AddMuseumFormProps) {
       address: data.address,
       latitude: data.latitude || 0,
       longitude: data.longitude || 0,
+      imageUrl: data.imageUrl || undefined,
       features: data.features,
     };
     

@@ -19,6 +19,7 @@ const playgroundFormSchema = z.object({
   address: z.string().min(3, { message: "Address is required" }),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
+  imageUrl: z.string().optional(),
   features: z.array(z.string()).default([]),
 });
 
@@ -277,6 +278,23 @@ export function AddPlaygroundForm({ onSuccess }: AddPlaygroundFormProps) {
             {t('places.useCurrentLocation', 'Use Current Location')}
           </Button>
         </div>
+
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('places.imageUrl', 'Image URL (Optional)')}</FormLabel>
+              <FormControl>
+                <Input placeholder="https://example.com/playground-image.jpg" {...field} />
+              </FormControl>
+              <FormDescription>
+                {t('places.imageUrlHelp', 'Provide a URL to an image of the playground')}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
