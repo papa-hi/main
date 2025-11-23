@@ -11,21 +11,37 @@ async function makeGeocodeRequest(query: string): Promise<any[] | null> {
   lastGeocodeTime = Date.now();
   
   const environment = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+  const userAgent = `PaPa-Hi Family App (${environment}; contact: papa-hi.com)`;
   const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=3&countrycodes=nl`;
+  
+  console.log(`[GEOCODE] Request: "${query}" with User-Agent: "${userAgent}"`);
   
   const response = await fetch(geocodeUrl, {
     headers: {
-      'User-Agent': `PaPa-Hi Family App (${environment}; papa-hi.com)`
+      'User-Agent': userAgent
     }
   });
   
+  console.log(`[GEOCODE] Response status: ${response.status} for "${query}"`);
+  
   if (!response.ok) {
     const errorText = await response.text().catch(() => 'Unable to read error');
-    console.error(`[GEOCODE] Failed: HTTP ${response.status} for "${query}"`, errorText);
+    console.error(`[GEOCODE] HTTP ${response.status} for "${query}"`);
+    console.error(`[GEOCODE] Error details:`, errorText);
+    console.error(`[GEOCODE] User-Agent used:`, userAgent);
+    console.error(`[GEOCODE] URL:`, geocodeUrl);
     return null;
   }
   
-  return await response.json();
+  const data = await response.json();
+  console.log(`[GEOCODE] Got ${data?.length || 0} results for "${query}"`);
+  
+  if (!data || data.length === 0) {
+    console.warn(`[GEOCODE] Empty results from Nominatim for "${query}"`);
+    console.warn(`[GEOCODE] This might mean the address is not in OpenStreetMap database`);
+  }
+  
+  return data;
 }
 
 // Geocoding utility using Nominatim API with fallback strategies for Netherlands addresses
