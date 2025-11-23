@@ -183,6 +183,8 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
             src={`/banner${currentBanner}.png`}
             alt="Children playing together"
             className="w-full h-52 object-cover transition-opacity duration-1000"
+            loading="eager"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent flex flex-col justify-end p-6">
             <span className="text-white text-xs font-medium bg-accent py-1 px-3 rounded-full inline-block mb-2 w-fit">
@@ -210,6 +212,8 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
             src={`/banner${currentBanner}.png`}
             alt="Children playing together"
             className="w-full h-52 object-cover transition-opacity duration-1000"
+            loading="eager"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent flex flex-col justify-end p-6">
             <span className="text-white text-xs font-medium bg-accent py-1 px-3 rounded-full inline-block mb-2 w-fit">
