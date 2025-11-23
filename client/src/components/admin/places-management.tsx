@@ -45,6 +45,7 @@ export function PlacesManagement() {
     description: "",
     address: "",
     type: "",
+    imageUrl: "",
     features: [] as string[]
   });
 
@@ -105,6 +106,7 @@ export function PlacesManagement() {
       description: place.description || "",
       address: place.address,
       type: place.type,
+      imageUrl: place.imageUrl || "",
       features: place.features || []
     });
   };
@@ -232,6 +234,29 @@ export function PlacesManagement() {
                             onChange={(e) => setEditFormData(prev => ({ ...prev, description: e.target.value }))}
                             rows={3}
                           />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="imageUrl">Image URL</Label>
+                          <Input
+                            id="imageUrl"
+                            value={editFormData.imageUrl}
+                            onChange={(e) => setEditFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                            placeholder="https://example.com/image.jpg"
+                          />
+                          {editFormData.imageUrl && (
+                            <div className="mt-2 w-full rounded-md overflow-hidden h-40 bg-muted">
+                              <img 
+                                src={editFormData.imageUrl}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
                         
                         <div>
