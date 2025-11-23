@@ -2032,12 +2032,18 @@ export class DatabaseStorage implements IStorage {
     if (placeData.imageUrl !== undefined) updateData.image_url = placeData.imageUrl;
     if (placeData.features !== undefined) updateData.features = placeData.features;
     
+    console.log('[STORAGE UPDATE] Place ID:', id);
+    console.log('[STORAGE UPDATE] placeData.imageUrl:', placeData.imageUrl);
+    console.log('[STORAGE UPDATE] updateData:', JSON.stringify(updateData, null, 2));
+    
     // Update the place
     const [updatedPlace] = await db
       .update(places)
       .set(updateData)
       .where(eq(places.id, id))
       .returning();
+    
+    console.log('[STORAGE UPDATE] updatedPlace from DB:', JSON.stringify(updatedPlace, null, 2));
     
     if (!updatedPlace) {
       throw new Error(`Place with id ${id} not found`);
