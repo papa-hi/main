@@ -2214,12 +2214,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let latitude = parseFloat(req.body.latitude) || 0;
       let longitude = parseFloat(req.body.longitude) || 0;
       
+      console.log(`[CREATE_PLACE] Initial coords: lat=${latitude}, lon=${longitude}, address="${req.body.address}"`);
+      
       if ((latitude === 0 || longitude === 0) && req.body.address) {
+        console.log(`[CREATE_PLACE] Attempting to geocode address: "${req.body.address}"`);
         const coords = await geocodeAddress(req.body.address);
         if (coords) {
           latitude = coords.latitude;
           longitude = coords.longitude;
+          console.log(`[CREATE_PLACE] Geocoding successful: lat=${latitude}, lon=${longitude}`);
+        } else {
+          console.warn(`[CREATE_PLACE] Geocoding failed for address: "${req.body.address}"`);
         }
+      } else {
+        console.log(`[CREATE_PLACE] Skipping geocoding - coordinates already provided or no address`);
       }
 
       // Create a new place object
