@@ -1884,8 +1884,6 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getNearbyPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]> {
-    // In a real app, you'd use PostGIS or similar to calculate distances
-    // For this demo, we'll just return places sorted by rating
     let query = db
       .select()
       .from(places);
@@ -1895,17 +1893,43 @@ export class DatabaseStorage implements IStorage {
       query = query.where(eq(places.type, options.type));
     }
     
-    // For now, we'll just use the rating for ordering
-    query = query.orderBy(desc(places.rating)).limit(4);
-    
     const placesData = await query;
     
-    // Add placeholder distance and isSaved properties
-    return placesData.map(place => ({
-      ...place,
-      distance: Math.floor(Math.random() * 5000), // Random distance for demo
-      isSaved: Math.random() > 0.5 // Random saved status for demo
-    }));
+    // Calculate distance for each place if user coordinates are provided
+    const result = placesData.map(place => {
+      let distance = 0;
+      
+      if (options.latitude && options.longitude && place.latitude && place.longitude) {
+        const placeLat = parseFloat(place.latitude);
+        const placeLon = parseFloat(place.longitude);
+        
+        // Haversine formula to calculate distance
+        const R = 6371; // Earth's radius in kilometers
+        const dLat = (placeLat - options.latitude) * Math.PI / 180;
+        const dLon = (placeLon - options.longitude) * Math.PI / 180;
+        const a = 
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(options.latitude * Math.PI / 180) * 
+          Math.cos(placeLat * Math.PI / 180) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        distance = Math.round(
+          R * c * 1000
+        ); // Convert to meters
+      }
+      
+      return {
+        ...place,
+        distance,
+        isSaved: false // Would need userId to check favorites
+      };
+    });
+    
+    // Sort by distance (closest first)
+    result.sort((a, b) => a.distance - b.distance);
+    
+    // Limit to 4 nearest places
+    return result.slice(0, 4);
   }
   
   async getUserFavoritePlaces(userId: number): Promise<Place[]> {
