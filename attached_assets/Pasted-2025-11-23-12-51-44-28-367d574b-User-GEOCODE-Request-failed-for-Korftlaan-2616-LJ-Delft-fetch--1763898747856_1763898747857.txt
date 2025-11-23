@@ -1,0 +1,60 @@
+2025-11-23 12:51:44.28
+367d574b
+User
+[GEOCODE] Request failed for "Korftlaan, 2616 LJ Delft": fetch failed
+2025-11-23 12:51:44.31
+367d574b
+User
+11:51:44 AM [express] GET /api/geocode 404 in 32294ms :: {"error":"Could not geocode address"}
+2025-11-23 12:51:44.31
+367d574b
+User
+ERROR HEADERS for GET /api/geocode: {"cookie":"connect.sid=s%3APuKMOU-rE5WJmPXC3edJ0Uik6FgTkw3X.tFtQ871Ra0EXDR38vQKK8fXpU7T%2Fnyd%2BDFw%2BYvl1E5s","user-agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36","referer":"https://papa-hi.com/places"}
+2025-11-23 12:51:44.32
+367d574b
+User
+11:51:44 AM [express] GET /api/geocode 404 in 27533ms :: {"error":"Could not geocode address"}
+2025-11-23 12:51:44.32
+367d574b
+User
+ERROR HEADERS for GET /api/geocode: {"cookie":"connect.sid=s%3APuKMOU-rE5WJmPXC3edJ0Uik6FgTkw3X.tFtQ871Ra0EXDR38vQKK8fXpU7T%2Fnyd%2BDFw%2BYvl1E5s","user-agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36","referer":"https://papa-hi.com/places"}
+2025-11-23 12:51:44.32
+367d574b
+User
+11:51:44 AM [express] GET /api/geocode 404 in 32305ms :: {"error":"Could not geocode address"}
+2025-11-23 12:51:44.32
+367d574b
+User
+ERROR HEADERS for GET /api/geocode: {"cookie":"connect.sid=s%3APuKMOU-rE5WJmPXC3edJ0Uik6FgTkw3X.tFtQ871Ra0EXDR38vQKK8fXpU7T%2Fnyd%2BDFw%2BYvl1E5s","user-agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36","referer":"https://papa-hi.com/places"}
+2025-11-23 12:51:44.38
+367d574b
+User
+[GEOCODE] Request failed for "6121 MA": fetch failed
+2025-11-23 12:51:44.38
+367d574b
+User
+[GEOCODE] No results found for address: "Florianstraat 3a, 6121 MA Born"
+2025-11-23 12:51:44.38
+367d574b
+User
+[GEOCODE_API] ERROR: Could not geocode address: Florianstraat 3a, 6121 MA Born
+2025-11-23 12:51:44.42
+367d574b
+User
+11:51:44 AM [express] GET /api/geocode 404 in 30647ms :: {"error":"Could not geocode address"}
+2025-11-23 12:51:44.42
+367d574b
+User
+ERROR HEADERS for GET /api/geocode: {"cookie":"connect.sid=s%3APuKMOU-rE5WJmPXC3edJ0Uik6FgTkw3X.tFtQ871Ra0EXDR38vQKK8fXpU7T%2Fnyd%2BDFw%2BYvl1E5s","user-agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36","referer":"https://papa-hi.com/places"}
+2025-11-23 12:51:45.28
+367d574b
+User
+[GEOCODE] Request: "2616 LJ" (attempt 1/3)
+2025-11-23 12:51:45.38
+367d574b
+User
+[GEOCODE] Request failed for "2616 LJ": fetch failed
+2025-11-23 12:51:45.38
+367d574b
+User
+[GEOCODE] No results found for address: "Korftlaan 3A, 2616 LJ Delft"

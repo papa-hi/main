@@ -69,6 +69,12 @@ Preferred communication style: Simple, everyday language.
   - Added automatic retry with exponential backoff (1s, 2s, 4s delays)
   - Handles timeout errors gracefully with up to 3 attempts per address
   - Prevents geocoding failures due to temporary network issues on production
+- **Client-Side Geocoding Fallback**: Added browser-based geocoding to avoid backend connectivity issues
+  - All place forms (restaurant, playground, museum) now geocode addresses in the browser before submitting
+  - Bypasses production backend Nominatim connectivity issues
+  - Uses direct Nominatim API calls from client (works around CORS since OpenStreetMap allows it)
+  - Shows user feedback during geocoding process with toast notifications
+  - Gracefully handles failures by still allowing place creation (with warning)
 
 ### November 23, 2025 - Production Fixes
 - **Geocoding Production Fix**: Fixed and enhanced Nominatim geocoding service for production environment

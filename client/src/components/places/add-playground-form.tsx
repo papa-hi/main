@@ -47,6 +47,32 @@ export function AddPlaygroundForm({ onSuccess }: AddPlaygroundFormProps) {
     mode: 'onChange',
   });
 
+  // Geocode an address using Nominatim (client-side)
+  const geocodeAddress = async (address: string): Promise<{ latitude: number; longitude: number } | null> => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=nl`,
+        {
+          headers: {
+            'User-Agent': 'PaPa-Hi Family App (papa-hi.com)'
+          }
+        }
+      );
+      if (!response.ok) return null;
+      const data = await response.json();
+      if (data && data.length > 0) {
+        return {
+          latitude: parseFloat(data[0].lat),
+          longitude: parseFloat(data[0].lon)
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Client-side geocoding failed:', error);
+      return null;
+    }
+  };
+
   // Use current location
   const handleUseCurrentLocation = () => {
     if (userLat && userLng) {
@@ -109,7 +135,31 @@ export function AddPlaygroundForm({ onSuccess }: AddPlaygroundFormProps) {
     },
   });
 
-  const onSubmit = (data: PlaygroundFormValues) => {
+  const onSubmit = async (data: PlaygroundFormValues) => {
+    // If coordinates aren't provided, try to geocode the address
+    if ((!data.latitude || !data.longitude || data.latitude === 0 || data.longitude === 0) && data.address) {
+      toast({
+        title: t('places.geocoding', 'Finding Location'),
+        description: t('places.geocodingMessage', 'Looking up coordinates for the address...'),
+      });
+
+      const coords = await geocodeAddress(data.address);
+      if (coords) {
+        data.latitude = coords.latitude;
+        data.longitude = coords.longitude;
+        toast({
+          title: t('places.locationFound', 'Location Found'),
+          description: t('places.locationFoundMessage', 'Address coordinates found successfully!'),
+        });
+      } else {
+        toast({
+          title: t('places.geocodingWarning', 'Could Not Find Location'),
+          description: t('places.geocodingWarningMessage', 'Playground will be added but may not appear on the map correctly.'),
+          variant: 'destructive',
+        });
+      }
+    }
+
     addPlaygroundMutation.mutate({
       ...data,
       type: 'playground',

@@ -48,6 +48,34 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
     mode: 'onChange',
   });
 
+  // Geocode an address using Nominatim (client-side)
+  const geocodeAddress = async (address: string): Promise<{ latitude: number; longitude: number } | null> => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=nl`,
+        {
+          headers: {
+            'User-Agent': 'PaPa-Hi Family App (papa-hi.com)'
+          }
+        }
+      );
+      
+      if (!response.ok) return null;
+      
+      const data = await response.json();
+      if (data && data.length > 0) {
+        return {
+          latitude: parseFloat(data[0].lat),
+          longitude: parseFloat(data[0].lon)
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Client-side geocoding failed:', error);
+      return null;
+    }
+  };
+
   // Get user's current location
   const getUserLocation = () => {
     if (navigator.geolocation) {
@@ -116,7 +144,31 @@ export function AddRestaurantForm({ onSuccess }: AddRestaurantFormProps) {
   });
 
   // Function to handle form submission
-  const onSubmit = (data: RestaurantFormValues) => {
+  const onSubmit = async (data: RestaurantFormValues) => {
+    // If coordinates aren't provided, try to geocode the address
+    if ((!data.latitude || !data.longitude) && data.address) {
+      toast({
+        title: t('places.geocoding', 'Finding Location'),
+        description: t('places.geocodingMessage', 'Looking up coordinates for the address...'),
+      });
+
+      const coords = await geocodeAddress(data.address);
+      if (coords) {
+        data.latitude = coords.latitude;
+        data.longitude = coords.longitude;
+        toast({
+          title: t('places.locationFound', 'Location Found'),
+          description: t('places.locationFoundMessage', 'Address coordinates found successfully!'),
+        });
+      } else {
+        toast({
+          title: t('places.geocodingWarning', 'Could Not Find Location'),
+          description: t('places.geocodingWarningMessage', 'Place will be added but may not appear on the map correctly.'),
+          variant: 'destructive',
+        });
+      }
+    }
+
     addRestaurantMutation.mutate(data);
   };
 
