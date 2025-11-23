@@ -62,6 +62,8 @@ export function PlacesManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/places"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/places"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/places/nearby"] });
       setEditingPlace(null);
       toast({
         title: "Success",
