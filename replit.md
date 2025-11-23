@@ -51,15 +51,22 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes
 
 ### November 23, 2025 - Production Fixes
-- **Geocoding Production Fix**: Fixed Nominatim geocoding service for production environment
+- **Geocoding Production Fix**: Fixed and enhanced Nominatim geocoding service for production environment
   - Updated User-Agent header to be environment-aware (development vs production with papa-hi.com domain)
   - Added rate limiting to respect Nominatim's 1 request per second usage policy
   - Enhanced error logging for better production debugging
+  - Implemented 4-level fallback system for Netherlands addresses:
+    1. Full address search
+    2. Without house number suffix (e.g., "2A" → "2")
+    3. Broad street search (street name + city only)
+    4. Postal code fallback (general area)
+  - Significantly improved success rate for Dutch addresses that have variations or are incomplete in OpenStreetMap
   - Prevents API blocking/rate-limiting that was causing map display issues when adding new places
 - **Admin Dashboard Fix**: Fixed paginated API response handling in admin users hook
   - Updated useAdmin hook to properly extract arrays from paginated responses ({users: [...]} format)
   - Resolved "TypeError: i?.filter is not a function" error on admin users page
   - All admin endpoints (users, activity, logs) now work correctly with pagination
+- **Code Cleanup**: Removed duplicate `/api/images` route definition
 
 ### November 22, 2025 - Performance Optimizations
 - **Database Indexes**: Added indexes on frequently queried columns (community_posts.created_at, playdates.start_time, family_events.start_date, category columns) to significantly improve query performance
