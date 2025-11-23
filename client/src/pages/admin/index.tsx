@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { ChevronLeft, Users, BarChart, ClipboardList, MapPin, TrendingUp, FileText, Mail, Calendar } from "lucide-react";
+import { ChevronLeft, Users, BarChart, ClipboardList, MapPin, TrendingUp, FileText, Mail, Calendar, Archive } from "lucide-react";
 
 import UsersManagement from "@/components/admin/users-management";
 import DashboardStats from "@/components/admin/dashboard-stats";
@@ -13,6 +13,7 @@ import PostsManagement from "@/components/admin/posts-management";
 import { ActivityAnalytics } from "@/components/admin/activity-analytics";
 import { ProfileReminders } from "@/components/admin/profile-reminders";
 import { EventsManagement } from "@/components/admin/events-management";
+import { DataRetentionManagement } from "@/components/admin/data-retention-management";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -40,7 +41,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-8 max-w-6xl">
+        <TabsList className="grid grid-cols-9 max-w-6xl">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <BarChart className="h-4 w-4" />
             <span className="hidden sm:inline">Dashboard</span>
@@ -72,6 +73,10 @@ export default function AdminPage() {
           <TabsTrigger value="reminders" className="flex items-center gap-2">
             <Mail className="h-4 w-4" />
             <span className="hidden sm:inline">Reminders</span>
+          </TabsTrigger>
+          <TabsTrigger value="retention" className="flex items-center gap-2">
+            <Archive className="h-4 w-4" />
+            <span className="hidden sm:inline">Data</span>
           </TabsTrigger>
         </TabsList>
 
@@ -105,6 +110,10 @@ export default function AdminPage() {
 
         <TabsContent value="reminders" className="space-y-6">
           <ProfileReminders />
+        </TabsContent>
+
+        <TabsContent value="retention" className="space-y-6">
+          <DataRetentionManagement />
         </TabsContent>
       </Tabs>
     </div>
