@@ -1,4 +1,4 @@
-const CACHE_NAME = 'papa-hi-v1';
+const CACHE_NAME = 'papa-hi-v2';
 const OFFLINE_URL = '/offline.html';
 
 const ASSETS_TO_CACHE = [
@@ -36,6 +36,12 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache if available, otherwise fetch from network
 self.addEventListener('fetch', (event) => {
+  // NEVER cache API requests - always fetch from network
+  if (event.request.url.includes('/api/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   // Skip cross-origin requests
   if (event.request.mode === 'navigate') {
     event.respondWith(
