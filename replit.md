@@ -50,6 +50,30 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 23, 2025 - Data Retention & Archive System
+- **Soft Delete Architecture**: Implemented 2-tier data retention strategy for database optimization
+  - After 90 days: Playdates and family events are automatically archived (soft delete)
+  - After 12 months: Archived items are permanently deleted (hard delete)
+  - Preserves user history and analytics while maintaining database performance
+- **Database Schema Updates**: Added `archivedAt` timestamp column to `playdates` and `family_events` tables
+  - Created indexes on `archivedAt` columns for efficient archival queries
+  - Applied schema changes via direct SQL to avoid migration conflicts
+- **Storage Layer Updates**: Modified all query methods to exclude archived items from main results
+  - Updated `getUpcomingPlaydates()`, `getPastPlaydates()`, `getUserPlaydates()`, and `getEvents()` 
+  - Archived items only visible to admins via dedicated endpoints
+- **Automated Cleanup Service**: Created cleanup service with two operations
+  - Archives items older than 90 days (sets `archivedAt` timestamp)
+  - Hard deletes archived items older than 12 months (with cascade to related tables)
+  - Integrated with existing weekly scheduler (runs Mondays at 10 AM)
+- **Admin Management Tools**: Three new admin endpoints for data retention oversight
+  - `POST /api/admin/cleanup`: Manually trigger cleanup process
+  - `GET /api/admin/archived/playdates`: View archived playdates
+  - `GET /api/admin/archived/events`: View archived family events
+  - All endpoints protected with admin-only authentication
+- **Cascading Deletion Logic**: Ensures referential integrity when deleting old playdates
+  - Deletes playdate participants before deleting playdates
+  - Prevents orphaned records in junction tables
+
 ### November 23, 2025 - TypeScript Build & Service Worker Fixes
 - **TypeScript Compilation Errors Fixed**: Resolved 8 TypeScript errors preventing production builds
   - Fixed null handling for `user.city` in playdate notification logic (line 137)
