@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from './use-auth';
 
 interface LocationState {
   latitude?: number;
@@ -20,6 +21,7 @@ interface LocationHookReturn {
 }
 
 export function useLocation(): LocationHookReturn {
+  const { user } = useAuth();
   const [locationState, setLocationState] = useState<LocationState>({
     isLoading: true
   });
@@ -41,7 +43,39 @@ export function useLocation(): LocationHookReturn {
         return;
       }
 
-      // Fallback values in case geolocation is denied
+      // Try to use user's profile city first
+      if (user?.city) {
+        console.log(`Using user profile city: ${user.city}`);
+        try {
+          // Get API key from server
+          const keyResponse = await axios.get('/api/env');
+          const apiKey = keyResponse.data.OPEN_WEATHER_API_KEY;
+          
+          // Geocode the user's city to get coordinates
+          const geocodeResponse = await axios.get(
+            `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(user.city)},NL&limit=1&appid=${apiKey}`
+          );
+          
+          if (geocodeResponse.data && geocodeResponse.data.length > 0) {
+            const location = geocodeResponse.data[0];
+            if (isMounted) {
+              setLocationState({
+                latitude: location.lat,
+                longitude: location.lon,
+                city: location.name,
+                country: location.country || "NL",
+                isLoading: false
+              });
+              console.log(`Successfully geocoded profile city: ${location.name} at ${location.lat}, ${location.lon}`);
+              return;
+            }
+          }
+        } catch (error) {
+          console.error("Error geocoding user profile city:", error);
+        }
+      }
+
+      // Fallback values in case geolocation is denied and profile city not available
       const fallbackLocation = {
         latitude: 52.3676,  // Amsterdam coordinates as fallback
         longitude: 4.9041,
@@ -133,7 +167,7 @@ export function useLocation(): LocationHookReturn {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [user?.city]); // Re-run when user's city changes
 
   return locationState;
 }
