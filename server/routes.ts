@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings, communityPosts, communityComments, communityReactions, communityMentions, insertCommunityPostSchema, insertCommunityCommentSchema, insertCommunityReactionSchema } from "@shared/schema";
+import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings, communityPosts, communityComments, communityReactions, communityMentions, insertCommunityPostSchema, insertCommunityCommentSchema, insertCommunityReactionSchema, familyEvents } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
@@ -12,7 +12,7 @@ import fs from "fs";
 import { WebSocketServer, WebSocket } from 'ws';
 import { fetchNearbyPlaygrounds } from "./maps-service";
 import { db } from "./db";
-import { eq, and, gte, asc, count, desc, like, or, sql, isNull, inArray } from "drizzle-orm";
+import { eq, and, gte, asc, count, desc, like, or, sql, isNull, isNotNull, inArray } from "drizzle-orm";
 import crypto from "crypto";
 import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate, sendNewCommunityPostNotification } from "./push-notifications";
 import { pushSubscriptions, matchPreferences } from "@shared/schema";
@@ -2441,6 +2441,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error sending test email:", error);
       res.status(500).json({ error: "Failed to send test email" });
+    }
+  });
+
+  // Trigger manual cleanup (admin only)
+  app.post("/api/admin/cleanup", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user!;
+      if (user.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { cleanupService } = await import('./cleanup-service');
+      const result = await cleanupService.runFullCleanup();
+      
+      res.json({ 
+        message: "Cleanup completed successfully",
+        ...result
+      });
+    } catch (error) {
+      console.error("Error running cleanup:", error);
+      res.status(500).json({ error: "Failed to run cleanup" });
+    }
+  });
+
+  // Get archived playdates (admin only)
+  app.get("/api/admin/archived/playdates", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user!;
+      if (user.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const archivedPlaydates = await db
+        .select()
+        .from(playdates)
+        .where(isNotNull(playdates.archivedAt))
+        .orderBy(desc(playdates.archivedAt))
+        .limit(100);
+      
+      res.json(archivedPlaydates);
+    } catch (error) {
+      console.error("Error fetching archived playdates:", error);
+      res.status(500).json({ error: "Failed to fetch archived playdates" });
+    }
+  });
+
+  // Get archived events (admin only)
+  app.get("/api/admin/archived/events", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user!;
+      if (user.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const archivedEvents = await db
+        .select()
+        .from(familyEvents)
+        .where(isNotNull(familyEvents.archivedAt))
+        .orderBy(desc(familyEvents.archivedAt))
+        .limit(100);
+      
+      res.json(archivedEvents);
+    } catch (error) {
+      console.error("Error fetching archived events:", error);
+      res.status(500).json({ error: "Failed to fetch archived events" });
     }
   });
   

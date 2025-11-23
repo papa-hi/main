@@ -215,9 +215,11 @@ export const playdates = pgTable("playdates", {
   recurringType: text("recurring_type").default("none"), // "none", "daily", "weekly", "monthly"
   parentPlaydateId: integer("parent_playdate_id"), // For recurring instances, points to the original
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  archivedAt: timestamp("archived_at"), // Soft delete: archived after 90 days, hard deleted after 12 months
 }, (table) => ({
   startTimeIdx: index("playdates_start_time_idx").on(table.startTime),
   creatorIdIdx: index("playdates_creator_id_idx").on(table.creatorId),
+  archivedAtIdx: index("playdates_archived_at_idx").on(table.archivedAt),
 }));
 
 // Define playdate relations
@@ -318,10 +320,12 @@ export const familyEvents = pgTable("family_events", {
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  archivedAt: timestamp("archived_at"), // Soft delete: archived after 90 days, hard deleted after 12 months
 }, (table) => ({
   startDateIdx: index("family_events_start_date_idx").on(table.startDate),
   categoryIdx: index("family_events_category_idx").on(table.category),
   isActiveIdx: index("family_events_is_active_idx").on(table.isActive),
+  archivedAtIdx: index("family_events_archived_at_idx").on(table.archivedAt),
 }));
 
 // Define family events relations

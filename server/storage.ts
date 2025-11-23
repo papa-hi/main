@@ -1458,7 +1458,7 @@ export class DatabaseStorage implements IStorage {
     let query = db
       .select()
       .from(playdates)
-      .where(gt(playdates.startTime, now));
+      .where(and(gt(playdates.startTime, now), isNull(playdates.archivedAt)));
     
     if (filters) {
       if (filters.searchQuery) {
@@ -1542,7 +1542,7 @@ export class DatabaseStorage implements IStorage {
     const playdatesData = await db
       .select()
       .from(playdates)
-      .where(lt(playdates.startTime, now))
+      .where(and(lt(playdates.startTime, now), isNull(playdates.archivedAt)))
       .orderBy(desc(playdates.startTime));
     
     // Load participants for each playdate
@@ -1573,7 +1573,7 @@ export class DatabaseStorage implements IStorage {
     const playdatesData = await db
       .select()
       .from(playdates)
-      .where(eq(playdates.creatorId, userId))
+      .where(and(eq(playdates.creatorId, userId), isNull(playdates.archivedAt)))
       .orderBy(asc(playdates.startTime));
     
     // Load participants for each playdate
@@ -2704,8 +2704,8 @@ export class DatabaseStorage implements IStorage {
       query = query.where(gte(familyEvents.startDate, now)) as any;
     }
 
-    // Only show active events
-    query = query.where(eq(familyEvents.isActive, true)) as any;
+    // Only show active and non-archived events
+    query = query.where(and(eq(familyEvents.isActive, true), isNull(familyEvents.archivedAt))) as any;
 
     // Order by start date
     query = query.orderBy(asc(familyEvents.startDate)) as any;

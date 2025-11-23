@@ -1,7 +1,8 @@
 import { runWeeklyProfileReminders } from './profile-reminder-scheduler';
+import { cleanupService } from './cleanup-service';
 
 /**
- * Simple weekly scheduler for profile reminders
+ * Simple weekly scheduler for profile reminders and database cleanup
  * This can be called from a cron job or scheduled task
  */
 class WeeklyScheduler {
@@ -9,7 +10,7 @@ class WeeklyScheduler {
   private lastRun: Date | null = null;
 
   /**
-   * Check if it's time to run the weekly reminders
+   * Check if it's time to run the weekly tasks
    * Runs every Monday at 10:00 AM
    */
   private shouldRun(): boolean {
@@ -35,7 +36,7 @@ class WeeklyScheduler {
   }
 
   /**
-   * Run the weekly profile reminders if it's time
+   * Run the weekly profile reminders and database cleanup if it's time
    */
   async checkAndRun(): Promise<void> {
     if (this.isRunning) {
@@ -49,12 +50,13 @@ class WeeklyScheduler {
 
     try {
       this.isRunning = true;
-      console.log('Starting weekly profile reminder scheduler...');
+      console.log('Starting weekly tasks (profile reminders + database cleanup)...');
       
       await runWeeklyProfileReminders();
+      await cleanupService.runFullCleanup();
       
       this.lastRun = new Date();
-      console.log('Weekly profile reminders completed successfully');
+      console.log('Weekly tasks completed successfully');
       
     } catch (error) {
       console.error('Error in weekly scheduler:', error);
@@ -64,7 +66,7 @@ class WeeklyScheduler {
   }
 
   /**
-   * Force run the weekly reminders (for testing or manual execution)
+   * Force run the weekly tasks (for testing or manual execution)
    */
   async forceRun(): Promise<void> {
     if (this.isRunning) {
@@ -74,12 +76,13 @@ class WeeklyScheduler {
 
     try {
       this.isRunning = true;
-      console.log('Manually running weekly profile reminders...');
+      console.log('Manually running weekly tasks...');
       
       await runWeeklyProfileReminders();
+      await cleanupService.runFullCleanup();
       
       this.lastRun = new Date();
-      console.log('Manual profile reminders completed successfully');
+      console.log('Manual weekly tasks completed successfully');
       
     } catch (error) {
       console.error('Error in manual scheduler run:', error);
@@ -92,7 +95,7 @@ class WeeklyScheduler {
    * Start the scheduler that checks every hour
    */
   start(): void {
-    console.log('Starting weekly profile reminder scheduler...');
+    console.log('Starting weekly scheduler (profile reminders + database cleanup)...');
     console.log('Will check every hour and run on Mondays at 10 AM');
     
     // Check immediately
