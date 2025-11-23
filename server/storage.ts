@@ -2032,18 +2032,17 @@ export class DatabaseStorage implements IStorage {
     if (placeData.imageUrl !== undefined) updateData.image_url = placeData.imageUrl;
     if (placeData.features !== undefined) updateData.features = placeData.features;
     
-    console.log('[STORAGE UPDATE] Place ID:', id);
-    console.log('[STORAGE UPDATE] placeData.imageUrl:', placeData.imageUrl);
-    console.log('[STORAGE UPDATE] updateData:', JSON.stringify(updateData, null, 2));
-    
     // Update the place
-    const [updatedPlace] = await db
+    await db
       .update(places)
       .set(updateData)
-      .where(eq(places.id, id))
-      .returning();
+      .where(eq(places.id, id));
     
-    console.log('[STORAGE UPDATE] updatedPlace from DB:', JSON.stringify(updatedPlace, null, 2));
+    // Query to get the updated place (workaround for Drizzle .returning() issue)
+    const [updatedPlace] = await db
+      .select()
+      .from(places)
+      .where(eq(places.id, id));
     
     if (!updatedPlace) {
       throw new Error(`Place with id ${id} not found`);
