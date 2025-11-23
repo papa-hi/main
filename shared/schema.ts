@@ -282,7 +282,10 @@ export const places = pgTable("places", {
   reviewCount: integer("review_count").default(0).notNull(),
   features: text("features").array(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  typeIdx: index("places_type_idx").on(table.type),
+  ratingIdx: index("places_rating_idx").on(table.rating),
+}));
 
 // Define places relations
 export const placesRelations = relations(places, ({ many }) => ({
