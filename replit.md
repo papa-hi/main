@@ -50,6 +50,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 23, 2025 - Location Detection Fix
+- **Missing API Endpoint**: Fixed critical bug where `/api/env` endpoint was missing from backend
+  - GPS location detection was working correctly but reverse geocoding failed due to undefined API key
+  - Added `/api/env` endpoint to expose `OPEN_WEATHER_API_KEY` to client-side location hook
+  - Location hook now successfully reverse geocodes GPS coordinates to city names (e.g., Haarlem)
+- **Location Hook Restoration**: Reverted to original simple GPS-based location detection
+  - Removed complex fallback logic that was interfering with GPS
+  - Uses `enableHighAccuracy: true` with 10-second timeout for accurate device location
+  - Added comprehensive logging to debug geolocation issues
+- **PWA Location Services**: App now correctly uses device GPS/location services
+  - Works as expected on mobile PWA installations
+  - Detects actual user location (e.g., 52.3749, 4.6708 for Haarlem)
+  - Properly displays city name instead of "Unknown" or incorrect fallback
+
 ### November 23, 2025 - Places Loading Performance Optimization
 - **Overpass API Caching**: Implemented 12-hour in-memory cache for nearby playgrounds from OpenStreetMap
   - Cache keyed by rounded lat/lon (~1km precision) and radius for maximum cache hit rate
