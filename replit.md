@@ -50,6 +50,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 23, 2025 - Admin Places Image URL Update Fix
+- **Drizzle ORM Property Mapping Bug**: Fixed critical bug in admin places management where image URL updates weren't persisting to database
+  - Root cause: Using database column name `image_url` instead of JavaScript property name `imageUrl` in Drizzle `.set()` method
+  - Drizzle automatically maps JavaScript property names (from schema definition) to database column names
+  - Fix applied to `updatePlace()` method in server/storage.ts (line 2035)
+  - Update was reporting success (rowCount: 1) but data wasn't actually changing in database
+  - Solution: Changed `updateData.image_url = placeData.imageUrl` to `updateData.imageUrl = placeData.imageUrl`
+  - Also applied workaround for Drizzle `.returning()` stale data issue by using separate SELECT query after UPDATE
+- **Performance Optimization**: Removed unnecessary geocoding fallback in distance calculation function
+  - All places in database already have coordinates stored, no need to geocode on every render
+  - Eliminated hundreds of 5-6 second API calls that were slowing down page loads
+  - Pages now load instantly instead of taking minutes
+
 ### November 23, 2025 - Location Detection Fix
 - **Missing API Endpoint**: Fixed critical bug where `/api/env` endpoint was missing from backend
   - GPS location detection was working correctly but reverse geocoding failed due to undefined API key
