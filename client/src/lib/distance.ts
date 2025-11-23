@@ -119,7 +119,7 @@ export async function calculateDistanceToPlace(place: {
     const userLocation = await getCurrentLocation();
     let placeLocation: Location | null = null;
     
-    // First try to use existing coordinates if they exist and are valid
+    // Use existing coordinates (all places should already have coordinates)
     if (place.latitude && place.longitude) {
       const lat = parseFloat(place.latitude);
       const lon = parseFloat(place.longitude);
@@ -129,13 +129,8 @@ export async function calculateDistanceToPlace(place: {
       }
     }
     
-    // If no valid coordinates, geocode the address
-    if (!placeLocation && place.address) {
-      placeLocation = await geocodeAddress(place.address);
-    }
-    
     if (!placeLocation) {
-      console.warn('Could not get coordinates for place:', place);
+      console.warn('Place missing coordinates:', place.address);
       return 0;
     }
     
