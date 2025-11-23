@@ -286,6 +286,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Environment variables endpoint - for client-side access to safe env vars
+  app.get("/api/env", (req, res) => {
+    res.json({
+      OPEN_WEATHER_API_KEY: process.env.OPEN_WEATHER_API_KEY
+    });
+  });
+
   // Push notification endpoints
   app.get("/api/push/vapid-public-key", (req, res) => {
     const publicKey = getVapidPublicKey();
