@@ -97,7 +97,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   // Users management queries
   const {
-    data: users = [],
+    data: usersData,
     isLoading: isLoadingUsers,
     refetch: refetchUsers,
   } = useQuery({
@@ -110,6 +110,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     enabled: !!user, // Only run when user is logged in
     retry: false, // Don't retry on auth errors
   });
+
+  // Extract users array from paginated response
+  const users = usersData?.users || [];
 
   // User stats query
   const {
@@ -161,10 +164,10 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   // Activity logs query
   const {
-    data: activityLogs = [],
+    data: activityData,
     isLoading: isLoadingActivityLogs,
     refetch: refetchActivityLogs,
-  } = useQuery<UserActivity[]>({
+  } = useQuery({
     queryKey: ["/api/admin/activity"],
     queryFn: async () => {
       const res = await apiRequest("GET", "/api/admin/activity");
@@ -175,12 +178,15 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     retry: false,
   });
 
+  // Extract activity array from paginated response
+  const activityLogs = activityData?.activity || [];
+
   // Admin logs query
   const {
-    data: adminLogs = [],
+    data: logsData,
     isLoading: isLoadingAdminLogs,
     refetch: refetchAdminLogs,
-  } = useQuery<AdminLog[]>({
+  } = useQuery({
     queryKey: ["/api/admin/logs"],
     queryFn: async () => {
       const res = await apiRequest("GET", "/api/admin/logs");
@@ -190,6 +196,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     enabled: !!user,
     retry: false,
   });
+
+  // Extract logs array from paginated response
+  const adminLogs = logsData?.logs || [];
 
   // Change user role mutation
   const changeUserRoleMutation = useMutation({

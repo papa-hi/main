@@ -1,0 +1,30 @@
+index-Ci1s-CTM.js:8 TypeError: i?.filter is not a function
+    at ASe (index-Ci1s-CTM.js:113:180767)
+    at NS (index-Ci1s-CTM.js:6:17836)
+    at j2 (index-Ci1s-CTM.js:8:44889)
+    at x2 (index-Ci1s-CTM.js:8:40463)
+    at cee (index-Ci1s-CTM.js:8:40390)
+    at Qx (index-Ci1s-CTM.js:8:40241)
+    at QS (index-Ci1s-CTM.js:8:36509)
+    at g2 (index-Ci1s-CTM.js:8:37322)
+    at oc (index-Ci1s-CTM.js:6:3274)
+    at index-Ci1s-CTM.js:8:34817
+index-Ci1s-CTM.js:203 Error boundary caught an error: TypeError: i?.filter is not a function
+    at ASe (index-Ci1s-CTM.js:113:180767)
+    at NS (index-Ci1s-CTM.js:6:17836)
+    at j2 (index-Ci1s-CTM.js:8:44889)
+    at x2 (index-Ci1s-CTM.js:8:40463)
+    at cee (index-Ci1s-CTM.js:8:40390)
+    at Qx (index-Ci1s-CTM.js:8:40241)
+    at QS (index-Ci1s-CTM.js:8:36509)
+    at g2 (index-Ci1s-CTM.js:8:37322)
+    at oc (index-Ci1s-CTM.js:6:3274)
+    at index-Ci1s-CTM.js:8:34817
+ 
+{componentStack: '\n    at ASe (https://papa-hi.com/assets/index-Ci1s…//papa-hi.com/assets/index-Ci1s-CTM.js:211:11304)'}
+componentStack
+: 
+"\n    at ASe (https://papa-hi.com/assets/index-Ci1s-CTM.js:113:180617)\n    at div\n    at https://papa-hi.com/assets/index-Ci1s-CTM.js:8:103875\n    at Hr (https://papa-hi.com/assets/index-Ci1s-CTM.js:8:108141)\n    at https://papa-hi.com/assets/index-Ci1s-CTM.js:61:12353\n    at https://papa-hi.com/assets/index-Ci1s-CTM.js:61:13749\n    at div\n    at https://papa-hi.com/assets/index-Ci1s-CTM.js:8:103875\n    at d (https://papa-hi.com/assets/index-Ci1s-CTM.js:8:102868)\n    at https://papa-hi.com/assets/index-Ci1s-CTM.js:61:10963\n    at div\n    at x4e (https://papa-hi.com/assets/index-Ci1s-CTM.js:177:76073)\n    at tl (https://papa-hi.com/assets/index-Ci1s-CTM.js:8:62553)\n    at Lr (https://papa-hi.com/assets/index-Ci1s-CTM.js:203:8052)\n    at Jee (https://papa-hi.com/assets/index-Ci1s-CTM.js:8:63354)\n    at eVe (https://papa-hi.com/assets/index-Ci1s-CTM.js:211:7976)\n    at main\n    at div\n    at Coe (https://papa-hi.com/assets/index-Ci1s-CTM.js:48:38685)\n    at nwe (https://papa-hi.com/assets/index-Ci1s-CTM.js:82:53389)\n    at CSe (https://papa-hi.com/assets/index-Ci1s-CTM.js:113:176152)\n    at Yre (https://papa-hi.com/assets/index-Ci1s-CTM.js:8:164141)\n    at dSe (https://papa-hi.com/assets/index-Ci1s-CTM.js:113:95930)\n    at bte (https://papa-hi.com/assets/index-Ci1s-CTM.js:8:94694)\n    at C4e (https://papa-hi.com/assets/index-Ci1s-CTM.js:203:7150)\n    at T4e (https://papa-hi.com/assets/index-Ci1s-CTM.js:203:7994)\n    at tVe (https://papa-hi.com/assets/index-Ci1s-CTM.js:211:9264)\n    at iVe (https://papa-hi.com/assets/index-Ci1s-CTM.js:211:11304)"
+[[Prototype]]
+: 
+Object
