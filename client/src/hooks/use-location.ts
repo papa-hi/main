@@ -31,61 +31,64 @@ export function useLocation(): LocationHookReturn {
     console.log("Location hook initialized");
 
     const getLocation = async () => {
-      // Check if geolocation is supported
-      if (!navigator.geolocation) {
-        console.log("Geolocation not supported by this browser");
+      // Helper function to use profile city
+      const useProfileCity = async () => {
+        if (user?.city) {
+          console.log(`Using user profile city: ${user.city}`);
+          try {
+            // Get API key from server
+            const keyResponse = await axios.get('/api/env');
+            const apiKey = keyResponse.data.OPEN_WEATHER_API_KEY;
+            
+            // Geocode the user's city to get coordinates
+            const geocodeResponse = await axios.get(
+              `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(user.city)},NL&limit=1&appid=${apiKey}`
+            );
+            
+            if (geocodeResponse.data && geocodeResponse.data.length > 0) {
+              const location = geocodeResponse.data[0];
+              if (isMounted) {
+                setLocationState({
+                  latitude: location.lat,
+                  longitude: location.lon,
+                  city: location.name,
+                  country: location.country || "NL",
+                  isLoading: false
+                });
+                console.log(`Successfully geocoded profile city: ${location.name} at ${location.lat}, ${location.lon}`);
+                return true;
+              }
+            }
+          } catch (error) {
+            console.error("Error geocoding user profile city:", error);
+          }
+        }
+        
+        // Use Amsterdam as final fallback
         if (isMounted) {
+          console.log("Using Amsterdam fallback location");
           setLocationState({
-            error: "Geolocation is not supported by your browser",
+            latitude: 52.3676,
+            longitude: 4.9041,
+            city: "Amsterdam",
+            country: "NL",
             isLoading: false
           });
         }
+        return false;
+      };
+
+      // Check if geolocation is supported
+      if (!navigator.geolocation) {
+        console.log("Geolocation not supported by this browser");
+        // Try profile city as fallback
+        await useProfileCity();
         return;
       }
 
-      // Try to use user's profile city first
-      if (user?.city) {
-        console.log(`Using user profile city: ${user.city}`);
-        try {
-          // Get API key from server
-          const keyResponse = await axios.get('/api/env');
-          const apiKey = keyResponse.data.OPEN_WEATHER_API_KEY;
-          
-          // Geocode the user's city to get coordinates
-          const geocodeResponse = await axios.get(
-            `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(user.city)},NL&limit=1&appid=${apiKey}`
-          );
-          
-          if (geocodeResponse.data && geocodeResponse.data.length > 0) {
-            const location = geocodeResponse.data[0];
-            if (isMounted) {
-              setLocationState({
-                latitude: location.lat,
-                longitude: location.lon,
-                city: location.name,
-                country: location.country || "NL",
-                isLoading: false
-              });
-              console.log(`Successfully geocoded profile city: ${location.name} at ${location.lat}, ${location.lon}`);
-              return;
-            }
-          }
-        } catch (error) {
-          console.error("Error geocoding user profile city:", error);
-        }
-      }
-
-      // Fallback values in case geolocation is denied and profile city not available
-      const fallbackLocation = {
-        latitude: 52.3676,  // Amsterdam coordinates as fallback
-        longitude: 4.9041,
-        city: "Amsterdam",
-        country: "NL",
-        isLoading: false
-      };
-
+      // Try device geolocation first (for PWA)
       try {
-        console.log("Requesting geolocation permission...");
+        console.log("Requesting device geolocation permission...");
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             console.log("Geolocation permission granted");
@@ -138,27 +141,21 @@ export function useLocation(): LocationHookReturn {
               }
             }
           },
-          (error) => {
-            console.log("Geolocation permission denied or error:", error.message);
-            // If user denied permission, use fallback location
-            if (isMounted) {
-              console.log("Using fallback location (Amsterdam)");
-              setLocationState(fallbackLocation);
-            }
+          async (error) => {
+            console.log("Device geolocation failed:", error.message);
+            // Fall back to profile city
+            await useProfileCity();
           },
           {
-            enableHighAccuracy: false, // Use false for faster response
-            timeout: 30000, // Increased to 30 seconds
+            enableHighAccuracy: false, // Use false for faster response (network-based)
+            timeout: 15000, // 15 seconds timeout
             maximumAge: 300000 // Cache location for 5 minutes
           }
         );
       } catch (error) {
         console.error("Unexpected error in geolocation request:", error);
-        if (isMounted) {
-          // Use fallback location on error
-          console.log("Using fallback location after error");
-          setLocationState(fallbackLocation);
-        }
+        // Fall back to profile city
+        await useProfileCity();
       }
     };
 
