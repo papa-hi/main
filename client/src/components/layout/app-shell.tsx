@@ -59,10 +59,10 @@ export default function AppShell({ children }: AppShellProps) {
   }, [toast]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Header user={userDisplay} />
       
-      <main className="flex-grow container mx-auto px-4 pt-5 pb-20 md:pb-5 max-w-6xl">
+      <main className="flex-grow container mx-auto px-4 pt-5 pb-24 md:pb-5 max-w-6xl overflow-x-hidden">
         {children}
       </main>
 
