@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Settings, User as UserIcon, Bell, Shield, HelpCircle, Heart } from 'lucide-react';
+import { Settings, User as UserIcon, Bell, Shield, HelpCircle, Heart, Lock, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import NotificationSettings from '@/components/NotificationSettings';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -28,6 +28,15 @@ export default function SettingsPage() {
   const { t } = useTranslation();
   const [_, navigate] = useLocation();
   const { toast } = useToast();
+  
+  // Password change states
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   
   // GDPR consent states
   const [analyticsConsent, setAnalyticsConsent] = useState(
@@ -83,6 +92,73 @@ export default function SettingsPage() {
     if (confirm(t('settings.privacy.deleteConfirm', 'Are you sure you want to delete your account? This action cannot be undone.'))) {
       // Navigate to dedicated account deletion page with proper warnings
       navigate('/settings/delete-account');
+    }
+  };
+
+  // Handle password change
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast({
+        title: t('settings.account.passwordError', 'Error'),
+        description: t('settings.account.allFieldsRequired', 'All password fields are required'),
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: t('settings.account.passwordError', 'Error'),
+        description: t('settings.account.passwordMismatch', 'New passwords do not match'),
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast({
+        title: t('settings.account.passwordError', 'Error'),
+        description: t('settings.account.passwordTooShort', 'Password must be at least 6 characters'),
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      const response = await fetch('/api/change-password', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to change password');
+      }
+
+      toast({
+        title: t('settings.account.passwordChanged', 'Password Changed'),
+        description: t('settings.account.passwordChangedDesc', 'Your password has been updated successfully')
+      });
+
+      // Clear the form
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error: any) {
+      toast({
+        title: t('settings.account.passwordError', 'Error'),
+        description: error.message || t('settings.account.passwordChangeFailed', 'Failed to change password'),
+        variant: 'destructive'
+      });
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -361,6 +437,99 @@ export default function SettingsPage() {
                 </div>
                 <Separator />
                 <Button variant="outline" onClick={() => navigate('/profile')}>{t('settings.account.editProfile')}</Button>
+                
+                <Separator />
+                
+                {/* Change Password Section */}
+                <div>
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <Lock className="h-4 w-4" />
+                    {t('settings.account.changePassword', 'Change Password')}
+                  </h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {t('settings.account.changePasswordDesc', 'Update your password to keep your account secure')}
+                  </p>
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="currentPassword">{t('settings.account.currentPassword', 'Current Password')}</Label>
+                      <div className="relative">
+                        <Input
+                          id="currentPassword"
+                          type={showCurrentPassword ? 'text' : 'password'}
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          placeholder="••••••••"
+                          className="pr-10"
+                          data-testid="input-current-password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          data-testid="button-toggle-current-password"
+                        >
+                          {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="newPassword">{t('settings.account.newPassword', 'New Password')}</Label>
+                      <div className="relative">
+                        <Input
+                          id="newPassword"
+                          type={showNewPassword ? 'text' : 'password'}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="••••••••"
+                          className="pr-10"
+                          data-testid="input-new-password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          data-testid="button-toggle-new-password"
+                        >
+                          {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword">{t('settings.account.confirmPassword', 'Confirm New Password')}</Label>
+                      <div className="relative">
+                        <Input
+                          id="confirmPassword"
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="••••••••"
+                          className="pr-10"
+                          data-testid="input-confirm-password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          data-testid="button-toggle-confirm-password"
+                        >
+                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={handleChangePassword}
+                      disabled={isChangingPassword}
+                      className="mt-2"
+                      data-testid="button-change-password"
+                    >
+                      {isChangingPassword ? (
+                        <><i className="fas fa-spinner fa-spin mr-2"></i> {t('settings.account.changingPassword', 'Changing...')}</>
+                      ) : (
+                        t('settings.account.changePasswordBtn', 'Change Password')
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
