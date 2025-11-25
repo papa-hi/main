@@ -694,11 +694,11 @@ export default function ProfilePage() {
       {/* Tabs for favorite places and created playdates */}
       <div className="mt-8">
         <Tabs defaultValue="playdates">
-          <TabsList className="w-full grid grid-cols-4">
-            <TabsTrigger value="playdates">{t('profile.myPlaydates', 'My Playdates')}</TabsTrigger>
-            <TabsTrigger value="places">{t('profile.favoritePlaces', 'Favorite Places')}</TabsTrigger>
-            <TabsTrigger value="matches">Dad Matches</TabsTrigger>
-            <TabsTrigger value="notifications">{t('profile.notifications', 'Notifications')}</TabsTrigger>
+          <TabsList className="w-full flex overflow-x-auto scrollbar-hide gap-1 p-1 h-auto">
+            <TabsTrigger value="playdates" className="flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 py-1.5 whitespace-nowrap">{t('profile.myPlaydates', 'My Playdates')}</TabsTrigger>
+            <TabsTrigger value="places" className="flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 py-1.5 whitespace-nowrap">{t('profile.favoritePlaces', 'Favorite Places')}</TabsTrigger>
+            <TabsTrigger value="matches" className="flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 py-1.5 whitespace-nowrap">Dad Matches</TabsTrigger>
+            <TabsTrigger value="notifications" className="flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 py-1.5 whitespace-nowrap">{t('profile.notifications', 'Notifications')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="playdates" className="mt-4">
