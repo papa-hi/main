@@ -2720,34 +2720,37 @@ export class DatabaseStorage implements IStorage {
 
   // Family Events methods
   async getEvents(options?: { latitude?: number; longitude?: number; category?: string; upcoming?: boolean }): Promise<FamilyEvent[]> {
-    let query = db.select().from(familyEvents);
-
+    const now = new Date();
+    
+    // Build all conditions
+    const conditions = [
+      eq(familyEvents.isActive, true),
+      isNull(familyEvents.archivedAt)
+    ];
+    
     // Filter by category if specified
     if (options?.category) {
-      query = query.where(eq(familyEvents.category, options.category)) as any;
+      conditions.push(eq(familyEvents.category, options.category));
     }
 
     // Filter by upcoming events (events that haven't ended yet)
     if (options?.upcoming) {
-      const now = new Date();
-      // Filter out events where:
-      // - endDate exists and is in the past, OR
-      // - endDate doesn't exist but startDate is in the past
-      query = query.where(
+      // Include events where:
+      // - endDate exists and is >= now, OR
+      // - endDate doesn't exist but startDate is >= now
+      conditions.push(
         or(
           and(isNotNull(familyEvents.endDate), gte(familyEvents.endDate, now)),
           and(isNull(familyEvents.endDate), gte(familyEvents.startDate, now))
-        )
-      ) as any;
+        )!
+      );
     }
 
-    // Only show active and non-archived events
-    query = query.where(and(eq(familyEvents.isActive, true), isNull(familyEvents.archivedAt))) as any;
-
-    // Order by start date
-    query = query.orderBy(asc(familyEvents.startDate)) as any;
-
-    const events = await query;
+    const events = await db
+      .select()
+      .from(familyEvents)
+      .where(and(...conditions))
+      .orderBy(asc(familyEvents.startDate));
 
     // Calculate distance if coordinates provided
     if (options?.latitude && options?.longitude) {
