@@ -191,13 +191,26 @@ export default function EventDetailsPage() {
                 <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium text-sm">{t('events.dateAndTime')}</p>
-                  <p className="text-sm text-muted-foreground" data-testid="text-event-date">
-                    {format(startDate, "EEEE, MMMM d, yyyy")}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {format(startDate, "h:mm a")}
-                    {endDate && ` - ${format(endDate, "h:mm a")}`}
-                  </p>
+                  {endDate && format(endDate, "yyyy-MM-dd") !== format(startDate, "yyyy-MM-dd") ? (
+                    <>
+                      <p className="text-sm text-muted-foreground" data-testid="text-event-date">
+                        {format(startDate, "EEEE, MMMM d, yyyy 'at' h:mm a")}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('events.to', 'to')} {format(endDate, "EEEE, MMMM d, yyyy 'at' h:mm a")}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-muted-foreground" data-testid="text-event-date">
+                        {format(startDate, "EEEE, MMMM d, yyyy")}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {format(startDate, "h:mm a")}
+                        {endDate && ` - ${format(endDate, "h:mm a")}`}
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
 
