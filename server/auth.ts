@@ -195,15 +195,17 @@ export function setupAuth(app: Express) {
       await storage.createPasswordResetToken({
         userId: user.id,
         token,
-        expiresAt,
-        used: false
+        expiresAt
       });
+
+      // Build reset link
+      const resetLink = `${process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/reset-password/${token}`;
 
       // Send password reset email
       const emailSent = await sendPasswordResetEmail({
         to: email,
         firstName: user.firstName,
-        resetToken: token
+        resetLink
       });
 
       if (!emailSent) {
@@ -278,7 +280,7 @@ export function setupAuth(app: Express) {
       await storage.updateUserPassword(resetToken.userId, hashedPassword);
 
       // Mark token as used
-      await storage.markTokenAsUsed(token);
+      await storage.markPasswordResetTokenAsUsed(token);
 
       res.status(200).json({ message: "Password has been reset successfully" });
     } catch (error) {

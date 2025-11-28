@@ -1,0 +1,80 @@
+index-yalfgvVY.js:8 TypeError: Cannot read properties of undefined (reading 'firstName')
+    at index-yalfgvVY.js:177:82161
+    at Array.map (<anonymous>)
+    at w4e (index-yalfgvVY.js:177:81298)
+    at ES (index-yalfgvVY.js:6:17836)
+    at $S (index-yalfgvVY.js:8:3162)
+    at N2 (index-yalfgvVY.js:8:45668)
+    at _2 (index-yalfgvVY.js:8:40467)
+    at dee (index-yalfgvVY.js:8:40394)
+    at tb (index-yalfgvVY.js:8:40245)
+    at tP (index-yalfgvVY.js:8:36513)
+
+index-yalfgvVY.js:203 Error boundary caught an error: TypeError: Cannot read properties of undefined (reading 'firstName')
+    at index-yalfgvVY.js:177:82161
+    at Array.map (<anonymous>)
+    at w4e (index-yalfgvVY.js:177:81298)
+    at ES (index-yalfgvVY.js:6:17836)
+    at $S (index-yalfgvVY.js:8:3162)
+    at N2 (index-yalfgvVY.js:8:45668)
+    at _2 (index-yalfgvVY.js:8:40467)
+    at dee (index-yalfgvVY.js:8:40394)
+    at tb (index-yalfgvVY.js:8:40245)
+    at tP (index-yalfgvVY.js:8:36513)
+ 
+{componentStack: '\n    at w4e (https://papa-hi.com/assets/index-yalf…//papa-hi.com/assets/index-yalfgvVY.js:211:11757)'}
+componentStack
+: 
+"\n    at w4e (https://papa-hi.com/assets/index-yalfgvVY.js:177:76668)\n    at div\n    at https://papa-hi.com/assets/index-yalfgvVY.js:8:103879\n    at Gr (https://papa-hi.com/assets/index-yalfgvVY.js:8:108145)\n    at https://papa-hi.com/assets/index-yalfgvVY.js:61:12397\n    at https://papa-hi.com/assets/index-yalfgvVY.js:61:13793\n    at div\n    at https://papa-hi.com/assets/index-yalfgvVY.js:8:103879\n    at d (https://papa-hi.com/assets/index-yalfgvVY.js:8:102872)\n    at https://papa-hi.com/assets/index-yalfgvVY.js:61:11007\n    at div\n    at _4e (https://papa-hi.com/assets/index-yalfgvVY.js:177:83853)\n    at rl (https://papa-hi.com/assets/index-yalfgvVY.js:8:62557)\n    at Lr (https://papa-hi.com/assets/index-yalfgvVY.js:203:8056)\n    at tte (https://papa-hi.com/assets/index-yalfgvVY.js:8:63358)\n    at rVe (https://papa-hi.com/assets/index-yalfgvVY.js:211:7976)\n    at main\n    at div\n    at Aoe (https://papa-hi.com/assets/index-yalfgvVY.js:48:38077)\n    at iwe (https://papa-hi.com/assets/index-yalfgvVY.js:82:53389)\n    at ESe (https://papa-hi.com/assets/index-yalfgvVY.js:113:180240)\n    at Jre (https://papa-hi.com/assets/index-yalfgvVY.js:8:164861)\n    at hSe (https://papa-hi.com/assets/index-yalfgvVY.js:113:95930)\n    at _te (https://papa-hi.com/assets/index-yalfgvVY.js:8:94698)\n    at A4e (https://papa-hi.com/assets/index-yalfgvVY.js:203:7150)\n    at k4e (https://papa-hi.com/assets/index-yalfgvVY.js:203:7996)\n    at iVe (https://papa-hi.com/assets/index-yalfgvVY.js:211:9264)\n    at oVe (https://papa-hi.com/assets/index-yalfgvVY.js:211:11757)"
+[[Prototype]]
+: 
+Object
+constructor
+: 
+ƒ Object()
+hasOwnProperty
+: 
+ƒ hasOwnProperty()
+isPrototypeOf
+: 
+ƒ isPrototypeOf()
+propertyIsEnumerable
+: 
+ƒ propertyIsEnumerable()
+toLocaleString
+: 
+ƒ toLocaleString()
+toString
+: 
+ƒ toString()
+valueOf
+: 
+ƒ valueOf()
+__defineGetter__
+: 
+ƒ __defineGetter__()
+__defineSetter__
+: 
+ƒ __defineSetter__()
+__lookupGetter__
+: 
+ƒ __lookupGetter__()
+__lookupSetter__
+: 
+ƒ __lookupSetter__()
+__proto__
+: 
+(...)
+get __proto__
+: 
+ƒ __proto__()
+set __proto__
+: 
+ƒ __proto__()
+﻿
+
+Press ctrl i to turn on code suggestions. Press ctrl x to disable code suggestions.
+ctrl
+i
+ to turn on code suggestions. Don't show again NEW
+

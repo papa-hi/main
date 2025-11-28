@@ -2481,8 +2481,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const archivedPlaydates = await db
-        .select()
+        .select({
+          id: playdates.id,
+          title: playdates.title,
+          location: playdates.location,
+          startTime: playdates.startTime,
+          archivedAt: playdates.archivedAt,
+          creator: {
+            username: users.username,
+            firstName: users.firstName,
+            lastName: users.lastName,
+          },
+          participantCount: sql<number>`(
+            SELECT COUNT(*)::int 
+            FROM ${playdateParticipants} 
+            WHERE ${playdateParticipants.playdateId} = ${playdates.id}
+          )`,
+        })
         .from(playdates)
+        .innerJoin(users, eq(playdates.creatorId, users.id))
         .where(isNotNull(playdates.archivedAt))
         .orderBy(desc(playdates.archivedAt))
         .limit(100);
