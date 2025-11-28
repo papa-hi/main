@@ -16,7 +16,7 @@ import {
   FamilyEvent, InsertFamilyEvent, familyEvents
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, not, inArray, like, or } from "drizzle-orm";
+import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, isNotNull, not, inArray, like, or } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
