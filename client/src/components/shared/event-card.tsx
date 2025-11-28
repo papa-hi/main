@@ -69,7 +69,13 @@ export function EventCard({ event, layout = 'horizontal' }: EventCardProps) {
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4 flex-shrink-0" />
           <span className="truncate" data-testid={`text-event-date-${event.id}`}>
-            {format(new Date(event.startDate), "MMM d, h:mm a")}
+            {event.endDate && format(new Date(event.startDate), "MMM d") !== format(new Date(event.endDate), "MMM d") ? (
+              <>
+                {format(new Date(event.startDate), "MMM d, h:mm a")} - {format(new Date(event.endDate), "MMM d, h:mm a")}
+              </>
+            ) : (
+              format(new Date(event.startDate), "MMM d, h:mm a")
+            )}
           </span>
         </div>
 

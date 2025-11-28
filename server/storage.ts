@@ -2730,7 +2730,15 @@ export class DatabaseStorage implements IStorage {
     // Filter by upcoming events (events that haven't ended yet)
     if (options?.upcoming) {
       const now = new Date();
-      query = query.where(gte(familyEvents.startDate, now)) as any;
+      // Filter out events where:
+      // - endDate exists and is in the past, OR
+      // - endDate doesn't exist but startDate is in the past
+      query = query.where(
+        or(
+          and(isNotNull(familyEvents.endDate), gte(familyEvents.endDate, now)),
+          and(isNull(familyEvents.endDate), gte(familyEvents.startDate, now))
+        )
+      ) as any;
     }
 
     // Only show active and non-archived events
