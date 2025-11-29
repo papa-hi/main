@@ -4,6 +4,8 @@ import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { insertFamilyEventSchema, updateFamilyEventSchema } from "@shared/schema";
 import { geocodeAddress } from "./geocoding";
+import { sendNewEventNotification } from "./email-service";
+import { format } from "date-fns";
 
 // Middleware to check if user is an admin
 export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
@@ -533,6 +535,11 @@ export function setupAdminRoutes(app: Express) {
         title: newEvent.title 
       }, req);
       
+      // Send email notifications to all users (non-blocking)
+      sendNewEventNotifications(newEvent).catch(err => {
+        console.error('Error sending new event notifications:', err);
+      });
+      
       res.status(201).json(newEvent);
     } catch (error) {
       console.error("Error creating event:", error);
@@ -617,4 +624,42 @@ export function setupAdminRoutes(app: Express) {
       res.status(500).json({ error: "Failed to delete event" });
     }
   });
+}
+
+async function sendNewEventNotifications(event: any): Promise<void> {
+  try {
+    const allUsers = await storage.getAllUsers();
+    
+    const usersWithEmail = allUsers.filter(user => 
+      user.email && 
+      user.role !== 'admin'
+    );
+    
+    console.log(`Sending new event notifications to ${usersWithEmail.length} users for event: ${event.title}`);
+    
+    const eventDate = format(new Date(event.startDate), "EEEE, MMMM d, yyyy 'at' h:mm a");
+    
+    const emailPromises = usersWithEmail.map(user => 
+      sendNewEventNotification({
+        to: user.email!,
+        firstName: user.firstName || user.username || 'Friend',
+        eventTitle: event.title,
+        eventDescription: event.description || '',
+        eventDate: eventDate,
+        eventLocation: event.location,
+        eventCategory: event.category,
+        eventId: event.id
+      }).catch(err => {
+        console.error(`Failed to send notification to ${user.email}:`, err);
+        return false;
+      })
+    );
+    
+    const results = await Promise.allSettled(emailPromises);
+    const successCount = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
+    
+    console.log(`New event notifications sent: ${successCount}/${usersWithEmail.length} successful`);
+  } catch (error) {
+    console.error('Error in sendNewEventNotifications:', error);
+  }
 }

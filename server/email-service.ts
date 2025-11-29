@@ -824,3 +824,268 @@ The PaPa-Hi Team
 PaPa-Hi - Connecting Fathers, Building Communities
   `.trim();
 }
+
+interface NewEventEmailData {
+  to: string;
+  firstName: string;
+  eventTitle: string;
+  eventDescription: string;
+  eventDate: string;
+  eventLocation: string;
+  eventCategory: string;
+  eventId: number;
+}
+
+export async function sendNewEventNotification({ to, firstName, eventTitle, eventDescription, eventDate, eventLocation, eventCategory, eventId }: NewEventEmailData): Promise<boolean> {
+  try {
+    const resendClient = getResendClient();
+    
+    if (!resendClient) {
+      console.warn('RESEND_API_KEY is not configured - skipping new event notification email');
+      console.log(`New event notification would be sent to: ${to}`);
+      console.log(`Event: ${eventTitle}`);
+      return true;
+    }
+
+    console.log(`Sending new event notification to: ${to}`);
+
+    const { data, error } = await resendClient.emails.send({
+      from: 'PaPa-Hi <papa@papa-hi.com>',
+      to: [to],
+      subject: `New Event: ${eventTitle} 🎉`,
+      html: generateNewEventEmailHTML(firstName, eventTitle, eventDescription, eventDate, eventLocation, eventCategory, eventId),
+      text: generateNewEventEmailText(firstName, eventTitle, eventDescription, eventDate, eventLocation, eventCategory, eventId),
+      headers: {
+        'X-Entity-Ref-ID': `new-event-${eventId}-${Date.now()}`,
+        'X-Priority': '3',
+        'Importance': 'normal'
+      }
+    });
+
+    if (error) {
+      console.error('New event notification email error:', error);
+      return false;
+    }
+
+    console.log('New event notification sent successfully:', data?.id);
+    return true;
+  } catch (error) {
+    console.error('Failed to send new event notification:', error);
+    return false;
+  }
+}
+
+function generateNewEventEmailHTML(firstName: string, eventTitle: string, eventDescription: string, eventDate: string, eventLocation: string, eventCategory: string, eventId: number): string {
+  const getCategoryEmoji = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'workshop': return '🎨';
+      case 'festival': return '🎉';
+      case 'outdoor': return '🌳';
+      case 'indoor': return '🏠';
+      case 'educational': return '📚';
+      case 'sports': return '⚽';
+      default: return '📅';
+    }
+  };
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>New Event: ${eventTitle}</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+        body {
+          font-family: 'Varela Round', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #f8f9fa;
+        }
+        .container {
+          background-color: white;
+          border-radius: 12px;
+          padding: 40px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 30px;
+        }
+        .logo {
+          font-family: 'Varela Round', sans-serif;
+          font-size: 32px;
+          font-weight: bold;
+          color: #FF6B35;
+          margin-bottom: 10px;
+        }
+        .event-badge {
+          display: inline-block;
+          background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+          color: white;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: bold;
+          margin-bottom: 20px;
+        }
+        .title {
+          font-size: 24px;
+          font-weight: bold;
+          color: #2d3748;
+          margin-bottom: 20px;
+          text-align: center;
+        }
+        .event-card {
+          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+          border-radius: 12px;
+          padding: 25px;
+          margin: 25px 0;
+          border-left: 4px solid #FF6B35;
+        }
+        .event-title {
+          font-size: 20px;
+          font-weight: bold;
+          color: #2d3748;
+          margin-bottom: 15px;
+        }
+        .event-detail {
+          display: flex;
+          align-items: center;
+          margin: 10px 0;
+          color: #4a5568;
+        }
+        .event-icon {
+          font-size: 18px;
+          margin-right: 12px;
+          min-width: 24px;
+        }
+        .event-description {
+          color: #4a5568;
+          margin-top: 15px;
+          padding-top: 15px;
+          border-top: 1px solid #dee2e6;
+        }
+        .cta-button {
+          display: inline-block;
+          background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+          color: white !important;
+          text-decoration: none;
+          padding: 16px 40px;
+          border-radius: 8px;
+          font-weight: bold;
+          font-size: 16px;
+          margin: 20px 0;
+          text-align: center;
+          transition: transform 0.2s;
+        }
+        .cta-button:hover {
+          transform: translateY(-2px);
+        }
+        .button-container {
+          text-align: center;
+          margin: 30px 0;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 30px;
+          padding-top: 20px;
+          border-top: 1px solid #eee;
+          color: #718096;
+          font-size: 14px;
+        }
+        .unsubscribe {
+          color: #a0aec0;
+          font-size: 12px;
+          margin-top: 15px;
+        }
+        .unsubscribe a {
+          color: #a0aec0;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <div class="logo">PaPa-Hi</div>
+          <div class="event-badge">${getCategoryEmoji(eventCategory)} New Event</div>
+        </div>
+
+        <h1 class="title">A New Family Event Awaits!</h1>
+
+        <p>Hi ${firstName},</p>
+        <p>Great news! A new family event has been added to PaPa-Hi that you might be interested in:</p>
+
+        <div class="event-card">
+          <div class="event-title">${getCategoryEmoji(eventCategory)} ${eventTitle}</div>
+          
+          <div class="event-detail">
+            <span class="event-icon">📅</span>
+            <span>${eventDate}</span>
+          </div>
+          
+          <div class="event-detail">
+            <span class="event-icon">📍</span>
+            <span>${eventLocation}</span>
+          </div>
+          
+          <div class="event-detail">
+            <span class="event-icon">🏷️</span>
+            <span>${eventCategory}</span>
+          </div>
+          
+          ${eventDescription ? `<div class="event-description">${eventDescription}</div>` : ''}
+        </div>
+
+        <div class="button-container">
+          <a href="https://papa-hi.com/events/${eventId}" class="cta-button">View Event Details</a>
+        </div>
+
+        <p>Don't miss out on this opportunity to create wonderful memories with your family!</p>
+
+        <div class="footer">
+          <p>Thanks for being part of the PaPa-Hi community!</p>
+          <p style="color: #a0aec0; font-size: 12px;">PaPa-Hi - Connecting Fathers, Building Communities</p>
+          <div class="unsubscribe">
+            <a href="https://papa-hi.com/settings">Manage notification preferences</a>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function generateNewEventEmailText(firstName: string, eventTitle: string, eventDescription: string, eventDate: string, eventLocation: string, eventCategory: string, eventId: number): string {
+  return `
+PaPa-Hi - New Family Event!
+
+Hi ${firstName},
+
+Great news! A new family event has been added to PaPa-Hi:
+
+📅 ${eventTitle}
+━━━━━━━━━━━━━━━━━━━━━━━━
+📅 Date: ${eventDate}
+📍 Location: ${eventLocation}
+🏷️ Category: ${eventCategory}
+
+${eventDescription ? `About this event:\n${eventDescription}\n` : ''}
+View event details: https://papa-hi.com/events/${eventId}
+
+Don't miss out on this opportunity to create wonderful memories with your family!
+
+Thanks for being part of the PaPa-Hi community!
+
+Best regards,
+The PaPa-Hi Team
+
+---
+PaPa-Hi - Connecting Fathers, Building Communities
+Manage notification preferences: https://papa-hi.com/settings
+  `.trim();
+}
