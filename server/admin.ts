@@ -639,26 +639,36 @@ async function sendNewEventNotifications(event: any): Promise<void> {
     
     const eventDate = format(new Date(event.startDate), "EEEE, MMMM d, yyyy 'at' h:mm a");
     
-    const emailPromises = usersWithEmail.map(user => 
-      sendNewEventNotification({
-        to: user.email!,
-        firstName: user.firstName || user.username || 'Friend',
-        eventTitle: event.title,
-        eventDescription: event.description || '',
-        eventDate: eventDate,
-        eventLocation: event.location,
-        eventCategory: event.category,
-        eventId: event.id
-      }).catch(err => {
+    let successCount = 0;
+    let failCount = 0;
+    
+    for (const user of usersWithEmail) {
+      try {
+        const result = await sendNewEventNotification({
+          to: user.email!,
+          firstName: user.firstName || user.username || 'Friend',
+          eventTitle: event.title,
+          eventDescription: event.description || '',
+          eventDate: eventDate,
+          eventLocation: event.location,
+          eventCategory: event.category,
+          eventId: event.id
+        });
+        
+        if (result) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch (err) {
         console.error(`Failed to send notification to ${user.email}:`, err);
-        return false;
-      })
-    );
+        failCount++;
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 600));
+    }
     
-    const results = await Promise.allSettled(emailPromises);
-    const successCount = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
-    
-    console.log(`New event notifications sent: ${successCount}/${usersWithEmail.length} successful`);
+    console.log(`New event notifications sent: ${successCount}/${usersWithEmail.length} successful, ${failCount} failed`);
   } catch (error) {
     console.error('Error in sendNewEventNotifications:', error);
   }
