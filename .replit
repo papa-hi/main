@@ -30,6 +30,10 @@ externalPort = 3003
 localPort = 37795
 externalPort = 3000
 
+[[ports]]
+localPort = 44817
+externalPort = 4200
+
 [workflows]
 runButton = "Project"
 
@@ -58,4 +62,4 @@ args = "npm run dev"
 waitForPort = 5000
 
 [agent]
-integrations = ["javascript_websocket==1.0.0", "javascript_sendgrid==1.0.0"]
+integrations = ["javascript_websocket:1.0.0", "javascript_sendgrid:1.0.0"]

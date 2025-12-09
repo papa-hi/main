@@ -630,12 +630,23 @@ async function sendNewEventNotifications(event: any): Promise<void> {
   try {
     const allUsers = await storage.getAllUsers();
     
-    const usersWithEmail = allUsers.filter(user => 
-      user.email && 
-      user.role !== 'admin'
-    );
+    // Filter users who:
+    // 1. Have an email address
+    // 2. Are not admins
+    // 3. Have a city in their profile
+    // 4. Their city matches the event location (case-insensitive)
+    const eventLocationLower = event.location.toLowerCase();
     
-    console.log(`Sending new event notifications to ${usersWithEmail.length} users for event: ${event.title}`);
+    const usersWithEmail = allUsers.filter(user => {
+      if (!user.email || user.role === 'admin') return false;
+      if (!user.city) return false; // Skip users without city
+      
+      // Check if user's city is mentioned in the event location
+      const userCityLower = user.city.toLowerCase();
+      return eventLocationLower.includes(userCityLower);
+    });
+    
+    console.log(`Sending new event notifications to ${usersWithEmail.length} users in ${event.location} for event: ${event.title}`);
     
     const eventDate = format(new Date(event.startDate), "EEEE, MMMM d, yyyy 'at' h:mm a");
     
