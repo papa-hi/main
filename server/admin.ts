@@ -649,6 +649,7 @@ async function sendNewEventNotifications(event: any): Promise<void> {
     console.log(`Sending new event notifications to ${usersWithEmail.length} users in ${event.location} for event: ${event.title}`);
     
     const eventDate = format(new Date(event.startDate), "EEEE, MMMM d, yyyy 'at' h:mm a");
+    const eventEndDate = event.endDate ? format(new Date(event.endDate), "EEEE, MMMM d, yyyy 'at' h:mm a") : undefined;
     
     let successCount = 0;
     let failCount = 0;
@@ -661,6 +662,7 @@ async function sendNewEventNotifications(event: any): Promise<void> {
           eventTitle: event.title,
           eventDescription: event.description || '',
           eventDate: eventDate,
+          eventEndDate: eventEndDate,
           eventLocation: event.location,
           eventCategory: event.category,
           eventId: event.id

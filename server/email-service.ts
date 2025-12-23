@@ -831,12 +831,13 @@ interface NewEventEmailData {
   eventTitle: string;
   eventDescription: string;
   eventDate: string;
+  eventEndDate?: string;
   eventLocation: string;
   eventCategory: string;
   eventId: number;
 }
 
-export async function sendNewEventNotification({ to, firstName, eventTitle, eventDescription, eventDate, eventLocation, eventCategory, eventId }: NewEventEmailData): Promise<boolean> {
+export async function sendNewEventNotification({ to, firstName, eventTitle, eventDescription, eventDate, eventEndDate, eventLocation, eventCategory, eventId }: NewEventEmailData): Promise<boolean> {
   try {
     const resendClient = getResendClient();
     
@@ -853,8 +854,8 @@ export async function sendNewEventNotification({ to, firstName, eventTitle, even
       from: 'PaPa-Hi <papa@papa-hi.com>',
       to: [to],
       subject: `New Event: ${eventTitle} 🎉`,
-      html: generateNewEventEmailHTML(firstName, eventTitle, eventDescription, eventDate, eventLocation, eventCategory, eventId),
-      text: generateNewEventEmailText(firstName, eventTitle, eventDescription, eventDate, eventLocation, eventCategory, eventId),
+      html: generateNewEventEmailHTML(firstName, eventTitle, eventDescription, eventDate, eventEndDate, eventLocation, eventCategory, eventId),
+      text: generateNewEventEmailText(firstName, eventTitle, eventDescription, eventDate, eventEndDate, eventLocation, eventCategory, eventId),
       headers: {
         'X-Entity-Ref-ID': `new-event-${eventId}-${Date.now()}`,
         'X-Priority': '3',
@@ -875,7 +876,7 @@ export async function sendNewEventNotification({ to, firstName, eventTitle, even
   }
 }
 
-function generateNewEventEmailHTML(firstName: string, eventTitle: string, eventDescription: string, eventDate: string, eventLocation: string, eventCategory: string, eventId: number): string {
+function generateNewEventEmailHTML(firstName: string, eventTitle: string, eventDescription: string, eventDate: string, eventEndDate: string | undefined, eventLocation: string, eventCategory: string, eventId: number): string {
   const getCategoryEmoji = (category: string) => {
     switch (category.toLowerCase()) {
       case 'workshop': return '🎨';
@@ -1025,7 +1026,7 @@ function generateNewEventEmailHTML(firstName: string, eventTitle: string, eventD
           
           <div class="event-detail">
             <span class="event-icon">📅</span>
-            <span>${eventDate}</span>
+            <span>${eventEndDate ? `${eventDate} - ${eventEndDate}` : eventDate}</span>
           </div>
           
           <div class="event-detail">
@@ -1060,7 +1061,8 @@ function generateNewEventEmailHTML(firstName: string, eventTitle: string, eventD
   `;
 }
 
-function generateNewEventEmailText(firstName: string, eventTitle: string, eventDescription: string, eventDate: string, eventLocation: string, eventCategory: string, eventId: number): string {
+function generateNewEventEmailText(firstName: string, eventTitle: string, eventDescription: string, eventDate: string, eventEndDate: string | undefined, eventLocation: string, eventCategory: string, eventId: number): string {
+  const dateDisplay = eventEndDate ? `${eventDate} - ${eventEndDate}` : eventDate;
   return `
 PaPa-Hi - New Family Event!
 
@@ -1070,7 +1072,7 @@ Great news! A new family event has been added to PaPa-Hi:
 
 📅 ${eventTitle}
 ━━━━━━━━━━━━━━━━━━━━━━━━
-📅 Date: ${eventDate}
+📅 Date: ${dateDisplay}
 📍 Location: ${eventLocation}
 🏷️ Category: ${eventCategory}
 
