@@ -288,11 +288,8 @@ export function Header({ user }: HeaderProps) {
             </>
           ) : (
             <Link href="/auth">
-              <a className="bg-white text-primary hover:bg-gray-100 hover:shadow-md px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 transform hover:scale-105 hover:translate-y-[-2px]">
-                <span className="flex items-center">
-                  <LogIn className="w-4 h-4 mr-2" />
-                  {t('auth.login')}
-                </span>
+              <a className="bg-white text-primary hover:bg-gray-100 hover:shadow-md px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 transform hover:scale-105 hover:translate-y-[-2px]">
+                {t('auth.login')}
               </a>
             </Link>
           )}
