@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { Bell, User, Settings, ShieldCheck, LogOut, LogIn, Menu, X, ChevronDown, Plus, Home, Calendar, MapPin, Map, MessageCircle, Users } from "lucide-react";
 
 // Logo for PaPa-Hi
 const PaPaHiLogo = () => (
@@ -69,7 +70,7 @@ export function Header({ user }: HeaderProps) {
                     {i18n.language === 'fr' && '🇫🇷'}
                     {i18n.language === 'es' && '🇪🇸'}
                   </span>
-                  <i className="fas fa-chevron-down text-xs"></i>
+                  <ChevronDown className="w-3 h-3" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="min-w-[120px]">
@@ -126,7 +127,7 @@ export function Header({ user }: HeaderProps) {
           {isAuthenticated && (
             <Link href="/create">
               <a className="bg-accent/90 hover:bg-accent text-white px-2 py-1 rounded-md flex items-center text-sm md:hidden">
-                <i className="fas fa-plus mr-1"></i>
+                <Plus className="w-4 h-4 mr-1" />
                 <span>{t('navigation.new', 'New')}</span>
               </a>
             </Link>
@@ -149,7 +150,7 @@ export function Header({ user }: HeaderProps) {
                   <DropdownMenuItem asChild>
                     <Link href="/profile">
                       <a className="flex items-center w-full cursor-pointer">
-                        <i className="fas fa-user mr-2"></i>
+                        <User className="w-4 h-4 mr-2" />
                         {t('header.myProfile', 'My Profile')}
                       </a>
                     </Link>
@@ -157,7 +158,7 @@ export function Header({ user }: HeaderProps) {
                   <DropdownMenuItem asChild>
                     <Link href="/settings">
                       <a className="flex items-center w-full cursor-pointer">
-                        <i className="fas fa-cog mr-2"></i>
+                        <Settings className="w-4 h-4 mr-2" />
                         {t('header.settings', 'Settings')}
                       </a>
                     </Link>
@@ -167,7 +168,7 @@ export function Header({ user }: HeaderProps) {
                     className="cursor-pointer text-red-600 focus:text-red-600"
                     onClick={handleLogout}
                   >
-                    <i className="fas fa-sign-out-alt mr-2"></i>
+                    <LogOut className="w-4 h-4 mr-2" />
                     {t('auth.logoutButton', 'Logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -187,7 +188,7 @@ export function Header({ user }: HeaderProps) {
             onClick={toggleMenu}
             aria-label="Menu"
           >
-            <i className="fas fa-bars text-xl"></i>
+            <Menu className="w-6 h-6" />
           </button>
         </div>
         
@@ -232,7 +233,7 @@ export function Header({ user }: HeaderProps) {
                 className="text-white hover:text-accent p-2 rounded-full hover:bg-white/10 transition-all duration-300 transform hover:scale-110" 
                 aria-label="Notifications"
               >
-                <i className="fas fa-bell text-sm"></i>
+                <Bell className="w-5 h-5" />
               </button>
               <DropdownMenu>
                 <DropdownMenuTrigger className="focus:outline-none">
@@ -249,7 +250,7 @@ export function Header({ user }: HeaderProps) {
                   <Link href="/profile">
                     <DropdownMenuItem className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
                       <span className="flex items-center">
-                        <i className="fas fa-user mr-2 text-primary/80"></i>
+                        <User className="w-4 h-4 mr-2 text-primary/80" />
                         {t('header.myProfile')}
                       </span>
                     </DropdownMenuItem>
@@ -257,7 +258,7 @@ export function Header({ user }: HeaderProps) {
                   <Link href="/settings">
                     <DropdownMenuItem className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
                       <span className="flex items-center">
-                        <i className="fas fa-cog mr-2 text-primary/80"></i>
+                        <Settings className="w-4 h-4 mr-2 text-primary/80" />
                         {t('header.settings', 'Instellingen')}
                       </span>
                     </DropdownMenuItem>
@@ -266,7 +267,7 @@ export function Header({ user }: HeaderProps) {
                     <Link href="/admin">
                       <DropdownMenuItem className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
                         <span className="flex items-center">
-                          <i className="fas fa-user-shield mr-2 text-primary/80"></i>
+                          <ShieldCheck className="w-4 h-4 mr-2 text-primary/80" />
                           Admin Dashboard
                         </span>
                       </DropdownMenuItem>
@@ -278,7 +279,7 @@ export function Header({ user }: HeaderProps) {
                     onClick={handleLogout}
                   >
                     <span className="flex items-center">
-                      <i className="fas fa-sign-out-alt mr-2"></i>
+                      <LogOut className="w-4 h-4 mr-2" />
                       {t('auth.logoutButton')}
                     </span>
                   </DropdownMenuItem>
@@ -289,7 +290,7 @@ export function Header({ user }: HeaderProps) {
             <Link href="/auth">
               <a className="bg-white text-primary hover:bg-gray-100 hover:shadow-md px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 transform hover:scale-105 hover:translate-y-[-2px]">
                 <span className="flex items-center">
-                  <i className="fas fa-sign-in-alt mr-2"></i>
+                  <LogIn className="w-4 h-4 mr-2" />
                   {t('auth.login')}
                 </span>
               </a>
@@ -304,36 +305,36 @@ export function Header({ user }: HeaderProps) {
           <nav className="flex flex-col space-y-3 text-white">
             <Link href="/">
               <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                <i className="fas fa-home mr-2"></i>
+                <Home className="w-4 h-4 mr-2" />
                 {t('nav.home', 'Home')}
               </a>
             </Link>
             <Link href="/playdates">
               <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                <i className="fas fa-calendar-alt mr-2"></i>
+                <Calendar className="w-4 h-4 mr-2" />
                 {t('nav.playdates', 'Speelafspraken')}
               </a>
             </Link>
             <Link href="/places">
               <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                <i className="fas fa-map-marker-alt mr-2"></i>
+                <MapPin className="w-4 h-4 mr-2" />
                 {t('nav.places', 'Places')}
               </a>
             </Link>
             <Link href="/playground-map">
               <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                <i className="fas fa-map mr-2"></i>
+                <Map className="w-4 h-4 mr-2" />
                 {t('nav.playgroundMap', 'Speeltuin Kaart')}
               </a>
             </Link>
             <Link href="/chat">
               <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                <i className="fas fa-comments mr-2"></i>
+                <MessageCircle className="w-4 h-4 mr-2" />
                 {t('nav.chat', 'Berichten')}
               </a>
             </Link>
             <a href="#" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-              <i className="fas fa-users mr-2"></i>
+              <Users className="w-4 h-4 mr-2" />
               {t('nav.community', 'Community')}
             </a>
             
@@ -341,14 +342,14 @@ export function Header({ user }: HeaderProps) {
               <>
                 <Link href="/profile">
                   <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                    <i className="fas fa-user mr-2"></i>
+                    <User className="w-4 h-4 mr-2" />
                     {t('header.myProfile', 'Mijn profiel')}
                   </a>
                 </Link>
                 {authUser?.role === 'admin' && (
                   <Link href="/admin">
                     <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                      <i className="fas fa-user-shield mr-2"></i>
+                      <ShieldCheck className="w-4 h-4 mr-2" />
                       Admin Dashboard
                     </a>
                   </Link>
@@ -357,7 +358,7 @@ export function Header({ user }: HeaderProps) {
                   onClick={handleLogout} 
                   className="py-2 px-4 mt-2 bg-red-600/20 text-white hover:bg-red-600/30 rounded-md w-full text-left transition-all duration-200 hover:pl-6 flex items-center"
                 >
-                  <i className="fas fa-sign-out-alt mr-2"></i>
+                  <LogOut className="w-4 h-4 mr-2" />
                   {t('auth.logoutButton')}
                 </button>
               </>
