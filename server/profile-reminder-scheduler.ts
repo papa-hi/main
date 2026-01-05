@@ -9,47 +9,16 @@ interface IncompleteUser {
   missingFields: string[];
 }
 
-// Define which fields are considered essential for a complete profile
-const REQUIRED_PROFILE_FIELDS = [
-  'profileImage',
-  'bio',
-  'city',
-  'phoneNumber',
-  'childrenInfo'
-];
-
 /**
- * Identifies users with incomplete profiles
+ * Identifies users with incomplete profiles using optimized SQL query
+ * This replaces the previous approach that loaded all users into memory
  */
 async function findUsersWithIncompleteProfiles(): Promise<IncompleteUser[]> {
   try {
-    console.log('Finding users with incomplete profiles...');
+    console.log('Finding users with incomplete profiles (optimized SQL query)...');
     
-    const allUsers = await storage.getAllUsers();
-    const incompleteUsers: IncompleteUser[] = [];
-
-    for (const user of allUsers) {
-      const missingFields: string[] = [];
-
-      // Check each essential field (phone number is optional)
-      if (!user.profileImage) missingFields.push('profileImage');
-      if (!user.bio || user.bio.trim() === '') missingFields.push('bio');
-      if (!user.city || user.city.trim() === '') missingFields.push('city');
-      if (!user.childrenInfo || (Array.isArray(user.childrenInfo) && user.childrenInfo.length === 0)) {
-        missingFields.push('childrenInfo');
-      }
-
-      // If user has any missing fields, add to incomplete list
-      if (missingFields.length > 0) {
-        incompleteUsers.push({
-          id: user.id,
-          firstName: user.firstName,
-          username: user.username,
-          email: user.email,
-          missingFields
-        });
-      }
-    }
+    // Use optimized storage method that filters at database level
+    const incompleteUsers = await storage.getUsersWithIncompleteProfiles();
 
     console.log(`Found ${incompleteUsers.length} users with incomplete profiles`);
     return incompleteUsers;

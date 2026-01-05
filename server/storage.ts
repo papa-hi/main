@@ -105,6 +105,10 @@ export interface IStorage {
   createEvent(event: InsertFamilyEvent): Promise<FamilyEvent>;
   updateEvent(id: number, event: Partial<FamilyEvent>): Promise<FamilyEvent>;
   deleteEvent(id: number): Promise<boolean>;
+  
+  // Optimized methods for scheduled tasks
+  getUsersWithIncompleteProfiles(): Promise<{ id: number; firstName: string; username: string; email: string; missingFields: string[] }[]>;
+  getUsersInCity(city: string): Promise<{ id: number; email: string; firstName: string }[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -988,6 +992,15 @@ export class MemStorage implements IStorage {
     });
     
     return true;
+  }
+
+  // Stub methods for scheduled tasks (MemStorage doesn't implement these)
+  async getUsersWithIncompleteProfiles(): Promise<{ id: number; firstName: string; username: string; email: string; missingFields: string[] }[]> {
+    return [];
+  }
+
+  async getUsersInCity(_city: string): Promise<{ id: number; email: string; firstName: string }[]> {
+    return [];
   }
 }
 
@@ -2837,6 +2850,67 @@ export class DatabaseStorage implements IStorage {
       Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
+  }
+
+  // Optimized method to get users with incomplete profiles using SQL filtering
+  async getUsersWithIncompleteProfiles(): Promise<{ id: number; firstName: string; username: string; email: string; missingFields: string[] }[]> {
+    // Use SQL to filter users with incomplete profiles (missing profileImage, bio, city, or childrenInfo)
+    const result = await db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        username: users.username,
+        email: users.email,
+        profileImage: users.profileImage,
+        bio: users.bio,
+        city: users.city,
+        childrenInfo: users.childrenInfo,
+      })
+      .from(users)
+      .where(
+        or(
+          isNull(users.profileImage),
+          isNull(users.bio),
+          sql`${users.bio} = ''`,
+          isNull(users.city),
+          sql`${users.city} = ''`,
+          isNull(users.childrenInfo),
+          sql`${users.childrenInfo} = '[]'::jsonb`
+        )
+      );
+
+    // Build missing fields for each user
+    return result.map(user => {
+      const missingFields: string[] = [];
+      if (!user.profileImage) missingFields.push('profileImage');
+      if (!user.bio || user.bio.trim() === '') missingFields.push('bio');
+      if (!user.city || user.city.trim() === '') missingFields.push('city');
+      if (!user.childrenInfo || (Array.isArray(user.childrenInfo) && user.childrenInfo.length === 0)) {
+        missingFields.push('childrenInfo');
+      }
+      
+      return {
+        id: user.id,
+        firstName: user.firstName,
+        username: user.username,
+        email: user.email,
+        missingFields,
+      };
+    }).filter(user => user.missingFields.length > 0);
+  }
+
+  // Optimized method to get users in a specific city (for event notifications)
+  async getUsersInCity(city: string): Promise<{ id: number; email: string; firstName: string }[]> {
+    const result = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+      })
+      .from(users)
+      .where(sql`LOWER(${users.city}) LIKE LOWER(${'%' + city + '%'})`);
+
+    return result;
   }
 }
 
