@@ -21,7 +21,11 @@ export const users = pgTable("users", {
   childrenInfo: jsonb("children_info"),
   role: text("role").default('user').notNull(), // 'user', 'admin'
   lastLogin: timestamp("last_login"),
-});
+}, (table) => ({
+  cityIdx: index("users_city_idx").on(table.city),
+  roleIdx: index("users_role_idx").on(table.role),
+  createdAtIdx: index("users_created_at_idx").on(table.createdAt),
+}));
 
 // Community Posts schema
 export const communityPosts = pgTable("community_posts", {
@@ -530,7 +534,9 @@ export const chatMessages = pgTable("chat_messages", {
   content: varchar("content", { length: 2000 }).notNull(),
   sentAt: timestamp("sent_at").defaultNow().notNull(),
   isRead: boolean("is_read").default(false).notNull(),
-});
+}, (table) => ({
+  chatIdSentAtIdx: index("chat_messages_chat_id_sent_at_idx").on(table.chatId, table.sentAt),
+}));
 
 // Define chat and participants relations
 export const chatsRelations = relations(chats, ({ many }) => ({
@@ -650,7 +656,10 @@ export const userActivity = pgTable("user_activity", {
   details: jsonb("details"), // Additional data specific to the action
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-});
+}, (table) => ({
+  timestampIdx: index("user_activity_timestamp_idx").on(table.timestamp),
+  userIdIdx: index("user_activity_user_id_idx").on(table.userId),
+}));
 
 export const pageViews = pgTable("page_views", {
   id: serial("id").primaryKey(),
