@@ -115,11 +115,7 @@ app.use((req, res, next) => {
 
   // Use PORT from environment (for Railway/other hosts) or default to 5000 (Replit)
   const port = parseInt(process.env.PORT || "5000", 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
+  server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
     
     // Start the weekly profile reminder scheduler
