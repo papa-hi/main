@@ -256,6 +256,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup admin routes
   setupAdminRoutes(app);
 
+  // Health check endpoint for Railway and other platforms
+  app.get("/api/health", (req, res) => {
+    res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
   // Image serving endpoint - serves images from database
   app.get("/api/images/:filename", async (req, res) => {
     try {
