@@ -43,3 +43,11 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_websocket:1.0.0", "javascript_sendgrid:1.0.0"]
+
+[userenv]
+
+[userenv.development]
+SUPABASE_DATABASE_URL = "postgresql://postgres.ufrsltfszvqxausmvaac:mC8v3tdMnh*cGDR@aws-1-eu-west-1.pooler.supabase.com:6543/postgres"
+
+[userenv.production]
+SUPABASE_DATABASE_URL = "postgresql://postgres.jneasdehjlyviqrifqeq:XN2zp26-MD432WQ@aws-1-eu-west-1.pooler.supabase.com:6543/postgres"
