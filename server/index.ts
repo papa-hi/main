@@ -114,8 +114,10 @@ app.use((req, res, next) => {
   }
 
   // Use PORT from environment (for Railway/other hosts) or default to 5000 (Replit)
-  const port = parseInt(process.env.PORT || "5000", 10);
+  const port = Number(process.env.PORT) || 5000;
+  console.log(`Starting server on 0.0.0.0:${port}...`);
   server.listen(port, "0.0.0.0", () => {
+    console.log(`Server is up on port ${port}`);
     log(`serving on port ${port}`);
     
     // Start the weekly profile reminder scheduler
