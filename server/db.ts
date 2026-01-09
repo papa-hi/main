@@ -17,6 +17,7 @@ function getClient() {
   if (!_client && databaseUrl) {
     _client = postgres(databaseUrl, {
       prepare: false,
+      ssl: 'require',
     });
   }
   return _client;
@@ -40,4 +41,5 @@ export const db = new Proxy({} as ReturnType<typeof drizzle>, {
 // pg Pool for session store (connect-pg-simple requires pg.Pool)
 export const pool = databaseUrl ? new pg.Pool({
   connectionString: databaseUrl,
+  ssl: { rejectUnauthorized: false },
 }) : null as any;
