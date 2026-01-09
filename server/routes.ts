@@ -261,13 +261,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
-  // Image serving endpoint - serves images from database
+  // In-memory image cache to reduce database hits
+  const imageCache = new Map<string, { buffer: Buffer; mimeType: string; cachedAt: number }>();
+  const IMAGE_CACHE_TTL = 1000 * 60 * 60; // 1 hour
+  const IMAGE_CACHE_MAX_SIZE = 100; // Max cached images
+  
+  // Image serving endpoint - serves images from database with caching
   app.get("/api/images/:filename", async (req, res) => {
     try {
       const { filename } = req.params;
       
+      // Check in-memory cache first
+      const cached = imageCache.get(filename);
+      if (cached && Date.now() - cached.cachedAt < IMAGE_CACHE_TTL) {
+        res.set({
+          'Content-Type': cached.mimeType,
+          'Content-Length': cached.buffer.length,
+          'Cache-Control': 'public, max-age=31536000',
+          'X-Cache': 'HIT',
+        });
+        return res.send(cached.buffer);
+      }
+      
+      // Select only needed columns (not the full row)
       const [image] = await db
-        .select()
+        .select({
+          filename: imageStorage.filename,
+          mimeType: imageStorage.mimeType,
+          dataBase64: imageStorage.dataBase64,
+        })
         .from(imageStorage)
         .where(eq(imageStorage.filename, filename));
       
@@ -278,10 +300,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Convert base64 back to buffer
       const imageBuffer = Buffer.from(image.dataBase64, 'base64');
       
+      // Cache the decoded image (evict oldest if full)
+      if (imageCache.size >= IMAGE_CACHE_MAX_SIZE) {
+        const oldestKey = imageCache.keys().next().value;
+        if (oldestKey) imageCache.delete(oldestKey);
+      }
+      imageCache.set(filename, {
+        buffer: imageBuffer,
+        mimeType: image.mimeType,
+        cachedAt: Date.now(),
+      });
+      
       res.set({
         'Content-Type': image.mimeType,
         'Content-Length': imageBuffer.length,
-        'Cache-Control': 'public, max-age=31536000', // Cache for 1 year
+        'Cache-Control': 'public, max-age=31536000',
+        'X-Cache': 'MISS',
       });
       
       res.send(imageBuffer);
