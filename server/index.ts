@@ -8,6 +8,17 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Ensure uploads directories exist
+const uploadsDir = path.join(process.cwd(), 'uploads');
+const placeImagesDir = path.join(uploadsDir, 'place-images');
+const profileImagesDir = path.join(uploadsDir, 'profile-images');
+[uploadsDir, placeImagesDir, profileImagesDir].forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+    console.log(`Created directory: ${dir}`);
+  }
+});
+
 // Serve files from the uploads directory
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
