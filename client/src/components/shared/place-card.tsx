@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { StarRating } from "@/components/reviews/review-form";
 import { useDistance } from "@/hooks/use-distance";
@@ -222,6 +222,9 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
             <DialogTitle>
               {t('playdates.createPlaydateAt', 'Create Playdate at {{placeName}}', { placeName: place.name })}
             </DialogTitle>
+            <DialogDescription>
+              {t('playdates.createPlaydateDescription', 'Fill in the details below to create a new playdate')}
+            </DialogDescription>
           </DialogHeader>
           <CreatePlaydateForm 
             defaultLocation={place.name + (place.address ? `, ${place.address}` : '')}
