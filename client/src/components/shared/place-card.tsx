@@ -217,7 +217,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
       
       {/* Create Playdate Dialog */}
       <Dialog open={showCreatePlaydate} onOpenChange={setShowCreatePlaydate}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle>
               {t('playdates.createPlaydateAt', 'Create Playdate at {{placeName}}', { placeName: place.name })}
