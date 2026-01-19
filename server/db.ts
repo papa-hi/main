@@ -3,15 +3,17 @@ import postgres from 'postgres';
 import pg from 'pg';
 import * as schema from "@shared/schema";
 
-// Use Replit's DATABASE_URL in development, SUPABASE_DATABASE_URL in production
+// Prefer SUPABASE_DATABASE_URL if set, fall back to DATABASE_URL
 const isProduction = process.env.NODE_ENV === 'production';
-const databaseUrl = isProduction 
-  ? (process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL)
-  : (process.env.DATABASE_URL || process.env.SUPABASE_DATABASE_URL);
+const databaseUrl = process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL;
 
 if (!databaseUrl) {
   console.error("WARNING: Database URL not set. Configure SUPABASE_DATABASE_URL or DATABASE_URL.");
 }
+
+// Detect if SSL is required based on the database URL (Supabase requires SSL)
+const requiresSSL = databaseUrl?.includes('supabase.com') || databaseUrl?.includes('pooler.supabase.com');
+console.log(`Database: ${requiresSSL ? 'Supabase (SSL)' : 'Local'}, ENV: ${isProduction ? 'production' : 'development'}`);
 
 // Drizzle ORM client for queries - lazy initialization
 let _client: ReturnType<typeof postgres> | null = null;
@@ -21,7 +23,7 @@ function getClient() {
   if (!_client && databaseUrl) {
     _client = postgres(databaseUrl, {
       prepare: false,
-      ssl: isProduction ? 'require' : false,
+      ssl: requiresSSL ? 'require' : false,
     });
   }
   return _client;
@@ -45,5 +47,5 @@ export const db = new Proxy({} as ReturnType<typeof drizzle>, {
 // pg Pool for session store (connect-pg-simple requires pg.Pool)
 export const pool = databaseUrl ? new pg.Pool({
   connectionString: databaseUrl,
-  ssl: isProduction ? { rejectUnauthorized: false } : false,
+  ssl: requiresSSL ? { rejectUnauthorized: false } : false,
 }) : null as any;
