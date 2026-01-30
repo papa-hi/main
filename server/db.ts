@@ -45,6 +45,7 @@ export const db = new Proxy({} as ReturnType<typeof drizzle>, {
 });
 
 // pg Pool for session store (connect-pg-simple requires pg.Pool)
+// For Supabase pooler, we need proper SSL config
 export const pool = databaseUrl ? new pg.Pool({
   connectionString: databaseUrl,
   ssl: requiresSSL ? { rejectUnauthorized: false } : false,
