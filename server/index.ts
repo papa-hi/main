@@ -5,6 +5,15 @@ import path from "path";
 import fs from "fs";
 
 const app = express();
+
+// Security: Catch malformed URIs (like /%c0) to prevent crashes from bot attacks
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof URIError) {
+    return res.status(400).send('Malformed URL');
+  }
+  next(err);
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -19,8 +28,8 @@ const profileImagesDir = path.join(uploadsDir, 'profile-images');
   }
 });
 
-// Serve files from the uploads directory
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+// Serve files from the uploads directory (index: false prevents directory listing)
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads'), { index: false }));
 
 // Serve static assets (playground images, etc.)
 app.use('/assets', express.static(path.join(process.cwd(), 'public', 'assets')));
