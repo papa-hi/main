@@ -6,10 +6,16 @@ PaPa-Hi is a social platform designed for fathers in the Netherlands. Its primar
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (February 2026)
+- **Deep Link Preview Mode**: Playdate, place, and event detail pages are now publicly accessible without login, enabling effective sharing via WhatsApp/social media with compelling sign-up prompts
+- **Google Calendar Integration**: "Add to Calendar" button on playdate detail pages and dropdown menus for easy calendar syncing
+- **Mobile UI Fixes**: Fixed map z-index issue that was overlapping the bottom navigation menu on mobile devices
+- **DOM Structure Fixes**: Resolved nested HTML element warnings (button inside button, anchor inside anchor) in header component using proper `asChild` patterns
+
 ## System Architecture
 
 ### UI/UX Decisions
-The application features a modern and intuitive user interface built with Radix UI components, styled using Tailwind CSS. It supports multiple languages (5 total) and adheres to GDPR compliance.
+The application features a modern and intuitive user interface built with Radix UI components, styled using Tailwind CSS. It supports multiple languages (5 total) and adheres to GDPR compliance. Mobile-first design with large touch targets for one-handed use.
 
 ### Technical Implementations
 - **Frontend**: Developed with React 18 and TypeScript, utilizing Wouter for routing, TanStack Query for state management, Leaflet for maps, and React Hook Form with Zod for form validation. It includes PWA features like service workers, app manifests, and web push notifications.
@@ -23,12 +29,21 @@ The application features a modern and intuitive user interface built with Radix 
     - **Notifications**: Supports web push notifications (VAPID) and email notifications (via Resend API) for various events like playdates, matches, mentions, comments, and community posts.
     - **Community Features**: Includes nested comments, @username mentions with autocomplete, and post/comment editing capabilities.
     - **Data Retention**: Implements a two-tier soft delete and archival system for playdates and events to optimize database performance.
+    - **Playdate Templates**: 6 one-click templates (Coffee & Sandbox, Cargo-Bike Ride, Park Adventure, Swimming Pool, Lunch Playdate, Indoor Play) with pre-filled data for quick playdate creation.
+    - **Calendar Integration**: Google Calendar URL generation for adding playdates to personal calendars.
 
 ### System Design Choices
 The application is designed for scalability and real-time interaction, leveraging a robust backend for handling user data, authentication, and communication. Performance optimizations include database indexing, N+1 query problem resolution, and caching mechanisms for external API calls (e.g., Overpass API).
+
+### Security Hardening
+- URIError handler for malformed URL attacks
+- Disabled directory listing for /uploads
+- robots.txt with AI crawler blocking and sitemap reference
+- Explicit static file routing before SPA catch-all
 
 ## External Dependencies
 - **Email Service**: Resend API
 - **Maps & Location**: OpenStreetMap (Overpass API, Nominatim), Leaflet
 - **Authentication**: Google OAuth
 - **Push Notifications**: Web Push Protocol, VAPID
+- **Calendar**: Google Calendar URL API for event integration
