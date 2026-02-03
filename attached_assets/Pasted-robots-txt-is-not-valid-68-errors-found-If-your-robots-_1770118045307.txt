@@ -1,0 +1,208 @@
+robots.txt is not valid 68 errors found
+If your robots.txt file is malformed, crawlers may not be able to understand how you want your website to be crawled or indexed. Learn more about robots.txt.
+Line #
+Content
+Error
+29
+Content-Signal: search=yes,ai-train=no
+Unknown directive
+58
+<!DOCTYPE html>
+Syntax not understood
+59
+<html lang="nl">
+Syntax not understood
+60
+<head>
+Syntax not understood
+61
+<style data-vite-theme="" data-inject-first="">:root {
+Unknown directive
+62
+--background: 0 0% 100%;
+Unknown directive
+63
+--foreground: 20 14.3% 4.1%;
+Unknown directive
+64
+--muted: 60 4.8% 95.9%;
+Unknown directive
+65
+--muted-foreground: 25 5.3% 44.7%;
+Unknown directive
+66
+--popover: 0 0% 100%;
+Unknown directive
+67
+--popover-foreground: 20 14.3% 4.1%;
+Unknown directive
+68
+--card: 0 0% 100%;
+Unknown directive
+69
+--card-foreground: 20 14.3% 4.1%;
+Unknown directive
+70
+--border: 20 5.9% 90%;
+Unknown directive
+71
+--input: 20 5.9% 90%;
+Unknown directive
+72
+--primary: 0 49% 68%;
+Unknown directive
+73
+--primary-foreground: 2 61% 99%;
+Unknown directive
+74
+--secondary: 60 4.8% 95.9%;
+Unknown directive
+75
+--secondary-foreground: 24 9.8% 10%;
+Unknown directive
+76
+--accent: 60 4.8% 95.9%;
+Unknown directive
+77
+--accent-foreground: 24 9.8% 10%;
+Unknown directive
+78
+--destructive: 0 84.2% 60.2%;
+Unknown directive
+79
+--destructive-foreground: 60 9.1% 97.8%;
+Unknown directive
+80
+--ring: 20 14.3% 4.1%;
+Unknown directive
+81
+--radius: 0.75rem;
+Unknown directive
+82
+}
+Syntax not understood
+83
+.dark {
+Syntax not understood
+84
+--background: 240 10% 3.9%;
+Unknown directive
+85
+--foreground: 0 0% 98%;
+Unknown directive
+86
+--muted: 240 3.7% 15.9%;
+Unknown directive
+87
+--muted-foreground: 240 5% 64.9%;
+Unknown directive
+88
+--popover: 240 10% 3.9%;
+Unknown directive
+89
+--popover-foreground: 0 0% 98%;
+Unknown directive
+90
+--card: 240 10% 3.9%;
+Unknown directive
+91
+--card-foreground: 0 0% 98%;
+Unknown directive
+92
+--border: 240 3.7% 15.9%;
+Unknown directive
+93
+--input: 240 3.7% 15.9%;
+Unknown directive
+94
+--primary: 0 49% 68%;
+Unknown directive
+95
+--primary-foreground: 2 61% 99%;
+Unknown directive
+96
+--secondary: 240 3.7% 15.9%;
+Unknown directive
+97
+--secondary-foreground: 0 0% 98%;
+Unknown directive
+98
+--accent: 240 3.7% 15.9%;
+Unknown directive
+99
+--accent-foreground: 0 0% 98%;
+Unknown directive
+100
+--destructive: 0 62.8% 30.6%;
+Unknown directive
+101
+--destructive-foreground: 0 0% 98%;
+Unknown directive
+102
+--ring: 240 4.9% 83.9%;
+Unknown directive
+103
+--radius: 0.75rem;
+Unknown directive
+104
+}</style>
+Syntax not understood
+106
+<meta charset="UTF-8" />
+Syntax not understood
+107
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+Syntax not understood
+108
+<meta name="theme-color" content="#04a3b3" />
+Syntax not understood
+109
+<title>PaPa-Hi | Social App voor Vaders</title>
+Syntax not understood
+110
+<meta name="description" content="PaPa-Hi is de sociale app voor vaders in Nederland om speelafspraken te maken en kindvriendelijke locaties te vinden." />
+Syntax not understood
+111
+<link rel="manifest" href="/manifest.json" />
+Syntax not understood
+112
+<link rel="icon" href="/favicon.ico" />
+Syntax not understood
+113
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+Syntax not understood
+114
+<link rel="preconnect" href="https://fonts.googleapis.com">
+Unknown directive
+115
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+Unknown directive
+116
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Outfit:wght@400;500;700&family=Varela+Round&display=swap" rel="stylesheet">
+Unknown directive
+117
+<script type="module" crossorigin src="/assets/index-ft3d2irT.js"></script>
+Syntax not understood
+118
+<link rel="stylesheet" crossorigin href="/assets/index-CvYOsi1E.css">
+Syntax not understood
+119
+</head>
+Syntax not understood
+120
+<body>
+Syntax not understood
+121
+<div id="root"></div>
+Syntax not understood
+122
+<!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+Syntax not understood
+123
+<script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+Unknown directive
+124
+</body>
+Syntax not understood
+125
+</html>

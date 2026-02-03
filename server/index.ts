@@ -31,6 +31,18 @@ const profileImagesDir = path.join(uploadsDir, 'profile-images');
 // Serve files from the uploads directory (index: false prevents directory listing)
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads'), { index: false }));
 
+// Serve robots.txt explicitly (before SPA catch-all)
+app.get('/robots.txt', (_req, res) => {
+  res.type('text/plain');
+  res.sendFile(path.join(process.cwd(), 'public', 'robots.txt'));
+});
+
+// Serve sitemap.xml explicitly
+app.get('/sitemap.xml', (_req, res) => {
+  res.type('application/xml');
+  res.sendFile(path.join(process.cwd(), 'public', 'sitemap.xml'));
+});
+
 // Serve static assets (playground images, etc.)
 app.use('/assets', express.static(path.join(process.cwd(), 'public', 'assets')));
 
