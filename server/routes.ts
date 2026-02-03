@@ -261,6 +261,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
+  // Dynamic sitemap.xml generation for SEO
+  app.get("/sitemap.xml", async (req, res) => {
+    try {
+      const baseUrl = "https://papa-hi.com";
+      const now = new Date().toISOString().split('T')[0];
+      
+      // Static pages
+      const staticPages = [
+        { url: "/", priority: "1.0", changefreq: "daily" },
+        { url: "/playdates", priority: "0.9", changefreq: "daily" },
+        { url: "/places", priority: "0.8", changefreq: "weekly" },
+        { url: "/events", priority: "0.8", changefreq: "daily" },
+        { url: "/community", priority: "0.7", changefreq: "daily" },
+        { url: "/login", priority: "0.5", changefreq: "monthly" },
+        { url: "/register", priority: "0.5", changefreq: "monthly" },
+      ];
+
+      // Fetch dynamic content from database
+      const upcomingPlaydates = await db
+        .select({ id: playdates.id, createdAt: playdates.createdAt })
+        .from(playdates)
+        .where(and(
+          gte(playdates.startTime, new Date()),
+          isNull(playdates.archivedAt)
+        ))
+        .limit(500);
+
+      const allEvents = await db
+        .select({ id: familyEvents.id, createdAt: familyEvents.createdAt })
+        .from(familyEvents)
+        .where(gte(familyEvents.startDate, new Date()))
+        .limit(500);
+
+      const allPlaces = await db
+        .select({ id: places.id })
+        .from(places)
+        .limit(500);
+
+      // Build XML
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+`;
+
+      // Add static pages
+      for (const page of staticPages) {
+        xml += `  <url>
+    <loc>${baseUrl}${page.url}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>
+`;
+      }
+
+      // Add playdates (publicly accessible via deep link preview)
+      for (const playdate of upcomingPlaydates) {
+        const lastmod = playdate.createdAt ? new Date(playdate.createdAt).toISOString().split('T')[0] : now;
+        xml += `  <url>
+    <loc>${baseUrl}/playdates/${playdate.id}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+`;
+      }
+
+      // Add events
+      for (const event of allEvents) {
+        const lastmod = event.createdAt ? new Date(event.createdAt).toISOString().split('T')[0] : now;
+        xml += `  <url>
+    <loc>${baseUrl}/events/${event.id}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+`;
+      }
+
+      // Add places
+      for (const place of allPlaces) {
+        xml += `  <url>
+    <loc>${baseUrl}/places/${place.id}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+`;
+      }
+
+      xml += `</urlset>`;
+
+      res.set('Content-Type', 'application/xml');
+      res.set('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+      res.send(xml);
+    } catch (error) {
+      console.error("Error generating sitemap:", error);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
+
   // In-memory image cache to reduce database hits
   const imageCache = new Map<string, { buffer: Buffer; mimeType: string; cachedAt: number }>();
   const IMAGE_CACHE_TTL = 1000 * 60 * 60; // 1 hour

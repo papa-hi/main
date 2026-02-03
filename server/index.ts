@@ -37,11 +37,7 @@ app.get('/robots.txt', (_req, res) => {
   res.sendFile(path.join(process.cwd(), 'public', 'robots.txt'));
 });
 
-// Serve sitemap.xml explicitly
-app.get('/sitemap.xml', (_req, res) => {
-  res.type('application/xml');
-  res.sendFile(path.join(process.cwd(), 'public', 'sitemap.xml'));
-});
+// Note: sitemap.xml is handled dynamically in routes.ts to include current playdates/events
 
 // Serve static assets (playground images, etc.)
 app.use('/assets', express.static(path.join(process.cwd(), 'public', 'assets')));
