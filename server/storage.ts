@@ -1733,12 +1733,13 @@ export class DatabaseStorage implements IStorage {
         .delete(playdateParticipants)
         .where(eq(playdateParticipants.playdateId, id));
       
-      // Then delete the playdate
+      // Then delete the playdate and return the deleted row to confirm success
       const result = await tx
         .delete(playdates)
-        .where(eq(playdates.id, id));
+        .where(eq(playdates.id, id))
+        .returning({ id: playdates.id });
       
-      return result.rowCount > 0;
+      return result.length > 0;
     });
   }
 
