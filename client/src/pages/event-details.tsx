@@ -405,6 +405,7 @@ export default function EventDetailsPage() {
               </button>
             </div>
             <CreatePlaydateForm 
+              defaultTitle={event.title}
               defaultLocation={event.location}
               defaultLatitude={lat !== null && !isNaN(lat) ? lat : undefined}
               defaultLongitude={lon !== null && !isNaN(lon) ? lon : undefined}

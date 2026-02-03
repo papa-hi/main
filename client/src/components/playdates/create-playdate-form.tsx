@@ -145,13 +145,15 @@ type CreatePlaydateFormData = z.infer<typeof createPlaydateFormSchema>;
 
 interface CreatePlaydateFormProps {
   onSuccess?: () => void;
+  defaultTitle?: string;
   defaultLocation?: string;
   defaultLatitude?: number;
   defaultLongitude?: number;
 }
 
 export function CreatePlaydateForm({ 
-  onSuccess, 
+  onSuccess,
+  defaultTitle,
   defaultLocation,
   defaultLatitude,
   defaultLongitude 
@@ -183,14 +185,20 @@ export function CreatePlaydateForm({
   // Update form values when default props change
   useEffect(() => {
     console.log('CreatePlaydateForm useEffect triggered:', {
+      defaultTitle,
       defaultLocation,
       defaultLatitude,
       defaultLongitude
     });
 
-    if (defaultLocation || defaultLatitude || defaultLongitude) {
+    if (defaultTitle || defaultLocation || defaultLatitude || defaultLongitude) {
+      // Use defaultTitle if provided, otherwise derive from location
+      const title = defaultTitle 
+        ? `Playdate: ${defaultTitle}` 
+        : (defaultLocation ? `Playdate at ${defaultLocation.split(',')[0]}` : "");
+      
       const newValues = {
-        title: defaultLocation ? `Playdate at ${defaultLocation.split(',')[0]}` : "",
+        title,
         location: defaultLocation || "",
         latitude: defaultLatitude?.toString() || "",
         longitude: defaultLongitude?.toString() || "",
@@ -202,7 +210,8 @@ export function CreatePlaydateForm({
       const currentValues = form.getValues();
       if (currentValues.location !== newValues.location || 
           currentValues.latitude !== newValues.latitude ||
-          currentValues.longitude !== newValues.longitude) {
+          currentValues.longitude !== newValues.longitude ||
+          currentValues.title !== newValues.title) {
         console.log('Form values are different, resetting form');
         form.reset({
           ...currentValues,
@@ -212,7 +221,7 @@ export function CreatePlaydateForm({
         console.log('Form values are the same, not updating');
       }
     }
-  }, [defaultLocation, defaultLatitude, defaultLongitude, form]);
+  }, [defaultTitle, defaultLocation, defaultLatitude, defaultLongitude, form]);
 
   const createPlaydateMutation = useMutation({
     mutationFn: async (data: CreatePlaydateFormData) => {
