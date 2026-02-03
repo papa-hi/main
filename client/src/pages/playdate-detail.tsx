@@ -272,13 +272,15 @@ export default function PlaydateDetailPage() {
                 <i className="fas fa-calendar-alt mt-1 mr-3 text-primary"></i>
                 <div>
                   <p className="text-sm text-muted-foreground">{t('playdates.createdFromEvent', 'Created from event')}</p>
-                  <a 
-                    href={`/events/${playdate.sourceEventId}`}
-                    className="text-primary font-medium hover:underline inline-flex items-center gap-1"
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="mt-1"
+                    onClick={() => navigate(`/events/${playdate.sourceEventId}`)}
                   >
+                    <i className="fas fa-calendar-check mr-2"></i>
                     {t('playdates.viewOriginalEvent', 'View Original Event')}
-                    <i className="fas fa-external-link-alt text-xs"></i>
-                  </a>
+                  </Button>
                 </div>
               </div>
             )}
