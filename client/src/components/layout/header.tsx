@@ -61,8 +61,8 @@ export function Header({ user }: HeaderProps) {
           {/* Mobile Language Selector */}
           <div className="md:hidden">
             <DropdownMenu>
-              <DropdownMenuTrigger className="focus:outline-none">
-                <button className="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-md flex items-center text-sm">
+              <DropdownMenuTrigger asChild>
+                <button className="bg-white/10 hover:bg-white/20 text-white p-1.5 rounded-md flex items-center text-sm focus:outline-none">
                   <span className="text-lg mr-1">
                     {i18n.language === 'nl' && '🇳🇱'}
                     {i18n.language === 'en' && '🇬🇧'}
@@ -125,11 +125,9 @@ export function Header({ user }: HeaderProps) {
           
           {/* Mobile Create Button (since we removed it from footer) */}
           {isAuthenticated && (
-            <Link href="/create">
-              <a className="bg-accent/90 hover:bg-accent text-white px-2 py-1 rounded-md flex items-center text-sm md:hidden">
-                <Plus className="w-4 h-4 mr-1" />
-                <span>{t('navigation.new', 'New')}</span>
-              </a>
+            <Link href="/create" className="bg-accent/90 hover:bg-accent text-white px-2 py-1 rounded-md flex items-center text-sm md:hidden">
+              <Plus className="w-4 h-4 mr-1" />
+              <span>{t('navigation.new', 'New')}</span>
             </Link>
           )}
           
@@ -148,19 +146,15 @@ export function Header({ user }: HeaderProps) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem asChild>
-                    <Link href="/profile">
-                      <a className="flex items-center w-full cursor-pointer">
-                        <User className="w-4 h-4 mr-2" />
-                        {t('header.myProfile', 'My Profile')}
-                      </a>
+                    <Link href="/profile" className="flex items-center w-full cursor-pointer">
+                      <User className="w-4 h-4 mr-2" />
+                      {t('header.myProfile', 'My Profile')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/settings">
-                      <a className="flex items-center w-full cursor-pointer">
-                        <Settings className="w-4 h-4 mr-2" />
-                        {t('header.settings', 'Settings')}
-                      </a>
+                    <Link href="/settings" className="flex items-center w-full cursor-pointer">
+                      <Settings className="w-4 h-4 mr-2" />
+                      {t('header.settings', 'Settings')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -174,10 +168,8 @@ export function Header({ user }: HeaderProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link href="/auth">
-                <a className="bg-white/10 text-white hover:bg-white/20 px-2 py-1 rounded text-sm">
-                  {t('auth.login', 'Login')}
-                </a>
+              <Link href="/auth" className="bg-white/10 text-white hover:bg-white/20 px-2 py-1 rounded text-sm">
+                {t('auth.login', 'Login')}
               </Link>
             )}
           </div>
@@ -194,31 +186,20 @@ export function Header({ user }: HeaderProps) {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6 text-sm">
-          <Link href="/">
-            <a className={`font-medium hover:text-accent transition ${location === '/' ? 'text-accent' : ''}`}>
-              {t('nav.home', 'Home')}
-            </a>
+          <Link href="/" className={`font-medium hover:text-accent transition ${location === '/' ? 'text-accent' : ''}`}>
+            {t('nav.home', 'Home')}
           </Link>
-          <Link href="/playdates">
-            <a className={`font-medium hover:text-accent transition ${location === '/playdates' ? 'text-accent' : ''}`}>
-              {t('nav.playdates', 'Speelafspraken')}
-            </a>
+          <Link href="/playdates" className={`font-medium hover:text-accent transition ${location === '/playdates' ? 'text-accent' : ''}`}>
+            {t('nav.playdates', 'Speelafspraken')}
           </Link>
-          <Link href="/places">
-            <a className={`font-medium hover:text-accent transition ${location.includes('/places') ? 'text-accent' : ''}`}>
-              {t('nav.places', 'Places')}
-            </a>
+          <Link href="/places" className={`font-medium hover:text-accent transition ${location.includes('/places') ? 'text-accent' : ''}`}>
+            {t('nav.places', 'Places')}
           </Link>
-
-          <Link href="/chat">
-            <a className={`font-medium hover:text-accent transition ${location === '/chat' ? 'text-accent' : ''}`}>
-              {t('nav.chat', 'Berichten')}
-            </a>
+          <Link href="/chat" className={`font-medium hover:text-accent transition ${location === '/chat' ? 'text-accent' : ''}`}>
+            {t('nav.chat', 'Berichten')}
           </Link>
-          <Link href="/community">
-            <a className={`font-medium hover:text-accent transition ${location === '/community' ? 'text-accent' : ''}`}>
-              {t('nav.community', 'Community')}
-            </a>
+          <Link href="/community" className={`font-medium hover:text-accent transition ${location === '/community' ? 'text-accent' : ''}`}>
+            {t('nav.community', 'Community')}
           </Link>
         </nav>
         
@@ -236,42 +217,36 @@ export function Header({ user }: HeaderProps) {
                 <Bell className="w-5 h-5" />
               </button>
               <DropdownMenu>
-                <DropdownMenuTrigger className="focus:outline-none">
-                  <div className="flex items-center space-x-1">
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center space-x-1 focus:outline-none">
                     <img 
                       src={user.profileImage} 
                       alt="Profile picture" 
                       className="w-8 h-8 rounded-full object-cover border-2 border-transparent hover:border-primary/30 transition-all duration-300 transform hover:scale-110"
                     />
                     <span className="text-sm font-medium">{user.firstName}</span>
-                  </div>
+                  </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
-                  <Link href="/profile">
-                    <DropdownMenuItem className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
-                      <span className="flex items-center">
-                        <User className="w-4 h-4 mr-2 text-primary/80" />
-                        {t('header.myProfile')}
-                      </span>
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link href="/settings">
-                    <DropdownMenuItem className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
-                      <span className="flex items-center">
-                        <Settings className="w-4 h-4 mr-2 text-primary/80" />
-                        {t('header.settings', 'Instellingen')}
-                      </span>
-                    </DropdownMenuItem>
-                  </Link>
-                  {authUser?.role === 'admin' && (
-                    <Link href="/admin">
-                      <DropdownMenuItem className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
-                        <span className="flex items-center">
-                          <ShieldCheck className="w-4 h-4 mr-2 text-primary/80" />
-                          Admin Dashboard
-                        </span>
-                      </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
+                    <Link href="/profile" className="flex items-center">
+                      <User className="w-4 h-4 mr-2 text-primary/80" />
+                      {t('header.myProfile')}
                     </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
+                    <Link href="/settings" className="flex items-center">
+                      <Settings className="w-4 h-4 mr-2 text-primary/80" />
+                      {t('header.settings', 'Instellingen')}
+                    </Link>
+                  </DropdownMenuItem>
+                  {authUser?.role === 'admin' && (
+                    <DropdownMenuItem asChild className="cursor-pointer transition-all duration-200 hover:bg-primary/10 hover:pl-3">
+                      <Link href="/admin" className="flex items-center">
+                        <ShieldCheck className="w-4 h-4 mr-2 text-primary/80" />
+                        Admin Dashboard
+                      </Link>
+                    </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
@@ -287,10 +262,8 @@ export function Header({ user }: HeaderProps) {
               </DropdownMenu>
             </>
           ) : (
-            <Link href="/auth">
-              <a className="bg-white text-primary hover:bg-gray-100 hover:shadow-md px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 transform hover:scale-105 hover:translate-y-[-2px]">
-                {t('auth.login')}
-              </a>
+            <Link href="/auth" className="bg-white text-primary hover:bg-gray-100 hover:shadow-md px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 transform hover:scale-105 hover:translate-y-[-2px]">
+              {t('auth.login')}
             </Link>
           )}
         </div>
@@ -300,55 +273,41 @@ export function Header({ user }: HeaderProps) {
       {menuOpen && (
         <div className="md:hidden bg-primary/95 absolute top-full left-0 right-0 p-4 shadow-lg z-50">
           <nav className="flex flex-col space-y-3 text-white">
-            <Link href="/">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                <Home className="w-4 h-4 mr-2" />
-                {t('nav.home', 'Home')}
-              </a>
+            <Link href="/" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+              <Home className="w-4 h-4 mr-2" />
+              {t('nav.home', 'Home')}
             </Link>
-            <Link href="/playdates">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                <Calendar className="w-4 h-4 mr-2" />
-                {t('nav.playdates', 'Speelafspraken')}
-              </a>
+            <Link href="/playdates" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+              <Calendar className="w-4 h-4 mr-2" />
+              {t('nav.playdates', 'Speelafspraken')}
             </Link>
-            <Link href="/places">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                <MapPin className="w-4 h-4 mr-2" />
-                {t('nav.places', 'Places')}
-              </a>
+            <Link href="/places" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+              <MapPin className="w-4 h-4 mr-2" />
+              {t('nav.places', 'Places')}
             </Link>
-            <Link href="/playground-map">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                <Map className="w-4 h-4 mr-2" />
-                {t('nav.playgroundMap', 'Speeltuin Kaart')}
-              </a>
+            <Link href="/playground-map" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+              <Map className="w-4 h-4 mr-2" />
+              {t('nav.playgroundMap', 'Speeltuin Kaart')}
             </Link>
-            <Link href="/chat">
-              <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                <MessageCircle className="w-4 h-4 mr-2" />
-                {t('nav.chat', 'Berichten')}
-              </a>
+            <Link href="/chat" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+              <MessageCircle className="w-4 h-4 mr-2" />
+              {t('nav.chat', 'Berichten')}
             </Link>
-            <a href="#" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+            <Link href="/community" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
               <Users className="w-4 h-4 mr-2" />
               {t('nav.community', 'Community')}
-            </a>
+            </Link>
             
             {isAuthenticated ? (
               <>
-                <Link href="/profile">
-                  <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                    <User className="w-4 h-4 mr-2" />
-                    {t('header.myProfile', 'Mijn profiel')}
-                  </a>
+                <Link href="/profile" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+                  <User className="w-4 h-4 mr-2" />
+                  {t('header.myProfile', 'Mijn profiel')}
                 </Link>
                 {authUser?.role === 'admin' && (
-                  <Link href="/admin">
-                    <a className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
-                      <ShieldCheck className="w-4 h-4 mr-2" />
-                      Admin Dashboard
-                    </a>
+                  <Link href="/admin" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+                    <ShieldCheck className="w-4 h-4 mr-2" />
+                    Admin Dashboard
                   </Link>
                 )}
                 <button 
@@ -360,10 +319,8 @@ export function Header({ user }: HeaderProps) {
                 </button>
               </>
             ) : (
-              <Link href="/auth">
-                <a className="py-2 px-4 bg-white/10 hover:bg-white/20 rounded-md text-white font-medium">
-                  {t('auth.login')}
-                </a>
+              <Link href="/auth" className="py-2 px-4 bg-white/10 hover:bg-white/20 rounded-md text-white font-medium">
+                {t('auth.login')}
               </Link>
             )}
             

@@ -1,0 +1,67 @@
+chunk-E22KYI7D.js?v=ddca208e:521 Warning: validateDOMNesting(...): <button> cannot appear as a descendant of <button>.
+    at button
+    at button
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-ILLUNSJE.js?v=ddca208e:41:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-DAM6MLS6.js?v=ddca208e:52:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-DAM6MLS6.js?v=ddca208e:33:11
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-ILLUNSJE.js?v=ddca208e:41:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…ner/workspace/node_modules/.vite/deps/chunk-2GK2KKHC.js?v=ddca208e:1980:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=ddca208e:144:13
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=ddca208e:928:13
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-UWQVR4AU.js?v=ddca208e:37:15)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-UWQVR4AU.js?v=ddca208e:37:15)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…ner/workspace/node_modules/.vite/deps/chunk-2GK2KKHC.js?v=ddca208e:1915:15)
+    at Popper (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…ner/workspace/node_modules/.vite/deps/chunk-2GK2KKHC.js?v=ddca208e:1972:11)
+    at Menu (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=ddca208e:98:11)
+    at Provider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…unner/workspace/node_modules/.vite/deps/chunk-UWQVR4AU.js?v=ddca208e:37:15)
+    at DropdownMenu (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=ddca208e:894:5)
+    at div
+    at div
+    at div
+    at header
+    at Header (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/header.tsx:54:26)
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:22:32)
+    at AdminProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-admin.tsx:27:33)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at FirebaseAuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-firebase-auth.tsx:23:40)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=ddca208e:2747:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx:224:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx:25:3)
+printWarning	@	chunk-E22KYI7D.js?v=ddca208e:521
+error	@	chunk-E22KYI7D.js?v=ddca208e:505
+validateDOMNesting	@	chunk-E22KYI7D.js?v=ddca208e:8303
+createInstance	@	chunk-E22KYI7D.js?v=ddca208e:8375
+completeWork	@	chunk-E22KYI7D.js?v=ddca208e:16338
+completeUnitOfWork	@	chunk-E22KYI7D.js?v=ddca208e:19277
+performUnitOfWork	@	chunk-E22KYI7D.js?v=ddca208e:19259
+workLoopSync	@	chunk-E22KYI7D.js?v=ddca208e:19190
+renderRootSync	@	chunk-E22KYI7D.js?v=ddca208e:19169
+performConcurrentWorkOnRoot	@	chunk-E22KYI7D.js?v=ddca208e:18728
+workLoop	@	chunk-E22KYI7D.js?v=ddca208e:197
+flushWork	@	chunk-E22KYI7D.js?v=ddca208e:176
+performWorkUntilDeadline	@	chunk-E22KYI7D.js?v=ddca208e:384
+
+chunk-E22KYI7D.js?v=ddca208e:521 Warning: validateDOMNesting(...): <a> cannot appear as a descendant of <a>.
+    at a
+    at a
+    at https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=ddca208e:336:18
+    at div
+    at div
+    at div
+    at header
+    at Header (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/header.tsx:54:26)
+    at div
+    at AppShell (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/layout/app-shell.tsx:23:36)
+    at ChatProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-chat.tsx:22:32)
+    at AdminProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-admin.tsx:27:33)
+    at AuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-auth.tsx:27:32)
+    at FirebaseAuthProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/hooks/use-firebase-auth.tsx:23:40)
+    at QueryClientProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.de…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=ddca208e:2747:3)
+    at ErrorBoundaryClass (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:25:5)
+    at ErrorBoundary (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/shared/error-boundary.tsx:97:17)
+    at App (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/App.tsx:224:55)
+    at ThemeProvider (https://04661828-2b6e-42fa-a890-5e763456e3c1-00-u1e2637z1n45.kirk.replit.dev/src/components/ui/theme-provider.tsx:25:3)
