@@ -12,6 +12,20 @@ import { nl, enUS, de, es, fr } from "date-fns/locale";
 import type { Locale } from "date-fns";
 import { apiRequest } from "@/lib/queryClient";
 import { PlaydateLocationMap } from "@/components/maps/playdate-location-map";
+import { CalendarPlus } from "lucide-react";
+
+function generateGoogleCalendarUrl(title: string, description: string, location: string, startTime: string | Date, endTime: string | Date): string {
+  const start = new Date(startTime).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const end = new Date(endTime).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: title,
+    details: description,
+    location: location,
+    dates: `${start}/${end}`,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
 
 export default function PlaydateDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -271,6 +285,24 @@ export default function PlaydateDetailPage() {
                 </p>
               </div>
             </div>
+          </div>
+          
+          <div className="mt-6 pt-4 border-t">
+            <a 
+              href={generateGoogleCalendarUrl(
+                playdate.title,
+                playdate.description || "",
+                playdate.location,
+                playdate.startTime,
+                playdate.endTime
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg font-medium transition-colors"
+            >
+              <CalendarPlus className="h-5 w-5" />
+              {t('playdates.addToCalendar', 'Add to Calendar')}
+            </a>
           </div>
         </div>
         

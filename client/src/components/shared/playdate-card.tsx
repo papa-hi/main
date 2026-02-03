@@ -13,8 +13,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Repeat } from "lucide-react";
+import { Repeat, CalendarPlus } from "lucide-react";
 import { useLocation } from "wouter";
+
+function generateGoogleCalendarUrl(title: string, description: string, location: string, startTime: string | Date, endTime: string | Date): string {
+  const start = new Date(startTime).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const end = new Date(endTime).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: title,
+    details: description,
+    location: location,
+    dates: `${start}/${end}`,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
 
 interface PlaydateCardProps {
   playdate: Playdate;
@@ -256,6 +269,23 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
                 <i className="fas fa-edit mr-2"></i> {t('common.edit', 'Edit')}
               </DropdownMenuItem>
             )}
+            <DropdownMenuItem asChild>
+              <a 
+                href={generateGoogleCalendarUrl(
+                  playdate.title,
+                  playdate.description || "",
+                  playdate.location,
+                  playdate.startTime,
+                  playdate.endTime
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center"
+              >
+                <CalendarPlus className="h-4 w-4 mr-2" />
+                {t('playdates.addToCalendar', 'Add to Calendar')}
+              </a>
+            </DropdownMenuItem>
             <DropdownMenuItem>
               <i className="fas fa-share mr-2"></i> {t('playdates.share', 'Share')}
             </DropdownMenuItem>
