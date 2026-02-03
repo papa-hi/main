@@ -13,19 +13,20 @@ function QuickActionButton({
   href
 }: QuickActionButtonProps) {
   return (
-    <Link href={href}>
-      <a className="flex flex-col items-center bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition transform hover:scale-105">
-        <div className={`w-24 h-24 rounded-full mb-3 shadow-md overflow-hidden relative`}>
-          {customIcon && (
-            <img 
-              src={customIcon} 
-              alt={label}
-              className="w-full h-full object-cover absolute inset-0" 
-            />
-          )}
-        </div>
-        <span className="text-center text-sm font-medium">{label}</span>
-      </a>
+    <Link 
+      href={href}
+      className="flex flex-col items-center bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition transform hover:scale-105"
+    >
+      <div className={`w-24 h-24 rounded-full mb-3 shadow-md overflow-hidden relative`}>
+        {customIcon && (
+          <img 
+            src={customIcon} 
+            alt={label}
+            className="w-full h-full object-cover absolute inset-0" 
+          />
+        )}
+      </div>
+      <span className="text-center text-sm font-medium">{label}</span>
     </Link>
   );
 }
