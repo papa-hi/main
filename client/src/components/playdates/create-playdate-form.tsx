@@ -149,6 +149,7 @@ interface CreatePlaydateFormProps {
   defaultLocation?: string;
   defaultLatitude?: number;
   defaultLongitude?: number;
+  sourceEventId?: number;
 }
 
 export function CreatePlaydateForm({ 
@@ -156,7 +157,8 @@ export function CreatePlaydateForm({
   defaultTitle,
   defaultLocation,
   defaultLatitude,
-  defaultLongitude 
+  defaultLongitude,
+  sourceEventId
 }: CreatePlaydateFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -232,6 +234,7 @@ export function CreatePlaydateForm({
         longitude: data.longitude || "0",
         startTime: new Date(data.startTime).toISOString(),
         endTime: new Date(data.endTime).toISOString(),
+        sourceEventId: sourceEventId || null,
       });
       return { playdate: await response.json(), formData: data };
     },

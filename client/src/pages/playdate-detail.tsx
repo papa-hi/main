@@ -267,6 +267,22 @@ export default function PlaydateDetailPage() {
               </div>
             )}
             
+            {playdate.sourceEventId && (
+              <div className="flex items-start">
+                <i className="fas fa-calendar-alt mt-1 mr-3 text-primary"></i>
+                <div>
+                  <p className="text-sm text-muted-foreground">{t('playdates.createdFromEvent', 'Created from event')}</p>
+                  <a 
+                    href={`/events/${playdate.sourceEventId}`}
+                    className="text-primary font-medium hover:underline inline-flex items-center gap-1"
+                  >
+                    {t('playdates.viewOriginalEvent', 'View Original Event')}
+                    <i className="fas fa-external-link-alt text-xs"></i>
+                  </a>
+                </div>
+              </div>
+            )}
+            
             <div className="flex items-start">
               <i className="fas fa-users mt-1 mr-3 text-primary"></i>
               <div>

@@ -409,6 +409,7 @@ export default function EventDetailsPage() {
               defaultLocation={event.location}
               defaultLatitude={lat !== null && !isNaN(lat) ? lat : undefined}
               defaultLongitude={lon !== null && !isNaN(lon) ? lon : undefined}
+              sourceEventId={event.id}
               onSuccess={() => setShowCreatePlaydate(false)}
             />
           </div>

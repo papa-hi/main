@@ -218,12 +218,14 @@ export const playdates = pgTable("playdates", {
   recurringEndDate: timestamp("recurring_end_date"),
   recurringType: text("recurring_type").default("none"), // "none", "daily", "weekly", "monthly"
   parentPlaydateId: integer("parent_playdate_id"), // For recurring instances, points to the original
+  sourceEventId: integer("source_event_id"), // Links to the event this playdate was created from
   createdAt: timestamp("created_at").defaultNow().notNull(),
   archivedAt: timestamp("archived_at"), // Soft delete: archived after 90 days, hard deleted after 12 months
 }, (table) => ({
   startTimeIdx: index("playdates_start_time_idx").on(table.startTime),
   creatorIdIdx: index("playdates_creator_id_idx").on(table.creatorId),
   archivedAtIdx: index("playdates_archived_at_idx").on(table.archivedAt),
+  sourceEventIdIdx: index("playdates_source_event_id_idx").on(table.sourceEventId),
 }));
 
 // Define playdate relations
@@ -250,6 +252,7 @@ export const insertPlaydateSchema = createInsertSchema(playdates).pick({
   recurringType: true,
   recurringEndDate: true,
   parentPlaydateId: true,
+  sourceEventId: true,
 });
 
 // Playdate participants schema
