@@ -92,3 +92,21 @@
 [role="dialog"][aria-modal="true"] {
   z-index: 9999 !important;
 }
+
+/* Constrain Leaflet map z-index to prevent it from overlapping navigation */
+.leaflet-container {
+  z-index: 1 !important;
+}
+
+.leaflet-pane {
+  z-index: 1 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 10 !important;
+}
+
+.leaflet-control {
+  z-index: 10 !important;
+}

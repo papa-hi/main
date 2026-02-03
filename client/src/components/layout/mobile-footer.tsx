@@ -14,7 +14,7 @@ export function MobileFooter() {
     }`;
 
   return (
-    <footer className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-40 safe-area-inset-bottom">
+    <footer className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-[1000] safe-area-inset-bottom">
       <nav className="flex items-stretch w-full px-0.5 py-1.5 overflow-hidden">
         <Link href="/" className={navItemClass(location === '/')}>
           <Home className={`w-5 h-5 ${location === '/' ? 'text-primary' : ''}`} />
