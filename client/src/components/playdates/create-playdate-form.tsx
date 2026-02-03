@@ -162,7 +162,8 @@ export function CreatePlaydateForm({
   const queryClient = useQueryClient();
   const [isRecurring, setIsRecurring] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-  const [showCustomForm, setShowCustomForm] = useState(false);
+  // Auto-show custom form when creating from an event (defaultTitle provided)
+  const [showCustomForm, setShowCustomForm] = useState(!!defaultTitle);
   
   const form = useForm<CreatePlaydateFormData>({
     resolver: zodResolver(createPlaydateFormSchema),
@@ -313,8 +314,12 @@ export function CreatePlaydateForm({
   const startCustomPlaydate = () => {
     setSelectedTemplate(null);
     setShowCustomForm(true);
+    // Use defaultTitle if provided (from event), otherwise derive from location
+    const title = defaultTitle 
+      ? `Playdate: ${defaultTitle}` 
+      : (defaultLocation ? `Playdate at ${defaultLocation.split(',')[0]}` : "");
     form.reset({
-      title: defaultLocation ? `Playdate at ${defaultLocation.split(',')[0]}` : "",
+      title,
       description: "",
       location: defaultLocation || "",
       latitude: defaultLatitude?.toString() || "",
