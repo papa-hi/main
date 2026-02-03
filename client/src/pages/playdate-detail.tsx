@@ -374,11 +374,26 @@ export default function PlaydateDetailPage() {
           )}
           
           {!user && (
-            <div className="bg-primary/10 p-4 rounded-lg text-center">
-              <p className="mb-2">{t('auth.loginToJoin', 'Login to join this playdate')}</p>
-              <Button onClick={() => navigate('/auth')} size="sm">
-                {t('auth.login', 'Login')}
-              </Button>
+            <div className="bg-gradient-to-br from-primary/10 to-accent/10 p-6 rounded-xl text-center border border-primary/20">
+              <div className="mb-3">
+                <i className="fas fa-users text-3xl text-primary mb-2"></i>
+              </div>
+              <h3 className="font-heading font-bold text-lg mb-2">
+                {t('auth.joinCommunity', 'Join the PaPa-Hi Community!')}
+              </h3>
+              <p className="text-muted-foreground mb-4 text-sm">
+                {t('auth.loginToJoinPlaydate', 'Sign up or log in to join this playdate and connect with other dads in your area.')}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <Button onClick={() => navigate('/auth')} className="w-full sm:w-auto">
+                  <i className="fas fa-sign-in-alt mr-2"></i>
+                  {t('auth.login', 'Login')}
+                </Button>
+                <Button onClick={() => navigate('/auth?tab=register')} variant="outline" className="w-full sm:w-auto">
+                  <i className="fas fa-user-plus mr-2"></i>
+                  {t('auth.signUp', 'Sign Up')}
+                </Button>
+              </div>
             </div>
           )}
         </div>

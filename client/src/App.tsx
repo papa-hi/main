@@ -57,11 +57,11 @@ function Router() {
   return (
     <Switch>
       <ProtectedRoute path="/" component={HomePage} />
-      <ProtectedRoute path="/playdates/:id" component={PlaydateDetailPage} />
+      <Route path="/playdates/:id" component={PlaydateDetailPage} />
       <ProtectedRoute path="/playdates" component={PlaydatesPage} />
-      <ProtectedRoute path="/places/:id" component={PlaceDetailsPage} />
+      <Route path="/places/:id" component={PlaceDetailsPage} />
       <ProtectedRoute path="/places" component={PlacesPage} />
-      <ProtectedRoute path="/events/:id" component={EventDetailsPage} />
+      <Route path="/events/:id" component={EventDetailsPage} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
       <ProtectedRoute path="/create" component={CreatePage} />
       <ProtectedRoute path="/edit-playdate/:id" component={EditPlaydatePage} />
