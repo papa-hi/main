@@ -9,11 +9,106 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Clock, Users, MapPin, Euro, Repeat } from "lucide-react";
+import { Calendar, Clock, Users, MapPin, Euro, Repeat, Coffee, Bike, TreePine, Waves, Utensils, Gamepad2, Sparkles } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { format, addHours, setHours, setMinutes, nextSaturday, nextSunday } from "date-fns";
+
+interface PlaydateTemplate {
+  id: string;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  defaultTitle: string;
+  defaultDescription: string;
+  defaultCost: string;
+  defaultMaxParticipants: number;
+  defaultDuration: number;
+  suggestedTime: { hour: number; minute: number };
+  weekend: boolean;
+}
+
+const playdateTemplates: PlaydateTemplate[] = [
+  {
+    id: "coffee-sandbox",
+    icon: <Coffee className="h-5 w-5" />,
+    title: "Coffee & Sandbox",
+    description: "Saturday morning coffee while kids play",
+    defaultTitle: "Saturday Morning Coffee & Sandbox",
+    defaultDescription: "Let's grab a coffee while the kids play in the sandbox! Bring your favorite brew or we'll grab one nearby. Perfect for toddlers and young kids.",
+    defaultCost: "Free",
+    defaultMaxParticipants: 6,
+    defaultDuration: 2,
+    suggestedTime: { hour: 10, minute: 0 },
+    weekend: true,
+  },
+  {
+    id: "cargo-bike",
+    icon: <Bike className="h-5 w-5" />,
+    title: "Cargo-Bike Ride",
+    description: "Afternoon bike adventure with the kids",
+    defaultTitle: "Afternoon Cargo-Bike Ride",
+    defaultDescription: "Join us for a relaxed cargo-bike ride through the neighborhood! We'll explore some nice routes and maybe stop for ice cream. All bike types welcome!",
+    defaultCost: "Free",
+    defaultMaxParticipants: 8,
+    defaultDuration: 2,
+    suggestedTime: { hour: 14, minute: 0 },
+    weekend: true,
+  },
+  {
+    id: "park-adventure",
+    icon: <TreePine className="h-5 w-5" />,
+    title: "Park Adventure",
+    description: "Explore nature with the little ones",
+    defaultTitle: "Park Adventure Day",
+    defaultDescription: "Let's explore the park together! We'll look for bugs, climb trees, and let the kids run free. Bring snacks and water!",
+    defaultCost: "Free",
+    defaultMaxParticipants: 10,
+    defaultDuration: 3,
+    suggestedTime: { hour: 10, minute: 30 },
+    weekend: true,
+  },
+  {
+    id: "swimming",
+    icon: <Waves className="h-5 w-5" />,
+    title: "Swimming Pool",
+    description: "Splash time at the local pool",
+    defaultTitle: "Swimming Pool Playdate",
+    defaultDescription: "Pool time! Let's take the kids for a swim. Bring swimsuits, towels, and goggles. We'll supervise together while kids have fun in the water.",
+    defaultCost: "Entry fee varies",
+    defaultMaxParticipants: 6,
+    defaultDuration: 2,
+    suggestedTime: { hour: 11, minute: 0 },
+    weekend: true,
+  },
+  {
+    id: "lunch-playdate",
+    icon: <Utensils className="h-5 w-5" />,
+    title: "Lunch Playdate",
+    description: "Kid-friendly restaurant meetup",
+    defaultTitle: "Family Lunch Meetup",
+    defaultDescription: "Let's have lunch together at a kid-friendly spot! Great way to meet other dads while the kids enjoy their meal and play area.",
+    defaultCost: "Pay for own food",
+    defaultMaxParticipants: 8,
+    defaultDuration: 2,
+    suggestedTime: { hour: 12, minute: 0 },
+    weekend: false,
+  },
+  {
+    id: "indoor-play",
+    icon: <Gamepad2 className="h-5 w-5" />,
+    title: "Indoor Play",
+    description: "Rainy day fun at indoor playground",
+    defaultTitle: "Indoor Playground Fun",
+    defaultDescription: "Perfect for rainy days! Let's meet at the indoor playground. Kids can climb, slide, and play while we catch up.",
+    defaultCost: "Entry fee varies",
+    defaultMaxParticipants: 8,
+    defaultDuration: 2,
+    suggestedTime: { hour: 10, minute: 0 },
+    weekend: true,
+  },
+];
 
 // Create form schema with validation for playdate creation
 const createPlaydateFormSchema = insertPlaydateSchema.extend({
@@ -51,6 +146,8 @@ export function CreatePlaydateForm({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isRecurring, setIsRecurring] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [showCustomForm, setShowCustomForm] = useState(false);
   
   const form = useForm<CreatePlaydateFormData>({
     resolver: zodResolver(createPlaydateFormSchema),
@@ -137,8 +234,122 @@ export function CreatePlaydateForm({
     createPlaydateMutation.mutate(data);
   };
 
+  const applyTemplate = (template: PlaydateTemplate) => {
+    setSelectedTemplate(template.id);
+    setShowCustomForm(true);
+    
+    const suggestedDate = template.weekend ? nextSaturday(new Date()) : new Date();
+    const startTime = setMinutes(setHours(suggestedDate, template.suggestedTime.hour), template.suggestedTime.minute);
+    const endTime = addHours(startTime, template.defaultDuration);
+    
+    const locationName = defaultLocation?.split(',')[0] || "";
+    
+    form.reset({
+      title: locationName ? `${template.defaultTitle} at ${locationName}` : template.defaultTitle,
+      description: template.defaultDescription,
+      location: defaultLocation || "",
+      latitude: defaultLatitude?.toString() || "",
+      longitude: defaultLongitude?.toString() || "",
+      startTime: format(startTime, "yyyy-MM-dd'T'HH:mm"),
+      endTime: format(endTime, "yyyy-MM-dd'T'HH:mm"),
+      maxParticipants: template.defaultMaxParticipants,
+      cost: template.defaultCost,
+      isRecurring: false,
+      recurringType: "none",
+      recurringEndDate: "",
+    });
+    
+    toast({
+      title: "Template Applied",
+      description: `"${template.title}" template loaded. Adjust details as needed!`,
+    });
+  };
+
+  const startCustomPlaydate = () => {
+    setSelectedTemplate(null);
+    setShowCustomForm(true);
+    form.reset({
+      title: defaultLocation ? `Playdate at ${defaultLocation.split(',')[0]}` : "",
+      description: "",
+      location: defaultLocation || "",
+      latitude: defaultLatitude?.toString() || "",
+      longitude: defaultLongitude?.toString() || "",
+      startTime: "",
+      endTime: "",
+      maxParticipants: 6,
+      cost: "Free",
+      isRecurring: false,
+      recurringType: "none",
+      recurringEndDate: "",
+    });
+  };
+
+  if (!showCustomForm) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center mb-4">
+          <h3 className="text-lg font-semibold flex items-center justify-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            Quick Start Templates
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Choose a template to get started quickly, or create your own
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          {playdateTemplates.map((template) => (
+            <button
+              key={template.id}
+              type="button"
+              onClick={() => applyTemplate(template)}
+              className="flex flex-col items-center p-4 rounded-lg border-2 border-muted hover:border-primary hover:bg-primary/5 transition-all text-center group"
+            >
+              <div className="p-2 rounded-full bg-primary/10 text-primary mb-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                {template.icon}
+              </div>
+              <span className="font-medium text-sm">{template.title}</span>
+              <span className="text-xs text-muted-foreground mt-1">{template.description}</span>
+            </button>
+          ))}
+        </div>
+        
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">or</span>
+          </div>
+        </div>
+        
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={startCustomPlaydate}
+        >
+          <Calendar className="h-4 w-4 mr-2" />
+          Create Custom Playdate
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      {selectedTemplate && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowCustomForm(false)}
+          className="mb-2"
+        >
+          &larr; Back to Templates
+        </Button>
+      )}
+      
       <div className="space-y-4">
         <div>
           <Label htmlFor="title" className="flex items-center gap-2">
