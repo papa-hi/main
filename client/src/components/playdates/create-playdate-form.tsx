@@ -9,11 +9,24 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Clock, Users, MapPin, Euro, Repeat, Coffee, Bike, TreePine, Waves, Utensils, Gamepad2, Sparkles } from "lucide-react";
+import { Calendar, Clock, Users, MapPin, Euro, Repeat, Coffee, Bike, TreePine, Waves, Utensils, Gamepad2, Sparkles, CalendarPlus } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { format, addHours, setHours, setMinutes, nextSaturday, nextSunday } from "date-fns";
+
+function generateGoogleCalendarUrl(title: string, description: string, location: string, startTime: string, endTime: string): string {
+  const start = new Date(startTime).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const end = new Date(endTime).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: title,
+    details: description,
+    location: location,
+    dates: `${start}/${end}`,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
 
 interface PlaydateTemplate {
   id: string;
@@ -210,13 +223,36 @@ export function CreatePlaydateForm({
         startTime: new Date(data.startTime).toISOString(),
         endTime: new Date(data.endTime).toISOString(),
       });
-      return response.json();
+      return { playdate: await response.json(), formData: data };
     },
-    onSuccess: () => {
+    onSuccess: ({ formData }) => {
       queryClient.invalidateQueries({ queryKey: ["/api/playdates"] });
+      
+      const calendarUrl = generateGoogleCalendarUrl(
+        formData.title,
+        formData.description || "",
+        formData.location || "",
+        formData.startTime,
+        formData.endTime
+      );
+      
       toast({
-        title: "Playdate Created",
-        description: "Your playdate has been created successfully!",
+        title: "Playdate Created!",
+        description: (
+          <div className="flex flex-col gap-2 mt-1">
+            <span>Your playdate is ready.</span>
+            <a 
+              href={calendarUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
+            >
+              <CalendarPlus className="h-4 w-4" />
+              Add to Calendar
+            </a>
+          </div>
+        ),
+        duration: 8000,
       });
       form.reset();
       onSuccess?.();
@@ -286,51 +322,33 @@ export function CreatePlaydateForm({
 
   if (!showCustomForm) {
     return (
-      <div className="space-y-4">
-        <div className="text-center mb-4">
-          <h3 className="text-lg font-semibold flex items-center justify-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Quick Start Templates
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Choose a template to get started quickly, or create your own
-          </p>
-        </div>
+      <div className="space-y-3">
+        <p className="text-center text-sm text-muted-foreground">Tap to start</p>
         
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           {playdateTemplates.map((template) => (
             <button
               key={template.id}
               type="button"
               onClick={() => applyTemplate(template)}
-              className="flex flex-col items-center p-4 rounded-lg border-2 border-muted hover:border-primary hover:bg-primary/5 transition-all text-center group"
+              className="flex items-center gap-3 p-4 min-h-[72px] rounded-xl border-2 border-muted hover:border-primary hover:bg-primary/5 active:scale-[0.98] transition-all group touch-manipulation"
             >
-              <div className="p-2 rounded-full bg-primary/10 text-primary mb-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+              <div className="p-3 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors shrink-0">
                 {template.icon}
               </div>
-              <span className="font-medium text-sm">{template.title}</span>
-              <span className="text-xs text-muted-foreground mt-1">{template.description}</span>
+              <span className="font-semibold text-left leading-tight">{template.title}</span>
             </button>
           ))}
         </div>
         
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">or</span>
-          </div>
-        </div>
-        
         <Button
           type="button"
-          variant="outline"
-          className="w-full"
+          variant="ghost"
+          size="lg"
+          className="w-full mt-2 text-muted-foreground"
           onClick={startCustomPlaydate}
         >
-          <Calendar className="h-4 w-4 mr-2" />
-          Create Custom Playdate
+          Or create your own
         </Button>
       </div>
     );
