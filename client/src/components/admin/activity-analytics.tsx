@@ -76,7 +76,7 @@ export function ActivityAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalActions.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Last 7 days</p>
+            <p className="text-xs text-muted-foreground">Last 30 days</p>
           </CardContent>
         </Card>
 

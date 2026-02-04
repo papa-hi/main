@@ -1169,7 +1169,7 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  async getUserActivityStats(days: number = 7): Promise<{
+  async getUserActivityStats(days: number = 30): Promise<{
     totalActions: number;
     uniqueUsers: number;
     topActions: { action: string; count: number }[];
