@@ -262,7 +262,7 @@ export function setupAdminRoutes(app: Express) {
   // Get detailed user activity statistics
   app.get('/api/admin/activity/stats', isAdmin, async (req: Request, res: Response) => {
     try {
-      const days = req.query.days ? parseInt(req.query.days as string) : 7;
+      const days = req.query.days ? parseInt(req.query.days as string) : 30;
       const stats = await storage.getUserActivityStats(days);
       res.json(stats);
       
@@ -277,7 +277,7 @@ export function setupAdminRoutes(app: Express) {
   // Get page view statistics
   app.get('/api/admin/stats/pages', isAdmin, async (req: Request, res: Response) => {
     try {
-      const days = req.query.days ? parseInt(req.query.days as string) : 7;
+      const days = req.query.days ? parseInt(req.query.days as string) : 30;
       const pages = await storage.getTopPages(days);
       res.json(pages);
       
@@ -292,7 +292,7 @@ export function setupAdminRoutes(app: Express) {
   // Get feature usage statistics
   app.get('/api/admin/stats/features', isAdmin, async (req: Request, res: Response) => {
     try {
-      const days = req.query.days ? parseInt(req.query.days as string) : 7;
+      const days = req.query.days ? parseInt(req.query.days as string) : 30;
       const features = await storage.getFeatureUsageStats(days);
       res.json(features);
       
