@@ -26,6 +26,14 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
   const [animateHeart, setAnimateHeart] = useState(false);
   const [showCreatePlaydate, setShowCreatePlaydate] = useState(false);
   
+  const handleCreatePlaydateClick = () => {
+    if (!user) {
+      setLocation('/auth');
+      return;
+    }
+    setShowCreatePlaydate(true);
+  };
+  
   // Calculate real distance from device location to place
   const { distance, isLoading: distanceLoading } = useDistance({
     latitude: place.latitude,
@@ -200,7 +208,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
         {/* Create Playdate Button */}
         <div className="mb-3">
           <Button 
-            onClick={() => setShowCreatePlaydate(true)}
+            onClick={handleCreatePlaydateClick}
             className="w-full bg-primary hover:bg-primary/90 text-white"
             size="sm"
           >
