@@ -146,11 +146,12 @@ export default function CommunityPage() {
     queryFn: () => fetch('/api/community/categories').then(res => res.json()),
   });
 
-  // Fetch events when Events tab is active
+  // Fetch events when Events tab is active - use public API for unauthenticated users
+  const eventsEndpoint = user ? '/api/events?upcoming=true' : '/api/public/events';
   const { data: events = [], isLoading: eventsLoading } = useQuery<FamilyEvent[]>({
-    queryKey: ['/api/events'],
+    queryKey: [eventsEndpoint],
     queryFn: async () => {
-      const response = await fetch('/api/events?upcoming=true');
+      const response = await fetch(eventsEndpoint);
       if (!response.ok) {
         throw new Error('Failed to fetch events');
       }
@@ -395,25 +396,6 @@ export default function CommunityPage() {
     return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <Users className="h-12 w-12 mx-auto text-blue-600 mb-4" />
-              <h2 className="text-xl font-semibold mb-2">{t('community.loginRequired')}</h2>
-              <p className="text-gray-600 mb-4">{t('community.loginDescription')}</p>
-              <Button onClick={() => window.location.href = '/login'}>
-                {t('auth.login')}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       <div className="container mx-auto px-4 py-8">
@@ -424,6 +406,7 @@ export default function CommunityPage() {
             <p className="text-gray-600 mt-1">{t('community.subtitle')}</p>
           </div>
           
+          {user && (
           <Dialog open={showCreatePost || !!editingPost} onOpenChange={(open) => {
             if (!open) {
               setShowCreatePost(false);
@@ -525,6 +508,7 @@ export default function CommunityPage() {
               </Form>
             </DialogContent>
           </Dialog>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -669,7 +653,30 @@ export default function CommunityPage() {
             {/* Posts - only show when not on Events tab */}
             {activeTab !== 'events' && (
             <div className="space-y-6">
-              {postsError ? (
+              {/* Show login prompt for unauthenticated users trying to view posts */}
+              {!user ? (
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center py-12">
+                      <Users className="h-16 w-16 mx-auto text-primary mb-4" />
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                        {t('community.joinToContinue', 'Join our community of dads!')}
+                      </h3>
+                      <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                        {t('community.loginToViewPosts', 'Sign in to read posts, share experiences, and connect with other fathers in the Netherlands.')}
+                      </p>
+                      <div className="flex gap-4 justify-center">
+                        <Button onClick={() => window.location.href = '/auth'}>
+                          {t('auth.signIn', 'Sign In')}
+                        </Button>
+                        <Button variant="outline" onClick={() => window.location.href = '/auth?mode=register'}>
+                          {t('auth.register', 'Create Account')}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : postsError ? (
                 <Card>
                   <CardContent className="pt-6">
                     <div className="text-center py-8">

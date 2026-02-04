@@ -61,8 +61,9 @@ function Router() {
       <Route path="/playdates/:id" component={PlaydateDetailPage} />
       <ProtectedRoute path="/playdates" component={PlaydatesPage} />
       <Route path="/places/:id" component={PlaceDetailsPage} />
-      <ProtectedRoute path="/places" component={PlacesPage} />
+      <Route path="/places" component={PlacesPage} />
       <Route path="/events/:id" component={EventDetailsPage} />
+      <Route path="/community" component={CommunityPage} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
       <ProtectedRoute path="/create" component={CreatePage} />
       <ProtectedRoute path="/edit-playdate/:id" component={EditPlaydatePage} />
@@ -70,7 +71,6 @@ function Router() {
       <ProtectedRoute path="/chat/:id" component={ChatPage} />
       <ProtectedRoute path="/matches" component={MatchesPage} />
       <ProtectedRoute path="/discover" component={DiscoverPage} />
-      <ProtectedRoute path="/community" component={CommunityPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
       <ProtectedRoute path="/settings/delete-account" component={DeleteAccountPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />

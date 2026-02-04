@@ -9,6 +9,7 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes (February 2026)
 - **Tiered Access Model**: Three-layer privacy system implemented:
     - **Public Layer**: Browse places, events, and sample playdates without login via /api/public/* endpoints
+    - **Public Pages**: /places and /community routes now accessible without login (events tab shows public events, posts tab prompts login)
     - **Registered User Layer**: Full features for authenticated users (create playdates, message, join events)
     - **Privacy Controls**: Playdate visibility options (public/registered/friends-only) with enforcement in API
 - **Dynamic Sitemap**: /sitemap.xml now auto-generated from database with all playdates, events, and places for SEO
