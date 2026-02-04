@@ -361,6 +361,143 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============================================
+  // PUBLIC API ENDPOINTS (No authentication required)
+  // For anonymous browsing - tiered access model
+  // ============================================
+
+  // Public places - browse child-friendly locations without login
+  app.get("/api/public/places", async (req, res) => {
+    try {
+      const type = req.query.type as string | undefined;
+      const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+      
+      let baseQuery = db.select({
+        id: places.id,
+        name: places.name,
+        type: places.type,
+        address: places.address,
+        description: places.description,
+        imageUrl: places.imageUrl,
+        features: places.features,
+        rating: places.rating,
+      }).from(places);
+
+      const publicPlaces = type && type !== 'all' 
+        ? await baseQuery.where(eq(places.type, type)).limit(limit)
+        : await baseQuery.limit(limit);
+        
+      res.json(publicPlaces);
+    } catch (error) {
+      console.error("Error fetching public places:", error);
+      res.status(500).json({ error: "Failed to fetch places" });
+    }
+  });
+
+  // Public events - see event listings without participant details
+  app.get("/api/public/events", async (req, res) => {
+    try {
+      const limit = Math.min(parseInt(req.query.limit as string) || 10, 30);
+      
+      const publicEvents = await db.select({
+        id: familyEvents.id,
+        title: familyEvents.title,
+        description: familyEvents.description,
+        location: familyEvents.location,
+        startDate: familyEvents.startDate,
+        endDate: familyEvents.endDate,
+        category: familyEvents.category,
+        cost: familyEvents.cost,
+        imageUrl: familyEvents.imageUrl,
+        ageRange: familyEvents.ageRange,
+      })
+      .from(familyEvents)
+      .where(gte(familyEvents.startDate, new Date()))
+      .orderBy(asc(familyEvents.startDate))
+      .limit(limit);
+
+      res.json(publicEvents);
+    } catch (error) {
+      console.error("Error fetching public events:", error);
+      res.status(500).json({ error: "Failed to fetch events" });
+    }
+  });
+
+  // Public playdates - sample anonymized playdates (only those marked as "public")
+  app.get("/api/public/playdates", async (req, res) => {
+    try {
+      const limit = Math.min(parseInt(req.query.limit as string) || 5, 10);
+      
+      // Only fetch playdates marked as public visibility
+      const publicPlaydates = await db.select({
+        id: playdates.id,
+        title: playdates.title,
+        location: playdates.location,
+        startTime: playdates.startTime,
+        endTime: playdates.endTime,
+        maxParticipants: playdates.maxParticipants,
+        cost: playdates.cost,
+      })
+      .from(playdates)
+      .where(and(
+        eq(playdates.visibility, 'public'),
+        gte(playdates.startTime, new Date()),
+        isNull(playdates.archivedAt)
+      ))
+      .orderBy(asc(playdates.startTime))
+      .limit(limit);
+
+      // Add anonymized participant count (no personal info)
+      const result = await Promise.all(publicPlaydates.map(async (playdate) => {
+        const [countResult] = await db
+          .select({ count: count() })
+          .from(playdateParticipants)
+          .where(eq(playdateParticipants.playdateId, playdate.id));
+        
+        return {
+          ...playdate,
+          participantCount: countResult?.count || 0,
+          spotsLeft: playdate.maxParticipants - (countResult?.count || 0),
+        };
+      }));
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching public playdates:", error);
+      res.status(500).json({ error: "Failed to fetch playdates" });
+    }
+  });
+
+  // Public community guidelines and safety info
+  app.get("/api/public/safety-info", (req, res) => {
+    res.json({
+      guidelines: [
+        "All members are verified fathers in the Netherlands",
+        "First meetups should be in public, child-friendly locations",
+        "Personal information is never shared without consent",
+        "Report any concerning behavior immediately",
+        "Respect other families' privacy and boundaries"
+      ],
+      features: [
+        "Profile verification system",
+        "In-app messaging (no personal phone numbers needed)",
+        "Public location meetups recommended",
+        "Community moderation and reporting",
+        "GDPR-compliant data handling"
+      ],
+      privacyOptions: [
+        "Control who sees your profile",
+        "Choose playdate visibility (public, registered users, or friends only)",
+        "Opt out of discovery features anytime",
+        "Delete your data at any time"
+      ]
+    });
+  });
+
+  // ============================================
+  // END PUBLIC API ENDPOINTS
+  // ============================================
+
   // In-memory image cache to reduce database hits
   const imageCache = new Map<string, { buffer: Buffer; mimeType: string; cachedAt: number }>();
   const IMAGE_CACHE_TTL = 1000 * 60 * 60; // 1 hour
@@ -958,18 +1095,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/users/:id/playdates", isAuthenticated, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
+      const requestingUserId = req.user?.id;
       if (isNaN(userId)) {
         return res.status(400).json({ message: "Invalid user ID" });
       }
       
       const playdates = await storage.getUserPlaydates(userId);
       
-      // Only return playdates that haven't happened yet
-      const upcomingPlaydates = playdates.filter(playdate => 
-        new Date(playdate.startTime) > new Date()
-      );
+      // Filter by visibility tier and upcoming only
+      const filteredPlaydates = playdates.filter(playdate => {
+        // Not upcoming, exclude
+        if (new Date(playdate.startTime) <= new Date()) return false;
+        
+        // Public and registered are visible to all logged-in users
+        if (playdate.visibility === 'public' || playdate.visibility === 'registered') {
+          return true;
+        }
+        // Friends-only: only show to the creator (future: add friend check)
+        if (playdate.visibility === 'friends') {
+          return playdate.creatorId === requestingUserId;
+        }
+        return true;
+      });
       
-      res.json(upcomingPlaydates);
+      res.json(filteredPlaydates);
     } catch (err) {
       console.error("Error fetching user's playdates:", err);
       res.status(500).json({ message: "Failed to fetch playdates" });
@@ -1210,8 +1359,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Playdate routes
   app.get("/api/playdates/upcoming", async (req, res) => {
     try {
+      const userId = req.user?.id;
+      const isAuthenticated = !!userId;
       const upcomingPlaydates = await storage.getUpcomingPlaydates();
-      res.json(upcomingPlaydates);
+      
+      // Filter playdates based on visibility tier
+      const filteredPlaydates = upcomingPlaydates.filter(playdate => {
+        // Public playdates: visible to everyone
+        if (playdate.visibility === 'public') return true;
+        // Registered playdates: visible only to logged-in users
+        if (playdate.visibility === 'registered') return isAuthenticated;
+        // Friends-only: only visible to the creator (future: add friend check)
+        if (playdate.visibility === 'friends') return playdate.creatorId === userId;
+        // Default (null/undefined visibility): treat as registered
+        return isAuthenticated;
+      });
+      
+      res.json(filteredPlaydates);
     } catch (err) {
       console.error("Error fetching upcoming playdates:", err);
       res.status(500).json({ message: "Failed to fetch upcoming playdates" });
@@ -1220,8 +1384,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/playdates/past", async (req, res) => {
     try {
+      const userId = req.user?.id;
+      const isAuthenticated = !!userId;
       const pastPlaydates = await storage.getPastPlaydates();
-      res.json(pastPlaydates);
+      
+      // Filter playdates based on visibility tier
+      const filteredPlaydates = pastPlaydates.filter(playdate => {
+        // Public playdates: visible to everyone
+        if (playdate.visibility === 'public') return true;
+        // Registered playdates: visible only to logged-in users
+        if (playdate.visibility === 'registered') return isAuthenticated;
+        // Friends-only: only visible to the creator (future: add friend check)
+        if (playdate.visibility === 'friends') return playdate.creatorId === userId;
+        // Default: treat as registered
+        return isAuthenticated;
+      });
+      
+      res.json(filteredPlaydates);
     } catch (err) {
       console.error("Error fetching past playdates:", err);
       res.status(500).json({ message: "Failed to fetch past playdates" });
@@ -1239,6 +1418,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const playdate = await storage.getPlaydateById(playdateId);
       if (!playdate) {
         return res.status(404).json({ message: "Playdate not found" });
+      }
+      
+      // Check visibility based on tiered access model
+      const userId = req.user?.id;
+      const isAuthenticated = !!userId;
+      
+      // Public playdates: visible to everyone (Deep Link Preview Mode)
+      if (playdate.visibility === 'public') {
+        return res.json(playdate);
+      }
+      
+      // Registered playdates: visible only to logged-in users
+      if (playdate.visibility === 'registered' || !playdate.visibility) {
+        if (!isAuthenticated) {
+          return res.status(401).json({ message: "Please log in to view this playdate" });
+        }
+        return res.json(playdate);
+      }
+      
+      // Friends-only: only visible to creator (future: add friend check)
+      if (playdate.visibility === 'friends') {
+        if (playdate.creatorId !== userId) {
+          return res.status(403).json({ message: "This playdate is only visible to friends" });
+        }
+        return res.json(playdate);
       }
       
       res.json(playdate);
@@ -2000,7 +2204,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const playdates = await storage.getUpcomingPlaydates(searchParams);
-      res.json(playdates);
+      
+      // Filter by visibility tier based on authentication
+      const userId = req.user?.id;
+      const filteredPlaydates = playdates.filter(playdate => {
+        // Public: visible to all
+        if (playdate.visibility === 'public') return true;
+        // Registered: visible to logged-in users only
+        if (playdate.visibility === 'registered') return !!userId;
+        // Friends-only: only show to the creator (future: add friend check)
+        if (playdate.visibility === 'friends') return playdate.creatorId === userId;
+        return true;
+      });
+      
+      res.json(filteredPlaydates);
     } catch (error) {
       console.error("Error searching playdates:", error);
       res.status(500).json({ error: "Failed to search playdates" });

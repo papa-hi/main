@@ -7,6 +7,12 @@ PaPa-Hi is a social platform designed for fathers in the Netherlands. Its primar
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (February 2026)
+- **Tiered Access Model**: Three-layer privacy system implemented:
+    - **Public Layer**: Browse places, events, and sample playdates without login via /api/public/* endpoints
+    - **Registered User Layer**: Full features for authenticated users (create playdates, message, join events)
+    - **Privacy Controls**: Playdate visibility options (public/registered/friends-only) with enforcement in API
+- **Dynamic Sitemap**: /sitemap.xml now auto-generated from database with all playdates, events, and places for SEO
+- **About Page**: New /about page showcasing community guidelines, safety features, and privacy options
 - **Deep Link Preview Mode**: Playdate, place, and event detail pages are now publicly accessible without login, enabling effective sharing via WhatsApp/social media with compelling sign-up prompts
 - **Google Calendar Integration**: "Add to Calendar" button on playdate detail pages and dropdown menus for easy calendar syncing
 - **Mobile UI Fixes**: Fixed map z-index issue that was overlapping the bottom navigation menu on mobile devices

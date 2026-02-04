@@ -29,6 +29,7 @@ import AdminDashboard from "./pages/admin";
 import AdminCheck from "./pages/admin-check";
 import TestCreatePlaydate from "./pages/test-create-playdate";
 import SimpleTestPage from "./pages/simple-test";
+import AboutPage from "./pages/about";
 import { useState, useEffect } from "react";
 import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
 import ErrorBoundary from "./components/shared/error-boundary";
@@ -74,6 +75,7 @@ function Router() {
       <ProtectedRoute path="/settings/delete-account" component={DeleteAccountPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
       <Route path="/privacy" component={PrivacyPolicyPage} />
+      <Route path="/about" component={AboutPage} />
 
       <ProtectedRoute path="/admin" component={AdminDashboard} />
       <Route path="/admin-check" component={AdminCheck} />

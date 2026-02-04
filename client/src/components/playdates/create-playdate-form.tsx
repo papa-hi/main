@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Clock, Users, MapPin, Euro, Repeat, Coffee, Bike, TreePine, Waves, Utensils, Gamepad2, Sparkles, CalendarPlus } from "lucide-react";
+import { Calendar, Clock, Users, MapPin, Euro, Repeat, Coffee, Bike, TreePine, Waves, Utensils, Gamepad2, Sparkles, CalendarPlus, Eye, Globe, UserCheck, Users2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -128,6 +128,7 @@ const createPlaydateFormSchema = insertPlaydateSchema.extend({
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
   cost: z.string().optional().default("Free"),
+  visibility: z.enum(["public", "registered", "friends"]).optional().default("registered"),
   isRecurring: z.boolean().optional().default(false),
   recurringType: z.string().optional().default("none"),
   recurringEndDate: z.string().optional(),
@@ -179,6 +180,7 @@ export function CreatePlaydateForm({
       endTime: "",
       maxParticipants: 6,
       cost: "Free",
+      visibility: "registered",
       isRecurring: false,
       recurringType: "none",
       recurringEndDate: "",
@@ -512,6 +514,44 @@ export function CreatePlaydateForm({
               {form.formState.errors.cost.message}
             </p>
           )}
+        </div>
+
+        <div>
+          <Label htmlFor="visibility" className="flex items-center gap-2">
+            <Eye className="h-4 w-4" />
+            Who can see this playdate?
+          </Label>
+          <Select
+            value={form.watch("visibility")}
+            onValueChange={(value) => form.setValue("visibility", value as "public" | "registered" | "friends")}
+          >
+            <SelectTrigger className="mt-1">
+              <SelectValue placeholder="Select visibility" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="public">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  <span>Public - Anyone can see (anonymized)</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="registered">
+                <div className="flex items-center gap-2">
+                  <UserCheck className="h-4 w-4" />
+                  <span>Registered users only</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="friends">
+                <div className="flex items-center gap-2">
+                  <Users2 className="h-4 w-4" />
+                  <span>Friends only</span>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-sm text-muted-foreground mt-1">
+            Public playdates help other dads discover PaPa-Hi
+          </p>
         </div>
 
         <div className="space-y-4 border-t pt-4">
