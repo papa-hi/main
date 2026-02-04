@@ -15,7 +15,7 @@ import { db } from "./db";
 import { eq, and, gte, asc, count, desc, like, or, sql, isNull, isNotNull, inArray } from "drizzle-orm";
 import crypto from "crypto";
 import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate, sendNewCommunityPostNotification } from "./push-notifications";
-import { pushSubscriptions, matchPreferences } from "@shared/schema";
+import { pushSubscriptions, matchPreferences, pageViews, featureUsage } from "@shared/schema";
 import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified } from "./notification-scheduler";
 import { calculateDistance, getCityCoordinates } from "./dad-matching-service";
 import { geocodeAddress } from "./geocoding";
@@ -259,6 +259,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint for Railway and other platforms
   app.get("/api/health", (req, res) => {
     res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  // Analytics: Track page views
+  app.post("/api/analytics/page-view", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      const { path } = req.body;
+      if (!path) {
+        return res.status(400).json({ error: "Path is required" });
+      }
+
+      await db.insert(pageViews).values({
+        userId,
+        path,
+        timestamp: new Date(),
+        referrer: req.headers.referer || null,
+        ipAddress: req.ip || null,
+        userAgent: req.headers['user-agent'] || null
+      });
+
+      res.status(201).json({ success: true });
+    } catch (error) {
+      console.error("Error tracking page view:", error);
+      res.status(500).json({ error: "Failed to track page view" });
+    }
+  });
+
+  // Analytics: Track feature usage
+  app.post("/api/analytics/feature-usage", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      const { feature, action, details } = req.body;
+      if (!feature || !action) {
+        return res.status(400).json({ error: "Feature and action are required" });
+      }
+
+      await db.insert(featureUsage).values({
+        userId,
+        feature,
+        action,
+        timestamp: new Date(),
+        details: details || null
+      });
+
+      res.status(201).json({ success: true });
+    } catch (error) {
+      console.error("Error tracking feature usage:", error);
+      res.status(500).json({ error: "Failed to track feature usage" });
+    }
   });
 
   // Dynamic sitemap.xml generation for SEO

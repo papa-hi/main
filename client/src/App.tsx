@@ -40,10 +40,14 @@ import { AdminProvider } from "./hooks/use-admin";
 import { ProtectedRoute } from "./lib/protected-route";
 import { useWelcome } from "./hooks/use-welcome";
 import AnimatedWelcome from "./components/welcome/animated-welcome";
+import { usePageTracking } from "./hooks/use-analytics";
 
 function Router() {
   const { user } = useAuth();
   const { showWelcome, completeWelcome } = useWelcome();
+  
+  // Track page views for analytics
+  usePageTracking();
 
   // Show welcome screen for authenticated users who haven't seen it
   if (showWelcome && user) {
