@@ -11,6 +11,7 @@ import { FamilyEvent } from "@shared/schema";
 import { format } from "date-fns";
 import { CreatePlaydateForm } from "@/components/playdates/create-playdate-form";
 import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -26,7 +27,16 @@ export default function EventDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   const [showCreatePlaydate, setShowCreatePlaydate] = useState(false);
+  
+  const handleCreatePlaydateClick = () => {
+    if (!user) {
+      setLocation('/auth');
+      return;
+    }
+    setShowCreatePlaydate(true);
+  };
 
   const { data: event, isLoading, error } = useQuery<FamilyEvent>({
     queryKey: ['/api/events', id],
@@ -378,7 +388,7 @@ export default function EventDetailsPage() {
 
               <Button 
                 className="w-full justify-start"
-                onClick={() => setShowCreatePlaydate(true)}
+                onClick={handleCreatePlaydateClick}
                 data-testid="button-create-playdate"
               >
                 <i className="fas fa-calendar-plus mr-2"></i>

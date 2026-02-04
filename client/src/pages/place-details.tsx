@@ -11,6 +11,7 @@ import { useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CreatePlaydateForm } from "@/components/playdates/create-playdate-form";
 import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -45,7 +46,16 @@ export default function PlaceDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   const [showCreatePlaydate, setShowCreatePlaydate] = useState(false);
+  
+  const handleCreatePlaydateClick = () => {
+    if (!user) {
+      setLocation('/auth');
+      return;
+    }
+    setShowCreatePlaydate(true);
+  };
 
   const { data: place, isLoading: placeLoading, error: placeError } = useQuery<Place>({
     queryKey: ['/api/places', id],
@@ -358,7 +368,7 @@ export default function PlaceDetailsPage() {
 
               <Button 
                 className="w-full justify-start"
-                onClick={() => setShowCreatePlaydate(true)}
+                onClick={handleCreatePlaydateClick}
               >
                 <i className="fas fa-calendar-plus mr-2"></i>
                 {t('places.createPlaydate', 'Create Playdate Here')}
