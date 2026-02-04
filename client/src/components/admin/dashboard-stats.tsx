@@ -30,13 +30,13 @@ export default function DashboardStats() {
             ) : (
               <div className="text-2xl font-bold">{userStats?.total || 0}</div>
             )}
-            <p className="text-xs text-muted-foreground">
-              {isLoadingUserStats ? (
-                <Skeleton className="h-3 w-24 mt-1" />
-              ) : (
-                `+${userStats?.newLastWeek || 0} from last week`
-              )}
-            </p>
+            {isLoadingUserStats ? (
+              <Skeleton className="h-3 w-24 mt-1" />
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                +{userStats?.newLastWeek || 0} from last week
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -52,13 +52,13 @@ export default function DashboardStats() {
             ) : (
               <div className="text-2xl font-bold">{userStats?.activeLastMonth || 0}</div>
             )}
-            <p className="text-xs text-muted-foreground">
-              {isLoadingUserStats ? (
-                <Skeleton className="h-3 w-24 mt-1" />
-              ) : (
-                `${Math.round((userStats?.activeLastMonth || 0) / (userStats?.total || 1) * 100)}% of total users`
-              )}
-            </p>
+            {isLoadingUserStats ? (
+              <Skeleton className="h-3 w-24 mt-1" />
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                {Math.round((userStats?.activeLastMonth || 0) / (userStats?.total || 1) * 100)}% of total users
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -74,13 +74,13 @@ export default function DashboardStats() {
             ) : (
               <div className="text-2xl font-bold">48</div>
             )}
-            <p className="text-xs text-muted-foreground">
-              {isLoadingUserStats ? (
-                <Skeleton className="h-3 w-24 mt-1" />
-              ) : (
-                "+12 from last month"
-              )}
-            </p>
+            {isLoadingUserStats ? (
+              <Skeleton className="h-3 w-24 mt-1" />
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                +12 from last month
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -96,13 +96,13 @@ export default function DashboardStats() {
             ) : (
               <div className="text-2xl font-bold">128</div>
             )}
-            <p className="text-xs text-muted-foreground">
-              {isLoadingUserStats ? (
-                <Skeleton className="h-3 w-24 mt-1" />
-              ) : (
-                "+24 from last month"
-              )}
-            </p>
+            {isLoadingUserStats ? (
+              <Skeleton className="h-3 w-24 mt-1" />
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                +24 from last month
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
