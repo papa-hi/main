@@ -34,16 +34,21 @@ const COUNTRY_CODES = [
   { code: "+1", country: "US", flag: "🇺🇸" },
 ];
 
-function PasswordStrengthIndicator({ password }: { password: string }) {
+function PasswordStrengthIndicator({ password, t }: { password: string; t: (key: string, fallback: string) => string }) {
   const requirements = [
-    { label: "At least 8 characters", met: password.length >= 8 },
-    { label: "Contains uppercase letter", met: /[A-Z]/.test(password) },
-    { label: "Contains lowercase letter", met: /[a-z]/.test(password) },
-    { label: "Contains a number", met: /[0-9]/.test(password) },
+    { label: t("auth:multiStep.password.requirements.length", "At least 8 characters"), met: password.length >= 8 },
+    { label: t("auth:multiStep.password.requirements.uppercase", "Contains uppercase letter"), met: /[A-Z]/.test(password) },
+    { label: t("auth:multiStep.password.requirements.lowercase", "Contains lowercase letter"), met: /[a-z]/.test(password) },
+    { label: t("auth:multiStep.password.requirements.number", "Contains a number"), met: /[0-9]/.test(password) },
   ];
 
   const strength = requirements.filter(r => r.met).length;
-  const strengthLabels = ["Weak", "Fair", "Good", "Strong"];
+  const strengthLabels = [
+    t("auth:multiStep.password.strength.weak", "Weak"),
+    t("auth:multiStep.password.strength.fair", "Fair"),
+    t("auth:multiStep.password.strength.good", "Good"),
+    t("auth:multiStep.password.strength.strong", "Strong")
+  ];
   const strengthColors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-green-500"];
 
   return (
@@ -64,7 +69,7 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
           "text-xs font-medium",
           strength <= 1 ? "text-red-600" : strength === 2 ? "text-orange-600" : strength === 3 ? "text-yellow-600" : "text-green-600"
         )}>
-          {strengthLabels[strength - 1] || "Too weak"}
+          {strengthLabels[strength - 1] || t("auth:multiStep.password.strength.tooWeak", "Too weak")}
         </p>
       )}
       <div className="space-y-1">
@@ -83,7 +88,13 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
   );
 }
 
-function ProgressBar({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) {
+function ProgressBar({ currentStep, totalSteps, t }: { currentStep: number; totalSteps: number; t: (key: string, fallback: string) => string }) {
+  const stepNames = [
+    t("auth:multiStep.steps.basics", "Basics"),
+    t("auth:multiStep.steps.security", "Security"),
+    t("auth:multiStep.steps.profile", "Profile")
+  ];
+  
   return (
     <div className="mb-6">
       <div className="flex justify-between mb-2">
@@ -105,7 +116,7 @@ function ProgressBar({ currentStep, totalSteps }: { currentStep: number; totalSt
               "text-xs mt-1",
               i <= currentStep ? "text-primary font-medium" : "text-gray-400"
             )}>
-              {i === 0 ? "Basics" : i === 1 ? "Security" : "Profile"}
+              {stepNames[i]}
             </span>
           </div>
         ))}
@@ -217,13 +228,13 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
 
   return (
     <div className="space-y-4">
-      <ProgressBar currentStep={currentStep} totalSteps={3} />
+      <ProgressBar currentStep={currentStep} totalSteps={3} t={t} />
 
       {currentStep === 0 && (
         <div className="space-y-4">
           <div className="text-center mb-4">
-            <h3 className="text-lg font-semibold">Get Started</h3>
-            <p className="text-sm text-muted-foreground">Quick signup with Google or enter your details</p>
+            <h3 className="text-lg font-semibold">{t("auth:multiStep.step1.title", "Get Started")}</h3>
+            <p className="text-sm text-muted-foreground">{t("auth:multiStep.step1.subtitle", "Quick signup with Google or enter your details")}</p>
           </div>
 
           <GoogleSignInButton 
@@ -236,7 +247,7 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
               <span className="w-full border-t border-gray-300"></span>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">or continue with email</span>
+              <span className="px-2 bg-white text-gray-500">{t("auth:multiStep.step1.orContinueWith", "or continue with email")}</span>
             </div>
           </div>
 
@@ -248,9 +259,9 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>First Name</FormLabel>
+                      <FormLabel>{t("auth:firstName", "First Name")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="John" {...field} />
+                        <Input placeholder={t("auth:firstNamePlaceholder", "Your first name")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -261,9 +272,9 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Name</FormLabel>
+                      <FormLabel>{t("auth:lastName", "Last Name")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Doe" {...field} />
+                        <Input placeholder={t("auth:lastNamePlaceholder", "Your last name")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -276,9 +287,9 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t("auth:email", "Email")}</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="john@example.com" {...field} />
+                      <Input type="email" placeholder={t("auth:emailPlaceholder", "Your email address")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -286,7 +297,7 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
               />
 
               <Button type="button" onClick={nextStep} className="w-full">
-                Continue <ChevronRight className="ml-2 h-4 w-4" />
+                {t("auth:multiStep.step1.continue", "Continue")} <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </Form>
@@ -297,8 +308,8 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
         <Form {...form}>
           <div className="space-y-4">
             <div className="text-center mb-4">
-              <h3 className="text-lg font-semibold">Secure Your Account</h3>
-              <p className="text-sm text-muted-foreground">Choose a username and create a strong password</p>
+              <h3 className="text-lg font-semibold">{t("auth:multiStep.step2.title", "Secure Your Account")}</h3>
+              <p className="text-sm text-muted-foreground">{t("auth:multiStep.step2.subtitle", "Choose a username and create a strong password")}</p>
             </div>
 
             <FormField
@@ -306,9 +317,9 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>{t("auth:username", "Username")}</FormLabel>
                   <FormControl>
-                    <Input placeholder="johndoe" {...field} />
+                    <Input placeholder={t("auth:usernamePlaceholder", "Choose a username")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -320,12 +331,12 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t("auth:password", "Password")}</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Create a strong password"
+                        placeholder={t("auth:passwordPlaceholder", "Create a password")}
                         {...field}
                       />
                       <Button
@@ -339,7 +350,7 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
                       </Button>
                     </div>
                   </FormControl>
-                  <PasswordStrengthIndicator password={watchPassword || ""} />
+                  <PasswordStrengthIndicator password={watchPassword || ""} t={t} />
                   <FormMessage />
                 </FormItem>
               )}
@@ -350,12 +361,12 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>{t("auth:confirmPassword", "Confirm Password")}</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Confirm your password"
+                        placeholder={t("auth:confirmPasswordPlaceholder", "Confirm your password")}
                         {...field}
                       />
                       <Button
@@ -376,10 +387,10 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
 
             <div className="flex gap-3">
               <Button type="button" variant="outline" onClick={prevStep} className="flex-1">
-                <ChevronLeft className="mr-2 h-4 w-4" /> Back
+                <ChevronLeft className="mr-2 h-4 w-4" /> {t("auth:multiStep.step2.back", "Back")}
               </Button>
               <Button type="button" onClick={nextStep} className="flex-1">
-                Continue <ChevronRight className="ml-2 h-4 w-4" />
+                {t("auth:multiStep.step2.continue", "Continue")} <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -390,8 +401,8 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="text-center mb-4">
-              <h3 className="text-lg font-semibold">Almost Done!</h3>
-              <p className="text-sm text-muted-foreground">Add optional details to help others find you</p>
+              <h3 className="text-lg font-semibold">{t("auth:multiStep.step3.title", "Almost Done!")}</h3>
+              <p className="text-sm text-muted-foreground">{t("auth:multiStep.step3.subtitle", "Add optional details to help others find you")}</p>
             </div>
 
             <FormField
@@ -400,10 +411,10 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    City <span className="text-muted-foreground text-xs">(optional)</span>
+                    {t("auth:city", "City")} <span className="text-muted-foreground text-xs">({t("auth:multiStep.step3.optional", "optional")})</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Amsterdam" {...field} />
+                    <Input placeholder={t("auth:cityPlaceholder", "Your city")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -416,7 +427,7 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Phone Number <span className="text-muted-foreground text-xs">(optional)</span>
+                    {t("auth:phoneNumber", "Phone Number")} <span className="text-muted-foreground text-xs">({t("auth:multiStep.step3.optional", "optional")})</span>
                   </FormLabel>
                   <FormControl>
                     <div className="flex gap-2">
@@ -459,7 +470,7 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormLabel className="text-sm font-normal cursor-pointer">
-                      I agree to the{" "}
+                      {t("auth:multiStep.terms.agree", "I agree to the")}{" "}
                       <button
                         type="button"
                         onClick={(e) => {
@@ -468,9 +479,9 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
                         }}
                         className="text-primary underline hover:text-primary/80"
                       >
-                        Terms of Service
+                        {t("auth:multiStep.terms.termsOfService", "Terms of Service")}
                       </button>{" "}
-                      and{" "}
+                      {t("auth:multiStep.terms.and", "and")}{" "}
                       <button
                         type="button"
                         onClick={(e) => {
@@ -479,7 +490,7 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
                         }}
                         className="text-primary underline hover:text-primary/80"
                       >
-                        Privacy Policy
+                        {t("auth:multiStep.terms.privacyPolicy", "Privacy Policy")}
                       </button>
                     </FormLabel>
                     <FormMessage />
@@ -490,16 +501,16 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
 
             <div className="flex gap-3">
               <Button type="button" variant="outline" onClick={prevStep} className="flex-1">
-                <ChevronLeft className="mr-2 h-4 w-4" /> Back
+                <ChevronLeft className="mr-2 h-4 w-4" /> {t("auth:multiStep.step3.back", "Back")}
               </Button>
               <Button type="submit" className="flex-1" disabled={registerMutation.isPending}>
                 {registerMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating...
+                    {t("auth:multiStep.step3.creating", "Creating...")}
                   </>
                 ) : (
-                  "Create Account"
+                  t("auth:multiStep.step3.createAccount", "Create Account")
                 )}
               </Button>
             </div>

@@ -69,6 +69,54 @@
       "loginFailed": "Inloggen mislukt",
       "registrationFailed": "Registratie mislukt",
       "logoutFailed": "Uitloggen mislukt"
+    },
+    "multiStep": {
+      "steps": {
+        "basics": "Basis",
+        "security": "Beveiliging",
+        "profile": "Profiel"
+      },
+      "step1": {
+        "title": "Aan de slag",
+        "subtitle": "Snelle aanmelding met Google of vul je gegevens in",
+        "orContinueWith": "of ga verder met e-mail",
+        "continue": "Doorgaan"
+      },
+      "step2": {
+        "title": "Beveilig je account",
+        "subtitle": "Kies een gebruikersnaam en maak een sterk wachtwoord",
+        "back": "Terug",
+        "continue": "Doorgaan"
+      },
+      "step3": {
+        "title": "Bijna klaar!",
+        "subtitle": "Voeg optionele gegevens toe zodat anderen je kunnen vinden",
+        "optional": "optioneel",
+        "back": "Terug",
+        "createAccount": "Account aanmaken",
+        "creating": "Aanmaken..."
+      },
+      "password": {
+        "strength": {
+          "tooWeak": "Te zwak",
+          "weak": "Zwak",
+          "fair": "Matig",
+          "good": "Goed",
+          "strong": "Sterk"
+        },
+        "requirements": {
+          "length": "Minimaal 8 tekens",
+          "uppercase": "Bevat hoofdletter",
+          "lowercase": "Bevat kleine letter",
+          "number": "Bevat een cijfer"
+        }
+      },
+      "terms": {
+        "agree": "Ik ga akkoord met de",
+        "termsOfService": "Algemene voorwaarden",
+        "and": "en",
+        "privacyPolicy": "Privacybeleid"
+      }
     }
   },
   "nav": {

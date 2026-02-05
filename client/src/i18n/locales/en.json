@@ -70,6 +70,54 @@
       "loginFailed": "Login failed",
       "registrationFailed": "Registration failed",
       "logoutFailed": "Logout failed"
+    },
+    "multiStep": {
+      "steps": {
+        "basics": "Basics",
+        "security": "Security",
+        "profile": "Profile"
+      },
+      "step1": {
+        "title": "Get Started",
+        "subtitle": "Quick signup with Google or enter your details",
+        "orContinueWith": "or continue with email",
+        "continue": "Continue"
+      },
+      "step2": {
+        "title": "Secure Your Account",
+        "subtitle": "Choose a username and create a strong password",
+        "back": "Back",
+        "continue": "Continue"
+      },
+      "step3": {
+        "title": "Almost Done!",
+        "subtitle": "Add optional details to help others find you",
+        "optional": "optional",
+        "back": "Back",
+        "createAccount": "Create Account",
+        "creating": "Creating..."
+      },
+      "password": {
+        "strength": {
+          "tooWeak": "Too weak",
+          "weak": "Weak",
+          "fair": "Fair",
+          "good": "Good",
+          "strong": "Strong"
+        },
+        "requirements": {
+          "length": "At least 8 characters",
+          "uppercase": "Contains uppercase letter",
+          "lowercase": "Contains lowercase letter",
+          "number": "Contains a number"
+        }
+      },
+      "terms": {
+        "agree": "I agree to the",
+        "termsOfService": "Terms of Service",
+        "and": "and",
+        "privacyPolicy": "Privacy Policy"
+      }
     }
   },
   "nav": {
