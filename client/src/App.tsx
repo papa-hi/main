@@ -79,6 +79,7 @@ function Router() {
       <ProtectedRoute path="/settings/delete-account" component={DeleteAccountPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
       <Route path="/privacy" component={PrivacyPolicyPage} />
+      <Route path="/privacy-policy" component={PrivacyPolicyPage} />
       <Route path="/about" component={AboutPage} />
 
       <ProtectedRoute path="/admin" component={AdminDashboard} />
