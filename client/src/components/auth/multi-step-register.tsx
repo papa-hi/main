@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -127,6 +127,7 @@ interface MultiStepRegisterProps {
 export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
   const { t } = useTranslation(["auth", "common"]);
   const { registerMutation } = useAuth();
+  const [, navigate] = useLocation();
   const [currentStep, setCurrentStep] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -459,13 +460,27 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
                   <div className="space-y-1 leading-none">
                     <FormLabel className="text-sm font-normal cursor-pointer">
                       I agree to the{" "}
-                      <Link href="/privacy" className="text-primary underline">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/privacy");
+                        }}
+                        className="text-primary underline hover:text-primary/80"
+                      >
                         Terms of Service
-                      </Link>{" "}
+                      </button>{" "}
                       and{" "}
-                      <Link href="/privacy" className="text-primary underline">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/privacy");
+                        }}
+                        className="text-primary underline hover:text-primary/80"
+                      >
                         Privacy Policy
-                      </Link>
+                      </button>
                     </FormLabel>
                     <FormMessage />
                   </div>
