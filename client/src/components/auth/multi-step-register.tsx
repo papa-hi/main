@@ -458,11 +458,11 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
                   <div className="space-y-1 leading-none">
                     <FormLabel className="text-sm font-normal cursor-pointer">
                       I agree to the{" "}
-                      <a href="/privacy-policy" target="_blank" className="text-primary underline">
+                      <a href="/privacy" target="_blank" className="text-primary underline">
                         Terms of Service
                       </a>{" "}
                       and{" "}
-                      <a href="/privacy-policy" target="_blank" className="text-primary underline">
+                      <a href="/privacy" target="_blank" className="text-primary underline">
                         Privacy Policy
                       </a>
                     </FormLabel>
