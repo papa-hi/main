@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
+import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -458,13 +459,13 @@ export function MultiStepRegister({ onSuccess }: MultiStepRegisterProps) {
                   <div className="space-y-1 leading-none">
                     <FormLabel className="text-sm font-normal cursor-pointer">
                       I agree to the{" "}
-                      <a href="/privacy" target="_blank" className="text-primary underline">
+                      <Link href="/privacy" className="text-primary underline">
                         Terms of Service
-                      </a>{" "}
+                      </Link>{" "}
                       and{" "}
-                      <a href="/privacy" target="_blank" className="text-primary underline">
+                      <Link href="/privacy" className="text-primary underline">
                         Privacy Policy
-                      </a>
+                      </Link>
                     </FormLabel>
                     <FormMessage />
                   </div>
