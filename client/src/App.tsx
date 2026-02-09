@@ -101,6 +101,8 @@ function App() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
+    let reloading = false;
+    
     // Register service worker for PWA capabilities
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -117,10 +119,8 @@ function App() {
               if (newWorker) {
                 newWorker.addEventListener('statechange', () => {
                   if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    // New service worker available, force it to activate
-                    console.log('New service worker available, reloading...');
+                    console.log('New service worker available, activating...');
                     newWorker.postMessage({ type: 'SKIP_WAITING' });
-                    window.location.reload();
                   }
                 });
               }
@@ -131,10 +131,13 @@ function App() {
           });
       });
       
-      // Listen for controller change and reload the page
+      // Listen for controller change and reload the page (only once)
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        console.log('Service worker controller changed, reloading...');
-        window.location.reload();
+        if (!reloading) {
+          reloading = true;
+          console.log('Service worker updated, reloading...');
+          window.location.reload();
+        }
       });
     }
 

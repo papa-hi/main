@@ -42,6 +42,8 @@ export function setupAuth(app: Express) {
     tableName: 'user_sessions' 
   });
 
+  const isProduction = process.env.NODE_ENV === 'production';
+  
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || 'papa-hi-session-secret',
     resave: false,
@@ -50,7 +52,7 @@ export function setupAuth(app: Express) {
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       httpOnly: true,
-      secure: false, // Set to false for development
+      secure: isProduction,
       sameSite: 'lax'
     }
   };
