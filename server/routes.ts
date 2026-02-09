@@ -232,9 +232,9 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     console.log("Session:", req.session);
   }
   
-  // For request debugging, log headers
+  // Session debugging for /api/user
   if (req.method === 'GET' && req.path === '/api/user' && !req.isAuthenticated()) {
-    console.log("ERROR HEADERS for GET /api/user:", JSON.stringify(req.headers));
+    console.log(`[SESSION_DEBUG] /api/user 401 - session.id=${req.session?.id}, passport.user=${(req.session as any)?.passport?.user || 'none'}, cookie present=${!!req.headers.cookie?.includes('connect.sid')}`);
   }
 
   // For API requests, show the full request body

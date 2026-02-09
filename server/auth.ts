@@ -77,17 +77,20 @@ export function setupAuth(app: Express) {
     }),
   );
 
-  passport.serializeUser((user, done) => done(null, user.id));
+  passport.serializeUser((user, done) => {
+    console.log(`[SESSION] Serializing user id=${user.id}, username=${user.username}`);
+    done(null, user.id);
+  });
   passport.deserializeUser(async (id: number, done) => {
     try {
       const user = await storage.getUserById(id);
       if (!user) {
-        // User not found in database, clear session
+        console.log(`[SESSION] Deserialize failed: user id=${id} not found in database`);
         return done(null, false);
       }
       done(null, user);
     } catch (error) {
-      console.error("Deserialize error:", error);
+      console.error(`[SESSION] Deserialize error for id=${id}:`, error);
       done(null, false);
     }
   });
@@ -150,12 +153,23 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
+    console.log(`[LOGIN] Attempt for username="${req.body.username}"`);
     passport.authenticate("local", (err: Error | null, user: SelectUser | false, info: any) => {
-      if (err) return next(err);
-      if (!user) return res.status(401).json({ error: "Invalid username or password" });
+      if (err) {
+        console.error(`[LOGIN] Auth error:`, err);
+        return next(err);
+      }
+      if (!user) {
+        console.log(`[LOGIN] Failed for username="${req.body.username}" - invalid credentials`);
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
       
       req.login(user, (loginErr) => {
-        if (loginErr) return next(loginErr);
+        if (loginErr) {
+          console.error(`[LOGIN] Session creation error for user id=${user.id}:`, loginErr);
+          return next(loginErr);
+        }
+        console.log(`[LOGIN] Success for user id=${user.id}, username="${user.username}", session.id=${req.session?.id}`);
         const userWithoutPassword = { ...user } as Partial<SelectUser>;
         delete userWithoutPassword.password;
         res.status(200).json(userWithoutPassword);
