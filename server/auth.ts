@@ -344,7 +344,7 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).json({ error: "Not authenticated" });
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Not authenticated" });
     const userWithoutPassword = { ...req.user } as Partial<SelectUser>;
     delete userWithoutPassword.password;
     res.json(userWithoutPassword);

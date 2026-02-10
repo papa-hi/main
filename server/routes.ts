@@ -218,28 +218,8 @@ async function notifyNearbyUsers(playdateId: number): Promise<void> {
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  // For search endpoints, we'll bypass authentication for testing purposes
   if (req.path.includes("/search")) {
-    console.log("Bypassing authentication for search route:", req.path);
     return next();
-  }
-  
-  // Debug authentication for profile endpoints
-  if (req.path.includes("/api/users/me/")) {
-    console.log("Auth check for profile endpoint:", req.path);
-    console.log("Is authenticated:", req.isAuthenticated());
-    console.log("User object:", req.user);
-    console.log("Session:", req.session);
-  }
-  
-  // Session debugging for /api/user
-  if (req.method === 'GET' && req.path === '/api/user' && !req.isAuthenticated()) {
-    console.log(`[SESSION_DEBUG] /api/user 401 - session.id=${req.session?.id}, passport.user=${(req.session as any)?.passport?.user || 'none'}, cookie present=${!!req.headers.cookie?.includes('connect.sid')}`);
-  }
-
-  // For API requests, show the full request body
-  if (req.method === 'POST' && req.path === '/api/playdates') {
-    console.log("REQUEST BODY for POST /api/playdates:", JSON.stringify(req.body));
   }
   
   if (req.isAuthenticated()) {
@@ -1187,7 +1167,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Advanced search endpoint - Allow without authentication for testing
   app.get("/api/users/search", async (req: Request, res: Response) => {
     // Skip authentication check for testing
-    console.log("Accessing /api/users/search without authentication check");
     try {
       const { 
         query, 
@@ -1369,12 +1348,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Upload profile image
   app.post("/api/users/me/profile-image", isAuthenticated, upload.single('profileImage'), async (req: Request, res: Response) => {
-    console.log("REQUEST BODY for POST /api/users/me/profile-image:", req.body);
-    console.log("Auth check for profile endpoint:", req.url);
-    console.log("Is authenticated:", req.isAuthenticated());
-    console.log("User object:", req.user);
-    console.log("Session:", req.session);
-    
     try {
       const userId = req.user?.id;
       
