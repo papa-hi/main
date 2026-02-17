@@ -47,6 +47,11 @@ The application is designed for scalability and real-time interaction, leveragin
 - Disabled directory listing for /uploads
 - robots.txt with AI crawler blocking and sitemap reference
 - Explicit static file routing before SPA catch-all
+- Helmet security headers (X-Content-Type-Options, X-Frame-Options, HSTS, etc.)
+- Rate limiting on auth endpoints: login (10/15min), register (5/hour), password reset (5/15min)
+- Input sanitization (server/sanitize.ts): strips script tags, event handlers, dangerous HTML, javascript: URIs from user-generated content
+- Profile update hardening: strips role, id, and password fields from update requests
+- Registration hardening: "admin" username blocked, role always forced to 'user'
 
 ## External Dependencies
 - **Email Service**: Resend API
