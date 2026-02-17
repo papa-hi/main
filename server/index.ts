@@ -12,6 +12,7 @@ app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
   crossOriginResourcePolicy: { policy: "cross-origin" },
+  frameguard: false,
 }));
 
 // Security: Catch malformed URIs (like /%c0) to prevent crashes from bot attacks
