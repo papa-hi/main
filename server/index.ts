@@ -3,8 +3,16 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 import fs from "fs";
+import helmet from "helmet";
 
 const app = express();
+
+// Security headers via Helmet
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
 
 // Security: Catch malformed URIs (like /%c0) to prevent crashes from bot attacks
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
@@ -14,7 +22,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   next(err);
 });
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false }));
 
 // Ensure uploads directories exist

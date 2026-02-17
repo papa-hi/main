@@ -11,6 +11,8 @@ import { pool } from "./db";
 import { sendWelcomeEmail, sendPasswordResetEmail } from "./email-service";
 import { emailQueue } from "./email-queue";
 import { passwordResetTokens } from "@shared/schema";
+import rateLimit from "express-rate-limit";
+import { sanitizeObject } from "./sanitize";
 
 declare global {
   namespace Express {
@@ -95,29 +97,51 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/register", async (req, res, next) => {
+  const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { error: "Too many login attempts. Please try again in 15 minutes." },
+    standardHeaders: true,
+    legacyHeaders: false,
+    validate: { trustProxy: false },
+  });
+
+  const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    message: { error: "Too many registration attempts. Please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+    validate: { trustProxy: false },
+  });
+
+  const passwordResetLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { error: "Too many password reset attempts. Please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+    validate: { trustProxy: false },
+  });
+
+  app.post("/api/register", registerLimiter, async (req, res, next) => {
     try {
-      const existingUser = await storage.getUserByUsername(req.body.username);
+      const sanitizedBody = sanitizeObject(req.body, ['username', 'firstName', 'lastName', 'bio', 'city', 'email']);
+      const existingUser = await storage.getUserByUsername(sanitizedBody.username);
       if (existingUser) {
         return res.status(400).json({ error: "Username already exists" });
       }
 
-      // Hash the password before storing
+      if (sanitizedBody.username.toLowerCase() === 'admin') {
+        return res.status(400).json({ error: "This username is reserved" });
+      }
+
       const hashedPassword = await hashPassword(req.body.password);
       
-      // Set default role to user if not provided
-      const role = req.body.role || 'user';
-      
-      // For security, only allow admin role if it's specifically for the admin user
-      // or in development environment
-      const finalRole = (req.body.username === 'admin' || process.env.NODE_ENV === 'development') 
-                      ? role 
-                      : 'user';
-      
       const user = await storage.createUser({
-        ...req.body,
+        ...sanitizedBody,
         password: hashedPassword,
-        role: finalRole
+        role: 'user'
       });
 
       // Send welcome email (don't wait for it to complete)
@@ -152,7 +176,7 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", (req, res, next) => {
+  app.post("/api/login", loginLimiter, (req, res, next) => {
     console.log(`[LOGIN] Attempt for username="${req.body.username}"`);
     passport.authenticate("local", (err: Error | null, user: SelectUser | false, info: any) => {
       if (err) {
@@ -185,7 +209,7 @@ export function setupAuth(app: Express) {
   });
 
   // Password reset endpoints
-  app.post("/api/forgot-password", async (req, res, next) => {
+  app.post("/api/forgot-password", passwordResetLimiter, async (req, res, next) => {
     try {
       const { email } = req.body;
       

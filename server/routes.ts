@@ -18,6 +18,7 @@ import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPl
 import { pushSubscriptions, matchPreferences, pageViews, featureUsage } from "@shared/schema";
 import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified } from "./notification-scheduler";
 import { calculateDistance, getCityCoordinates } from "./dad-matching-service";
+import { sanitizeText, sanitizeObject } from "./sanitize";
 import { geocodeAddress } from "./geocoding";
 
 // Counter to track which playground image to use next
@@ -1271,9 +1272,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
       
-      // Remove sensitive fields that shouldn't be updated directly
-      const updateData = { ...req.body } as Partial<SelectUser>;
-      delete updateData.password; // Password should be updated through a dedicated endpoint
+      const sanitizedBody = sanitizeObject(req.body, ['firstName', 'lastName', 'bio', 'city']);
+      const updateData = { ...sanitizedBody } as Partial<SelectUser>;
+      delete updateData.password;
+      delete (updateData as any).role;
+      delete (updateData as any).id;
       
       const updatedUser = await storage.updateUser(userId, updateData);
       
@@ -3203,8 +3206,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Not authenticated" });
       }
 
+      const sanitizedBody = sanitizeObject(req.body, ['title', 'content']);
       const validatedData = insertCommunityPostSchema.parse({
-        ...req.body,
+        ...sanitizedBody,
         userId,
       });
 
@@ -3463,8 +3467,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid post ID" });
       }
 
+      const sanitizedBody = sanitizeObject(req.body, ['content']);
       const validatedData = insertCommunityCommentSchema.parse({
-        ...req.body,
+        ...sanitizedBody,
         postId,
         authorId: userId,
       });
@@ -3736,7 +3741,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const postId = parseInt(req.params.id);
-      const { title, content, category, hashtags } = req.body;
+      const sanitizedBody = sanitizeObject(req.body, ['title', 'content']);
+      const { title, content, category, hashtags } = sanitizedBody;
 
       if (!content?.trim()) {
         return res.status(400).json({ error: "Content is required" });
@@ -3824,7 +3830,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const commentId = parseInt(req.params.id);
-      const { content } = req.body;
+      const content = sanitizeText(req.body.content);
 
       if (!content?.trim()) {
         return res.status(400).json({ error: "Content is required" });
