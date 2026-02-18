@@ -67,24 +67,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         const newSocket = new WebSocket(wsUrl);
         
         newSocket.onopen = () => {
-          console.log("WebSocket connection established");
+          console.log("WebSocket connection established (session-based auth)");
           setConnected(true);
           setConnecting(false);
           
-          // Clear any existing reconnect timeouts
           if (reconnectTimeoutRef.current) {
             clearTimeout(reconnectTimeoutRef.current);
             reconnectTimeoutRef.current = null;
-          }
-          
-          // Authenticate the connection
-          if (user) {
-            console.log("Authenticating WebSocket connection...");
-            newSocket.send(JSON.stringify({
-              type: 'authenticate',
-              userId: user.id,
-              token: 'mock-token' // In a real implementation, use a real auth token
-            }));
           }
         };
         

@@ -1,6 +1,6 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { Express } from "express";
+import express, { Express } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -21,6 +21,10 @@ declare global {
 }
 
 const scryptAsync = promisify(scrypt);
+
+export let sessionMiddleware: express.RequestHandler;
+export let passportInitMiddleware: express.RequestHandler;
+export let passportSessionMiddleware: express.RequestHandler;
 
 export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
@@ -60,9 +64,14 @@ export function setupAuth(app: Express) {
   };
 
   app.set("trust proxy", 1);
-  app.use(session(sessionSettings));
-  app.use(passport.initialize());
-  app.use(passport.session());
+
+  sessionMiddleware = session(sessionSettings);
+  passportInitMiddleware = passport.initialize();
+  passportSessionMiddleware = passport.session();
+
+  app.use(sessionMiddleware);
+  app.use(passportInitMiddleware);
+  app.use(passportSessionMiddleware);
 
   passport.use(
     new LocalStrategy(async (username, password, done) => {

@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings, communityPosts, communityComments, communityReactions, communityMentions, insertCommunityPostSchema, insertCommunityCommentSchema, insertCommunityReactionSchema, familyEvents } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { setupAuth } from "./auth";
+import { setupAuth, sessionMiddleware, passportInitMiddleware, passportSessionMiddleware } from "./auth";
 import { setupAdminRoutes, logUserActivity } from "./admin";
 import { upload, getFileUrl, deleteProfileImage, storeImageInDatabase } from "./upload";
 import path from "path";
@@ -3909,36 +3909,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create HTTP server
   const httpServer = createServer(app);
   
-  // WebSocket Server setup
-  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  // WebSocket Server setup - noServer so we handle upgrade manually with session auth
+  const wss = new WebSocketServer({ noServer: true });
   
   // Client connections and their associated user IDs
   const clients = new Map<WebSocket, { userId: number | null }>();
+
+  // Wire up session-based auth on WebSocket upgrade
+  httpServer.on('upgrade', (req: any, socket, head) => {
+    // Only handle /ws path, let Vite HMR handle other upgrades
+    const urlPath = req.url?.split('?')[0];
+    if (urlPath !== '/ws') {
+      return;
+    }
+
+    sessionMiddleware(req, {} as any, () => {
+      passportInitMiddleware(req, {} as any, () => {
+        passportSessionMiddleware(req, {} as any, () => {
+          wss.handleUpgrade(req, socket, head, (ws) => {
+            wss.emit('connection', ws, req);
+          });
+        });
+      });
+    });
+  });
   
-  wss.on('connection', (ws) => {
-    // Initially, the connection is not authenticated
-    clients.set(ws, { userId: null });
+  wss.on('connection', (ws, req: any) => {
+    const userId = req.user?.id ?? null;
     
-    console.log('WebSocket client connected');
+    if (!userId) {
+      ws.close(4001, 'Unauthorized');
+      return;
+    }
+
+    clients.set(ws, { userId });
+    console.log(`WebSocket client connected, userId=${userId}`);
+
+    ws.send(JSON.stringify({ type: 'authenticated', success: true }));
     
     ws.on('message', async (message) => {
       try {
         const data = JSON.parse(message.toString());
         
-        // Handle authentication message
-        if (data.type === 'authenticate') {
-          if (data.token) {
-            // In a real app, you would verify the token here
-            // For now, we'll trust the user ID sent by the client
-            clients.set(ws, { userId: data.userId });
-            ws.send(JSON.stringify({
-              type: 'authenticated',
-              success: true
-            }));
-          }
-        }
         // Handle get_messages request
-        else if (data.type === 'get_messages') {
+        if (data.type === 'get_messages') {
           const clientInfo = clients.get(ws);
           if (!clientInfo || !clientInfo.userId) {
             ws.send(JSON.stringify({
