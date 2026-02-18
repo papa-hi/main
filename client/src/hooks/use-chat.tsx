@@ -1,8 +1,9 @@
-import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from "react";
 import { useAuth } from "@/hooks/use-auth";
 
-// Message expiration time: 1 week in milliseconds
 const MESSAGE_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000;
+const RECONNECT_BASE_DELAY = 3000;
+const RECONNECT_MAX_DELAY = 30000;
 
 type Message = {
   id: number;
@@ -27,167 +28,153 @@ type ChatContextType = {
 
 const ChatContext = createContext<ChatContextType | null>(null);
 
+function saveMessagesToStorage(msgs: Record<number, Message[]>, chatId?: number) {
+  try {
+    const existing = localStorage.getItem('papa-hi-chat-messages');
+    const existingTimestamps = existing
+      ? JSON.parse(existing).timestamps || {}
+      : {};
+    localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
+      messages: msgs,
+      timestamps: {
+        ...existingTimestamps,
+        ...(chatId != null ? { [chatId]: Date.now() } : {}),
+      },
+    }));
+  } catch {
+    // localStorage quota or parse error — ignore
+  }
+}
+
 export function ChatProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const socketRef = useRef<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [messages, setMessages] = useState<Record<number, Message[]>>(() => {
     try {
-      // Load messages from localStorage
       const storedData = localStorage.getItem('papa-hi-chat-messages');
       if (storedData) {
-        const { messages, timestamps } = JSON.parse(storedData);
-        
-        // Messages are retained if their timestamp is within the retention period
-        // We'll filter expired messages per chat later in the code
-        return messages;
+        const { messages: storedMessages } = JSON.parse(storedData);
+        return storedMessages || {};
       }
-    } catch (err) {
-      console.error('Error loading cached messages:', err);
+    } catch {
+      // ignore
     }
     return {};
   });
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
-  // Setup WebSocket connection
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectAttemptsRef = useRef(0);
+  const unmountedRef = useRef(false);
+
   useEffect(() => {
+    unmountedRef.current = false;
     if (!user) return;
-    
+
     const connectWebSocket = () => {
+      if (unmountedRef.current) return;
       setConnecting(true);
-      
+
       try {
-        // Choose the appropriate protocol based on the current connection
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const host = window.location.host || "localhost:5000"; // Fallback to default port
+        const host = window.location.host || "localhost:5000";
         const wsUrl = `${protocol}//${host}/ws`;
-        
-        console.log(`Attempting to connect to WebSocket at: ${wsUrl}`);
-        const newSocket = new WebSocket(wsUrl);
-        
-        newSocket.onopen = () => {
-          console.log("WebSocket connection established (session-based auth)");
+
+        const ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+          if (unmountedRef.current) { ws.close(); return; }
+          console.log("WebSocket connected (session auth)");
           setConnected(true);
           setConnecting(false);
-          
+          reconnectAttemptsRef.current = 0;
+
           if (reconnectTimeoutRef.current) {
             clearTimeout(reconnectTimeoutRef.current);
             reconnectTimeoutRef.current = null;
           }
         };
-        
-        newSocket.onclose = () => {
-          console.log("WebSocket connection closed");
+
+        ws.onclose = (event) => {
+          if (unmountedRef.current) return;
+          console.log(`WebSocket closed: code=${event.code}`);
           setConnected(false);
-          
-          // Set up reconnection
+          socketRef.current = null;
+
+          if (event.code === 4001) {
+            console.log("WebSocket auth failed — refreshing session and retrying");
+            setConnecting(false);
+            fetch('/api/user', { credentials: 'include' })
+              .then((res) => {
+                if (res.ok && !unmountedRef.current) {
+                  reconnectTimeoutRef.current = setTimeout(() => {
+                    reconnectTimeoutRef.current = null;
+                    connectWebSocket();
+                  }, RECONNECT_BASE_DELAY);
+                }
+              })
+              .catch(() => {});
+            return;
+          }
+
+          const attempt = reconnectAttemptsRef.current;
+          const delay = Math.min(RECONNECT_BASE_DELAY * Math.pow(2, attempt), RECONNECT_MAX_DELAY);
+          reconnectAttemptsRef.current = attempt + 1;
+
           if (!reconnectTimeoutRef.current) {
             reconnectTimeoutRef.current = setTimeout(() => {
               reconnectTimeoutRef.current = null;
               connectWebSocket();
-            }, 3000);
+            }, delay);
           }
         };
-        
-        newSocket.onerror = (error) => {
-          console.error("WebSocket error:", error);
+
+        ws.onerror = () => {
+          // onclose will fire after this
         };
-        
-        newSocket.onmessage = (event) => {
+
+        ws.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            
+
             if (data.type === "initial_messages") {
-              // Handle initial messages batch from server (after connecting or requesting messages)
-              setMessages((prevMessages) => {
-                // Get existing messages for this chat
-                const existingMessages = prevMessages[data.chatId] || [];
-                
-                // Check which messages are new
-                const newMessages = data.messages.filter(
-                  (newMsg: Message) => !existingMessages.some((existingMsg) => existingMsg.id === newMsg.id)
+              setMessages((prev) => {
+                const existing = prev[data.chatId] || [];
+                const incoming = data.messages.filter(
+                  (m: Message) => !existing.some((e) => e.id === m.id)
                 );
-                
-                // If no new messages, return existing state
-                if (newMessages.length === 0) {
-                  return prevMessages;
-                }
-                
-                // Combine existing and new messages
-                const combinedMessages = [...existingMessages, ...newMessages];
-                
-                // Sort by sent time
-                combinedMessages.sort((a, b) => 
-                  new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
+                if (incoming.length === 0) return prev;
+
+                const combined = [...existing, ...incoming].sort(
+                  (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
                 );
-                
-                const updatedMessages = {
-                  ...prevMessages,
-                  [data.chatId]: combinedMessages
-                };
-                
-                // Store to localStorage with message timestamps
-                localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
-                  messages: updatedMessages,
-                  timestamps: {
-                    ...JSON.parse(localStorage.getItem('papa-hi-chat-messages') || '{"timestamps":{}}').timestamps,
-                    [data.chatId]: Date.now()
-                  }
-                }));
-                
-                return updatedMessages;
+                const updated = { ...prev, [data.chatId]: combined };
+                saveMessagesToStorage(updated, data.chatId);
+                return updated;
               });
-              
-              console.log(`Loaded ${data.messages.length} messages for chat ${data.chatId} from server`);
-            }
-            else if (data.type === "message") {
-              const message = data.message;
-              
-              setMessages((prevMessages) => {
-                const chatMessages = [...(prevMessages[message.chatId] || [])];
-                
-                // Check if the message already exists
-                const messageExists = chatMessages.some(m => m.id === message.id);
-                
-                if (!messageExists) {
-                  chatMessages.push(message);
-                  
-                  // Sort messages by sentAt
-                  chatMessages.sort((a, b) => {
-                    return new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime();
-                  });
-                }
-                
-                const updatedMessages = {
-                  ...prevMessages,
-                  [message.chatId]: chatMessages,
-                };
-                
-                // Store updated messages to localStorage with per-chat timestamps
-                localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
-                  messages: updatedMessages,
-                  timestamps: {
-                    ...JSON.parse(localStorage.getItem('papa-hi-chat-messages') || '{"timestamps":{}}').timestamps,
-                    [message.chatId]: Date.now()
-                  }
-                }));
-                
-                return updatedMessages;
+            } else if (data.type === "message") {
+              const msg = data.message;
+              setMessages((prev) => {
+                const chatMsgs = [...(prev[msg.chatId] || [])];
+                if (chatMsgs.some((m) => m.id === msg.id)) return prev;
+
+                chatMsgs.push(msg);
+                chatMsgs.sort(
+                  (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
+                );
+                const updated = { ...prev, [msg.chatId]: chatMsgs };
+                saveMessagesToStorage(updated, msg.chatId);
+                return updated;
               });
-            // We already handle initial_messages above
             }
-          } catch (error) {
-            console.error("Error parsing WebSocket message:", error);
+          } catch {
+            // ignore parse errors
           }
         };
-        
-        setSocket(newSocket);
-      } catch (error) {
-        console.error("Failed to create WebSocket connection:", error);
+
+        socketRef.current = ws;
+      } catch {
         setConnecting(false);
-        
-        // Schedule reconnection attempt
         if (!reconnectTimeoutRef.current) {
           reconnectTimeoutRef.current = setTimeout(() => {
             reconnectTimeoutRef.current = null;
@@ -196,139 +183,102 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         }
       }
     };
-    
+
     connectWebSocket();
-    
-    // Cleanup function
+
     return () => {
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.close();
+      unmountedRef.current = true;
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
       }
-      
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
       }
     };
   }, [user]);
 
-  // Load initial messages for a chat when it's opened
-  const loadInitialMessages = (chatId: number) => {
-    if (!socket || socket.readyState !== WebSocket.OPEN) return;
-
-    socket.send(JSON.stringify({
-      type: "get_messages",
-      chatId: chatId,
-    }));
-  };
-
-  // Send a message via WebSocket
-  const sendMessage = async (chatId: number, content: string): Promise<void> => {
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
+  const sendMessage = useCallback(async (chatId: number, content: string): Promise<void> => {
+    const ws = socketRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
       throw new Error("WebSocket connection not open");
     }
+    ws.send(JSON.stringify({ type: "send_message", chatId, content }));
+  }, []);
 
-    socket.send(JSON.stringify({
-      type: "send_message",
-      chatId: chatId,
-      content: content,
-    }));
-  };
-
-  // Subscribe to messages when a chat is opened
   useEffect(() => {
-    if (!socket || !connected) return;
+    if (!connected) return;
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        // When the tab becomes visible, reload messages
+      const ws = socketRef.current;
+      if (document.visibilityState === "visible" && ws && ws.readyState === WebSocket.OPEN) {
         Object.keys(messages).forEach((chatId) => {
-          loadInitialMessages(parseInt(chatId));
+          ws.send(JSON.stringify({ type: "get_messages", chatId: parseInt(chatId) }));
         });
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [connected, messages]);
 
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [socket, connected, messages]);
-  
-  // Check for expired messages on component mount and periodically
   useEffect(() => {
     const checkExpiredMessages = () => {
       try {
         const storedData = localStorage.getItem('papa-hi-chat-messages');
-        if (storedData) {
-          const { messages: storedMessages, timestamps } = JSON.parse(storedData);
+        if (!storedData) return;
+
+        const { messages: storedMessages, timestamps } = JSON.parse(storedData);
+        if (!timestamps) {
           const now = Date.now();
-          
-          if (!timestamps) {
-            // If using old format, migrate to new format
-            localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
-              messages: storedMessages,
-              timestamps: Object.keys(storedMessages).reduce((acc, chatId) => {
-                acc[chatId] = now;
-                return acc;
-              }, {})
-            }));
-            return;
+          localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
+            messages: storedMessages,
+            timestamps: Object.keys(storedMessages).reduce((acc: Record<string, number>, chatId: string) => {
+              acc[chatId] = now;
+              return acc;
+            }, {}),
+          }));
+          return;
+        }
+
+        let hasExpired = false;
+        const updatedMessages = { ...storedMessages };
+        const updatedTimestamps = { ...timestamps };
+        const now = Date.now();
+
+        Object.entries(timestamps).forEach(([chatId, timestamp]) => {
+          if (now - Number(timestamp) >= MESSAGE_EXPIRATION_TIME) {
+            delete updatedMessages[chatId];
+            delete updatedTimestamps[chatId];
+            hasExpired = true;
           }
-          
-          // Check each chat's timestamp individually
-          let hasExpired = false;
-          const updatedMessages = { ...storedMessages };
-          const updatedTimestamps = { ...timestamps };
-          
-          Object.entries(timestamps).forEach(([chatId, timestamp]) => {
-            if (now - Number(timestamp) >= MESSAGE_EXPIRATION_TIME) {
-              console.log(`Chat ${chatId} messages have expired (older than 1 week), removing`);
-              delete updatedMessages[chatId];
-              delete updatedTimestamps[chatId];
-              hasExpired = true;
-            }
-          });
-          
-          // Update storage if any chats were expired
-          if (hasExpired) {
-            if (Object.keys(updatedMessages).length === 0) {
-              console.log('All chat messages expired, clearing cache');
-              localStorage.removeItem('papa-hi-chat-messages');
-              setMessages({});
-            } else {
-              localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
-                messages: updatedMessages,
-                timestamps: updatedTimestamps
-              }));
-              setMessages(updatedMessages);
-            }
+        });
+
+        if (hasExpired) {
+          if (Object.keys(updatedMessages).length === 0) {
+            localStorage.removeItem('papa-hi-chat-messages');
+            setMessages({});
+          } else {
+            localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
+              messages: updatedMessages,
+              timestamps: updatedTimestamps,
+            }));
+            setMessages(updatedMessages);
           }
         }
-      } catch (err) {
-        console.error('Error checking message expiration:', err);
+      } catch {
+        // ignore
       }
     };
-    
-    // Check on component mount
+
     checkExpiredMessages();
-    
-    // Set interval to check daily
     const dailyCheck = setInterval(checkExpiredMessages, 24 * 60 * 60 * 1000);
-    
-    return () => {
-      clearInterval(dailyCheck);
-    };
+    return () => clearInterval(dailyCheck);
   }, []);
 
   return (
-    <ChatContext.Provider
-      value={{
-        connected,
-        connecting,
-        sendMessage,
-        messages,
-      }}
-    >
+    <ChatContext.Provider value={{ connected, connecting, sendMessage, messages }}>
       {children}
     </ChatContext.Provider>
   );

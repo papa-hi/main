@@ -2183,7 +2183,10 @@ export class DatabaseStorage implements IStorage {
         .innerJoin(users, eq(chatParticipants.userId, users.id))
         .where(eq(chatParticipants.chatId, chatId));
       
-      // Get the last message for this chat
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+      // Get the last message for this chat (only within retention period)
       const [lastMessage] = await db
         .select({
           id: chatMessages.id,
@@ -2194,11 +2197,16 @@ export class DatabaseStorage implements IStorage {
         })
         .from(chatMessages)
         .innerJoin(users, eq(chatMessages.senderId, users.id))
-        .where(eq(chatMessages.chatId, chatId))
+        .where(
+          and(
+            eq(chatMessages.chatId, chatId),
+            gte(chatMessages.sentAt, oneWeekAgo)
+          )
+        )
         .orderBy(desc(chatMessages.sentAt))
         .limit(1);
       
-      // Count unread messages
+      // Count unread messages (only within 7-day retention period)
       const [{ unreadCount }] = await db
         .select({
           unreadCount: count()
@@ -2207,8 +2215,9 @@ export class DatabaseStorage implements IStorage {
         .where(
           and(
             eq(chatMessages.chatId, chatId),
-            not(eq(chatMessages.senderId, userId)), // Not sent by the current user
-            eq(chatMessages.isRead, false) // Not read yet
+            not(eq(chatMessages.senderId, userId)),
+            eq(chatMessages.isRead, false),
+            gte(chatMessages.sentAt, oneWeekAgo)
           )
         );
       
