@@ -197,7 +197,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         reconnectTimeoutRef.current = null;
       }
     };
-  }, [user]);
+  }, [user?.id]);
 
   const sendMessage = useCallback(async (chatId: number, content: string): Promise<void> => {
     const ws = socketRef.current;
@@ -207,13 +207,16 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     ws.send(JSON.stringify({ type: "send_message", chatId, content }));
   }, []);
 
+  const messagesRef = useRef(messages);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
+
   useEffect(() => {
     if (!connected) return;
 
     const handleVisibilityChange = () => {
       const ws = socketRef.current;
       if (document.visibilityState === "visible" && ws && ws.readyState === WebSocket.OPEN) {
-        Object.keys(messages).forEach((chatId) => {
+        Object.keys(messagesRef.current).forEach((chatId) => {
           ws.send(JSON.stringify({ type: "get_messages", chatId: parseInt(chatId) }));
         });
       }
@@ -221,7 +224,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [connected, messages]);
+  }, [connected]);
 
   useEffect(() => {
     const checkExpiredMessages = () => {
