@@ -16,7 +16,7 @@ import {
   FamilyEvent, InsertFamilyEvent, familyEvents
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, isNotNull, not, inArray, like, or } from "drizzle-orm";
+import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, isNotNull, not, inArray, like, or, type SQL } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -1012,9 +1012,10 @@ export class DatabaseStorage implements IStorage {
     const offset = Math.max(0, options?.offset || 0);
     
     // Get total count
-    const [{ count: totalCount }] = await db
+    const countResult = await db
       .select({ count: count() })
       .from(users);
+    const totalCount = countResult[0]?.count ?? 0;
     
     // Get paginated users
     const result = await db
@@ -1062,27 +1063,30 @@ export class DatabaseStorage implements IStorage {
   
   async getUserStats(): Promise<{ total: number, newLastWeek: number, activeLastMonth: number }> {
     // Get total users
-    const [{ count: total }] = await db
+    const totalResult = await db
       .select({ count: count() })
       .from(users);
+    const total = totalResult[0]?.count ?? 0;
       
     // Get users created in the last week
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     
-    const [{ count: newLastWeek }] = await db
+    const newLastWeekResult = await db
       .select({ count: count() })
       .from(users)
       .where(gte(users.createdAt, oneWeekAgo));
+    const newLastWeek = newLastWeekResult[0]?.count ?? 0;
       
     // Get users who logged in in the last month
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
     
-    const [{ count: activeLastMonth }] = await db
+    const activeLastMonthResult = await db
       .select({ count: count() })
       .from(users)
       .where(gte(users.lastLogin, oneMonthAgo));
+    const activeLastMonth = activeLastMonthResult[0]?.count ?? 0;
       
     return {
       total: Number(total) || 0,
@@ -1134,9 +1138,10 @@ export class DatabaseStorage implements IStorage {
     const offset = Math.max(0, options?.offset || 0);
     
     // Get total count
-    const [{ count: totalCount }] = await db
+    const countResult = await db
       .select({ count: count() })
       .from(userActivity);
+    const totalCount = countResult[0]?.count ?? 0;
     
     // Get paginated activity
     const result = await db
@@ -1180,16 +1185,18 @@ export class DatabaseStorage implements IStorage {
     daysAgo.setDate(daysAgo.getDate() - days);
 
     // Get total actions in period
-    const [{ count: totalActions }] = await db
+    const totalActionsResult = await db
       .select({ count: count() })
       .from(userActivity)
       .where(gte(userActivity.timestamp, daysAgo));
+    const totalActions = totalActionsResult[0]?.count ?? 0;
 
     // Get unique users in period
-    const [{ count: uniqueUsers }] = await db
+    const uniqueUsersResult = await db
       .select({ count: sql<number>`COUNT(DISTINCT ${userActivity.userId})` })
       .from(userActivity)
       .where(gte(userActivity.timestamp, daysAgo));
+    const uniqueUsers = uniqueUsersResult[0]?.count ?? 0;
 
     // Get top actions
     const topActions = await db
@@ -1299,9 +1306,10 @@ export class DatabaseStorage implements IStorage {
     const offset = Math.max(0, options?.offset || 0);
     
     // Get total count
-    const [{ count: totalCount }] = await db
+    const adminCountResult = await db
       .select({ count: count() })
       .from(adminLogs);
+    const totalCount = adminCountResult[0]?.count ?? 0;
     
     // Get paginated logs
     const result = await db
@@ -1340,12 +1348,12 @@ export class DatabaseStorage implements IStorage {
     limit?: number;
     offset?: number;
   }): Promise<User[]> {
-    let query = db.select().from(users);
+    const conditions: SQL[] = [];
     
     if (filters) {
       if (filters.searchQuery) {
         const searchTerm = `%${filters.searchQuery}%`;
-        query = query.where(
+        conditions.push(
           sql`(${users.firstName} ILIKE ${searchTerm} OR 
                ${users.lastName} ILIKE ${searchTerm} OR 
                ${users.username} ILIKE ${searchTerm} OR
@@ -1354,24 +1362,21 @@ export class DatabaseStorage implements IStorage {
       }
       
       if (filters.city) {
-        query = query.where(eq(users.city, filters.city));
+        conditions.push(eq(users.city, filters.city));
       }
-      
-      // For child age filtering, we'd need to parse the JSON array in childrenInfo
-      // This is a simplified version that works if childrenInfo is stored properly
-      if (filters.childAgeRange && filters.childAgeRange.length === 2) {
-        const [minAge, maxAge] = filters.childAgeRange;
-        // This would need a more complex query with JSONB operations
-        // For simplicity, we'll return all users and filter in memory
-        // In a real implementation, this would be a database query
-      }
-      
+    }
+    
+    let query = conditions.length > 0
+      ? db.select().from(users).where(and(...conditions))
+      : db.select().from(users);
+    
+    if (filters) {
       if (filters.limit) {
-        query = query.limit(filters.limit);
+        query = query.limit(Number(filters.limit));
       }
       
       if (filters.offset) {
-        query = query.offset(filters.offset);
+        query = query.offset(Number(filters.offset));
       }
     }
     
@@ -1468,15 +1473,12 @@ export class DatabaseStorage implements IStorage {
   }): Promise<Playdate[]> {
     const now = new Date();
     
-    let query = db
-      .select()
-      .from(playdates)
-      .where(and(gt(playdates.startTime, now), isNull(playdates.archivedAt)));
+    const conditions: SQL[] = [gt(playdates.startTime, now), isNull(playdates.archivedAt)];
     
     if (filters) {
       if (filters.searchQuery) {
         const searchTerm = `%${filters.searchQuery}%`;
-        query = query.where(
+        conditions.push(
           sql`(${playdates.title} ILIKE ${searchTerm} OR 
                ${playdates.description} ILIKE ${searchTerm} OR 
                ${playdates.location} ILIKE ${searchTerm})`
@@ -1484,36 +1486,38 @@ export class DatabaseStorage implements IStorage {
       }
       
       if (filters.startDateMin) {
-        query = query.where(gte(playdates.startTime, filters.startDateMin));
+        conditions.push(gte(playdates.startTime, filters.startDateMin));
       }
       
       if (filters.startDateMax) {
-        query = query.where(lte(playdates.startTime, filters.startDateMax));
+        conditions.push(lte(playdates.startTime, filters.startDateMax));
       }
       
       if (filters.location) {
         const locationTerm = `%${filters.location}%`;
-        query = query.where(sql`${playdates.location} ILIKE ${locationTerm}`);
+        conditions.push(sql`${playdates.location} ILIKE ${locationTerm}`);
       }
       
       if (filters.maxParticipants) {
-        query = query.where(lte(playdates.maxParticipants, filters.maxParticipants));
+        conditions.push(lte(playdates.maxParticipants, Number(filters.maxParticipants)));
       }
       
       if (filters.creatorId) {
-        query = query.where(eq(playdates.creatorId, filters.creatorId));
+        conditions.push(eq(playdates.creatorId, Number(filters.creatorId)));
       }
-      
-      // The hasAvailableSpots filter needs a subquery count of participants
-      // We'll do this filtering in memory for simplicity
-      
-      if (filters.limit) {
-        query = query.limit(filters.limit);
-      }
-      
-      if (filters.offset) {
-        query = query.offset(filters.offset);
-      }
+    }
+    
+    let query = db
+      .select()
+      .from(playdates)
+      .where(and(...conditions));
+    
+    if (filters?.limit) {
+      query = query.limit(Number(filters.limit));
+    }
+    
+    if (filters?.offset) {
+      query = query.offset(Number(filters.offset));
     }
     
     query = query.orderBy(asc(playdates.startTime));
@@ -1757,25 +1761,23 @@ export class DatabaseStorage implements IStorage {
     offset?: number,
     userId?: number // To check if places are favorites
   }): Promise<Place[]> {
-    let query = db
-      .select()
-      .from(places);
+    const conditions: SQL[] = [];
     
     // Filter by type if specified
     if (options.type) {
       if (options.type === "restaurants") {
-        query = query.where(eq(places.type, "restaurant"));
+        conditions.push(eq(places.type, "restaurant"));
       } else if (options.type === "playgrounds") {
-        query = query.where(eq(places.type, "playground"));
+        conditions.push(eq(places.type, "playground"));
       } else if (options.type !== "all") {
-        query = query.where(eq(places.type, options.type));
+        conditions.push(eq(places.type, options.type));
       }
     }
     
     // Search by name, description, or address
     if (options.searchQuery) {
       const searchTerm = `%${options.searchQuery}%`;
-      query = query.where(
+      conditions.push(
         sql`(${places.name} ILIKE ${searchTerm} OR 
              ${places.description} ILIKE ${searchTerm} OR 
              ${places.address} ILIKE ${searchTerm})`
@@ -1784,12 +1786,12 @@ export class DatabaseStorage implements IStorage {
     
     // Filter by minimum rating
     if (options.minRating) {
-      query = query.where(gte(places.rating, options.minRating));
+      conditions.push(gte(places.rating, Number(options.minRating)));
     }
     
-    // Filter by features (array contains operations)
-    // This would normally be done with a PostgreSQL array contains operator
-    // For simplicity, we'll fetch all places and filter in memory
+    let query = conditions.length > 0
+      ? db.select().from(places).where(and(...conditions))
+      : db.select().from(places);
     
     // Apply sorting
     if (options.sortBy) {
@@ -1798,23 +1800,21 @@ export class DatabaseStorage implements IStorage {
           ? query.orderBy(desc(places.name)) 
           : query.orderBy(asc(places.name));
       } else {
-        // Default to rating
         query = options.sortOrder === 'asc' 
           ? query.orderBy(asc(places.rating)) 
           : query.orderBy(desc(places.rating));
       }
     } else {
-      // Default sort by rating descending
       query = query.orderBy(desc(places.rating));
     }
     
     // Apply pagination
     if (options.limit) {
-      query = query.limit(options.limit);
+      query = query.limit(Number(options.limit));
     }
     
     if (options.offset) {
-      query = query.offset(options.offset);
+      query = query.offset(Number(options.offset));
     }
     
     const placesData = await query;

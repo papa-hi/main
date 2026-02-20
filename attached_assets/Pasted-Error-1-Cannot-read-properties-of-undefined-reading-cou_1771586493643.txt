@@ -1,0 +1,46 @@
+Error 1: Cannot read properties of undefined (reading 'count')
+Location: getRecentUserActivity at line 864
+Cause: You're doing something like result[0].count or rows.count but the query returned no rows, so result[0] is undefined.
+Fix:
+js// Before
+const activity = await sql`SELECT COUNT(*) ...`;
+return activity[0].count; // crashes if no rows
+
+// After
+const activity = await sql`SELECT COUNT(*) ...`;
+return activity[0]?.count ?? 0;
+
+Error 2: Cannot read properties of undefined (reading 'length') — ERR_INVALID_ARG_TYPE in connection.js
+Location: Deep in the postgres driver's DataRow handler
+Cause: You're passing a value the driver can't serialize — most commonly undefined as a query parameter. The driver expects null, not undefined.
+Fix:
+js// Before
+await sql`SELECT * FROM places WHERE city = ${userCity}`; // userCity might be undefined
+
+// After
+await sql`SELECT * FROM places WHERE city = ${userCity ?? null}`;
+Audit every parameter passed into your nearby places query and ensure none are undefined.
+
+Error 3: ERR_INVALID_ARG_TYPE — "string" argument... Received type number (73)
+Location: Bind in the postgres driver, during upcoming playdates query
+Cause: You're passing a raw number where the driver expects a string (or you have a type mismatch in a prepared statement). The value 73 is being passed as a JS number to a parameter that postgres is trying to serialize as a string/buffer — often happens with LIMIT/OFFSET or ID parameters that should be cast.
+Fix:
+js// Before
+const limit = 73; // or some numeric variable
+await sql`SELECT * FROM playdates WHERE ... LIMIT ${limit}`;
+
+// After — cast to string, or use sql's int helper
+await sql`SELECT * FROM playdates WHERE ... LIMIT ${String(limit)}`;
+
+// Or better, use a typed cast in SQL:
+await sql`SELECT * FROM playdates WHERE ... LIMIT ${limit}::int`;
+If it's an ID field:
+js// Pass as string if your schema uses VARCHAR/UUID, or cast explicitly
+await sql`SELECT * FROM playdates WHERE user_id = ${userId}::int`;
+
+General checklist
+
+Guard all query results against empty arrays before accessing index 0
+Replace undefined params with null before passing to sql\``
+Explicitly cast numeric params in your SQL using ::int, ::bigint, etc., or convert to string before interpolating
+Add a wrapper to catch and log the actual parameter values before queries run during development:
