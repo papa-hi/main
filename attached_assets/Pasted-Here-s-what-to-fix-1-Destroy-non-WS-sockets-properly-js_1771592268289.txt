@@ -1,0 +1,56 @@
+Here's what to fix:
+1. Destroy non-WS sockets properly:
+jshttpServer.on('upgrade', (req: any, socket, head) => {
+  const urlPath = req.url?.split('?')[0];
+  if (urlPath !== '/ws') {
+    socket.destroy(); // ← add this
+    return;
+  }
+  ...
+2. Add error handling to the session middleware chain:
+jssessionMiddleware(req, {} as any, (err?: any) => {
+  if (err) { socket.destroy(); return; }
+  passportInitMiddleware(req, {} as any, (err?: any) => {
+    if (err) { socket.destroy(); return; }
+    passportSessionMiddleware(req, {} as any, (err?: any) => {
+      if (err) { socket.destroy(); return; }
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.emit('connection', ws, req);
+      });
+    });
+  });
+});
+3. Add a ping/pong keepalive (still needed for Railway/Cloudflare):
+jswss.on('connection', (ws, req: any) => {
+  const userId = req.user?.id ?? null;
+  if (!userId) { ws.close(4001, 'Unauthorized'); return; }
+
+  (ws as any).isAlive = true;
+  ws.on('pong', () => { (ws as any).isAlive = true; });
+  
+  // ... rest of your handler
+});
+
+// Add this after wss setup
+const heartbeat = setInterval(() => {
+  wss.clients.forEach((ws) => {
+    if ((ws as any).isAlive === false) return ws.terminate();
+    (ws as any).isAlive = false;
+    ws.ping();
+  });
+}, 30000);
+
+wss.on('close', () => clearInterval(heartbeat));
+4. Move the chat lookup outside the client loop in send_message — fetching from DB inside for...of clients for every connected user is both slow and a potential crash point:
+js// Fetch chat ONCE, before the loop
+const chat = await storage.getChatById(data.chatId);
+if (!chat) { /* send error */ return; }
+
+const participantIds = new Set(chat.participants.map((p: any) => p.id));
+
+for (const [client, info] of Array.from(clients.entries())) {
+  if (client.readyState === WebSocket.OPEN && info.userId && participantIds.has(info.userId)) {
+    client.send(JSON.stringify({ type: 'message', message: savedMessage }));
+  }
+}
+The session middleware error handling (#2) is most likely your immediate fix — if the session cookie isn't being passed correctly on the WS handshake, the middleware chain silently fails and the socket drops.

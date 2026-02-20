@@ -3920,12 +3920,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Only handle /ws path, let Vite HMR handle other upgrades
     const urlPath = req.url?.split('?')[0];
     if (urlPath !== '/ws') {
+      socket.destroy();
       return;
     }
 
-    sessionMiddleware(req, {} as any, () => {
-      passportInitMiddleware(req, {} as any, () => {
-        passportSessionMiddleware(req, {} as any, () => {
+    sessionMiddleware(req, {} as any, (err?: any) => {
+      if (err) { socket.destroy(); return; }
+      passportInitMiddleware(req, {} as any, (err?: any) => {
+        if (err) { socket.destroy(); return; }
+        passportSessionMiddleware(req, {} as any, (err?: any) => {
+          if (err) { socket.destroy(); return; }
           wss.handleUpgrade(req, socket, head, (ws) => {
             wss.emit('connection', ws, req);
           });
@@ -3934,6 +3938,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
   
+  // Ping/pong keepalive for Railway/Cloudflare proxy timeouts
+  const heartbeat = setInterval(() => {
+    wss.clients.forEach((ws) => {
+      if ((ws as any).isAlive === false) return ws.terminate();
+      (ws as any).isAlive = false;
+      ws.ping();
+    });
+  }, 30000);
+
+  wss.on('close', () => clearInterval(heartbeat));
+  
   wss.on('connection', (ws, req: any) => {
     const userId = req.user?.id ?? null;
     
@@ -3941,6 +3956,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ws.close(4001, 'Unauthorized');
       return;
     }
+
+    (ws as any).isAlive = true;
+    ws.on('pong', () => { (ws as any).isAlive = true; });
 
     clients.set(ws, { userId });
     console.log(`WebSocket client connected, userId=${userId}`);
@@ -4046,18 +4064,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             console.log("Saved message:", savedMessage);
             
+            // Fetch chat ONCE before broadcasting, not inside the loop
+            const chat = await storage.getChatById(data.chatId);
+            if (!chat) {
+              ws.send(JSON.stringify({ type: 'error', message: 'Chat not found' }));
+              return;
+            }
+
+            const participantIds = new Set(chat.participants.map((p: any) => p.id));
+
             // Broadcast to all connected clients who are participants of this chat
             for (const [client, info] of Array.from(clients.entries())) {
-              if (client.readyState === WebSocket.OPEN && info.userId) {
-                // Check if this user is a participant in the chat
-                const chat = await storage.getChatById(data.chatId);
-                if (chat && chat.participants.some((p: any) => p.id === info.userId)) {
-                  console.log("Sending message to user:", info.userId);
-                  client.send(JSON.stringify({
-                    type: 'message',
-                    message: savedMessage
-                  }));
-                }
+              if (client.readyState === WebSocket.OPEN && info.userId && participantIds.has(info.userId)) {
+                client.send(JSON.stringify({
+                  type: 'message',
+                  message: savedMessage
+                }));
               }
             }
           } catch (err) {
