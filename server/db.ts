@@ -51,5 +51,5 @@ const sessionDatabaseUrl = process.env.SUPABASE_SESSION_URL || databaseUrl;
 export const pool = sessionDatabaseUrl ? new pg.Pool({
   connectionString: sessionDatabaseUrl,
   ssl: requiresSSL ? { rejectUnauthorized: false } : false,
-  family: 4,
+  family: 4 as any,
 }) : null as any;
