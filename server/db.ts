@@ -3,12 +3,11 @@ import postgres from 'postgres';
 import pg from 'pg';
 import * as schema from "@shared/schema";
 
-// Prefer SUPABASE_DATABASE_URL if set, fall back to DATABASE_URL
 const isProduction = process.env.NODE_ENV === 'production';
-const databaseUrl = process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL;
+const databaseUrl = process.env.SUPABASE_DATABASE_URL;
 
 if (!databaseUrl) {
-  console.error("WARNING: Database URL not set. Configure SUPABASE_DATABASE_URL or DATABASE_URL.");
+  console.error("WARNING: Database URL not set. Configure SUPABASE_DATABASE_URL.");
 }
 
 // Detect if SSL is required based on the database URL (Supabase requires SSL)
