@@ -745,35 +745,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Serve other uploaded files
-  app.use('/uploads', (req, res, next) => {
-    // Security check to prevent directory traversal
-    if (req.path.includes('..')) {
-      return res.status(403).send('Forbidden');
-    }
-    next();
-  }, (req, res, next) => {
-    const uploadsPath = path.join(process.cwd(), 'uploads');
-    const filePath = path.join(uploadsPath, req.path);
-    
-    // Add debug logging
-    console.log(`[FILE_SERVER] Request for: ${req.path}`);
-    console.log(`[FILE_SERVER] Full path: ${filePath}`);
-    
-    // Check if file exists before sending
-    if (fs.existsSync(filePath)) {
-      res.sendFile(filePath, (err) => {
-        if (err) {
-          console.error(`[FILE_SERVER] Error sending file: ${err.message}`);
-          next(err);
-        }
-      });
-    } else {
-      console.error(`[FILE_SERVER] File not found: ${filePath}`);
-      res.status(404).send('File not found');
-    }
-  });
-  
   // put application routes here
   // prefix all routes with /api
 
