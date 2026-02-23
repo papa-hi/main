@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiRequest } from '@/lib/queryClient';
+import { useAppConfig } from './use-app-config';
 
 interface PushSubscriptionData {
   endpoint: string;
@@ -10,6 +11,7 @@ interface PushSubscriptionData {
 }
 
 export function usePushNotifications() {
+  const { vapidPublicKey } = useAppConfig();
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscription, setSubscription] = useState<PushSubscription | null>(null);
@@ -17,7 +19,6 @@ export function usePushNotifications() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if push notifications are supported
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       setIsSupported(true);
       checkSubscription();
@@ -39,20 +40,12 @@ export function usePushNotifications() {
   };
 
   const requestPermission = async (): Promise<NotificationPermission> => {
-    // Check current permission first
-    if (Notification.permission === 'granted') {
-      return 'granted';
-    }
-    
-    if (Notification.permission === 'denied') {
-      return 'denied';
-    }
+    if (Notification.permission === 'granted') return 'granted';
+    if (Notification.permission === 'denied') return 'denied';
 
     try {
-      // Direct approach for modern browsers including Android Chrome
       if (typeof Notification.requestPermission === 'function') {
-        const permission = await Notification.requestPermission();
-        return permission;
+        return await Notification.requestPermission();
       } else {
         throw new Error('Notifications not supported');
       }
@@ -72,7 +65,6 @@ export function usePushNotifications() {
     setError(null);
 
     try {
-      // Shorter timeout for mobile devices
       const timeoutDuration = /Android/i.test(navigator.userAgent) ? 5000 : 10000;
       const permissionTimeout = new Promise<never>((_, reject) => {
         setTimeout(() => reject(new Error(`Permission request timed out after ${timeoutDuration/1000} seconds`)), timeoutDuration);
@@ -90,19 +82,9 @@ export function usePushNotifications() {
         return false;
       }
 
-      // Get VAPID public key from server
-      const envResponse = await fetch('/api/push/vapid-public-key');
-      if (!envResponse.ok) {
-        throw new Error('Failed to get VAPID public key');
-      }
-      
-      const envData = await envResponse.json();
-      const vapidPublicKey = envData.publicKey || 'BLslB1PkERhUIoQhTLjwpQdp5p3KK0ZqGhLuJxIJhLLWWCdaJPvGw_KEFOgO5pfTk7Fg_Dt97wqxl9DH2IUzmCg';
+      const key = vapidPublicKey || 'BLslB1PkERhUIoQhTLjwpQdp5p3KK0ZqGhLuJxIJhLLWWCdaJPvGw_KEFOgO5pfTk7Fg_Dt97wqxl9DH2IUzmCg';
+      const applicationServerKey = urlBase64ToUint8Array(key);
 
-      // Convert VAPID key to Uint8Array
-      const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
-
-      // Add timeout for service worker ready with fallback for Android devices
       const swTimeout = new Promise<never>((_, reject) => {
         setTimeout(() => reject(new Error('Service worker ready timeout')), 3000);
       });
@@ -111,11 +93,9 @@ export function usePushNotifications() {
       try {
         registration = await Promise.race([navigator.serviceWorker.ready, swTimeout]);
       } catch (error) {
-        // Fallback: Register service worker manually for Android devices
         registration = await navigator.serviceWorker.register('/service-worker.js');
         await registration.update();
         
-        // Wait for it to become ready
         const readyTimeout = new Promise<never>((_, reject) => {
           setTimeout(() => reject(new Error('Manual registration timeout')), 5000);
         });
@@ -128,7 +108,6 @@ export function usePushNotifications() {
         applicationServerKey
       });
 
-      // Send subscription to server (wrap in subscription object as expected by server)
       const subscriptionData = {
         subscription: {
           endpoint: pushSubscription.endpoint,
@@ -152,7 +131,6 @@ export function usePushNotifications() {
       setLoading(false);
       return false;
     } finally {
-      // Ensure loading is always reset
       setLoading(false);
     }
   };
@@ -165,8 +143,6 @@ export function usePushNotifications() {
 
     try {
       await subscription.unsubscribe();
-      
-      // Remove subscription from server
       await apiRequest('POST', '/api/push/unsubscribe', { endpoint: subscription.endpoint });
 
       setSubscription(null);
@@ -204,7 +180,6 @@ export function usePushNotifications() {
   };
 }
 
-// Helper functions
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)

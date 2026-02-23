@@ -600,19 +600,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/config/weather", (req, res) => {
+  app.get("/api/config", (req, res) => {
     res.json({
-      apiKey: process.env.OPEN_WEATHER_API_KEY
+      weatherApiKey: process.env.OPEN_WEATHER_API_KEY ?? null,
+      vapidPublicKey: getVapidPublicKey() ?? null,
     });
-  });
-
-  // Push notification endpoints
-  app.get("/api/push/vapid-public-key", (req, res) => {
-    const publicKey = getVapidPublicKey();
-    if (!publicKey) {
-      return res.status(500).json({ error: "VAPID keys not configured" });
-    }
-    res.json({ publicKey });
   });
 
   app.post("/api/push/subscribe", isAuthenticated, async (req, res) => {

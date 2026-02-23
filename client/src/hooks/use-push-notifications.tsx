@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './use-auth';
 import { useToast } from './use-toast';
+import { useAppConfig } from './use-app-config';
 
 export interface PushNotificationState {
   isSupported: boolean;
@@ -12,6 +13,7 @@ export interface PushNotificationState {
 export function usePushNotifications() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { vapidPublicKey: configVapidKey } = useAppConfig();
   const [state, setState] = useState<PushNotificationState>({
     isSupported: false,
     isSubscribed: false,
@@ -78,14 +80,7 @@ export function usePushNotifications() {
       // Get service worker registration
       const registration = await navigator.serviceWorker.ready;
 
-      // Get VAPID public key from server
-      const response = await fetch('/api/push/vapid-public-key');
-      if (!response.ok) {
-        throw new Error('Failed to get VAPID public key');
-      }
-      
-      const { publicKey } = await response.json();
-      
+      const publicKey = configVapidKey;
       if (!publicKey) {
         throw new Error('VAPID public key not configured on server');
       }

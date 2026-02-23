@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAppConfig } from './use-app-config';
 
 interface LocationState {
   latitude?: number;
@@ -20,6 +21,7 @@ interface LocationHookReturn {
 }
 
 export function useLocation(): LocationHookReturn {
+  const { weatherApiKey, isLoading: configLoading } = useAppConfig();
   const [locationState, setLocationState] = useState<LocationState>({
     isLoading: true
   });
@@ -27,11 +29,10 @@ export function useLocation(): LocationHookReturn {
   useEffect(() => {
     let isMounted = true;
 
+    if (configLoading) return;
+
     const getLocation = async () => {
-      console.log("[LOCATION] Starting geolocation request");
-      
       if (!navigator.geolocation) {
-        console.log("[LOCATION] Geolocation not supported");
         if (isMounted) {
           setLocationState({
             error: "Geolocation is not supported by your browser",
@@ -42,20 +43,25 @@ export function useLocation(): LocationHookReturn {
       }
 
       try {
-        console.log("[LOCATION] Requesting position with enableHighAccuracy=true, timeout=10s");
         navigator.geolocation.getCurrentPosition(
           async (position) => {
-            console.log("[LOCATION] Position obtained:", position.coords);
             const { latitude, longitude } = position.coords;
             
+            if (!weatherApiKey) {
+              if (isMounted) {
+                setLocationState({
+                  latitude,
+                  longitude,
+                  city: "Unknown",
+                  isLoading: false
+                });
+              }
+              return;
+            }
+
             try {
-              // Get API key from server
-              const keyResponse = await axios.get('/api/config/weather');
-              const apiKey = keyResponse.data.apiKey;
-              
-              // Use OpenWeatherMap reverse geocoding to get city name
               const response = await axios.get(
-                `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${apiKey}`
+                `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${weatherApiKey}`
               );
               
               let city = "Unknown";
@@ -77,7 +83,6 @@ export function useLocation(): LocationHookReturn {
               }
             } catch (geocodeError) {
               console.error("Geocoding error:", geocodeError);
-              // In case geocoding fails, we still return the coordinates
               if (isMounted) {
                 setLocationState({
                   latitude,
@@ -89,13 +94,6 @@ export function useLocation(): LocationHookReturn {
             }
           },
           (error) => {
-            console.log("[LOCATION] Geolocation error:");
-            console.log("[LOCATION] - Error code:", error.code);
-            console.log("[LOCATION] - Error message:", error.message);
-            console.log("[LOCATION] - PERMISSION_DENIED:", error.code === 1);
-            console.log("[LOCATION] - POSITION_UNAVAILABLE:", error.code === 2);
-            console.log("[LOCATION] - TIMEOUT:", error.code === 3);
-            
             if (isMounted) {
               setLocationState({
                 error: error.message,
@@ -120,11 +118,8 @@ export function useLocation(): LocationHookReturn {
     };
 
     getLocation();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    return () => { isMounted = false; };
+  }, [weatherApiKey, configLoading]);
 
   return locationState;
 }

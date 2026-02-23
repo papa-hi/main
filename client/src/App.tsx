@@ -37,6 +37,7 @@ import { AuthProvider, useAuth } from "./hooks/use-auth";
 import { FirebaseAuthProvider } from "./hooks/use-firebase-auth";
 import { ChatProvider } from "./hooks/use-chat";
 import { AdminProvider } from "./hooks/use-admin";
+import { AppConfigProvider } from "./hooks/use-app-config";
 import { ProtectedRoute } from "./lib/protected-route";
 import { useWelcome } from "./hooks/use-welcome";
 import AnimatedWelcome from "./components/welcome/animated-welcome";
@@ -224,6 +225,7 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
+        <AppConfigProvider>
         <FirebaseAuthProvider>
           <AuthProvider>
             <AdminProvider>
@@ -250,6 +252,7 @@ function App() {
             </AdminProvider>
           </AuthProvider>
         </FirebaseAuthProvider>
+        </AppConfigProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );
