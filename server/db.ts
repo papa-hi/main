@@ -14,6 +14,9 @@ if (!databaseUrl) {
 // Detect if SSL is required based on the database URL (Supabase requires SSL)
 const requiresSSL = databaseUrl?.includes('supabase.com') || databaseUrl?.includes('pooler.supabase.com');
 console.log(`Database: ${requiresSSL ? 'Supabase (SSL)' : 'Local'}, ENV: ${isProduction ? 'production' : 'development'}`);
+console.log('SUPABASE_DATABASE_URL set:', !!process.env.SUPABASE_DATABASE_URL);
+console.log('DATABASE_URL set:', !!process.env.DATABASE_URL);
+console.log('databaseUrl host:', databaseUrl?.match(/@([^:]+)/)?.[1]);
 
 // Drizzle ORM client for queries - lazy initialization
 let _client: ReturnType<typeof postgres> | null = null;
@@ -49,6 +52,7 @@ export const db = new Proxy({} as ReturnType<typeof drizzle>, {
 const sessionDatabaseUrl = process.env.SUPABASE_SESSION_URL || databaseUrl;
 console.log('Session URL set:', !!process.env.SUPABASE_SESSION_URL);
 console.log('Session port:', sessionDatabaseUrl?.match(/:(\d+)\//)?.[1]);
+console.log('sessionDatabaseUrl host:', sessionDatabaseUrl?.match(/@([^:]+)/)?.[1]);
 
 export const pool = sessionDatabaseUrl ? new pg.Pool({
   connectionString: sessionDatabaseUrl,
