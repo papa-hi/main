@@ -600,10 +600,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Environment variables endpoint - for client-side access to safe env vars
-  app.get("/api/env", (req, res) => {
+  app.get("/api/config/weather", (req, res) => {
     res.json({
-      OPEN_WEATHER_API_KEY: process.env.OPEN_WEATHER_API_KEY
+      apiKey: process.env.OPEN_WEATHER_API_KEY
     });
   });
 

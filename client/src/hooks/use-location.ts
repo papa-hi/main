@@ -50,8 +50,8 @@ export function useLocation(): LocationHookReturn {
             
             try {
               // Get API key from server
-              const keyResponse = await axios.get('/api/env');
-              const apiKey = keyResponse.data.OPEN_WEATHER_API_KEY;
+              const keyResponse = await axios.get('/api/config/weather');
+              const apiKey = keyResponse.data.apiKey;
               
               // Use OpenWeatherMap reverse geocoding to get city name
               const response = await axios.get(

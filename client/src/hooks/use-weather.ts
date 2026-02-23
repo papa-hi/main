@@ -54,8 +54,8 @@ export function useWeather(): WeatherData {
       try {
         // Get API key from server
         console.log("Fetching API key for weather");
-        const keyResponse = await axios.get('/api/env');
-        const apiKey = keyResponse.data.OPEN_WEATHER_API_KEY;
+        const keyResponse = await axios.get('/api/config/weather');
+        const apiKey = keyResponse.data.apiKey;
         console.log("Successfully retrieved API key for weather");
         
         // Fetch weather data

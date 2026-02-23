@@ -91,13 +91,13 @@ export function usePushNotifications() {
       }
 
       // Get VAPID public key from server
-      const envResponse = await fetch('/api/env');
+      const envResponse = await fetch('/api/push/vapid-public-key');
       if (!envResponse.ok) {
-        throw new Error('Failed to get server configuration');
+        throw new Error('Failed to get VAPID public key');
       }
       
       const envData = await envResponse.json();
-      const vapidPublicKey = envData.VAPID_PUBLIC_KEY || 'BLslB1PkERhUIoQhTLjwpQdp5p3KK0ZqGhLuJxIJhLLWWCdaJPvGw_KEFOgO5pfTk7Fg_Dt97wqxl9DH2IUzmCg';
+      const vapidPublicKey = envData.publicKey || 'BLslB1PkERhUIoQhTLjwpQdp5p3KK0ZqGhLuJxIJhLLWWCdaJPvGw_KEFOgO5pfTk7Fg_Dt97wqxl9DH2IUzmCg';
 
       // Convert VAPID key to Uint8Array
       const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
