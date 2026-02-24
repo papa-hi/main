@@ -3068,92 +3068,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get community posts with different feed types
   app.get("/api/community/posts", async (req: Request, res: Response) => {
     try {
-      const { 
-        feed = 'latest', // 'latest', 'trending', 'popular'
-        category, 
-        search, 
-        hashtag, 
-        userId,
-        limit = 20, 
-        offset = 0 
-      } = req.query;
+      const { category, search, hashtag, userId, limit = 20, offset = 0 } = req.query;
 
-      // Build filter conditions
-      const conditions = [];
-      
-      if (category) {
-        conditions.push(eq(communityPosts.category, category as string));
-      }
-      
-      if (search) {
-        conditions.push(
-          or(
-            like(communityPosts.title, `%${search}%`),
-            like(communityPosts.content, `%${search}%`)
-          )
-        );
-      }
-      
-      if (hashtag) {
-        const hashtagValue = String(hashtag);
-        conditions.push(sql`${hashtagValue} = ANY(${communityPosts.hashtags})`);
-      }
-      
-      if (userId) {
-        conditions.push(eq(communityPosts.userId, parseInt(userId as string)));
-      }
+      const posts = await storage.getCommunityPosts({
+        limit: parseInt(limit as string),
+        offset: parseInt(offset as string),
+        category: category as string | undefined,
+        search: search as string | undefined,
+        hashtag: hashtag as string | undefined,
+        userId: userId ? parseInt(userId as string) : undefined,
+      });
 
-      let query = db
-        .select({
-          id: communityPosts.id,
-          title: communityPosts.title,
-          content: communityPosts.content,
-          category: communityPosts.category,
-          hashtags: communityPosts.hashtags,
-          isEdited: communityPosts.isEdited,
-          createdAt: communityPosts.createdAt,
-          updatedAt: communityPosts.updatedAt,
-          author: {
-            id: users.id,
-            firstName: users.firstName,
-            lastName: users.lastName,
-            profileImage: users.profileImage,
-            username: users.username,
-          },
-        })
-        .from(communityPosts)
-        .leftJoin(users, eq(communityPosts.userId, users.id))
-        .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(desc(communityPosts.createdAt))
-        .limit(parseInt(limit as string))
-        .offset(parseInt(offset as string));
-
-      const posts = await query;
-
-      // Get comment and reaction counts for each post
-      const postsWithCounts = await Promise.all(
-        posts.map(async (post) => {
-          const [commentCount] = await db
-            .select({ count: count() })
-            .from(communityComments)
-            .where(eq(communityComments.postId, post.id));
-
-          const [reactionCount] = await db
-            .select({ count: count() })
-            .from(communityReactions)
-            .where(eq(communityReactions.postId, post.id));
-
-          return {
-            ...post,
-            _count: {
-              comments: commentCount.count,
-              reactions: reactionCount.count,
-            },
-          };
-        })
-      );
-
-      res.json(postsWithCounts);
+      res.json(posts);
     } catch (error) {
       console.error("Error fetching community posts:", error);
       res.status(500).json({ error: "Failed to fetch community posts" });

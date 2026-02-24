@@ -95,7 +95,7 @@ export interface IStorage {
   sendMessage(chatId: number, senderId: number, content: string): Promise<ChatMessage>;
   
   // Community posts methods
-  getCommunityPosts(options?: { limit?: number; offset?: number }): Promise<any[]>;
+  getCommunityPosts(options?: { limit?: number; offset?: number; category?: string; search?: string; hashtag?: string; userId?: number }): Promise<any[]>;
   getCommunityPostById(postId: number): Promise<any | undefined>;
   deleteCommunityPost(postId: number): Promise<boolean>;
   
@@ -1524,30 +1524,39 @@ export class DatabaseStorage implements IStorage {
     
     const playdatesData = await query;
     
-    // Load participants for each playdate
-    const result: Playdate[] = [];
-    
-    for (const playdate of playdatesData) {
-      const participants = await db
-        .select({
-          id: users.id,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          profileImage: users.profileImage
-        })
-        .from(playdateParticipants)
-        .innerJoin(users, eq(playdateParticipants.userId, users.id))
-        .where(eq(playdateParticipants.playdateId, playdate.id));
-      
-      // Filter by available spots if requested
-      if (filters?.hasAvailableSpots && participants.length >= playdate.maxParticipants) {
-        continue; // Skip this playdate as it's full
-      }
-      
-      result.push({
-        ...playdate,
-        participants
+    if (playdatesData.length === 0) return [];
+
+    const playdateIds = playdatesData.map(p => p.id);
+    const allParticipants = await db
+      .select({
+        playdateId: playdateParticipants.playdateId,
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImage: users.profileImage,
+      })
+      .from(playdateParticipants)
+      .innerJoin(users, eq(playdateParticipants.userId, users.id))
+      .where(inArray(playdateParticipants.playdateId, playdateIds));
+
+    const participantMap = new Map<number, any[]>();
+    for (const p of allParticipants) {
+      if (!participantMap.has(p.playdateId)) participantMap.set(p.playdateId, []);
+      participantMap.get(p.playdateId)!.push({
+        id: p.id,
+        firstName: p.firstName,
+        lastName: p.lastName,
+        profileImage: p.profileImage,
       });
+    }
+
+    const result: Playdate[] = [];
+    for (const playdate of playdatesData) {
+      const participants = participantMap.get(playdate.id) || [];
+      if (filters?.hasAvailableSpots && participants.length >= playdate.maxParticipants) {
+        continue;
+      }
+      result.push({ ...playdate, participants });
     }
     
     return result;
@@ -1562,28 +1571,36 @@ export class DatabaseStorage implements IStorage {
       .where(and(lt(playdates.startTime, now), isNull(playdates.archivedAt)))
       .orderBy(desc(playdates.startTime));
     
-    // Load participants for each playdate
-    const result: Playdate[] = [];
-    
-    for (const playdate of playdatesData) {
-      const participants = await db
-        .select({
-          id: users.id,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          profileImage: users.profileImage
-        })
-        .from(playdateParticipants)
-        .innerJoin(users, eq(playdateParticipants.userId, users.id))
-        .where(eq(playdateParticipants.playdateId, playdate.id));
-      
-      result.push({
-        ...playdate,
-        participants
+    if (playdatesData.length === 0) return [];
+
+    const playdateIds = playdatesData.map(p => p.id);
+    const allParticipants = await db
+      .select({
+        playdateId: playdateParticipants.playdateId,
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImage: users.profileImage,
+      })
+      .from(playdateParticipants)
+      .innerJoin(users, eq(playdateParticipants.userId, users.id))
+      .where(inArray(playdateParticipants.playdateId, playdateIds));
+
+    const participantMap = new Map<number, any[]>();
+    for (const p of allParticipants) {
+      if (!participantMap.has(p.playdateId)) participantMap.set(p.playdateId, []);
+      participantMap.get(p.playdateId)!.push({
+        id: p.id,
+        firstName: p.firstName,
+        lastName: p.lastName,
+        profileImage: p.profileImage,
       });
     }
-    
-    return result;
+
+    return playdatesData.map(playdate => ({
+      ...playdate,
+      participants: participantMap.get(playdate.id) || [],
+    }));
   }
   
   async getUserPlaydates(userId: number): Promise<Playdate[]> {
@@ -1593,28 +1610,36 @@ export class DatabaseStorage implements IStorage {
       .where(and(eq(playdates.creatorId, userId), isNull(playdates.archivedAt)))
       .orderBy(asc(playdates.startTime));
     
-    // Load participants for each playdate
-    const result: Playdate[] = [];
-    
-    for (const playdate of playdatesData) {
-      const participants = await db
-        .select({
-          id: users.id,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          profileImage: users.profileImage
-        })
-        .from(playdateParticipants)
-        .innerJoin(users, eq(playdateParticipants.userId, users.id))
-        .where(eq(playdateParticipants.playdateId, playdate.id));
-      
-      result.push({
-        ...playdate,
-        participants
+    if (playdatesData.length === 0) return [];
+
+    const playdateIds = playdatesData.map(p => p.id);
+    const allParticipants = await db
+      .select({
+        playdateId: playdateParticipants.playdateId,
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImage: users.profileImage,
+      })
+      .from(playdateParticipants)
+      .innerJoin(users, eq(playdateParticipants.userId, users.id))
+      .where(inArray(playdateParticipants.playdateId, playdateIds));
+
+    const participantMap = new Map<number, any[]>();
+    for (const p of allParticipants) {
+      if (!participantMap.has(p.playdateId)) participantMap.set(p.playdateId, []);
+      participantMap.get(p.playdateId)!.push({
+        id: p.id,
+        firstName: p.firstName,
+        lastName: p.lastName,
+        profileImage: p.profileImage,
       });
     }
-    
-    return result;
+
+    return playdatesData.map(playdate => ({
+      ...playdate,
+      participants: participantMap.get(playdate.id) || [],
+    }));
   }
   
   async getPlaydateById(id: number): Promise<Playdate | undefined> {
@@ -2152,93 +2177,90 @@ export class DatabaseStorage implements IStorage {
 
   // Chat methods
   async getChats(userId: number): Promise<Chat[]> {
-    // Get all chats where the user is a participant
-    const userChats = await db
-      .select({
-        chatId: chatParticipants.chatId
-      })
+    const chatIds = await db
+      .select({ chatId: chatParticipants.chatId })
       .from(chatParticipants)
       .where(eq(chatParticipants.userId, userId));
-    
-    const result: Chat[] = [];
-    
-    for (const { chatId } of userChats) {
-      // Get the chat details
-      const [chat] = await db
-        .select()
-        .from(chats)
-        .where(eq(chats.id, chatId));
-      
-      if (!chat) continue;
-      
-      // Get all participants for this chat
-      const participants = await db
-        .select({
-          id: users.id,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          profileImage: users.profileImage
-        })
-        .from(chatParticipants)
-        .innerJoin(users, eq(chatParticipants.userId, users.id))
-        .where(eq(chatParticipants.chatId, chatId));
-      
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-      // Get the last message for this chat (only within retention period)
-      const [lastMessage] = await db
-        .select({
-          id: chatMessages.id,
-          content: chatMessages.content,
-          sentAt: chatMessages.sentAt,
-          senderId: chatMessages.senderId,
-          senderName: users.firstName
-        })
-        .from(chatMessages)
-        .innerJoin(users, eq(chatMessages.senderId, users.id))
-        .where(
-          and(
-            eq(chatMessages.chatId, chatId),
-            gte(chatMessages.sentAt, oneWeekAgo)
-          )
+    if (chatIds.length === 0) return [];
+
+    const ids = chatIds.map(r => r.chatId);
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const allParticipants = await db
+      .select({
+        chatId: chatParticipants.chatId,
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImage: users.profileImage,
+      })
+      .from(chatParticipants)
+      .innerJoin(users, eq(chatParticipants.userId, users.id))
+      .where(inArray(chatParticipants.chatId, ids));
+
+    const lastMessages = await db.execute(sql`
+      SELECT DISTINCT ON (cm.chat_id)
+        cm.chat_id AS "chatId",
+        cm.id,
+        cm.content,
+        cm.sent_at AS "sentAt",
+        cm.sender_id AS "senderId",
+        u.first_name AS "senderName"
+      FROM chat_messages cm
+      INNER JOIN users u ON cm.sender_id = u.id
+      WHERE cm.chat_id = ANY(ARRAY[${sql.join(ids.map(id => sql`${id}`), sql`, `)}])
+        AND cm.sent_at >= ${oneWeekAgo}
+      ORDER BY cm.chat_id, cm.sent_at DESC, cm.id DESC
+    `);
+
+    const unreadCounts = await db
+      .select({
+        chatId: chatMessages.chatId,
+        count: count(),
+      })
+      .from(chatMessages)
+      .where(
+        and(
+          inArray(chatMessages.chatId, ids),
+          not(eq(chatMessages.senderId, userId)),
+          eq(chatMessages.isRead, false),
+          gte(chatMessages.sentAt, oneWeekAgo)
         )
-        .orderBy(desc(chatMessages.sentAt))
-        .limit(1);
-      
-      // Count unread messages (only within 7-day retention period)
-      const [{ unreadCount }] = await db
-        .select({
-          unreadCount: count()
-        })
-        .from(chatMessages)
-        .where(
-          and(
-            eq(chatMessages.chatId, chatId),
-            not(eq(chatMessages.senderId, userId)),
-            eq(chatMessages.isRead, false),
-            gte(chatMessages.sentAt, oneWeekAgo)
-          )
-        );
-      
-      // Add this chat to the result
-      result.push({
-        ...chat,
-        participants,
-        lastMessage,
-        unreadCount: Number(unreadCount || 0)
+      )
+      .groupBy(chatMessages.chatId);
+
+    const chatDetails = await db
+      .select()
+      .from(chats)
+      .where(inArray(chats.id, ids));
+
+    const participantMap = new Map<number, any[]>();
+    for (const p of allParticipants) {
+      if (!participantMap.has(p.chatId)) participantMap.set(p.chatId, []);
+      participantMap.get(p.chatId)!.push({
+        id: p.id,
+        firstName: p.firstName,
+        lastName: p.lastName,
+        profileImage: p.profileImage,
       });
     }
-    
-    // Sort chats by last message time (newest first)
-    result.sort((a, b) => {
-      if (a.lastMessage && b.lastMessage) {
-        return b.lastMessage.sentAt.getTime() - a.lastMessage.sentAt.getTime();
-      }
-      return a.lastMessage ? -1 : b.lastMessage ? 1 : 0;
+
+    const lastMessageRows = lastMessages as any[];
+    const lastMessageMap = new Map(lastMessageRows.map(m => [m.chatId, m]));
+    const unreadMap = new Map(unreadCounts.map(u => [u.chatId, Number(u.count)]));
+
+    return chatDetails.map(chat => ({
+      ...chat,
+      participants: participantMap.get(chat.id) || [],
+      lastMessage: lastMessageMap.get(chat.id),
+      unreadCount: unreadMap.get(chat.id) || 0,
+    })).sort((a, b) => {
+      const tA = a.lastMessage?.sentAt?.getTime() ?? 0;
+      const tB = b.lastMessage?.sentAt?.getTime() ?? 0;
+      return tB - tA;
     });
-    
-    return result;
   }
 
   async getChatById(chatId: number): Promise<Chat | undefined> {
@@ -2351,36 +2373,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getChatMessages(chatId: number, limit: number = 50, offset: number = 0): Promise<ChatMessage[]> {
-    // Get messages for the chat, ordered by sentAt
-    const messages = await db
-      .select()
+    const rows = await db
+      .select({
+        id: chatMessages.id,
+        chatId: chatMessages.chatId,
+        senderId: chatMessages.senderId,
+        content: chatMessages.content,
+        sentAt: chatMessages.sentAt,
+        isRead: chatMessages.isRead,
+        sender: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage,
+        },
+      })
       .from(chatMessages)
+      .innerJoin(users, eq(chatMessages.senderId, users.id))
       .where(eq(chatMessages.chatId, chatId))
       .orderBy(asc(chatMessages.sentAt))
       .limit(limit)
       .offset(offset);
-    
-    // For each message, get the sender details
-    const result: ChatMessage[] = [];
-    
-    for (const message of messages) {
-      const [sender] = await db
-        .select({
-          id: users.id,
-          firstName: users.firstName,
-          lastName: users.lastName,
-          profileImage: users.profileImage
-        })
-        .from(users)
-        .where(eq(users.id, message.senderId));
-      
-      result.push({
-        ...message,
-        sender
-      });
-    }
-    
-    return result;
+
+    return rows;
   }
 
   async sendMessage(chatId: number, senderId: number, content: string): Promise<ChatMessage> {
@@ -2638,11 +2653,36 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Community posts methods
-  async getCommunityPosts(options?: { limit?: number; offset?: number }): Promise<any[]> {
+  async getCommunityPosts(options?: {
+    limit?: number;
+    offset?: number;
+    category?: string;
+    search?: string;
+    hashtag?: string;
+    userId?: number;
+  }): Promise<any[]> {
     const limit = options?.limit || 100;
     const offset = options?.offset || 0;
 
-    // OPTIMIZATION: Use SQL subqueries to fetch counts in a single query (prevents N+1)
+    const conditions: SQL[] = [];
+    if (options?.category) {
+      conditions.push(eq(communityPosts.category, options.category));
+    }
+    if (options?.search) {
+      conditions.push(
+        or(
+          like(communityPosts.title, `%${options.search}%`),
+          like(communityPosts.content, `%${options.search}%`)
+        )!
+      );
+    }
+    if (options?.hashtag) {
+      conditions.push(sql`${options.hashtag} = ANY(${communityPosts.hashtags})`);
+    }
+    if (options?.userId) {
+      conditions.push(eq(communityPosts.userId, options.userId));
+    }
+
     const posts = await db
       .select({
         id: communityPosts.id,
@@ -2672,11 +2712,11 @@ export class DatabaseStorage implements IStorage {
       })
       .from(communityPosts)
       .leftJoin(users, eq(communityPosts.userId, users.id))
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(communityPosts.createdAt))
       .limit(limit)
       .offset(offset);
 
-    // Transform to match expected format
     return posts.map(post => ({
       id: post.id,
       userId: post.userId,

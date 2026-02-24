@@ -1,0 +1,197 @@
+1. getUpcomingPlaydates, getPastPlaydates, getUserPlaydates — all have N+1 on participants
+typescript// CURRENT: 1 query for playdates + N queries for participants
+for (const playdate of playdatesData) {
+  const participants = await db.select()... // runs once per playdate!
+}
+
+// FIX: single query with a join, then group in JS
+async getUpcomingPlaydates(): Promise<Playdate[]> {
+  const now = new Date();
+  
+  const rows = await db
+    .select({
+      // playdate fields
+      id: playdates.id,
+      title: playdates.title,
+      description: playdates.description,
+      location: playdates.location,
+      startTime: playdates.startTime,
+      endTime: playdates.endTime,
+      creatorId: playdates.creatorId,
+      maxParticipants: playdates.maxParticipants,
+      createdAt: playdates.createdAt,
+      visibility: playdates.visibility,
+      // participant fields
+      participantId: users.id,
+      participantFirstName: users.firstName,
+      participantLastName: users.lastName,
+      participantImage: users.profileImage,
+    })
+    .from(playdates)
+    .leftJoin(playdateParticipants, eq(playdateParticipants.playdateId, playdates.id))
+    .leftJoin(users, eq(playdateParticipants.userId, users.id))
+    .where(and(gt(playdates.startTime, now), isNull(playdates.archivedAt)))
+    .orderBy(asc(playdates.startTime));
+
+  // Group rows into playdates with participant arrays
+  const playdateMap = new Map<number, Playdate>();
+  for (const row of rows) {
+    if (!playdateMap.has(row.id)) {
+      playdateMap.set(row.id, {
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        location: row.location,
+        startTime: row.startTime,
+        endTime: row.endTime,
+        creatorId: row.creatorId,
+        maxParticipants: row.maxParticipants,
+        createdAt: row.createdAt,
+        visibility: row.visibility,
+        participants: [],
+      });
+    }
+    if (row.participantId) {
+      playdateMap.get(row.id)!.participants.push({
+        id: row.participantId,
+        firstName: row.participantFirstName,
+        lastName: row.participantLastName,
+        profileImage: row.participantImage,
+      });
+    }
+  }
+  return Array.from(playdateMap.values());
+}
+Apply the same pattern to getPastPlaydates and getUserPlaydates.
+2. getChats — triple N+1 (chat details, participants, last message, unread count all in loops)
+typescriptasync getChats(userId: number): Promise<Chat[]> {
+  // Single query: get all chat IDs + participants + last message in one shot
+  const chatIds = await db
+    .select({ chatId: chatParticipants.chatId })
+    .from(chatParticipants)
+    .where(eq(chatParticipants.userId, userId));
+
+  if (chatIds.length === 0) return [];
+  
+  const ids = chatIds.map(r => r.chatId);
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+  // Get all participants for all chats in one query
+  const allParticipants = await db
+    .select({
+      chatId: chatParticipants.chatId,
+      id: users.id,
+      firstName: users.firstName,
+      lastName: users.lastName,
+      profileImage: users.profileImage,
+    })
+    .from(chatParticipants)
+    .innerJoin(users, eq(chatParticipants.userId, users.id))
+    .where(inArray(chatParticipants.chatId, ids));
+
+  // Get last message per chat using a subquery
+  const lastMessages = await db
+    .select({
+      chatId: chatMessages.chatId,
+      id: chatMessages.id,
+      content: chatMessages.content,
+      sentAt: chatMessages.sentAt,
+      senderId: chatMessages.senderId,
+      senderName: users.firstName,
+    })
+    .from(chatMessages)
+    .innerJoin(users, eq(chatMessages.senderId, users.id))
+    .where(
+      and(
+        inArray(chatMessages.chatId, ids),
+        gte(chatMessages.sentAt, oneWeekAgo),
+        sql`(${chatMessages.chatId}, ${chatMessages.sentAt}) IN (
+          SELECT chat_id, MAX(sent_at) FROM chat_messages
+          WHERE chat_id = ANY(${sql.raw(`ARRAY[${ids.join(',')}]`)})
+          AND sent_at >= ${oneWeekAgo}
+          GROUP BY chat_id
+        )`
+      )
+    );
+
+  // Get unread counts for all chats in one query
+  const unreadCounts = await db
+    .select({
+      chatId: chatMessages.chatId,
+      count: count(),
+    })
+    .from(chatMessages)
+    .where(
+      and(
+        inArray(chatMessages.chatId, ids),
+        not(eq(chatMessages.senderId, userId)),
+        eq(chatMessages.isRead, false),
+        gte(chatMessages.sentAt, oneWeekAgo)
+      )
+    )
+    .groupBy(chatMessages.chatId);
+
+  // Get chat details
+  const chatDetails = await db
+    .select()
+    .from(chats)
+    .where(inArray(chats.id, ids));
+
+  // Assemble everything in JS
+  const participantMap = new Map<number, any[]>();
+  for (const p of allParticipants) {
+    if (!participantMap.has(p.chatId)) participantMap.set(p.chatId, []);
+    participantMap.get(p.chatId)!.push(p);
+  }
+
+  const lastMessageMap = new Map(lastMessages.map(m => [m.chatId, m]));
+  const unreadMap = new Map(unreadCounts.map(u => [u.chatId, Number(u.count)]));
+
+  return chatDetails.map(chat => ({
+    ...chat,
+    participants: participantMap.get(chat.id) || [],
+    lastMessage: lastMessageMap.get(chat.id),
+    unreadCount: unreadMap.get(chat.id) || 0,
+  })).sort((a, b) => {
+    const tA = a.lastMessage?.sentAt?.getTime() ?? 0;
+    const tB = b.lastMessage?.sentAt?.getTime() ?? 0;
+    return tB - tA;
+  });
+}
+3. getChatMessages — N+1 on sender details
+typescriptasync getChatMessages(chatId: number, limit = 50, offset = 0): Promise<ChatMessage[]> {
+  // Single join instead of loop
+  return await db
+    .select({
+      id: chatMessages.id,
+      chatId: chatMessages.chatId,
+      senderId: chatMessages.senderId,
+      content: chatMessages.content,
+      sentAt: chatMessages.sentAt,
+      isRead: chatMessages.isRead,
+      sender: {
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImage: users.profileImage,
+      },
+    })
+    .from(chatMessages)
+    .innerJoin(users, eq(chatMessages.senderId, users.id))
+    .where(eq(chatMessages.chatId, chatId))
+    .orderBy(asc(chatMessages.sentAt))
+    .limit(limit)
+    .offset(offset);
+}
+4. Also fix in routes.ts — the /api/community/posts endpoint still has the N+1
+Your storage.getCommunityPosts() already has the subquery fix, but routes.ts has its own inline version that doesn't use it. Change the route to call storage.getCommunityPosts() instead:
+typescriptapp.get("/api/community/posts", async (req, res) => {
+  const { limit = 20, offset = 0, ...filters } = req.query;
+  // use the storage method which already has the optimized subquery
+  const posts = await storage.getCommunityPosts({ 
+    limit: parseInt(limit as string), 
+    offset: parseInt(offset as string) 
+  });
+  res.json(posts);
+});
