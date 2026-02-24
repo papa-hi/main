@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { playdates, places, users, chatMessages, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings, communityPosts, communityComments, communityReactions, communityMentions, insertCommunityPostSchema, insertCommunityCommentSchema, insertCommunityReactionSchema, familyEvents } from "@shared/schema";
+import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings, communityPosts, communityComments, communityReactions, communityMentions, insertCommunityPostSchema, insertCommunityCommentSchema, insertCommunityReactionSchema, familyEvents } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth, sessionMiddleware, passportInitMiddleware, passportSessionMiddleware } from "./auth";
@@ -238,6 +238,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint for Railway and other platforms
   app.get("/api/health", (req, res) => {
     res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  // One-time migration: move base64 images from DB to Supabase Storage
+  app.post("/api/admin/migrate-images", isAuthenticated, async (req, res) => {
+    const user = req.user!;
+    if (user.role !== 'admin') return res.status(403).json({ error: "Admin only" });
+
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
+      const BUCKET = 'papa-hi-images';
+
+      const images = await db.select().from(imageStorage);
+      console.log(`[MIGRATE] Found ${images.length} images to migrate`);
+      const results: { filename: string; success: boolean; error?: string }[] = [];
+
+      for (const image of images) {
+        try {
+          const buffer = Buffer.from(image.dataBase64, 'base64');
+          const filePath = `profiles/${image.filename}`;
+
+          const { error } = await supabase.storage
+            .from(BUCKET)
+            .upload(filePath, buffer, {
+              contentType: image.mimeType,
+              upsert: true,
+            });
+
+          if (error) {
+            results.push({ filename: image.filename, success: false, error: error.message });
+            continue;
+          }
+
+          const { data } = supabase.storage
+            .from(BUCKET)
+            .getPublicUrl(filePath);
+
+          const oldUrl = `/api/images/${image.filename}`;
+          await db.execute(sql`
+            UPDATE users SET profile_image = ${data.publicUrl}
+            WHERE profile_image = ${oldUrl}
+          `);
+
+          results.push({ filename: image.filename, success: true });
+          console.log(`[MIGRATE] Migrated ${image.filename} -> ${data.publicUrl}`);
+        } catch (e: any) {
+          results.push({ filename: image.filename, success: false, error: e.message });
+        }
+      }
+
+      const migrated = results.filter(r => r.success).length;
+      console.log(`[MIGRATE] Complete: ${migrated}/${images.length} migrated`);
+      res.json({ migrated, total: images.length, results });
+    } catch (error: any) {
+      console.error("[MIGRATE] Migration failed:", error);
+      res.status(500).json({ error: "Migration failed", message: error.message });
+    }
   });
 
   // Analytics: Track page views
