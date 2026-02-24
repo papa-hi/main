@@ -240,64 +240,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
-  // One-time migration: move base64 images from DB to Supabase Storage
-  app.post("/api/admin/migrate-images", isAuthenticated, async (req, res) => {
-    const user = req.user!;
-    if (user.role !== 'admin') return res.status(403).json({ error: "Admin only" });
-
-    try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
-      const BUCKET = 'papa-hi-images';
-
-      const images = await db.select().from(imageStorage);
-      console.log(`[MIGRATE] Found ${images.length} images to migrate`);
-      const results: { filename: string; success: boolean; error?: string }[] = [];
-
-      for (const image of images) {
-        try {
-          const buffer = Buffer.from(image.dataBase64, 'base64');
-          const filePath = `profiles/${image.filename}`;
-
-          const { error } = await supabase.storage
-            .from(BUCKET)
-            .upload(filePath, buffer, {
-              contentType: image.mimeType,
-              upsert: true,
-            });
-
-          if (error) {
-            console.error(`[MIGRATE] Upload failed for ${image.filename}:`, error.message);
-            results.push({ filename: image.filename, success: false, error: error.message });
-            continue;
-          }
-
-          const { data } = supabase.storage
-            .from(BUCKET)
-            .getPublicUrl(filePath);
-
-          const oldUrl = `/api/images/${image.filename}`;
-          await db.execute(sql`
-            UPDATE users SET profile_image = ${data.publicUrl}
-            WHERE profile_image = ${oldUrl}
-          `);
-
-          results.push({ filename: image.filename, success: true });
-          console.log(`[MIGRATE] Migrated ${image.filename} -> ${data.publicUrl}`);
-        } catch (e: any) {
-          console.error(`[MIGRATE] Error for ${image.filename}:`, e.message);
-          results.push({ filename: image.filename, success: false, error: e.message });
-        }
-      }
-
-      const migrated = results.filter(r => r.success).length;
-      console.log(`[MIGRATE] Complete: ${migrated}/${images.length} migrated`);
-      res.json({ migrated, total: images.length, results });
-    } catch (error: any) {
-      console.error("[MIGRATE] Migration failed:", error);
-      res.status(500).json({ error: "Migration failed", message: error.message });
-    }
-  });
 
   // Analytics: Track page views
   app.post("/api/analytics/page-view", isAuthenticated, async (req, res) => {
