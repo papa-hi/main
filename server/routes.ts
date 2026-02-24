@@ -1,14 +1,12 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings, communityPosts, communityComments, communityReactions, communityMentions, insertCommunityPostSchema, insertCommunityCommentSchema, insertCommunityReactionSchema, familyEvents } from "@shared/schema";
+import { playdates, places, users, chatMessages, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings, communityPosts, communityComments, communityReactions, communityMentions, insertCommunityPostSchema, insertCommunityCommentSchema, insertCommunityReactionSchema, familyEvents } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth, sessionMiddleware, passportInitMiddleware, passportSessionMiddleware } from "./auth";
 import { setupAdminRoutes, logUserActivity } from "./admin";
-import { upload, getFileUrl, deleteProfileImage, storeImageInDatabase } from "./upload";
-import path from "path";
-import fs from "fs";
+import { upload, uploadToSupabase } from "./upload";
 import { WebSocketServer, WebSocket } from 'ws';
 import { fetchNearbyPlaygrounds } from "./maps-service";
 import { db } from "./db";
@@ -536,68 +534,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // END PUBLIC API ENDPOINTS
   // ============================================
 
-  // In-memory image cache to reduce database hits
-  const imageCache = new Map<string, { buffer: Buffer; mimeType: string; cachedAt: number }>();
-  const IMAGE_CACHE_TTL = 1000 * 60 * 60; // 1 hour
-  const IMAGE_CACHE_MAX_SIZE = 100; // Max cached images
-  
-  // Image serving endpoint - serves images from database with caching
-  app.get("/api/images/:filename", async (req, res) => {
-    try {
-      const { filename } = req.params;
-      
-      // Check in-memory cache first
-      const cached = imageCache.get(filename);
-      if (cached && Date.now() - cached.cachedAt < IMAGE_CACHE_TTL) {
-        res.set({
-          'Content-Type': cached.mimeType,
-          'Content-Length': cached.buffer.length,
-          'Cache-Control': 'public, max-age=31536000',
-          'X-Cache': 'HIT',
-        });
-        return res.send(cached.buffer);
-      }
-      
-      // Select only needed columns (not the full row)
-      const [image] = await db
-        .select({
-          filename: imageStorage.filename,
-          mimeType: imageStorage.mimeType,
-          dataBase64: imageStorage.dataBase64,
-        })
-        .from(imageStorage)
-        .where(eq(imageStorage.filename, filename));
-      
-      if (!image) {
-        return res.status(404).json({ error: "Image not found" });
-      }
-      
-      // Convert base64 back to buffer
-      const imageBuffer = Buffer.from(image.dataBase64, 'base64');
-      
-      // Cache the decoded image (evict oldest if full)
-      if (imageCache.size >= IMAGE_CACHE_MAX_SIZE) {
-        const oldestKey = imageCache.keys().next().value;
-        if (oldestKey) imageCache.delete(oldestKey);
-      }
-      imageCache.set(filename, {
-        buffer: imageBuffer,
-        mimeType: image.mimeType,
-        cachedAt: Date.now(),
-      });
-      
-      res.set({
-        'Content-Type': image.mimeType,
-        'Content-Length': imageBuffer.length,
-        'Cache-Control': 'public, max-age=31536000',
-        'X-Cache': 'MISS',
-      });
-      
-      res.send(imageBuffer);
-    } catch (error) {
-      console.error("Error serving image:", error);
-      res.status(500).json({ error: "Failed to serve image" });
-    }
+  // Legacy /api/images/:filename redirect - old base64 images no longer served
+  app.get("/api/images/:filename", (req, res) => {
+    res.status(410).json({ error: "Image endpoint deprecated. Images are now served from Supabase Storage." });
   });
 
   app.get("/api/config", (req, res) => {
@@ -690,23 +629,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Handle profile image upload during registration (no auth required)
   app.post("/api/upload/profile-image", upload.single('profileImage'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
       
-      // Store image in database - no user ID since this is during registration
-      const filename = await storeImageInDatabase(req.file, null, 'profile');
-      const imageUrl = `/api/images/${filename}`;
-      
-      console.log(`Profile image uploaded during registration: ${filename}`);
-      console.log(`Database image URL: ${imageUrl}`);
+      const imageUrl = await uploadToSupabase(req.file, 'profile');
+      console.log(`Profile image uploaded during registration: ${imageUrl}`);
       
       res.json({ 
         success: true, 
-        filename,
+        filename: imageUrl,
         imageUrl
       });
     } catch (err) {
@@ -1271,19 +1205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (currentUser?.profileImage) {
         // Extract filename from the URL if it exists
-        const oldFilename = currentUser.profileImage.split('/').pop();
-        console.log(`[DELETE USER] Profile image filename:`, oldFilename);
-        
-        if (oldFilename) {
-          // Delete the profile image
-          try {
-            deleteProfileImage(oldFilename);
-            console.log(`[DELETE USER] Profile image deleted:`, oldFilename);
-          } catch (error) {
-            console.error(`[DELETE USER] Error deleting profile image:`, error);
-            // Continue with user deletion even if image deletion fails
-          }
-        }
+        console.log(`[DELETE USER] Profile image will be cleaned up: ${currentUser.profileImage}`);
       }
       
       // Delete the user
@@ -1311,7 +1233,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Upload profile image
   app.post("/api/users/me/profile-image", isAuthenticated, upload.single('profileImage'), async (req: Request, res: Response) => {
     try {
       const userId = req.user?.id;
@@ -1324,19 +1245,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No file uploaded" });
       }
       
-      // Store image in database and get the filename
-      const filename = await storeImageInDatabase(req.file, userId, 'profile');
-      const profileImageUrl = `/api/images/${filename}`;
+      const profileImageUrl = await uploadToSupabase(req.file, 'profile');
+      console.log(`Profile image updated for user ${userId}: ${profileImageUrl}`);
       
-      console.log(`Profile image updated: ${filename}`);
-      console.log(`Image stored at: ${profileImageUrl}`);
-      
-      // Update the user's profile with the database image URL
       const updatedUser = await storage.updateUser(userId, { 
         profileImage: profileImageUrl
       });
       
-      // Remove password from response
       const userWithoutPassword = { ...updatedUser } as Partial<SelectUser>;
       delete userWithoutPassword.password;
       
@@ -2618,35 +2533,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`Using random playground image: ${imageUrl}`);
       } else if (req.body.type === 'restaurant') {
         if (req.file) {
-          // Create a proper URL to the uploaded file if user uploaded one
-          const filename = req.file.filename;
-          imageUrl = `/uploads/place-images/${filename}`;
-          console.log(`Restaurant image uploaded: ${filename}`);
-          console.log(`Image URL: ${imageUrl}`);
+          imageUrl = await uploadToSupabase(req.file, 'place');
+          console.log(`Restaurant image uploaded: ${imageUrl}`);
         } else {
-          // Use a random restaurant image if no file uploaded
           imageUrl = getRandomRestaurantImage();
-          console.log(`No image uploaded for restaurant, using random restaurant image: ${imageUrl}`);
         }
       } else if (req.body.type === 'museum') {
         if (req.file) {
-          // Create a proper URL to the uploaded file if user uploaded one
-          const filename = req.file.filename;
-          imageUrl = `/uploads/place-images/${filename}`;
-          console.log(`Museum image uploaded: ${filename}`);
-          console.log(`Image URL: ${imageUrl}`);
+          imageUrl = await uploadToSupabase(req.file, 'place');
+          console.log(`Museum image uploaded: ${imageUrl}`);
         } else {
-          // Use a random museum image if no file uploaded
           imageUrl = getRandomMuseumImage();
-          console.log(`No image uploaded for museum, using random museum image: ${imageUrl}`);
         }
       } else {
-        // For other types, still allow file uploads
         if (req.file) {
-          const filename = req.file.filename;
-          imageUrl = `/uploads/place-images/${filename}`;
+          imageUrl = await uploadToSupabase(req.file, 'place');
         } else {
-          imageUrl = getRandomPlaygroundImage(); // Default fallback
+          imageUrl = getRandomPlaygroundImage();
         }
       }
       
@@ -2931,20 +2834,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Handle image upload if provided
       if (req.file) {
-        const filename = req.file.filename;
-        
-        // Verify the file exists to prevent broken images
-        const fullPath = path.join(process.cwd(), 'uploads', 'place-images', filename);
-        if (fs.existsSync(fullPath)) {
-          updateData.imageUrl = `/uploads/place-images/${filename}`;
-          console.log(`Updated place image: ${filename}`);
-          console.log(`New image URL: ${updateData.imageUrl}`);
-        } else {
-          console.error(`[ERROR] Update failed - File not found at ${fullPath}`);
-          return res.status(500).json({ error: "Image update failed - please try again" });
-        }
+        const imageUrl = await uploadToSupabase(req.file, 'place');
+        updateData.imageUrl = imageUrl;
+        console.log(`Updated place image: ${imageUrl}`);
       }
       
       // Update the place
