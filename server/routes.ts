@@ -267,6 +267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
 
           if (error) {
+            console.error(`[MIGRATE] Upload failed for ${image.filename}:`, error.message);
             results.push({ filename: image.filename, success: false, error: error.message });
             continue;
           }
@@ -284,6 +285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           results.push({ filename: image.filename, success: true });
           console.log(`[MIGRATE] Migrated ${image.filename} -> ${data.publicUrl}`);
         } catch (e: any) {
+          console.error(`[MIGRATE] Error for ${image.filename}:`, e.message);
           results.push({ filename: image.filename, success: false, error: e.message });
         }
       }
