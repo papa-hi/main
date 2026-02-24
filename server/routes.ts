@@ -591,9 +591,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // END PUBLIC API ENDPOINTS
   // ============================================
 
-  // Legacy /api/images/:filename redirect - old base64 images no longer served
-  app.get("/api/images/:filename", (req, res) => {
-    res.status(410).json({ error: "Image endpoint deprecated. Images are now served from Supabase Storage." });
+  // Legacy /api/images/:filename - serve from DB during migration transition
+  app.get("/api/images/:filename", async (req, res) => {
+    try {
+      const { filename } = req.params;
+
+      const [image] = await db
+        .select({
+          mimeType: imageStorage.mimeType,
+          dataBase64: imageStorage.dataBase64,
+        })
+        .from(imageStorage)
+        .where(eq(imageStorage.filename, filename));
+
+      if (!image) {
+        return res.status(404).json({ error: "Image not found" });
+      }
+
+      const imageBuffer = Buffer.from(image.dataBase64, 'base64');
+      res.set({
+        'Content-Type': image.mimeType,
+        'Content-Length': String(imageBuffer.length),
+        'Cache-Control': 'public, max-age=86400',
+      });
+      res.send(imageBuffer);
+    } catch (error) {
+      console.error("Error serving legacy image:", error);
+      res.status(500).json({ error: "Failed to serve image" });
+    }
   });
 
   app.get("/api/config", (req, res) => {
