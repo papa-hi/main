@@ -2212,7 +2212,7 @@ export class DatabaseStorage implements IStorage {
       FROM chat_messages cm
       INNER JOIN users u ON cm.sender_id = u.id
       WHERE cm.chat_id IN (${sql.join(ids.map(id => sql`${id}::integer`), sql`, `)})
-        AND cm.sent_at >= ${oneWeekAgo}
+        AND cm.sent_at >= ${oneWeekAgo.toISOString()}::timestamp
       ORDER BY cm.chat_id, cm.sent_at DESC, cm.id DESC
     `);
 
