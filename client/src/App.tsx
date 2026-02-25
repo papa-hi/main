@@ -83,7 +83,7 @@ function Router() {
       <Route path="/privacy-policy" component={PrivacyPolicyPage} />
       <Route path="/about" component={AboutPage} />
 
-      <ProtectedRoute path="/admin" component={AdminDashboard} />
+      <ProtectedRoute path="/admin" component={AdminDashboardWithProvider} />
       <Route path="/admin-check" component={AdminCheck} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/forgot-password" component={ForgotPasswordPage} />
@@ -93,6 +93,14 @@ function Router() {
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
+  );
+}
+
+function AdminDashboardWithProvider() {
+  return (
+    <AdminProvider>
+      <AdminDashboard />
+    </AdminProvider>
   );
 }
 
@@ -228,7 +236,6 @@ function App() {
         <AppConfigProvider>
         <FirebaseAuthProvider>
           <AuthProvider>
-            <AdminProvider>
               <ChatProvider>
                 <AppShell>
                   <Router />
@@ -249,7 +256,6 @@ function App() {
                   />
                 )}
               </ChatProvider>
-            </AdminProvider>
           </AuthProvider>
         </FirebaseAuthProvider>
         </AppConfigProvider>

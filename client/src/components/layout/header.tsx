@@ -2,7 +2,6 @@ import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
 import LanguageSwitcher from "../shared/language-switcher";
 import { 
   DropdownMenu, 
@@ -38,12 +37,7 @@ export function Header({ user }: HeaderProps) {
   const { user: authUser, logoutMutation } = useAuth();
   const isAuthenticated = !!authUser;
 
-  const { data: unreadData } = useQuery<{ count: number }>({
-    queryKey: ["/api/chats/unread-count"],
-    enabled: isAuthenticated,
-    refetchInterval: 30000,
-  });
-  const totalUnread = unreadData?.count || 0;
+  const totalUnread = (authUser as any)?.unreadMessages || 0;
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);

@@ -376,10 +376,15 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.get("/api/user", (req, res) => {
+  app.get("/api/user", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ message: "Not authenticated" });
-    const userWithoutPassword = { ...req.user } as Partial<SelectUser>;
+    const userWithoutPassword = { ...req.user } as Partial<SelectUser> & { unreadMessages?: number };
     delete userWithoutPassword.password;
+    try {
+      userWithoutPassword.unreadMessages = await storage.getTotalUnreadCount(req.user!.id);
+    } catch {
+      userWithoutPassword.unreadMessages = 0;
+    }
     res.json(userWithoutPassword);
   });
   

@@ -1,7 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
 import { Home, Calendar, MapPin, Users, MessageCircle, MessageSquare, ShieldCheck } from "lucide-react";
 
 export function MobileFooter() {
@@ -9,13 +8,7 @@ export function MobileFooter() {
   const { t } = useTranslation();
   const { user } = useAuth();
 
-  const { data: unreadData } = useQuery<{ count: number }>({
-    queryKey: ["/api/chats/unread-count"],
-    enabled: !!user,
-    refetchInterval: 30000,
-  });
-
-  const totalUnread = unreadData?.count || 0;
+  const totalUnread = (user as any)?.unreadMessages || 0;
 
   const navItemClass = (isActive: boolean) => 
     `flex flex-col items-center justify-center py-1.5 px-1 min-w-0 flex-1 rounded-lg transition-colors ${

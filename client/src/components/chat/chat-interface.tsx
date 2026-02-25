@@ -44,7 +44,7 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
     if (chatId) {
       fetch(`/api/chats/${chatId}/read`, { method: "POST", credentials: "include" })
         .then(() => {
-          queryClient.invalidateQueries({ queryKey: ["/api/chats/unread-count"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/user"] });
           queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
         })
         .catch(() => {});
@@ -62,7 +62,7 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
     if (chatId && chatMessages.some(m => m.senderId !== user?.id && !m.isRead)) {
       fetch(`/api/chats/${chatId}/read`, { method: "POST", credentials: "include" })
         .then(() => {
-          queryClient.invalidateQueries({ queryKey: ["/api/chats/unread-count"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/user"] });
         })
         .catch(() => {});
     }

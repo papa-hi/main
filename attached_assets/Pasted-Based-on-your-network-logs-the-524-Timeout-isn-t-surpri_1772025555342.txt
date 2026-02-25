@@ -1,0 +1,37 @@
+Based on your network logs, the "524 Timeout" isn't surprising—your app is firing over 50 concurrent requests the moment it starts (e.g., unread-count, page-view, users, features, activity, etc.). This creates a massive bottleneck that chokes your database connections.
+
+To fix this and complete the transition to a high-performance app, you need to implement these three core architectural changes:
+
+1. Data Fetching Consolidation (The "Big Clean Up")
+Your logs show separate requests for almost every small piece of data.
+
+The Problem: Each request (like unread-count) opens a new database connection.
+
+The Fix: Combine these into the initial login or user session payload.
+
+Action: Instead of calling /api/unread-count, have your backend return that number as a field inside the /api/login or /api/user response.
+
+Stagger Requests: For analytical data like features or activity, do not load them on the home page. Move them to an Admin Dashboard where they only load when specifically needed.
+
+2. Implement "Mark as Read" (The Logic Loop)
+To make your new notification badges functional, you must tell the database when a user has actually viewed their messages.
+
+Frontend Trigger: Add an effect to your chat detail page that sends a POST to /api/chats/:id/read when the component mounts.
+
+Backend Action: This endpoint should update the is_read column in your chat_messages table to TRUE for all messages where the user is the receiver.
+
+WebSocket Sync: When a message is read, broadcast a "read" event via WebSocket so other open tabs can clear their badges instantly.
+
+3. Move to Global "Unread" State
+Instead of the unread-count request you see in your logs, use the data you already have.
+
+The Fix: Your ChatProvider already manages your messages. Create a derived state for totalUnread by counting messages in your local state where is_read is false.
+
+The Result: You can delete the /api/unread-count request entirely, saving one connection per page load and preventing the 524 error for that specific resource.
+
+Final Implementation Checklist
+[ ] Consolidate: Move unread-count data into the main user/session fetch.
+
+[ ] Lazy Load: Only fetch features, activity, and logs on the Admin page.
+
+[ ] RPC Call: Use the mark_chat_as_read SQL function we created to clear badges efficiently.
