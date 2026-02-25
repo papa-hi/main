@@ -2258,8 +2258,8 @@ export class DatabaseStorage implements IStorage {
       lastMessage: lastMessageMap.get(chat.id),
       unreadCount: unreadMap.get(chat.id) || 0,
     })).sort((a, b) => {
-      const tA = a.lastMessage?.sentAt?.getTime() ?? 0;
-      const tB = b.lastMessage?.sentAt?.getTime() ?? 0;
+      const tA = a.lastMessage?.sentAt ? new Date(a.lastMessage.sentAt).getTime() : 0;
+      const tB = b.lastMessage?.sentAt ? new Date(b.lastMessage.sentAt).getTime() : 0;
       return tB - tA;
     });
   }
