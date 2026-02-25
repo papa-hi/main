@@ -2211,7 +2211,7 @@ export class DatabaseStorage implements IStorage {
         u.first_name AS "senderName"
       FROM chat_messages cm
       INNER JOIN users u ON cm.sender_id = u.id
-      WHERE cm.chat_id = ANY(ARRAY[${sql.join(ids.map(id => sql`${id}`), sql`, `)}])
+      WHERE cm.chat_id = ANY(${ids}::integer[])
         AND cm.sent_at >= ${oneWeekAgo}
       ORDER BY cm.chat_id, cm.sent_at DESC, cm.id DESC
     `);
