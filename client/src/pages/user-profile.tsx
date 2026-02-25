@@ -64,7 +64,7 @@ export default function UserProfilePage({ params }: { params?: UserProfileParams
     },
     onSuccess: (data) => {
       // Navigate to the chat page with the newly created chat
-      navigate(`/chat?id=${data.id}`);
+      navigate(`/chat/${data.id}`);
     },
     onError: (error: Error) => {
       toast({

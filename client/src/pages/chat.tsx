@@ -24,10 +24,18 @@ export default function ChatPage() {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const params = useParams();
-  // Get chatId from URL params if it exists
   const chatIdFromParams = params.id ? parseInt(params.id, 10) : null;
   const [selectedChatId, setSelectedChatId] = useState<number | null>(chatIdFromParams);
   const [showChatList, setShowChatList] = useState(!chatIdFromParams || !isMobile);
+
+  useEffect(() => {
+    if (chatIdFromParams) {
+      setSelectedChatId(chatIdFromParams);
+      if (isMobile) {
+        setShowChatList(false);
+      }
+    }
+  }, [chatIdFromParams, isMobile]);
   
   // Fetch all users to be able to start new chats
   const { data: users = [] } = useQuery<User[]>({
