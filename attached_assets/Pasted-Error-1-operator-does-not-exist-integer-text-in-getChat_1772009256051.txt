@@ -1,0 +1,32 @@
+Error 1: operator does not exist: integer = text in getChats
+The inArray() call is passing chat IDs as integers but Postgres is seeing them as text somewhere. The fix is to explicitly cast:
+typescriptconst ids = chatIds.map(r => Number(r.chatId));
+
+// And in your inArray calls, cast explicitly:
+.where(inArray(chatParticipants.chatId, ids.map(id => sql`${id}::integer`)))
+Actually the simpler fix — just make sure the ids array contains actual numbers, not strings, and use sql for the ANY clause which is more reliable than inArray for this case:
+typescriptconst ids = chatIds.map(r => Number(r.chatId));
+
+if (ids.length === 0) return [];
+
+// Replace all inArray(someColumn, ids) with:
+.where(sql`${chatParticipants.chatId} = ANY(ARRAY[${sql.join(ids.map(id => sql`${id}`), sql`, `)}]::integer[])`)
+Or the easiest fix — cast at the query level in your chatIds fetch:
+typescriptconst chatIds = await db
+  .select({ chatId: sql<number>`${chatParticipants.chatId}::integer` })
+  .from(chatParticipants)
+  .where(eq(chatParticipants.userId, userId));
+Error 2: Cannot read properties of undefined (reading 'map') on PgArray
+This is in getNearbyPlaces and is caused by a null value in an array column (likely features) that Drizzle's array mapper can't handle. Fix with a COALESCE:
+typescript// In your getNearbyPlaces (and getPlaces) select, wrap array columns:
+features: sql<string[]>`COALESCE(${places.features}, '{}')`,
+Or handle it when mapping results:
+typescriptreturn {
+  ...place,
+  features: place.features ?? [],
+  distance,
+  isSaved: false
+};
+Error 3: Cannot read properties of undefined (reading 'length') in logAdminAction
+This is a separate issue — something is calling logAdminAction and the result is undefined. This is likely a schema mismatch where a column was added to adminLogs in the schema but not yet migrated in the database. Check your admin_logs table in Supabase and make sure it matches your Drizzle schema, then run drizzle-kit push if needed.
+The chat error is the most urgent since it's firing constantly. Which of the three inArray calls in your new getChats do you want me to rewrite fully with the cast?

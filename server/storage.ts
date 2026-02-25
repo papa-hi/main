@@ -1959,8 +1959,9 @@ export class DatabaseStorage implements IStorage {
       
       return {
         ...place,
+        features: place.features ?? [],
         distance,
-        isSaved: false // Would need userId to check favorites
+        isSaved: false
       };
     });
     
@@ -2184,7 +2185,7 @@ export class DatabaseStorage implements IStorage {
 
     if (chatIds.length === 0) return [];
 
-    const ids = chatIds.map(r => r.chatId);
+    const ids = chatIds.map(r => Number(r.chatId));
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
