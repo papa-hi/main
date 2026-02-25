@@ -1,0 +1,89 @@
+I see where the disconnect is. You're likely using a Dropdown or Popover component for that "New Chat" list, which is why it’s behaving like a "menu" (requiring you to click away to close it) rather than a "selection."
+
+If the list is appearing but you can't scroll and you have to click away to see the chat, it's because the UI is blocking the main thread or the focus trap isn't releasing until the component unmounts.
+
+Here is the "Friendly UI" fix that solves the scrolling and the "click away" bug simultaneously:
+
+1. The Layout Fix (Scrolling)
+The reason you can't scroll is usually that the list is rendered inside a container that doesn't have a defined height. Using Shadcn's Command component inside a Dialog is the standard fix for this.
+
+2. The Implementation
+Instead of a dropdown, use this Dialog-based flow. This ensures that as soon as a user is clicked, the selection is made and the list disappears instantly.
+
+TypeScript
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+
+export function NewChatSelection({ users, onSelectUser }) {
+  const [open, setOpen] = useState(false);
+
+  const handleSelect = (userId: number) => {
+    // 1. Trigger the selection immediately
+    onSelectUser(userId);
+    // 2. Close the modal immediately (prevents the "click away" bug)
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="w-full justify-start gap-2 mb-4">
+          <Plus className="h-4 w-4" />
+          New Chat
+        </Button>
+      </DialogTrigger>
+      
+      {/* Using DialogContent with p-0 and overflow-hidden 
+          allows the CommandList to handle the scrolling 
+      */}
+      <DialogContent className="p-0 overflow-hidden sm:max-w-[450px]">
+        <DialogHeader className="p-4 border-b">
+          <DialogTitle>Start a conversation</DialogTitle>
+        </DialogHeader>
+        
+        <Command>
+          <CommandInput placeholder="Search people..." autoFocus />
+          
+          {/* This CommandList is the key. 
+              It has built-in scrolling that works on mobile.
+          */}
+          <CommandList className="max-h-[300px] overflow-y-auto p-2">
+            <CommandEmpty>No users found.</CommandEmpty>
+            <CommandGroup>
+              {users?.map((user) => (
+                <CommandItem
+                  key={user.id}
+                  onSelect={() => handleSelect(user.id)}
+                  className="flex items-center gap-3 p-3 cursor-pointer"
+                >
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={user.profileImage} />
+                    <AvatarFallback>{user.firstName[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{user.firstName} {user.lastName}</span>
+                    <span className="text-xs text-muted-foreground">Available</span>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </DialogContent>
+    </Dialog>
+  );
+}
+Why this works:
+Immediate Close: By manually controlling the open state (setOpen(false) inside handleSelect), you kill the "click away" bug. The chat behind it will be visible the millisecond you tap a name.
+
+Scroll Fix: CommandList combined with max-h-[300px] overflow-y-auto creates a dedicated scrollable area. If you use a standard div, it often tries to expand the whole modal instead of scrolling inside it.
+
+No Lag: The Command component is optimized for large lists. It filters "as you type" and handles keyboard navigation, which feels much more professional.
+
+Common Pitfall to Check:
+If you are currently using a Popover, the reason you can't scroll is likely a CSS property called pointer-events: none being applied to the body while the popover is open. Switching to a Dialog (as shown above) usually resolves this because it manages the "body lock" correctly.
+
+Are you currently using a "Popover" component from a library like Shadcn or Radix for that user list? If so, I can show you how to swap just that part.

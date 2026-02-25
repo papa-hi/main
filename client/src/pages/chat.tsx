@@ -6,12 +6,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowLeft, MessageSquarePlus, Search } from "lucide-react";
+import { ArrowLeft, MessageSquarePlus } from "lucide-react";
 import { useParams } from "wouter";
 
 interface User {
@@ -30,7 +30,6 @@ export default function ChatPage() {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(chatIdFromParams);
   const [showChatList, setShowChatList] = useState(!chatIdFromParams || !isMobile);
   const [newChatOpen, setNewChatOpen] = useState(false);
-  const [userSearch, setUserSearch] = useState("");
 
   useEffect(() => {
     if (chatIdFromParams) {
@@ -40,12 +39,12 @@ export default function ChatPage() {
       }
     }
   }, [chatIdFromParams, isMobile]);
-  
+
   const { data: users = [] } = useQuery<User[]>({
     queryKey: ["/api/users"],
     enabled: !!user,
   });
-  
+
   const createChatMutation = useMutation({
     mutationFn: async (userId: number) => {
       const res = await apiRequest("POST", "/api/chats", { participants: [userId] });
@@ -55,41 +54,39 @@ export default function ChatPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
       setSelectedChatId(newChat.id);
       setNewChatOpen(false);
-      setUserSearch("");
       if (isMobile) {
         setShowChatList(false);
       }
     },
   });
-  
+
   const handleSelectChat = (chatId: number) => {
     setSelectedChatId(chatId);
     if (isMobile) {
       setShowChatList(false);
     }
   };
-  
+
   const handleBackToList = () => {
     setShowChatList(true);
   };
-  
+
+  const handleSelectUser = (userId: number) => {
+    createChatMutation.mutate(userId);
+  };
+
   const otherUsers = users.filter((u) => u.id !== user?.id);
-  const filteredUsers = otherUsers.filter((u) => {
-    if (!userSearch.trim()) return true;
-    const query = userSearch.toLowerCase();
-    return u.firstName.toLowerCase().includes(query) || u.lastName.toLowerCase().includes(query);
-  });
-  
+
   return (
     <div className="h-full">
       <div className="max-w-6xl mx-auto">
         <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2 rounded-md text-sm">
           <p>{t('chat.expirationNotice', 'Note: Chat messages are automatically deleted after one week for privacy.')}</p>
         </div>
-        
+
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">{t('chat.title', 'Messages')}</h1>
-          
+
           {!isMobile && (
             <Button
               variant="outline"
@@ -102,7 +99,7 @@ export default function ChatPage() {
             </Button>
           )}
         </div>
-        
+
         <div className="flex-1 flex overflow-hidden">
           {(!isMobile || showChatList) && (
             <div className={`${isMobile ? 'w-full' : 'w-1/3'} border-r overflow-y-auto`}>
@@ -112,7 +109,7 @@ export default function ChatPage() {
               />
             </div>
           )}
-          
+
           {(!isMobile || !showChatList) && selectedChatId ? (
             <div className={`${isMobile ? 'w-full' : 'w-2/3'} flex flex-col`}>
               {isMobile && (
@@ -149,46 +146,36 @@ export default function ChatPage() {
         )}
 
         <Dialog open={newChatOpen} onOpenChange={setNewChatOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
+          <DialogContent className="p-0 overflow-hidden sm:max-w-[450px]">
+            <DialogHeader className="p-4 border-b">
               <DialogTitle>{t('chat.selectUser', 'Start a conversation')}</DialogTitle>
             </DialogHeader>
-            <div className="relative mt-2">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={t('chat.searchUsers', 'Search users...')}
-                className="pl-9"
-                value={userSearch}
-                onChange={(e) => setUserSearch(e.target.value)}
-              />
-            </div>
-            <ScrollArea className="max-h-[50vh] mt-2">
-              <div className="space-y-1 pr-3">
-                {filteredUsers.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-6">
-                    {t('chat.noUsersFound', 'No users found')}
-                  </p>
-                ) : (
-                  filteredUsers.map((otherUser: User) => (
-                    <button
+
+            <Command>
+              <CommandInput placeholder={t('chat.searchUsers', 'Search people...')} autoFocus />
+              <CommandList className="max-h-[300px] overflow-y-auto p-2">
+                <CommandEmpty>{t('chat.noUsersFound', 'No users found.')}</CommandEmpty>
+                <CommandGroup>
+                  {otherUsers.map((otherUser) => (
+                    <CommandItem
                       key={otherUser.id}
-                      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/60 active:bg-muted transition-colors text-left disabled:opacity-50"
+                      value={`${otherUser.firstName} ${otherUser.lastName}`}
+                      onSelect={() => handleSelectUser(otherUser.id)}
+                      className="flex items-center gap-3 p-3 cursor-pointer"
                       disabled={createChatMutation.isPending}
-                      onClick={() => createChatMutation.mutate(otherUser.id)}
                     >
-                      <img
-                        src={otherUser.profileImage || `https://placehold.co/40x40/4F6F52/white?text=${otherUser.firstName[0]}`}
-                        alt={`${otherUser.firstName} ${otherUser.lastName}`}
-                        className="w-10 h-10 rounded-full object-cover shrink-0"
-                      />
-                      <div className="min-w-0">
-                        <p className="font-medium truncate">{otherUser.firstName} {otherUser.lastName}</p>
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={otherUser.profileImage || undefined} alt={otherUser.firstName} />
+                        <AvatarFallback>{otherUser.firstName[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{otherUser.firstName} {otherUser.lastName}</span>
                       </div>
-                    </button>
-                  ))
-                )}
-              </div>
-            </ScrollArea>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
           </DialogContent>
         </Dialog>
       </div>
