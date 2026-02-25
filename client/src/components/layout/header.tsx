@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
 import LanguageSwitcher from "../shared/language-switcher";
 import { 
   DropdownMenu, 
@@ -36,6 +37,13 @@ export function Header({ user }: HeaderProps) {
   const { t, i18n } = useTranslation();
   const { user: authUser, logoutMutation } = useAuth();
   const isAuthenticated = !!authUser;
+
+  const { data: unreadData } = useQuery<{ count: number }>({
+    queryKey: ["/api/chats/unread-count"],
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+  });
+  const totalUnread = unreadData?.count || 0;
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -195,8 +203,13 @@ export function Header({ user }: HeaderProps) {
           <Link href="/places" className={`font-medium hover:text-accent transition ${location.includes('/places') ? 'text-accent' : ''}`}>
             {t('nav.places', 'Places')}
           </Link>
-          <Link href="/chat" className={`font-medium hover:text-accent transition ${location === '/chat' ? 'text-accent' : ''}`}>
+          <Link href="/chat" className={`font-medium hover:text-accent transition relative ${location === '/chat' ? 'text-accent' : ''}`}>
             {t('nav.chat', 'Berichten')}
+            {totalUnread > 0 && (
+              <span className="absolute -top-2 -right-4 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white px-0.5">
+                {totalUnread > 9 ? '9+' : totalUnread}
+              </span>
+            )}
           </Link>
           <Link href="/community" className={`font-medium hover:text-accent transition ${location === '/community' ? 'text-accent' : ''}`}>
             {t('nav.community', 'Community')}
@@ -289,9 +302,14 @@ export function Header({ user }: HeaderProps) {
               <Map className="w-4 h-4 mr-2" />
               {t('nav.playgroundMap', 'Speeltuin Kaart')}
             </Link>
-            <Link href="/chat" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
+            <Link href="/chat" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center relative">
               <MessageCircle className="w-4 h-4 mr-2" />
               {t('nav.chat', 'Berichten')}
+              {totalUnread > 0 && (
+                <span className="ml-2 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 text-[11px] font-medium text-white px-1">
+                  {totalUnread > 9 ? '9+' : totalUnread}
+                </span>
+              )}
             </Link>
             <Link href="/community" className="py-2 px-4 hover:bg-primary/80 rounded-md transition-all duration-200 hover:pl-6 flex items-center">
               <Users className="w-4 h-4 mr-2" />

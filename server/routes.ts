@@ -1955,6 +1955,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat REST API endpoints
+  app.get("/api/chats/unread-count", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ message: "Not authenticated" });
+      const count = await storage.getTotalUnreadCount(userId);
+      res.json({ count });
+    } catch (err) {
+      console.error("Error fetching unread count:", err);
+      res.status(500).json({ message: "Failed to fetch unread count" });
+    }
+  });
+
   app.get("/api/chats", isAuthenticated, async (req, res) => {
     try {
       const userId = req.user?.id;
@@ -3880,13 +3892,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
             const participantIds = new Set(chat.participants.map((p: any) => p.id));
 
-            // Broadcast to all connected clients who are participants of this chat
+            const connectedUserIds = new Set<number>();
             for (const [client, info] of Array.from(clients.entries())) {
               if (client.readyState === WebSocket.OPEN && info.userId && participantIds.has(info.userId)) {
+                connectedUserIds.add(info.userId);
                 client.send(JSON.stringify({
                   type: 'message',
                   message: savedMessage
                 }));
+              }
+            }
+
+            const senderName = savedMessage.sender?.firstName || 'Someone';
+            const snippet = data.content.length > 80 ? data.content.substring(0, 80) + '...' : data.content;
+            for (const pid of participantIds) {
+              if (pid !== clientInfo.userId && !connectedUserIds.has(pid)) {
+                sendNotificationToUser(pid, {
+                  title: `${senderName} sent you a message`,
+                  body: snippet,
+                  data: { url: `/chat/${data.chatId}` },
+                }).catch(err => console.error(`Push notification failed for user ${pid}:`, err));
               }
             }
           } catch (err) {

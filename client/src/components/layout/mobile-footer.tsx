@@ -1,12 +1,21 @@
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
 import { Home, Calendar, MapPin, Users, MessageCircle, MessageSquare, ShieldCheck } from "lucide-react";
 
 export function MobileFooter() {
   const [location] = useLocation();
   const { t } = useTranslation();
   const { user } = useAuth();
+
+  const { data: unreadData } = useQuery<{ count: number }>({
+    queryKey: ["/api/chats/unread-count"],
+    enabled: !!user,
+    refetchInterval: 30000,
+  });
+
+  const totalUnread = unreadData?.count || 0;
 
   const navItemClass = (isActive: boolean) => 
     `flex flex-col items-center justify-center py-1.5 px-1 min-w-0 flex-1 rounded-lg transition-colors ${
@@ -41,8 +50,15 @@ export function MobileFooter() {
           <span className="text-[10px] mt-0.5 font-medium truncate max-w-full">{t('nav.community', 'Community')}</span>
         </Link>
         
-        <Link href="/chat" className={navItemClass(location.includes('/chat'))}>
-          <MessageCircle className={`w-5 h-5 ${location.includes('/chat') ? 'text-primary' : ''}`} />
+        <Link href="/chat" className={`${navItemClass(location.includes('/chat'))} relative`}>
+          <div className="relative">
+            <MessageCircle className={`w-5 h-5 ${location.includes('/chat') ? 'text-primary' : ''}`} />
+            {totalUnread > 0 && (
+              <span className="absolute -top-1.5 -right-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white px-0.5">
+                {totalUnread > 9 ? '9+' : totalUnread}
+              </span>
+            )}
+          </div>
           <span className="text-[10px] mt-0.5 font-medium truncate max-w-full">{t('navigation.chat', 'Messages')}</span>
         </Link>
         

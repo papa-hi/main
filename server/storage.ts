@@ -106,6 +106,8 @@ export interface IStorage {
   updateEvent(id: number, event: Partial<FamilyEvent>): Promise<FamilyEvent>;
   deleteEvent(id: number): Promise<boolean>;
   
+  getTotalUnreadCount(userId: number): Promise<number>;
+
   // Optimized methods for scheduled tasks
   getUsersWithIncompleteProfiles(): Promise<{ id: number; firstName: string; username: string; email: string; missingFields: string[] }[]>;
   getUsersInCity(city: string): Promise<{ id: number; email: string; firstName: string }[]>;
@@ -1001,6 +1003,10 @@ export class MemStorage implements IStorage {
 
   async getUsersInCity(_city: string): Promise<{ id: number; email: string; firstName: string }[]> {
     return [];
+  }
+
+  async getTotalUnreadCount(_userId: number): Promise<number> {
+    return 0;
   }
 }
 
@@ -2962,6 +2968,33 @@ export class DatabaseStorage implements IStorage {
       .where(sql`LOWER(${users.city}) LIKE LOWER(${'%' + city + '%'})`);
 
     return result;
+  }
+
+  async getTotalUnreadCount(userId: number): Promise<number> {
+    const chatIds = await db
+      .select({ chatId: chatParticipants.chatId })
+      .from(chatParticipants)
+      .where(eq(chatParticipants.userId, userId));
+
+    if (chatIds.length === 0) return 0;
+
+    const ids = chatIds.map(r => Number(r.chatId));
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const [result] = await db
+      .select({ count: count() })
+      .from(chatMessages)
+      .where(
+        and(
+          inArray(chatMessages.chatId, ids),
+          not(eq(chatMessages.senderId, userId)),
+          eq(chatMessages.isRead, false),
+          gte(chatMessages.sentAt, oneWeekAgo)
+        )
+      );
+
+    return Number(result?.count ?? 0);
   }
 }
 

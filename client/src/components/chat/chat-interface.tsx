@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useChat } from "@/hooks/use-chat";
 import { formatTime } from "@/lib/utils";
@@ -39,7 +40,10 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
     enabled: !!chatId && !!user,
   });
   
-  // Scroll to bottom when messages change
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["/api/chats/unread-count"] });
+  }, [chatId]);
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
