@@ -53,7 +53,6 @@ export default function ChatPage() {
     onSuccess: (newChat) => {
       queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
       setSelectedChatId(newChat.id);
-      setNewChatOpen(false);
       if (isMobile) {
         setShowChatList(false);
       }
@@ -72,7 +71,10 @@ export default function ChatPage() {
   };
 
   const handleSelectUser = (userId: number) => {
-    createChatMutation.mutate(userId);
+    setNewChatOpen(false);
+    requestAnimationFrame(() => {
+      createChatMutation.mutate(userId);
+    });
   };
 
   const otherUsers = users.filter((u) => u.id !== user?.id);
