@@ -107,8 +107,11 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       if (!res.ok) throw new Error("Failed to fetch users");
       return await res.json();
     },
-    enabled: !!user, // Only run when user is logged in
-    retry: false, // Don't retry on auth errors
+    enabled: !!user,
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
   // Extract users array from paginated response
@@ -128,6 +131,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     },
     enabled: !!user,
     retry: false,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
   // Page stats query
@@ -144,6 +150,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     },
     enabled: !!user,
     retry: false,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
   // Feature stats query
@@ -160,6 +169,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     },
     enabled: !!user,
     retry: false,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
   // Activity logs query
@@ -176,6 +188,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     },
     enabled: !!user,
     retry: false,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
   // Extract activity array from paginated response
@@ -195,6 +210,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     },
     enabled: !!user,
     retry: false,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
   // Extract logs array from paginated response

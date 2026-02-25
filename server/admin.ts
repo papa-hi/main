@@ -141,7 +141,7 @@ export function setupAdminRoutes(app: Express) {
       });
       
       // Log admin action
-      await logAdminAction("Get all users", { limit, offset }, req);
+      logAdminAction("Get all users", { limit, offset }, req);
     } catch (error) {
       console.error("Error fetching admin users:", error);
       res.status(500).json({ error: "Failed to fetch users" });
@@ -155,7 +155,7 @@ export function setupAdminRoutes(app: Express) {
       res.json(stats);
       
       // Log admin action
-      await logAdminAction("View user statistics", null, req);
+      logAdminAction("View user statistics", null, req);
     } catch (error) {
       console.error("Error fetching user statistics:", error);
       res.status(500).json({ error: "Failed to fetch user statistics" });
@@ -182,7 +182,7 @@ export function setupAdminRoutes(app: Express) {
       res.json(userWithoutPassword);
       
       // Log admin action
-      await logAdminAction("Change user role", { userId, newRole: role }, req);
+      logAdminAction("Change user role", { userId, newRole: role }, req);
     } catch (error) {
       console.error("Error changing user role:", error);
       
@@ -213,7 +213,7 @@ export function setupAdminRoutes(app: Express) {
         res.json({ success: true });
         
         // Log admin action
-        await logAdminAction("Delete user", { 
+        logAdminAction("Delete user", { 
           userId, 
           username: user.username,
           email: user.email 
@@ -252,7 +252,7 @@ export function setupAdminRoutes(app: Express) {
       });
       
       // Log admin action
-      await logAdminAction("View user activity", { limit, offset }, req);
+      logAdminAction("View user activity", { limit, offset }, req);
     } catch (error) {
       console.error("Error fetching user activity:", error);
       res.status(500).json({ error: "Failed to fetch user activity" });
@@ -267,7 +267,7 @@ export function setupAdminRoutes(app: Express) {
       res.json(stats);
       
       // Log admin action
-      await logAdminAction("View user activity statistics", { days }, req);
+      logAdminAction("View user activity statistics", { days }, req);
     } catch (error) {
       console.error("Error fetching user activity stats:", error);
       res.status(500).json({ error: "Failed to fetch user activity statistics" });
@@ -282,7 +282,7 @@ export function setupAdminRoutes(app: Express) {
       res.json(pages);
       
       // Log admin action
-      await logAdminAction("View page statistics", { days }, req);
+      logAdminAction("View page statistics", { days }, req);
     } catch (error) {
       console.error("Error fetching page statistics:", error);
       res.status(500).json({ error: "Failed to fetch page statistics" });
@@ -297,7 +297,7 @@ export function setupAdminRoutes(app: Express) {
       res.json(features);
       
       // Log admin action
-      await logAdminAction("View feature usage statistics", { days }, req);
+      logAdminAction("View feature usage statistics", { days }, req);
     } catch (error) {
       console.error("Error fetching feature usage statistics:", error);
       res.status(500).json({ error: "Failed to fetch feature usage statistics" });
@@ -329,7 +329,7 @@ export function setupAdminRoutes(app: Express) {
       });
       
       // Log admin action
-      await logAdminAction("View admin logs", { limit, offset }, req);
+      logAdminAction("View admin logs", { limit, offset }, req);
     } catch (error) {
       console.error("Error fetching admin logs:", error);
       res.status(500).json({ error: "Failed to fetch admin logs" });
@@ -340,7 +340,7 @@ export function setupAdminRoutes(app: Express) {
   app.get('/api/admin/places', isAdmin, async (req: Request, res: Response) => {
     try {
       const places = await storage.getPlaces({});
-      await logAdminAction("View places list", { count: places.length }, req);
+      logAdminAction("View places list", { count: places.length }, req);
       res.json(places);
     } catch (error) {
       console.error("Error fetching places:", error);
@@ -352,7 +352,7 @@ export function setupAdminRoutes(app: Express) {
     try {
       const placeId = parseInt(req.params.placeId);
       const updatedPlace = await storage.updatePlace(placeId, req.body);
-      await logAdminAction("Edit place", { placeId, placeName: updatedPlace.name }, req);
+      logAdminAction("Edit place", { placeId, placeName: updatedPlace.name }, req);
       res.json(updatedPlace);
     } catch (error) {
       console.error("Error updating place:", error);
@@ -365,7 +365,7 @@ export function setupAdminRoutes(app: Express) {
       const placeId = parseInt(req.params.placeId);
       const success = await storage.deletePlace(placeId);
       if (success) {
-        await logAdminAction("Delete place", { placeId }, req);
+        logAdminAction("Delete place", { placeId }, req);
         res.json({ success: true });
       } else {
         res.status(404).json({ error: "Place not found" });
@@ -380,7 +380,7 @@ export function setupAdminRoutes(app: Express) {
   app.get('/api/admin/posts', isAdmin, async (req: Request, res: Response) => {
     try {
       const posts = await storage.getCommunityPosts({ limit: 100 });
-      await logAdminAction("View community posts", { postCount: posts.length }, req);
+      logAdminAction("View community posts", { postCount: posts.length }, req);
       res.json(posts);
     } catch (error) {
       console.error("Error fetching admin posts:", error);
@@ -399,7 +399,7 @@ export function setupAdminRoutes(app: Express) {
 
       const success = await storage.deleteCommunityPost(postId);
       if (success) {
-        await logAdminAction("Delete harmful post", { 
+        logAdminAction("Delete harmful post", { 
           postId, 
           postTitle: post.title,
           authorId: post.userId,
@@ -420,7 +420,7 @@ export function setupAdminRoutes(app: Express) {
     try {
       const { weeklyScheduler } = await import('./weekly-scheduler');
       const status = weeklyScheduler.getStatus();
-      await logAdminAction("Check profile reminder status", status, req);
+      logAdminAction("Check profile reminder status", status, req);
       res.json(status);
     } catch (error) {
       console.error("Error getting scheduler status:", error);
@@ -433,7 +433,7 @@ export function setupAdminRoutes(app: Express) {
       const { findUsersWithIncompleteProfiles } = await import('./profile-reminder-scheduler');
       const incompleteUsers = await findUsersWithIncompleteProfiles();
       
-      await logAdminAction("Check incomplete profiles", { 
+      logAdminAction("Check incomplete profiles", { 
         totalIncomplete: incompleteUsers.length 
       }, req);
       
@@ -464,7 +464,7 @@ export function setupAdminRoutes(app: Express) {
         console.error('Error in manual profile reminders:', error);
       });
 
-      await logAdminAction("Trigger profile reminders", { 
+      logAdminAction("Trigger profile reminders", { 
         triggeredBy: "manual",
         timestamp: new Date().toISOString()
       }, req);
@@ -483,7 +483,7 @@ export function setupAdminRoutes(app: Express) {
   app.get('/api/admin/events', isAdmin, async (req: Request, res: Response) => {
     try {
       const events = await storage.getEvents();
-      await logAdminAction("View events", { eventCount: events.length }, req);
+      logAdminAction("View events", { eventCount: events.length }, req);
       res.json(events);
     } catch (error) {
       console.error("Error fetching admin events:", error);
@@ -500,7 +500,7 @@ export function setupAdminRoutes(app: Express) {
         return res.status(404).json({ error: "Event not found" });
       }
 
-      await logAdminAction("View event details", { eventId }, req);
+      logAdminAction("View event details", { eventId }, req);
       res.json(event);
     } catch (error) {
       console.error("Error fetching event:", error);
@@ -526,7 +526,7 @@ export function setupAdminRoutes(app: Express) {
       
       const newEvent = await storage.createEvent(validatedData);
       
-      await logAdminAction("Create event", { 
+      logAdminAction("Create event", { 
         eventId: newEvent.id, 
         title: newEvent.title 
       }, req);
@@ -576,7 +576,7 @@ export function setupAdminRoutes(app: Express) {
       
       const updatedEvent = await storage.updateEvent(eventId, validatedData);
       
-      await logAdminAction("Update event", { 
+      logAdminAction("Update event", { 
         eventId, 
         title: updatedEvent.title,
         changes: validatedData 
@@ -607,7 +607,7 @@ export function setupAdminRoutes(app: Express) {
       const success = await storage.deleteEvent(eventId);
       
       if (success) {
-        await logAdminAction("Delete event", { 
+        logAdminAction("Delete event", { 
           eventId, 
           title: event.title 
         }, req);
@@ -624,37 +624,27 @@ export function setupAdminRoutes(app: Express) {
 
 async function sendNewEventNotifications(event: any): Promise<void> {
   try {
-    const allUsers = await storage.getAllUsers();
-    
-    // Filter users who:
-    // 1. Have an email address
-    // 2. Are not admins
-    // 3. Have a city in their profile
-    // 4. Their city matches the event location (case-insensitive)
-    const eventLocationLower = event.location.toLowerCase();
-    
-    const usersWithEmail = allUsers.filter(user => {
-      if (!user.email || user.role === 'admin') return false;
-      if (!user.city) return false; // Skip users without city
-      
-      // Check if user's city is mentioned in the event location
-      const userCityLower = user.city.toLowerCase();
-      return eventLocationLower.includes(userCityLower);
-    });
-    
-    console.log(`Sending new event notifications to ${usersWithEmail.length} users in ${event.location} for event: ${event.title}`);
-    
+    const locationParts = event.location.split(',');
+    const city = locationParts[locationParts.length - 1].trim();
+
+    const usersInCity = await storage.getUsersInCity(city);
+    const eligibleUsers = usersInCity.filter(u => u.email);
+
+    console.log(`Sending new event notifications to ${eligibleUsers.length} users in ${city} for event: ${event.title}`);
+
     const eventDate = format(new Date(event.startDate), "EEEE, MMMM d, yyyy 'at' h:mm a");
     const eventEndDate = event.endDate ? format(new Date(event.endDate), "EEEE, MMMM d, yyyy 'at' h:mm a") : undefined;
-    
+
     let successCount = 0;
     let failCount = 0;
-    
-    for (const user of usersWithEmail) {
-      try {
-        const result = await sendNewEventNotification({
+
+    const batchSize = 10;
+    for (let i = 0; i < eligibleUsers.length; i += batchSize) {
+      const batch = eligibleUsers.slice(i, i + batchSize);
+      const results = await Promise.allSettled(
+        batch.map(user => sendNewEventNotification({
           to: user.email!,
-          firstName: user.firstName || user.username || 'Friend',
+          firstName: user.firstName || 'Friend',
           eventTitle: event.title,
           eventDescription: event.description || '',
           eventDate: eventDate,
@@ -662,22 +652,23 @@ async function sendNewEventNotifications(event: any): Promise<void> {
           eventLocation: event.location,
           eventCategory: event.category,
           eventId: event.id
-        });
-        
-        if (result) {
+        }))
+      );
+
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value) {
           successCount++;
         } else {
           failCount++;
         }
-      } catch (err) {
-        console.error(`Failed to send notification to ${user.email}:`, err);
-        failCount++;
       }
-      
-      await new Promise(resolve => setTimeout(resolve, 600));
+
+      if (i + batchSize < eligibleUsers.length) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
     }
-    
-    console.log(`New event notifications sent: ${successCount}/${usersWithEmail.length} successful, ${failCount} failed`);
+
+    console.log(`New event notifications sent: ${successCount}/${eligibleUsers.length} successful, ${failCount} failed`);
   } catch (error) {
     console.error('Error in sendNewEventNotifications:', error);
   }

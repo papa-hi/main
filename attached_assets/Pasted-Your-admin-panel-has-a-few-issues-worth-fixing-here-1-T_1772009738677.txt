@@ -1,0 +1,63 @@
+Your admin panel has a few issues worth fixing here.
+1. The polling loop causing those repeated DB hits
+Looking at your admin routes, the frontend is probably calling these in a useEffect with an interval. But there's also a structural issue — every admin route logs the action after sending the response, which means if the log fails, you've already responded 200. That's fine, but the bigger issue is sendNewEventNotifications which has a critical bug:
+typescript// This loads ALL users into memory every time an event is created
+const allUsers = await storage.getAllUsers();
+
+// Then filters in JS — should be a DB query instead
+const usersWithEmail = allUsers.filter(user => { ... });
+
+// Then sends emails sequentially with a 600ms delay between each
+// If you have 500 users in the same city, this blocks for 5 minutes
+await new Promise(resolve => setTimeout(resolve, 600));
+Fix by using the existing getUsersInCity method and making the delay shorter or using a proper queue:
+typescriptasync function sendNewEventNotifications(event: any): Promise<void> {
+  try {
+    // Extract city from location string (e.g. "Vondelpark, Amsterdam" → "Amsterdam")
+    const locationParts = event.location.split(',');
+    const city = locationParts[locationParts.length - 1].trim();
+    
+    // Use the optimized DB query instead of loading all users
+    const usersInCity = await storage.getUsersInCity(city);
+    
+    // Filter out admins - add role to getUsersInCity if needed
+    const eligibleUsers = usersInCity.filter(u => u.email);
+    
+    console.log(`Sending to ${eligibleUsers.length} users in ${city}`);
+    
+    // Send in parallel batches of 10 instead of sequential with delay
+    const batchSize = 10;
+    for (let i = 0; i < eligibleUsers.length; i += batchSize) {
+      const batch = eligibleUsers.slice(i, i + batchSize);
+      await Promise.allSettled(
+        batch.map(user => sendNewEventNotification({
+          to: user.email!,
+          firstName: user.firstName,
+          // ...rest of params
+        }))
+      );
+      // Small delay between batches to respect email provider limits
+      if (i + batchSize < eligibleUsers.length) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+  } catch (error) {
+    console.error('Error in sendNewEventNotifications:', error);
+  }
+}
+2. The admin polling — fix on the frontend
+Your admin dashboard is hitting these endpoints every ~30 seconds. Find the component and add staleTime:
+typescript// For any admin data that doesn't change often
+const { data: users } = useQuery({
+  queryKey: ['admin-users'],
+  queryFn: () => fetch('/api/admin/users').then(r => r.json()),
+  staleTime: 5 * 60 * 1000,      // cached for 5 min
+  refetchOnWindowFocus: false,    // don't refetch when tab regains focus
+  refetchInterval: false,         // disable auto-polling entirely
+});
+3. Minor — log after respond pattern
+All your routes do res.json(...) then await logAdminAction(...). This is fine but if you ever add middleware that checks if headers are sent, it'll cause issues. Better pattern:
+typescript// log first, then respond — or log without awaiting
+logAdminAction("Get all users", { limit, offset }, req); // no await
+res.json({ users: sanitizedUsers, total, limit, offset });
+The event notification bug is the most important — if someone creates an event in Amsterdam right now, your server would be locked sending sequential emails for potentially minutes, blocking that worker process.
