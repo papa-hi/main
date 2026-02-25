@@ -1,0 +1,48 @@
+Here is the breakdown of what is still needed:
+
+1. The "Mark as Read" Logic (The Loop-Closer)
+Now that you have unread badges, they need to disappear when you actually read the messages. Currently, your database has is_read = false, but nothing is changing it to true.
+
+The Change: You need an API endpoint or a WebSocket event (e.g., mark_chat_as_read) that triggers when a user opens a chat.
+
+SQL for the Backend:
+
+SQL
+-- Example of what the backend needs to run
+UPDATE chat_messages 
+SET is_read = true 
+WHERE chat_id = $1 AND receiver_id = $2 AND is_read = false;
+Frontend Trigger: In your ChatPage.tsx, add a useEffect that fires when a chat ID is present in the URL to tell the server "I'm looking at this now."
+
+2. The Bottom Nav Badge (The "Dopamine" Hit)
+You need to visually show the user they have mail while they are browsing other parts of the app (like the Home or Discover pages).
+
+The Change: Modify your AppShell.tsx or BottomNav.tsx to display the total count.
+
+The Code snippet:
+
+TypeScript
+const totalUnread = Object.values(unreadCounts).reduce((a, b) => a + b, 0);
+
+// Inside your Nav Link for Chat:
+<div className="relative">
+  <MessageSquareIcon />
+  {totalUnread > 0 && (
+    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+      {totalUnread > 9 ? '9+' : totalUnread}
+    </span>
+  )}
+</div>
+3. Web Push Notifications (The "Retention" Tool)
+As we discussed earlier, if the user isn't on the site, the WebSocket won't reach them.
+
+The Change: Integrate your existing VAPID push setup with the chat logic.
+
+The Workflow: When a message is sent, the server checks if the recipient is connected to the WebSocket. If not connected, the server sends a Push Notification to their device so they get a ping on their phone/lock screen.
+
+4. Chat List "Last Message" Preview
+To make the chat list look professional, each chat item should show a snippet of the last message sent.
+
+The Change: Update your chat list query to include the content of the most recent message from chat_messages.
+
+UI Detail: Bold the text if the message is unread, and use regular weight if it has been seen.

@@ -107,6 +107,7 @@ export interface IStorage {
   deleteEvent(id: number): Promise<boolean>;
   
   getTotalUnreadCount(userId: number): Promise<number>;
+  markChatAsRead(chatId: number, userId: number): Promise<void>;
 
   // Optimized methods for scheduled tasks
   getUsersWithIncompleteProfiles(): Promise<{ id: number; firstName: string; username: string; email: string; missingFields: string[] }[]>;
@@ -1008,6 +1009,8 @@ export class MemStorage implements IStorage {
   async getTotalUnreadCount(_userId: number): Promise<number> {
     return 0;
   }
+
+  async markChatAsRead(_chatId: number, _userId: number): Promise<void> {}
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2995,6 +2998,19 @@ export class DatabaseStorage implements IStorage {
       );
 
     return Number(result?.count ?? 0);
+  }
+
+  async markChatAsRead(chatId: number, userId: number): Promise<void> {
+    await db
+      .update(chatMessages)
+      .set({ isRead: true })
+      .where(
+        and(
+          eq(chatMessages.chatId, chatId),
+          not(eq(chatMessages.senderId, userId)),
+          eq(chatMessages.isRead, false)
+        )
+      );
   }
 }
 

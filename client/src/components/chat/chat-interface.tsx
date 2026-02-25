@@ -41,19 +41,32 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
   });
   
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ["/api/chats/unread-count"] });
+    if (chatId) {
+      fetch(`/api/chats/${chatId}/read`, { method: "POST", credentials: "include" })
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ["/api/chats/unread-count"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/chats"] });
+        })
+        .catch(() => {});
+    }
   }, [chatId]);
+
+  const chatMessages = messages[chatId] || [];
+
+  const otherParticipant = chatDetails?.participants.find(p => p.id !== user?.id);
 
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
+    if (chatId && chatMessages.some(m => m.senderId !== user?.id && !m.isRead)) {
+      fetch(`/api/chats/${chatId}/read`, { method: "POST", credentials: "include" })
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ["/api/chats/unread-count"] });
+        })
+        .catch(() => {});
+    }
   }, [messages[chatId]]);
-  
-  // Get other participant for display
-  const otherParticipant = chatDetails?.participants.find(p => p.id !== user?.id);
-  
-  const chatMessages = messages[chatId] || [];
   
   const handleSendMessage = async () => {
     if (!connected || !newMessage.trim() || isSending) return;

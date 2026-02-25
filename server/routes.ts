@@ -1967,6 +1967,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/chats/:id/read", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ message: "Not authenticated" });
+      const chatId = parseInt(req.params.id);
+      if (isNaN(chatId)) return res.status(400).json({ message: "Invalid chat ID" });
+      await storage.markChatAsRead(chatId, userId);
+      res.json({ success: true });
+    } catch (err) {
+      console.error("Error marking chat as read:", err);
+      res.status(500).json({ message: "Failed to mark chat as read" });
+    }
+  });
+
   app.get("/api/chats", isAuthenticated, async (req, res) => {
     try {
       const userId = req.user?.id;
