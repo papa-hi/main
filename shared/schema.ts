@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar, unique, index } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar, unique, index, decimal } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -107,6 +107,85 @@ export const matchPreferences = pgTable("match_preferences", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// User Availability - recurring weekly schedule for playdate matching
+export const userAvailability = pgTable("user_availability", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  dayOfWeek: integer("day_of_week").notNull(),
+  timeSlot: varchar("time_slot", { length: 20 }).notNull(),
+  startTime: varchar("start_time", { length: 5 }),
+  endTime: varchar("end_time", { length: 5 }),
+  recurrenceType: varchar("recurrence_type", { length: 20 }).default("weekly"),
+  isActive: boolean("is_active").default(true).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  uniqueUserSlot: unique().on(table.userId, table.dayOfWeek, table.timeSlot, table.recurrenceType),
+  daySlotIdx: index("idx_user_availability_day_slot").on(table.dayOfWeek, table.timeSlot, table.isActive),
+  userActiveIdx: index("idx_user_availability_user").on(table.userId, table.isActive),
+}));
+
+// Availability Matches - cached matches based on shared time slots
+export const availabilityMatches = pgTable("availability_matches", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  matchedUserId: integer("matched_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  sharedSlots: jsonb("shared_slots").notNull(),
+  matchScore: integer("match_score").default(0),
+  distanceKm: decimal("distance_km", { precision: 5, scale: 2 }),
+  calculatedAt: timestamp("calculated_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  uniqueMatch: unique().on(table.userId, table.matchedUserId),
+  userScoreIdx: index("idx_availability_matches_user_score").on(table.userId, table.matchScore),
+}));
+
+export const userAvailabilityRelations = relations(userAvailability, ({ one }) => ({
+  user: one(users, {
+    fields: [userAvailability.userId],
+    references: [users.id],
+  }),
+}));
+
+export const availabilityMatchesRelations = relations(availabilityMatches, ({ one }) => ({
+  user: one(users, {
+    fields: [availabilityMatches.userId],
+    references: [users.id],
+    relationName: "availabilityUser",
+  }),
+  matchedUser: one(users, {
+    fields: [availabilityMatches.matchedUserId],
+    references: [users.id],
+    relationName: "availabilityMatchedUser",
+  }),
+}));
+
+export const TIME_SLOTS = {
+  MORNING: 'morning',
+  AFTERNOON: 'afternoon',
+  EVENING: 'evening',
+  ALLDAY: 'allday'
+} as const;
+
+export const DAYS_OF_WEEK = {
+  SUNDAY: 0,
+  MONDAY: 1,
+  TUESDAY: 2,
+  WEDNESDAY: 3,
+  THURSDAY: 4,
+  FRIDAY: 5,
+  SATURDAY: 6
+} as const;
+
+export type TimeSlot = typeof TIME_SLOTS[keyof typeof TIME_SLOTS];
+export type DayOfWeek = typeof DAYS_OF_WEEK[keyof typeof DAYS_OF_WEEK];
+export type UserAvailability = typeof userAvailability.$inferSelect;
+export type NewUserAvailability = typeof userAvailability.$inferInsert;
+export type AvailabilityMatch = typeof availabilityMatches.$inferSelect;
+export type NewAvailabilityMatch = typeof availabilityMatches.$inferInsert;
+
 // Define user relations
 export const usersRelations = relations(users, ({ many }) => ({
   createdPlaydates: many(playdates),
@@ -120,6 +199,9 @@ export const usersRelations = relations(users, ({ many }) => ({
   matchesAsDad1: many(dadMatches, { relationName: "dad1Matches" }),
   matchesAsDad2: many(dadMatches, { relationName: "dad2Matches" }),
   matchPreferences: many(matchPreferences),
+  availability: many(userAvailability),
+  availabilityMatchesAsUser: many(availabilityMatches, { relationName: "availabilityUser" }),
+  availabilityMatchesAsMatched: many(availabilityMatches, { relationName: "availabilityMatchedUser" }),
 }));
 
 // Community Posts relations

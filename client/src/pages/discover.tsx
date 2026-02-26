@@ -8,7 +8,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation } from "@/hooks/use-location";
-import { MapPin, Search, Users } from "lucide-react";
+import { Calendar, MapPin, Search, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface User {
@@ -54,6 +54,23 @@ export default function DiscoverPage() {
         <p className="text-muted-foreground">{t('discover.subtitle')}</p>
       </div>
       
+      <Link href="/dad-days">
+        <Card className="mb-6 cursor-pointer hover:shadow-md transition-shadow border-primary/30 bg-primary/5">
+          <CardContent className="flex items-center gap-4 py-4">
+            <div className="bg-primary/10 p-3 rounded-full">
+              <Calendar className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold">Dad Days Calendar</h3>
+              <p className="text-sm text-muted-foreground">
+                Set your weekly availability and get matched with dads who share your schedule
+              </p>
+            </div>
+            <Button variant="outline" size="sm">Open</Button>
+          </CardContent>
+        </Card>
+      </Link>
+
       {/* Search Bar */}
       <div className="relative mb-6">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />

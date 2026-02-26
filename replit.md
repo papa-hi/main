@@ -32,6 +32,7 @@ The application features a modern and intuitive user interface built with Radix 
     - **User Management**: Role-based access, profile management, secure password reset, and Google OAuth.
     - **Location Services**: Integrates OpenStreetMap via Overpass API and Nominatim for geocoding, user location tracking, and distance calculations.
     - **Social Features**: Real-time chat, playdate creation (including recurring events), user discovery, rating systems, and dad matching based on location and age.
+    - **Calendar Availability Matching**: "Dad Days Calendar" feature where users mark weekly availability (morning/afternoon/evening per day). System matches dads with overlapping free times, factoring in distance and children's age compatibility. Includes real-time match recalculation, slot statistics for social proof, and email/push notifications for new matches. Tables: `user_availability`, `availability_matches`. Route: `/dad-days`. Service: `server/availability-matching-service.ts`.
     - **Admin Dashboard**: Provides tools for user management, analytics, and action logging.
     - **Notifications**: Supports web push notifications (VAPID) and email notifications (via Resend API) for various events like playdates, matches, mentions, comments, and community posts.
     - **Community Features**: Includes nested comments, @username mentions with autocomplete, and post/comment editing capabilities.

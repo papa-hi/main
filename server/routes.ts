@@ -14,6 +14,7 @@ import { eq, and, gte, asc, count, desc, like, or, sql, isNull, isNotNull, inArr
 import crypto from "crypto";
 import { getVapidPublicKey, sendNotificationToUser, sendPlaydateReminder, sendPlaydateUpdate, sendNewCommunityPostNotification } from "./push-notifications";
 import { pushSubscriptions, matchPreferences, pageViews, featureUsage } from "@shared/schema";
+import availabilityRouter from "./availability-routes";
 import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified } from "./notification-scheduler";
 import { calculateDistance, getCityCoordinates } from "./dad-matching-service";
 import { sanitizeText, sanitizeObject } from "./sanitize";
@@ -234,6 +235,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Setup admin routes
   setupAdminRoutes(app);
+
+  // Setup availability routes
+  app.use("/api/availability", isAuthenticated, availabilityRouter);
 
   // Health check endpoint for Railway and other platforms
   app.get("/api/health", (req, res) => {

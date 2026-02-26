@@ -30,6 +30,7 @@ import AdminCheck from "./pages/admin-check";
 import TestCreatePlaydate from "./pages/test-create-playdate";
 import SimpleTestPage from "./pages/simple-test";
 import AboutPage from "./pages/about";
+import DadDaysPage from "./pages/dad-days";
 import { useState, useEffect } from "react";
 import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
 import ErrorBoundary from "./components/shared/error-boundary";
@@ -76,6 +77,7 @@ function Router() {
       <ProtectedRoute path="/chat/:id" component={ChatPage} />
       <ProtectedRoute path="/matches" component={MatchesPage} />
       <ProtectedRoute path="/discover" component={DiscoverPage} />
+      <ProtectedRoute path="/dad-days" component={DadDaysPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
       <ProtectedRoute path="/settings/delete-account" component={DeleteAccountPage} />
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
