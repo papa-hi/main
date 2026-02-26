@@ -1210,6 +1210,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userWithoutPassword = { ...updatedUser } as Partial<SelectUser>;
       delete userWithoutPassword.password;
       
+      // Auto-run matching when city or children info is updated
+      if (updateData.city || (updateData as any).childrenInfo) {
+        setImmediate(async () => {
+          try {
+            const { runDadMatchingForUser } = await import("./dad-matching-service");
+            const matchesCreated = await runDadMatchingForUser(userId);
+            console.log(`Auto-matching after profile update for user ${userId}: ${matchesCreated} matches`);
+          } catch (error) {
+            console.error(`Auto-matching failed for user ${userId}:`, error);
+          }
+        });
+      }
+
       res.json(userWithoutPassword);
     } catch (err) {
       console.error("Error updating user:", err);

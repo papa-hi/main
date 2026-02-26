@@ -5,9 +5,9 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User as SelectUser } from "@shared/schema";
+import { User as SelectUser, matchPreferences } from "@shared/schema";
 import connectPg from "connect-pg-simple";
-import { pool } from "./db";
+import { pool, db } from "./db";
 import { sendWelcomeEmail, sendPasswordResetEmail } from "./email-service";
 import { emailQueue } from "./email-queue";
 import { passwordResetTokens } from "@shared/schema";
@@ -21,6 +21,30 @@ declare global {
 }
 
 const scryptAsync = promisify(scrypt);
+
+async function initializeMatchPreferences(userId: number): Promise<void> {
+  try {
+    await db.insert(matchPreferences).values({
+      userId,
+      maxDistanceKm: 20,
+      ageFlexibility: 2,
+      isEnabled: true,
+    }).onConflictDoNothing();
+    console.log(`Match preferences initialized for user ${userId}`);
+  } catch (error) {
+    console.error(`Failed to initialize match preferences for user ${userId}:`, error);
+  }
+}
+
+async function triggerInitialMatching(userId: number): Promise<void> {
+  try {
+    const { runDadMatchingForUser } = await import("./dad-matching-service");
+    const matchesCreated = await runDadMatchingForUser(userId);
+    console.log(`Initial matching for user ${userId}: ${matchesCreated} matches found`);
+  } catch (error) {
+    console.error(`Failed to run initial matching for user ${userId}:`, error);
+  }
+}
 
 export let sessionMiddleware: express.RequestHandler;
 export let passportInitMiddleware: express.RequestHandler;
@@ -173,6 +197,14 @@ export function setupAuth(app: Express) {
       } else {
         console.log('Skipping welcome email - missing email or firstName');
       }
+
+      // Initialize match preferences and run initial matching in background
+      setImmediate(async () => {
+        await initializeMatchPreferences(user.id);
+        if (user.city && user.childrenInfo) {
+          await triggerInitialMatching(user.id);
+        }
+      });
 
       req.login(user, (err) => {
         if (err) return next(err);
@@ -469,6 +501,13 @@ export function setupAuth(app: Express) {
           } else {
             console.log(`⚠️  FIREBASE SIGNUP: Skipping welcome email - missing data. Email: ${user.email}, FirstName: ${user.firstName}`);
           }
+          // Initialize match preferences and run initial matching in background
+          setImmediate(async () => {
+            await initializeMatchPreferences(user.id);
+            if (user.city && user.childrenInfo) {
+              await triggerInitialMatching(user.id);
+            }
+          });
         } catch (createError) {
           console.error("Error creating user:", createError);
           return res.status(500).json({ error: "Failed to create user account" });

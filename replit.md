@@ -29,7 +29,7 @@ The application features a modern and intuitive user interface built with Radix 
 - **Backend**: Built on Node.js with Express.js and TypeScript. It uses Passport.js for authentication (local and Google OAuth), PostgreSQL for session management, and WebSockets for real-time communication. Multer handles file uploads.
 - **Data Storage**: PostgreSQL (Neon serverless) is the primary database, managed with Drizzle ORM.
 - **Key Features**:
-    - **User Management**: Role-based access, profile management, secure password reset, and Google OAuth.
+    - **User Management**: Role-based access, profile management, secure password reset, and Google OAuth. Match preferences auto-created on registration (default: 20km, ±2yr, enabled). Dad matching auto-runs on registration and profile updates (city/children changes).
     - **Location Services**: Integrates OpenStreetMap via Overpass API and Nominatim for geocoding, user location tracking, and distance calculations.
     - **Social Features**: Real-time chat, playdate creation (including recurring events), user discovery, rating systems, and dad matching based on location and age.
     - **Calendar Availability Matching**: "Dad Days Calendar" feature where users mark weekly availability (morning/afternoon/evening per day). System matches dads with overlapping free times, factoring in distance and children's age compatibility. Includes real-time match recalculation, slot statistics for social proof, and email/push notifications for new matches. Tables: `user_availability`, `availability_matches`. Route: `/dad-days`. Service: `server/availability-matching-service.ts`.
