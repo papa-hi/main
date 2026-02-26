@@ -10,8 +10,9 @@ import { useLocation, Link } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
-import { MessageCircle, Calendar, MapPin, Users } from "lucide-react";
+import { MessageCircle, Calendar, MapPin, Users, Clock } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { AvailabilityDisplay } from "@/components/availability/availability-display";
 
 interface UserProfileParams {
   id: string;
@@ -207,8 +208,12 @@ export default function UserProfilePage({ params }: { params?: UserProfileParams
       </div>
 
       {/* Tabs for Playdates and Favorite Places */}
-      <Tabs defaultValue="playdates" className="mt-8">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+      <Tabs defaultValue="availability" className="mt-8">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsTrigger value="availability" className="flex items-center justify-center">
+            <Clock className="w-4 h-4 mr-2" />
+            Dad Days
+          </TabsTrigger>
           <TabsTrigger value="playdates" className="flex items-center justify-center">
             <Calendar className="w-4 h-4 mr-2" />
             {t('playdates.upcoming', 'Upcoming Playdates')}
@@ -219,6 +224,11 @@ export default function UserProfilePage({ params }: { params?: UserProfileParams
           </TabsTrigger>
         </TabsList>
         
+        {/* Availability Tab */}
+        <TabsContent value="availability">
+          <AvailabilityDisplay userId={userId} />
+        </TabsContent>
+
         {/* Playdates Tab */}
         <TabsContent value="playdates">
           {playdatesLoading ? (
