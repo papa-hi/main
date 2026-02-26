@@ -28,21 +28,12 @@ interface AvailabilityData {
   nextOccurrence: string;
 }
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const FULL_DAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+const DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 const TIME_SLOTS_CONFIG = [
-  { key: "morning", label: "Morning", emoji: "🌅", time: "7am - 12pm" },
-  { key: "afternoon", label: "Afternoon", emoji: "☀️", time: "12pm - 5pm" },
-  { key: "evening", label: "Evening", emoji: "🌆", time: "5pm - 8pm" },
-];
+  { key: "morning", emoji: "🌅" },
+  { key: "afternoon", emoji: "☀️" },
+  { key: "evening", emoji: "🌆" },
+] as const;
 
 function SlotStats({ day, slot }: { day: number; slot: string }) {
   const { data } = useQuery<{
@@ -76,6 +67,7 @@ function SlotStats({ day, slot }: { day: number; slot: string }) {
 }
 
 function MatchesPreview() {
+  const { t } = useTranslation();
   const { data } = useQuery<{
     totalMatches: number;
     matches: any[];
@@ -89,18 +81,17 @@ function MatchesPreview() {
     <Card className="mb-6 border-green-200 bg-green-50 dark:bg-green-950/20">
       <CardContent className="pt-6">
         <h3 className="font-semibold text-green-900 dark:text-green-100 mb-2">
-          🎯 {data.totalMatches} dad{data.totalMatches !== 1 ? "s" : ""} match
-          your schedule!
+          🎯 {t('dadDays.matchesTitle', { count: data.totalMatches })}
         </h3>
         <p className="text-green-700 dark:text-green-300 text-sm mb-3">
-          These dads are free at the same times as you. Start connecting!
+          {t('dadDays.matchesSubtitle')}
         </p>
         <Link href="/matches">
           <Button
             size="sm"
             className="bg-green-600 hover:bg-green-700 text-white"
           >
-            View All Matches
+            {t('dadDays.viewAllMatches')}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
@@ -150,14 +141,14 @@ export function DadDaysCalendar() {
         queryKey: ["/api/availability/matches"],
       });
       toast({
-        title: "Saved!",
-        description: data.message || "Your availability has been updated.",
+        title: t('dadDays.saved'),
+        description: data.message || t('dadDays.savedDescription'),
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to save availability. Please try again.",
+        description: t('dadDays.errorSave'),
         variant: "destructive",
       });
     },
@@ -219,14 +210,14 @@ export function DadDaysCalendar() {
         queryKey: ["/api/availability/matches"],
       });
       toast({
-        title: "Cleared",
-        description: "Your availability has been cleared.",
+        title: t('dadDays.cleared'),
+        description: t('dadDays.clearedDescription'),
       });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to clear availability. Please try again.",
+        description: t('dadDays.errorClear'),
         variant: "destructive",
       });
     },
@@ -264,11 +255,10 @@ export function DadDaysCalendar() {
       <div>
         <h1 className="text-2xl font-heading font-bold flex items-center gap-2">
           <Calendar className="h-7 w-7 text-primary" />
-          Your Dad Days Calendar
+          {t('dadDays.title')}
         </h1>
         <p className="text-muted-foreground mt-1">
-          Mark when you're usually free for playdates. We'll match you with dads
-          who share your schedule!
+          {t('dadDays.subtitle')}
         </p>
       </div>
 
@@ -279,14 +269,14 @@ export function DadDaysCalendar() {
               <thead>
                 <tr className="border-b bg-muted/50">
                   <th className="px-4 py-3 text-left text-sm font-semibold">
-                    Time
+                    {t('dadDays.time')}
                   </th>
-                  {DAYS.map((day, index) => (
+                  {DAY_KEYS.map((dayKey, index) => (
                     <th
                       key={index}
                       className="px-1 md:px-2 py-3 text-center text-xs md:text-sm font-semibold text-foreground"
                     >
-                      {day}
+                      {t(`dadDays.${dayKey}`)}
                     </th>
                   ))}
                 </tr>
@@ -299,15 +289,15 @@ export function DadDaysCalendar() {
                         <span className="text-xl">{timeSlot.emoji}</span>
                         <div>
                           <div className="font-medium text-sm">
-                            {timeSlot.label}
+                            {t(`dadDays.${timeSlot.key}`)}
                           </div>
                           <div className="text-xs text-muted-foreground hidden sm:block">
-                            {timeSlot.time}
+                            {t(`dadDays.${timeSlot.key}Time`)}
                           </div>
                         </div>
                       </div>
                     </td>
-                    {DAYS.map((_, dayIndex) => (
+                    {DAY_KEYS.map((_, dayIndex) => (
                       <td
                         key={dayIndex}
                         className="px-1 md:px-2 py-3 text-center"
@@ -349,8 +339,7 @@ export function DadDaysCalendar() {
         <Card className="border-primary/30 bg-primary/5">
           <CardContent className="pt-6">
             <h3 className="font-semibold mb-2">
-              ✅ You've selected {selectedSlots.size} time slot
-              {selectedSlots.size !== 1 ? "s" : ""}
+              ✅ {t('dadDays.selectedSlots', { count: selectedSlots.size })}
             </h3>
             <div className="flex flex-wrap gap-2">
               {Array.from(selectedSlots)
@@ -362,8 +351,7 @@ export function DadDaysCalendar() {
                   );
                   return (
                     <Badge key={key} variant="secondary" className="gap-1">
-                      {timeSlotInfo?.emoji} {FULL_DAYS[parseInt(day)]}{" "}
-                      {timeSlotInfo?.label}
+                      {timeSlotInfo?.emoji} {t(`dadDays.${DAY_KEYS[parseInt(day)]}`)} {t(`dadDays.${slot}`)}
                     </Badge>
                   );
                 })}
@@ -382,7 +370,7 @@ export function DadDaysCalendar() {
           size="lg"
         >
           <Save className="mr-2 h-4 w-4" />
-          {saveAvailability.isPending ? "Saving..." : "Save Dad Days"}
+          {saveAvailability.isPending ? t('dadDays.saving') : t('dadDays.saveDadDays')}
         </Button>
         <Button
           onClick={handleClear}
@@ -391,7 +379,7 @@ export function DadDaysCalendar() {
           disabled={selectedSlots.size === 0 || clearAvailability.isPending}
         >
           <Trash2 className="mr-2 h-4 w-4" />
-          {clearAvailability.isPending ? "Clearing..." : "Clear All"}
+          {clearAvailability.isPending ? t('dadDays.clearing') : t('dadDays.clearAll')}
         </Button>
       </div>
     </div>

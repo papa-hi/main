@@ -61,9 +61,9 @@ export default function DiscoverPage() {
               <Calendar className="h-6 w-6 text-primary" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold">Dad Days Calendar</h3>
+              <h3 className="font-semibold">{t('dadDays.discoverTitle')}</h3>
               <p className="text-sm text-muted-foreground">
-                Set your weekly availability and get matched with dads who share your schedule
+                {t('dadDays.discoverSubtitle')}
               </p>
             </div>
             <Button variant="outline" size="sm">Open</Button>

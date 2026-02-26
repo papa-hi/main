@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Calendar, Clock } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -11,12 +12,12 @@ interface AvailabilitySlot {
   isActive: boolean;
 }
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 const TIME_SLOTS_CONFIG = [
-  { key: "morning", label: "Morning", emoji: "🌅" },
-  { key: "afternoon", label: "Afternoon", emoji: "☀️" },
-  { key: "evening", label: "Evening", emoji: "🌆" },
-];
+  { key: "morning", emoji: "🌅" },
+  { key: "afternoon", emoji: "☀️" },
+  { key: "evening", emoji: "🌆" },
+] as const;
 
 export function AvailabilityDisplay({
   userId,
@@ -25,6 +26,7 @@ export function AvailabilityDisplay({
   userId: number;
   isOwnProfile?: boolean;
 }) {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery<{ availability: AvailabilitySlot[] }>({
     queryKey: ["/api/availability", "user", userId],
     queryFn: async () => {
@@ -49,13 +51,13 @@ export function AvailabilityDisplay({
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-semibold font-heading flex items-center gap-2">
           <Clock className="h-5 w-5 text-primary" />
-          {isOwnProfile ? "My Dad Days" : "Available For Playdates"}
+          {isOwnProfile ? t('dadDays.myDadDays') : t('dadDays.availableForPlaydates')}
         </h2>
         {isOwnProfile && (
           <Link href="/dad-days">
             <Button variant="outline" size="sm">
               <Calendar className="h-4 w-4 mr-1" />
-              {activeSlots.size === 0 ? "Set Up" : "Edit"}
+              {activeSlots.size === 0 ? t('dadDays.setUp') : t('dadDays.edit')}
             </Button>
           </Link>
         )}
@@ -63,10 +65,10 @@ export function AvailabilityDisplay({
 
       {activeSlots.size === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No availability set yet.{" "}
+          {t('dadDays.noAvailability')}{" "}
           {isOwnProfile && (
             <Link href="/dad-days" className="text-primary underline">
-              Set your Dad Days
+              {t('dadDays.setYourDadDays')}
             </Link>
           )}
         </p>
@@ -76,12 +78,12 @@ export function AvailabilityDisplay({
             <thead>
               <tr className="bg-muted/50 border-b">
                 <th className="px-2 py-1.5 text-left text-xs font-medium text-muted-foreground w-20"></th>
-                {DAYS.map((day) => (
+                {DAY_KEYS.map((dayKey) => (
                   <th
-                    key={day}
+                    key={dayKey}
                     className="px-1 py-1.5 text-center text-xs font-medium text-muted-foreground"
                   >
-                    {day}
+                    {t(`dadDays.${dayKey}`)}
                   </th>
                 ))}
               </tr>
@@ -91,9 +93,9 @@ export function AvailabilityDisplay({
                 <tr key={slot.key} className="border-b last:border-b-0">
                   <td className="px-2 py-1.5 text-xs">
                     <span className="mr-1">{slot.emoji}</span>
-                    <span className="hidden sm:inline">{slot.label}</span>
+                    <span className="hidden sm:inline">{t(`dadDays.${slot.key}`)}</span>
                   </td>
-                  {DAYS.map((_, dayIndex) => {
+                  {DAY_KEYS.map((_, dayIndex) => {
                     const isActive = activeSlots.has(
                       `${dayIndex}-${slot.key}`
                     );
