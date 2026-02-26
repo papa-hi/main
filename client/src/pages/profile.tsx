@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PlaceCard } from "@/components/shared/place-card";
 import { PlaydateCard } from "@/components/shared/playdate-card";
 import { useLocation } from "wouter";
-import { Plus, Trash2, Baby, Users, Heart, X, RefreshCw, Settings, MapPin } from "lucide-react";
+import { Plus, Trash2, Baby, Users, Heart, X, RefreshCw, Settings, MapPin, Calendar } from "lucide-react";
 import { AvailabilityDisplay } from "@/components/availability/availability-display";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -830,7 +830,7 @@ export default function ProfilePage() {
             )}
           </TabsContent>
 
-          <TabsContent value="matches" className="mt-4">
+          <TabsContent value="matches" className="mt-4 space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -838,16 +838,15 @@ export default function ProfilePage() {
                   Dad Matches
                 </CardTitle>
                 <CardDescription>
-                  Connect with other dads based on location and children's ages
+                  Connect with dads based on schedule availability, location, and children's ages
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 space-y-4">
-                  <Users className="h-12 w-12 text-gray-400 mx-auto" />
+                <div className="text-center py-6 space-y-4">
+                  <Users className="h-10 w-10 text-muted-foreground mx-auto" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Discover Dad Matches</h3>
-                    <p className="text-gray-600 text-sm mt-2">
-                      Find and connect with other fathers in your area with children of similar ages.
+                    <p className="text-muted-foreground text-sm">
+                      We match you with fathers nearby who have similar-age children and share your free time slots.
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
@@ -857,15 +856,15 @@ export default function ProfilePage() {
                         View All Matches
                       </Button>
                     </Link>
-                    <Link to="/settings">
+                    <Link to="/dad-days">
                       <Button variant="outline" className="w-full">
-                        <Settings className="h-4 w-4 mr-2" />
-                        Match Settings
+                        <Calendar className="h-4 w-4 mr-2" />
+                        {t('dadDays.myDadDays')}
                       </Button>
                     </Link>
                   </div>
-                  <p className="text-xs text-gray-500">
-                    Configure distance and age preferences in settings
+                  <p className="text-xs text-muted-foreground">
+                    Set your Dad Days calendar and match preferences in settings
                   </p>
                 </div>
               </CardContent>
