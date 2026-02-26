@@ -55,29 +55,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/user/:userId", async (req, res) => {
-  try {
-    const targetUserId = parseInt(req.params.userId);
-    if (isNaN(targetUserId)) return res.status(400).json({ error: "Invalid user ID" });
-
-    const availability = await getUserAvailability(targetUserId);
-
-    res.json({
-      success: true,
-      availability: availability.map(slot => ({
-        dayOfWeek: slot.dayOfWeek,
-        dayName: getDayName(slot.dayOfWeek as DayOfWeek),
-        timeSlot: slot.timeSlot,
-        timeSlotDisplay: getTimeSlotDisplay(slot.timeSlot as TimeSlot),
-        isActive: slot.isActive,
-      })),
-    });
-  } catch (error) {
-    console.error("Error getting user availability:", error);
-    res.status(500).json({ error: "Failed to get availability" });
-  }
-});
-
 router.post("/", async (req, res) => {
   try {
     const userId = req.user?.id;
