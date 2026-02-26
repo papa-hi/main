@@ -205,9 +205,36 @@ export function DadDaysCalendar() {
     saveAvailability.mutate(availability);
   };
 
+  const clearAvailability = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/availability", {
+        availability: [],
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      setSelectedSlots(new Set());
+      queryClient.invalidateQueries({ queryKey: ["/api/availability"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/availability/matches"],
+      });
+      toast({
+        title: "Cleared",
+        description: "Your availability has been cleared.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to clear availability. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleClear = () => {
     setSelectedSlots(new Set());
-    saveAvailability.mutate([]);
+    clearAvailability.mutate();
   };
 
   const isSlotSelected = (day: number, slot: string) => {
@@ -361,10 +388,10 @@ export function DadDaysCalendar() {
           onClick={handleClear}
           variant="outline"
           size="lg"
-          disabled={selectedSlots.size === 0}
+          disabled={selectedSlots.size === 0 || clearAvailability.isPending}
         >
           <Trash2 className="mr-2 h-4 w-4" />
-          Clear All
+          {clearAvailability.isPending ? "Clearing..." : "Clear All"}
         </Button>
       </div>
     </div>
