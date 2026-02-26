@@ -257,10 +257,9 @@ export function DadDaysCalendar() {
                   {DAYS.map((day, index) => (
                     <th
                       key={index}
-                      className="px-1 md:px-2 py-3 text-center text-sm font-semibold"
+                      className="px-1 md:px-2 py-3 text-center text-xs md:text-sm font-semibold text-foreground"
                     >
-                      <span className="hidden md:inline">{day}</span>
-                      <span className="md:hidden">{day.charAt(0)}</span>
+                      {day}
                     </th>
                   ))}
                 </tr>
