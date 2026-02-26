@@ -156,5 +156,15 @@ app.use((req, res, next) => {
       weeklyScheduler.start();
       log("Weekly profile reminder scheduler started");
     }
+
+    // Start availability matching cron jobs
+    import("./availability-cron-jobs")
+      .then(({ setupAvailabilityCronJobs }) => {
+        setupAvailabilityCronJobs();
+        log("Availability matching cron jobs started");
+      })
+      .catch((error) => {
+        console.error("Failed to start availability cron jobs:", error);
+      });
   });
 })();
