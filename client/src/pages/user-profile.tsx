@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { MessageCircle, Calendar, MapPin, Users } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { AvailabilityDisplay } from "@/components/availability/availability-display";
 
 interface UserProfileParams {
   id: string;
@@ -183,6 +184,8 @@ export default function UserProfilePage({ params }: { params?: UserProfileParams
             </div>
           )}
           
+          <AvailabilityDisplay userId={userId} isOwnProfile={isCurrentUser} />
+
           {/* Contact Button */}
           <Button 
             className="bg-primary hover:bg-accent text-white transition-all duration-300 hover:scale-105"

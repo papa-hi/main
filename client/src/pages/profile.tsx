@@ -15,6 +15,7 @@ import { PlaceCard } from "@/components/shared/place-card";
 import { PlaydateCard } from "@/components/shared/playdate-card";
 import { useLocation } from "wouter";
 import { Plus, Trash2, Baby, Users, Heart, X, RefreshCw, Settings, MapPin } from "lucide-react";
+import { AvailabilityDisplay } from "@/components/availability/availability-display";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -398,7 +399,7 @@ export default function ProfilePage() {
           )}
           
           {user.favoriteLocations && user.favoriteLocations.length > 0 && (
-            <div>
+            <div className="mb-4">
               <h3 className="font-heading font-medium text-lg mb-2">Favoriete plekken</h3>
               <div className="flex flex-wrap gap-2">
                 {user.favoriteLocations.map((location, index) => (
@@ -409,6 +410,8 @@ export default function ProfilePage() {
               </div>
             </div>
           )}
+
+          {user.id && <AvailabilityDisplay userId={user.id} isOwnProfile={true} />}
         </div>
       </div>
     </div>
