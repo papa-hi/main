@@ -21,6 +21,11 @@ export function setupAvailabilityCronJobs() {
     await runNightlyMatchCalculation();
   });
 
+  cron.schedule("30 2 * * *", async () => {
+    console.log("[CRON] Running nightly dad profile match calculation...");
+    await runNightlyDadMatchCalculation();
+  });
+
   cron.schedule("0 18 * * 0", async () => {
     console.log("[CRON] Sending weekly availability digests...");
     await sendWeeklyDigests();
@@ -32,7 +37,8 @@ export function setupAvailabilityCronJobs() {
   });
 
   console.log("Availability cron jobs scheduled:");
-  console.log("   - Nightly match calculation: Daily at 2:00 AM");
+  console.log("   - Nightly availability match calculation: Daily at 2:00 AM");
+  console.log("   - Nightly dad profile match calculation: Daily at 2:30 AM");
   console.log("   - Weekly digest: Sundays at 6:00 PM");
   console.log("   - Day-before reminders: Daily at 8:00 PM");
 }
@@ -80,6 +86,18 @@ async function runNightlyMatchCalculation(): Promise<void> {
     );
   } catch (error) {
     console.error("[CRON] Error in nightly match calculation:", error);
+  }
+}
+
+async function runNightlyDadMatchCalculation(): Promise<void> {
+  try {
+    const { runDadMatchingForAllUsers } = await import("./dad-matching-service");
+    const result = await runDadMatchingForAllUsers();
+    console.log(
+      `[CRON] Nightly dad match calculation complete: ${result.totalMatches} matches for ${result.usersProcessed} users`
+    );
+  } catch (error) {
+    console.error("[CRON] Error in nightly dad match calculation:", error);
   }
 }
 
