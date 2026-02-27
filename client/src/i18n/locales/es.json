@@ -638,5 +638,31 @@
     "setYourDadDays": "Configura tus Días de Papá",
     "discoverTitle": "Calendario de Días de Papá",
     "discoverSubtitle": "Marca cuando estés libre y encuentra papás con horarios compatibles"
+  },
+  "matches": {
+    "title": "Papá Matches",
+    "subtitle": "Conecta con padres según ubicación, disponibilidad y edades de los niños",
+    "settings": "Ajustes",
+    "findMatches": "Buscar Matches",
+    "scheduleMatches": "Matches de Horario",
+    "profileMatches": "Matches de Perfil",
+    "noScheduleMatchesTitle": "Sin Matches de Horario Aún",
+    "noScheduleMatchesDescription": "Configura tu calendario de Días de Papá para que podamos emparejarte con papás que estén libres en los mismos horarios.",
+    "noProfileMatchesTitle": "Sin Matches de Perfil Aún",
+    "noProfileMatchesDescription": "Asegúrate de que tu perfil esté completo con tu ubicación e información de tus hijos, luego ejecuta el algoritmo de emparejamiento.",
+    "findFirstMatches": "Encontrar Mis Primeros Matches",
+    "sharedAvailability": "Disponibilidad compartida",
+    "compatibleAges": "Edades compatibles",
+    "viewProfile": "Ver Perfil",
+    "message": "Mensaje",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "match": "match",
+    "unknown": "Desconocido",
+    "profileTabTitle": "Papá Matches",
+    "profileTabSubtitle": "Conecta con papás según disponibilidad, ubicación y edades de los niños",
+    "profileTabDescription": "Te emparejamos con padres cercanos que tienen hijos de edades similares y comparten tus horarios libres.",
+    "viewAllMatches": "Ver Todos los Matches",
+    "profileTabHint": "Configura tu calendario de Días de Papá y preferencias de emparejamiento en ajustes"
   }
 }

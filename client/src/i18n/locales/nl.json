@@ -838,5 +838,31 @@
     "setYourDadDays": "Stel je Papa Dagen in",
     "discoverTitle": "Papa Dagen Kalender",
     "discoverSubtitle": "Geef aan wanneer je vrij bent en vind papa's met hetzelfde schema"
+  },
+  "matches": {
+    "title": "Papa Matches",
+    "subtitle": "Maak contact met vaders op basis van locatie, beschikbaarheid en leeftijden van kinderen",
+    "settings": "Instellingen",
+    "findMatches": "Matches Zoeken",
+    "scheduleMatches": "Schema Matches",
+    "profileMatches": "Profiel Matches",
+    "noScheduleMatchesTitle": "Nog Geen Schema Matches",
+    "noScheduleMatchesDescription": "Stel je Papa Dagen kalender in zodat we je kunnen matchen met papa's die op dezelfde momenten vrij zijn.",
+    "noProfileMatchesTitle": "Nog Geen Profiel Matches",
+    "noProfileMatchesDescription": "Zorg ervoor dat je profiel compleet is met je locatie en kinderinformatie, en zoek dan naar matches.",
+    "findFirstMatches": "Vind Mijn Eerste Matches",
+    "sharedAvailability": "Gedeelde beschikbaarheid",
+    "compatibleAges": "Overeenkomende leeftijden",
+    "viewProfile": "Bekijk Profiel",
+    "message": "Bericht",
+    "accept": "Accepteren",
+    "decline": "Afwijzen",
+    "match": "match",
+    "unknown": "Onbekend",
+    "profileTabTitle": "Papa Matches",
+    "profileTabSubtitle": "Maak contact met papa's op basis van beschikbaarheid, locatie en leeftijden van kinderen",
+    "profileTabDescription": "We matchen je met vaders in de buurt die kinderen van vergelijkbare leeftijd hebben en dezelfde vrije tijden delen.",
+    "viewAllMatches": "Bekijk Alle Matches",
+    "profileTabHint": "Stel je Papa Dagen kalender en matchvoorkeuren in via instellingen"
   }
 }

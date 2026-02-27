@@ -157,9 +157,9 @@ export default function MatchesPage() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold font-heading">Dad Matches</h1>
+          <h1 className="text-3xl font-bold font-heading">{t('matches.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            Connect with fathers based on location, availability, and children's ages
+            {t('matches.subtitle')}
           </p>
         </div>
         
@@ -167,7 +167,7 @@ export default function MatchesPage() {
           <Link to="/settings">
             <Button variant="outline" size="sm">
               <Settings className="h-4 w-4 mr-1" />
-              Settings
+              {t('matches.settings')}
             </Button>
           </Link>
           
@@ -181,7 +181,7 @@ export default function MatchesPage() {
             ) : (
               <RefreshCw className="h-4 w-4 mr-1" />
             )}
-            Find Matches
+            {t('matches.findMatches')}
           </Button>
         </div>
       </div>
@@ -190,7 +190,7 @@ export default function MatchesPage() {
         <TabsList className="w-full grid grid-cols-2">
           <TabsTrigger value="availability" className="gap-2">
             <Calendar className="h-4 w-4" />
-            <span className="hidden sm:inline">Schedule</span> Matches
+            {t('matches.scheduleMatches')}
             {availabilityMatches.length > 0 && (
               <Badge variant="secondary" className="ml-1 text-xs px-1.5">
                 {availabilityMatches.length}
@@ -199,7 +199,7 @@ export default function MatchesPage() {
           </TabsTrigger>
           <TabsTrigger value="profile" className="gap-2">
             <Users className="h-4 w-4" />
-            <span className="hidden sm:inline">Profile</span> Matches
+            {t('matches.profileMatches')}
             {matches.length > 0 && (
               <Badge variant="secondary" className="ml-1 text-xs px-1.5">
                 {matches.length}
@@ -213,9 +213,9 @@ export default function MatchesPage() {
             <Card>
               <CardContent className="text-center py-12">
                 <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Schedule Matches Yet</h3>
+                <h3 className="text-lg font-semibold mb-2">{t('matches.noScheduleMatchesTitle')}</h3>
                 <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-                  Set up your Dad Days calendar so we can match you with dads who are free at the same times.
+                  {t('matches.noScheduleMatchesDescription')}
                 </p>
                 <Link to="/dad-days">
                   <Button>
@@ -255,7 +255,7 @@ export default function MatchesPage() {
                           
                           <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
                             <MapPin className="h-3.5 w-3.5 shrink-0" />
-                            <span>{match.user.city || "Unknown"} · {match.distanceKm}km</span>
+                            <span>{match.user.city || t('matches.unknown')} · {match.distanceKm}km</span>
                           </div>
 
                           {match.user.childrenInfo && match.user.childrenInfo.length > 0 && (
@@ -272,7 +272,7 @@ export default function MatchesPage() {
                           <div className="mt-3">
                             <div className="flex items-center gap-1.5 mb-1.5">
                               <Clock className="h-3.5 w-3.5 text-primary shrink-0" />
-                              <span className="text-xs font-medium text-primary">Shared availability</span>
+                              <span className="text-xs font-medium text-primary">{t('matches.sharedAvailability')}</span>
                             </div>
                             <div className="flex flex-wrap gap-1.5">
                               {match.sharedSlots.map((slot, i) => (
@@ -292,13 +292,13 @@ export default function MatchesPage() {
                       <div className="flex sm:flex-col gap-2 sm:w-28 shrink-0">
                         <Link to={`/users/${match.user.id}`} className="flex-1 sm:flex-none">
                           <Button size="sm" variant="outline" className="w-full text-xs">
-                            View Profile
+                            {t('matches.viewProfile')}
                           </Button>
                         </Link>
                         <Link to={`/chat/${match.user.id}`} className="flex-1 sm:flex-none">
                           <Button size="sm" className="w-full text-xs">
                             <MessageCircle className="h-3.5 w-3.5 mr-1" />
-                            Message
+                            {t('matches.message')}
                           </Button>
                         </Link>
                       </div>
@@ -315,12 +315,12 @@ export default function MatchesPage() {
             <Card>
               <CardContent className="text-center py-12">
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Profile Matches Yet</h3>
+                <h3 className="text-lg font-semibold mb-2">{t('matches.noProfileMatchesTitle')}</h3>
                 <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-                  Make sure your profile is complete with your location and children's information, then run the matching algorithm.
+                  {t('matches.noProfileMatchesDescription')}
                 </p>
                 <Button onClick={() => runMatchingMutation.mutate()}>
-                  Find My First Matches
+                  {t('matches.findFirstMatches')}
                 </Button>
               </CardContent>
             </Card>
@@ -358,7 +358,7 @@ export default function MatchesPage() {
                             
                             <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
                               <MapPin className="h-3.5 w-3.5 shrink-0" />
-                              <span>{otherDad.city || "Unknown"} · {match.distanceKm}km</span>
+                              <span>{otherDad.city || t('matches.unknown')} · {match.distanceKm}km</span>
                             </div>
                             
                             {otherDad.childrenInfo && otherDad.childrenInfo.length > 0 && (
@@ -374,7 +374,7 @@ export default function MatchesPage() {
                             
                             <div className="mt-2">
                               <span className="text-xs font-medium text-muted-foreground">
-                                Compatible ages: {formatAgeRanges(match.commonAgeRanges)}
+                                {t('matches.compatibleAges')}: {formatAgeRanges(match.commonAgeRanges)}
                               </span>
                             </div>
                           </div>
@@ -393,7 +393,7 @@ export default function MatchesPage() {
                                 className="flex-1 sm:flex-none text-xs"
                               >
                                 <Heart className="h-3.5 w-3.5 mr-1" />
-                                Accept
+                                {t('matches.accept')}
                               </Button>
                               
                               <Button
@@ -407,7 +407,7 @@ export default function MatchesPage() {
                                 className="flex-1 sm:flex-none text-xs"
                               >
                                 <X className="h-3.5 w-3.5 mr-1" />
-                                Decline
+                                {t('matches.decline')}
                               </Button>
                             </>
                           ) : (
@@ -422,7 +422,7 @@ export default function MatchesPage() {
                                 <Link to={`/chat/${otherDad.id}`}>
                                   <Button size="sm" variant="outline" className="w-full text-xs">
                                     <MessageCircle className="h-3.5 w-3.5 mr-1" />
-                                    Message
+                                    {t('matches.message')}
                                   </Button>
                                 </Link>
                               )}

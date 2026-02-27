@@ -638,5 +638,31 @@
     "setYourDadDays": "Configure tes Papa Days",
     "discoverTitle": "Calendrier Papa Days",
     "discoverSubtitle": "Indique quand tu es libre et trouve des papas avec le même emploi du temps"
+  },
+  "matches": {
+    "title": "Papa Matches",
+    "subtitle": "Connecte-toi avec des pères selon la localisation, la disponibilité et l'âge des enfants",
+    "settings": "Paramètres",
+    "findMatches": "Trouver des Matches",
+    "scheduleMatches": "Matches Planning",
+    "profileMatches": "Matches Profil",
+    "noScheduleMatchesTitle": "Pas Encore de Matches Planning",
+    "noScheduleMatchesDescription": "Configure ton calendrier Papa Days pour qu'on puisse te matcher avec des papas qui sont libres aux mêmes moments.",
+    "noProfileMatchesTitle": "Pas Encore de Matches Profil",
+    "noProfileMatchesDescription": "Assure-toi que ton profil est complet avec ta localisation et les informations de tes enfants, puis lance l'algorithme de matching.",
+    "findFirstMatches": "Trouver Mes Premiers Matches",
+    "sharedAvailability": "Disponibilité partagée",
+    "compatibleAges": "Âges compatibles",
+    "viewProfile": "Voir le Profil",
+    "message": "Message",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "match": "match",
+    "unknown": "Inconnu",
+    "profileTabTitle": "Papa Matches",
+    "profileTabSubtitle": "Connecte-toi avec des papas selon la disponibilité, la localisation et l'âge des enfants",
+    "profileTabDescription": "On te matche avec des pères proches qui ont des enfants d'âge similaire et qui partagent tes créneaux libres.",
+    "viewAllMatches": "Voir Tous les Matches",
+    "profileTabHint": "Configure ton calendrier Papa Days et tes préférences de matching dans les paramètres"
   }
 }

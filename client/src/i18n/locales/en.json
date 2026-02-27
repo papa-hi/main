@@ -904,5 +904,31 @@
     "setYourDadDays": "Set your Dad Days",
     "discoverTitle": "Dad Days Calendar",
     "discoverSubtitle": "Mark when you're free and find dads with matching schedules"
+  },
+  "matches": {
+    "title": "Dad Matches",
+    "subtitle": "Connect with fathers based on location, availability, and children's ages",
+    "settings": "Settings",
+    "findMatches": "Find Matches",
+    "scheduleMatches": "Schedule Matches",
+    "profileMatches": "Profile Matches",
+    "noScheduleMatchesTitle": "No Schedule Matches Yet",
+    "noScheduleMatchesDescription": "Set up your Dad Days calendar so we can match you with dads who are free at the same times.",
+    "noProfileMatchesTitle": "No Profile Matches Yet",
+    "noProfileMatchesDescription": "Make sure your profile is complete with your location and children's information, then run the matching algorithm.",
+    "findFirstMatches": "Find My First Matches",
+    "sharedAvailability": "Shared availability",
+    "compatibleAges": "Compatible ages",
+    "viewProfile": "View Profile",
+    "message": "Message",
+    "accept": "Accept",
+    "decline": "Decline",
+    "match": "match",
+    "unknown": "Unknown",
+    "profileTabTitle": "Dad Matches",
+    "profileTabSubtitle": "Connect with dads based on schedule availability, location, and children's ages",
+    "profileTabDescription": "We match you with fathers nearby who have similar-age children and share your free time slots.",
+    "viewAllMatches": "View All Matches",
+    "profileTabHint": "Set your Dad Days calendar and match preferences in settings"
   }
 }
