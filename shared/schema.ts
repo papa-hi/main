@@ -935,3 +935,24 @@ export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions
 
 export type InsertPushSubscription = z.infer<typeof insertPushSubscriptionSchema>;
 export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+
+export const emailLogs = pgTable("email_logs", {
+  id: serial("id").primaryKey(),
+  recipientEmail: text("recipient_email").notNull(),
+  recipientUserId: integer("recipient_user_id").references(() => users.id, { onDelete: "set null" }),
+  emailType: text("email_type").notNull(),
+  subject: text("subject").notNull(),
+  status: text("status").notNull().default("sent"),
+  resendId: text("resend_id"),
+  errorMessage: text("error_message"),
+  metadata: text("metadata"),
+  sentAt: timestamp("sent_at").defaultNow().notNull(),
+});
+
+export const insertEmailLogSchema = createInsertSchema(emailLogs).omit({
+  id: true,
+  sentAt: true,
+});
+
+export type InsertEmailLog = z.infer<typeof insertEmailLogSchema>;
+export type EmailLog = typeof emailLogs.$inferSelect;
