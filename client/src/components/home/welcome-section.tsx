@@ -6,6 +6,7 @@ import { Playdate } from "@shared/schema";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import { nl, enUS } from "date-fns/locale";
+import { Sun, Moon, Cloud, CloudSun, CloudMoon, CloudRain, CloudDrizzle, CloudLightning, Snowflake, CloudFog } from "lucide-react";
 
 interface WelcomeSectionProps {
   userName: string;
@@ -78,45 +79,39 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
     return playdate.location;
   };
   
-  // Get weather icon based on condition and time
   const getWeatherIcon = () => {
-    // If we have an icon code from the API, use it
+    const iconClass = "h-5 w-5 text-amber-500 group-hover:animate-weather";
     if (icon) {
-      const iconMap: Record<string, string> = {
-        '01d': 'fa-sun', // clear sky day
-        '01n': 'fa-moon', // clear sky night
-        '02d': 'fa-cloud-sun', // few clouds day
-        '02n': 'fa-cloud-moon', // few clouds night
-        '03d': 'fa-cloud', // scattered clouds
-        '03n': 'fa-cloud',
-        '04d': 'fa-cloud', // broken clouds
-        '04n': 'fa-cloud',
-        '09d': 'fa-cloud-showers-heavy', // shower rain
-        '09n': 'fa-cloud-showers-heavy',
-        '10d': 'fa-cloud-rain', // rain day
-        '10n': 'fa-cloud-rain', // rain night
-        '11d': 'fa-bolt', // thunderstorm
-        '11n': 'fa-bolt',
-        '13d': 'fa-snowflake', // snow
-        '13n': 'fa-snowflake',
-        '50d': 'fa-smog', // mist
-        '50n': 'fa-smog'
+      const iconMap: Record<string, JSX.Element> = {
+        '01d': <Sun className={iconClass} />,
+        '01n': <Moon className={iconClass} />,
+        '02d': <CloudSun className={iconClass} />,
+        '02n': <CloudMoon className={iconClass} />,
+        '03d': <Cloud className={iconClass} />,
+        '03n': <Cloud className={iconClass} />,
+        '04d': <Cloud className={iconClass} />,
+        '04n': <Cloud className={iconClass} />,
+        '09d': <CloudDrizzle className={iconClass} />,
+        '09n': <CloudDrizzle className={iconClass} />,
+        '10d': <CloudRain className={iconClass} />,
+        '10n': <CloudRain className={iconClass} />,
+        '11d': <CloudLightning className={iconClass} />,
+        '11n': <CloudLightning className={iconClass} />,
+        '13d': <Snowflake className={iconClass} />,
+        '13n': <Snowflake className={iconClass} />,
+        '50d': <CloudFog className={iconClass} />,
+        '50n': <CloudFog className={iconClass} />,
       };
-      
-      return iconMap[icon] || 'fa-cloud';
+      return iconMap[icon] || <Cloud className={iconClass} />;
     }
-    
-    // Fallback based on text condition
     const conditionLower = condition.toLowerCase();
-    if (conditionLower.includes('clear')) return 'fa-sun';
-    if (conditionLower.includes('cloud')) return 'fa-cloud';
-    if (conditionLower.includes('rain') || conditionLower.includes('shower')) return 'fa-cloud-rain';
-    if (conditionLower.includes('snow')) return 'fa-snowflake';
-    if (conditionLower.includes('thunder')) return 'fa-bolt';
-    if (conditionLower.includes('fog') || conditionLower.includes('mist')) return 'fa-smog';
-    
-    // Default
-    return 'fa-cloud';
+    if (conditionLower.includes('clear')) return <Sun className={iconClass} />;
+    if (conditionLower.includes('cloud')) return <Cloud className={iconClass} />;
+    if (conditionLower.includes('rain') || conditionLower.includes('shower')) return <CloudRain className={iconClass} />;
+    if (conditionLower.includes('snow')) return <Snowflake className={iconClass} />;
+    if (conditionLower.includes('thunder')) return <CloudLightning className={iconClass} />;
+    if (conditionLower.includes('fog') || conditionLower.includes('mist')) return <CloudFog className={iconClass} />;
+    return <Cloud className={iconClass} />;
   };
 
   return (
@@ -132,7 +127,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
         {/* Weather Widget */}
         {!weatherLoading && !weatherError && city && (
           <div className="bg-white rounded-lg p-3 shadow-sm flex items-center space-x-3 hover:shadow-md transition-all duration-300 transform hover:scale-105 cursor-pointer group">
-            <i className={`fas ${getWeatherIcon()} text-accent text-lg group-hover:animate-weather`}></i>
+            {getWeatherIcon()}
             <div>
               <span className="text-sm font-medium group-hover:text-primary transition-colors duration-300">{temperature}°C</span>
               <p className="text-xs text-muted-foreground">{city}{country ? `, ${country}` : ''}</p>
@@ -154,7 +149,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
         {/* Fallback state when both loading is false and there's an error/no city data */}
         {!weatherLoading && (weatherError || !city) && (
           <div className="bg-white rounded-lg p-3 shadow-sm flex items-center space-x-3">
-            <i className="fas fa-sun text-accent text-lg"></i>
+            <Sun className="h-5 w-5 text-amber-500" />
             <div>
               <span className="text-sm font-medium">18°C</span>
               <p className="text-xs text-muted-foreground">Amsterdam, NL</p>
