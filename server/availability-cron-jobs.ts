@@ -205,15 +205,6 @@ async function sendDayBeforeReminders(): Promise<void> {
     );
 
     let sent = 0;
-    const dayNamesNL = [
-      "Zondag",
-      "Maandag",
-      "Dinsdag",
-      "Woensdag",
-      "Donderdag",
-      "Vrijdag",
-      "Zaterdag",
-    ];
 
     for (const { userId } of usersAvailableTomorrow) {
       try {
@@ -237,11 +228,11 @@ async function sendDayBeforeReminders(): Promise<void> {
           0
         );
 
-        const dayName = dayNamesNL[tomorrowDayOfWeek];
+        const dayName = getDayName(tomorrowDayOfWeek as any);
 
         await sendNotificationToUser(userId, {
-          title: `📅 Morgen: ${totalTomorrowMatches} ${totalTomorrowMatches === 1 ? "Vader" : "Vaders"} Beschikbaar`,
-          body: `${dayName} heb je ${totalTomorrowMatches} playdate mogelijkheden in je buurt!`,
+          title: `Tomorrow: ${totalTomorrowMatches} ${totalTomorrowMatches === 1 ? "Dad" : "Dads"} Available`,
+          body: `${dayName} you have ${totalTomorrowMatches} playdate opportunities nearby!`,
           icon: "/icon-192x192.png",
           badge: "/icon-192x192.png",
           data: {
@@ -253,12 +244,12 @@ async function sendDayBeforeReminders(): Promise<void> {
           actions: [
             {
               action: "view_matches",
-              title: "Bekijk Matches",
+              title: "View Matches",
               icon: "/icon-192x192.png",
             },
             {
               action: "dismiss",
-              title: "Sluiten",
+              title: "Dismiss",
             },
           ],
         });

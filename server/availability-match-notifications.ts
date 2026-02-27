@@ -95,24 +95,95 @@ export async function sendAvailabilityMatchNotificationEmail(
     const nextTimeDisplay = getTimeSlotDisplay(nextSlot.timeSlot as any);
 
     const emailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="text-align: center; padding: 20px 0; border-bottom: 3px solid #4F46E5;">
-          <h1 style="color: #4F46E5; margin: 0; font-size: 28px;">
-            📅 Nieuwe Beschikbaarheids Match!
-          </h1>
-        </div>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Availability Match</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+          body {
+            font-family: 'Varela Round', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+          }
+          .container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 30px;
+          }
+          .logo {
+            font-family: 'Varela Round', sans-serif;
+            font-size: 32px;
+            font-weight: bold;
+            color: #FF6B35;
+            margin-bottom: 10px;
+          }
+          .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+          }
+          .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: white !important;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 0 5px 10px 5px;
+          }
+          .cta-button-green {
+            display: inline-block;
+            background: #10B981;
+            color: white !important;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 0 5px 10px 5px;
+          }
+          .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #718096;
+            font-size: 14px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="logo">PaPa-Hi</div>
+          </div>
 
-        <div style="padding: 30px 0;">
-          <h2 style="color: #333; margin-bottom: 20px;">Hallo ${user.firstName}!</h2>
+          <h1 class="title">New Availability Match!</h1>
+
+          <p>Hi ${user.firstName},</p>
           
-          <p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-            Geweldig nieuws! <strong>${matchedUser.firstName} ${matchedUser.lastName}</strong> 
-            ${matchedUser.city ? `uit ${matchedUser.city}` : ""} heeft dezelfde vrije tijden als jij ingesteld op PaPa-Hi. 
-            Dit is een perfecte kans om een playdate te plannen!
-          </p>
+          <p>Great news! <strong>${matchedUser.firstName} ${matchedUser.lastName}</strong> 
+            ${matchedUser.city ? `from ${matchedUser.city}` : ""} has the same free times as you on PaPa-Hi. 
+            This is a perfect opportunity to plan a playdate!</p>
 
-          <div style="background: linear-gradient(135deg, #4F46E5, #7C3AED); padding: 25px; border-radius: 15px; color: white; margin: 25px 0;">
-            <h3 style="margin: 0 0 15px 0; font-size: 20px;">📅 Jullie Gedeelde Tijden</h3>
+          <div style="background: linear-gradient(135deg, #FF6B35, #F7931E); padding: 25px; border-radius: 12px; color: white; margin: 25px 0;">
+            <h3 style="margin: 0 0 15px 0; font-size: 20px;">Your Shared Times</h3>
             
             <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 10px; margin-bottom: 15px;">
               ${sharedSlots
@@ -130,20 +201,17 @@ export async function sendAvailabilityMatchNotificationEmail(
             </div>
 
             <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
-              <p style="margin: 0 0 8px 0;"><strong>📍 Afstand:</strong> ${distance} km</p>
-              <p style="margin: 0 0 8px 0;"><strong>🎯 Match Score:</strong> ${candidate.matchScore}%</p>
-              <p style="margin: 0;"><strong>👶 Gemeenschappelijke leeftijden:</strong> ${candidate.childrenCompatibility} kinderen</p>
+              <p style="margin: 0 0 8px 0;"><strong>Distance:</strong> ${distance} km</p>
+              <p style="margin: 0 0 8px 0;"><strong>Match Score:</strong> ${candidate.matchScore}%</p>
+              <p style="margin: 0;"><strong>Compatible Children:</strong> ${candidate.childrenCompatibility}</p>
             </div>
           </div>
 
-          <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h4 style="color: #92400E; margin: 0 0 10px 0;">
-              <span style="font-size: 24px; margin-right: 10px;">⏰</span>
-              Aanstaande Kans
-            </h4>
+          <div style="background: #fff3cd; border-left: 4px solid #F59E0B; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h4 style="color: #92400E; margin: 0 0 10px 0;">Upcoming Opportunity</h4>
             <p style="color: #78350F; margin: 0; font-size: 16px;">
-              <strong>${nextDayName}</strong> ${nextTimeDisplay.toLowerCase()} - 
-              Jullie zijn beide beschikbaar!
+              <strong>${nextDayName}</strong> ${nextTimeDisplay.toLowerCase()} — 
+              You're both available!
             </p>
           </div>
 
@@ -151,13 +219,13 @@ export async function sendAvailabilityMatchNotificationEmail(
             matchedUser.childrenInfo && matchedUser.childrenInfo.length > 0
               ? `
           <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
-            <h4 style="color: #333; margin: 0 0 10px 0;">Kinderen van ${matchedUser.firstName}:</h4>
+            <h4 style="color: #333; margin: 0 0 10px 0;">${matchedUser.firstName}'s Children:</h4>
             <div>
               ${matchedUser.childrenInfo
                 .map(
                   (child) =>
-                    `<span style="background: #4F46E5; color: white; padding: 5px 12px; border-radius: 20px; font-size: 14px; display: inline-block; margin: 3px;">
-                  ${child.name} (${child.age} jaar)
+                    `<span style="background: #FF6B35; color: white; padding: 5px 12px; border-radius: 20px; font-size: 14px; display: inline-block; margin: 3px;">
+                  ${child.name} (${child.age} yr)
                 </span>`
                 )
                 .join("")}
@@ -168,60 +236,39 @@ export async function sendAvailabilityMatchNotificationEmail(
           }
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="https://papa-hi.com/matches" 
-               style="background: linear-gradient(135deg, #4F46E5, #7C3AED); 
-                      color: white; 
-                      padding: 15px 30px; 
-                      text-decoration: none; 
-                      border-radius: 25px; 
-                      font-weight: bold; 
-                      font-size: 16px;
-                      display: inline-block;
-                      margin: 0 5px 10px 5px;
-                      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);">
-              Bekijk Match
+            <a href="https://papa-hi.com/matches" class="cta-button">
+              View Match
             </a>
-            <a href="https://papa-hi.com/playdates/create?match=${matchedUserId}&day=${nextSlot.dayOfWeek}&slot=${nextSlot.timeSlot}" 
-               style="background: #10B981; 
-                      color: white; 
-                      padding: 15px 30px; 
-                      text-decoration: none; 
-                      border-radius: 25px; 
-                      font-weight: bold; 
-                      font-size: 16px;
-                      display: inline-block;
-                      margin: 0 5px 10px 5px;
-                      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
-              Stel Playdate Voor
+            <a href="https://papa-hi.com/playdates/create?match=${matchedUserId}&day=${nextSlot.dayOfWeek}&slot=${nextSlot.timeSlot}" class="cta-button-green">
+              Suggest Playdate
             </a>
           </div>
 
           <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 15px; border-radius: 8px; margin: 20px 0;">
             <p style="margin: 0; color: #1E40AF; font-size: 14px;">
-              💡 <strong>Tip:</strong> Stuur een snel bericht om kennis te maken en stel een specifieke tijd voor. 
-              De meeste vaders reageren binnen 24 uur!
+              <strong>Tip:</strong> Send a quick message to introduce yourself and suggest a specific time. 
+              Most dads respond within 24 hours!
+            </p>
+          </div>
+
+          <div class="footer">
+            <p>PaPa-Hi - Connecting Fathers, Building Communities</p>
+            <p>
+              <a href="https://papa-hi.com/dad-days" style="color: #FF6B35;">Edit your Dad Days</a> | 
+              <a href="https://papa-hi.com" style="color: #FF6B35;">papa-hi.com</a>
             </p>
           </div>
         </div>
-
-        <div style="border-top: 1px solid #eee; padding: 20px 0; text-align: center; color: #888; font-size: 14px;">
-          <p style="margin: 0 0 10px 0;">
-            PaPa-Hi - Verbind Nederlandse vaders op het juiste moment
-          </p>
-          <p style="margin: 0;">
-            <a href="https://papa-hi.com/dad-days" style="color: #4F46E5;">Bewerk je Dad Days</a> | 
-            <a href="https://papa-hi.com" style="color: #4F46E5;">papa-hi.com</a>
-          </p>
-        </div>
-      </div>
+      </body>
+      </html>
     `;
 
     const emailText = `
-Hallo ${user.firstName}!
+Hi ${user.firstName},
 
-Geweldig nieuws! ${matchedUser.firstName} ${matchedUser.lastName}${matchedUser.city ? ` uit ${matchedUser.city}` : ""} heeft dezelfde vrije tijden als jij.
+Great news! ${matchedUser.firstName} ${matchedUser.lastName}${matchedUser.city ? ` from ${matchedUser.city}` : ""} has the same free times as you.
 
-Jullie Gedeelde Tijden:
+Your Shared Times:
 ${sharedSlots
   .map((slot) => {
     const day = getDayName(slot.dayOfWeek as any);
@@ -231,22 +278,22 @@ ${sharedSlots
   .join("\n")}
 
 Match Details:
-- Afstand: ${distance} km
+- Distance: ${distance} km
 - Match Score: ${candidate.matchScore}%
-- Gemeenschappelijke leeftijden: ${candidate.childrenCompatibility} kinderen
+- Compatible Children: ${candidate.childrenCompatibility}
 
-Aanstaande Kans:
-${nextDayName} ${nextTimeDisplay.toLowerCase()} - Jullie zijn beide beschikbaar!
+Upcoming Opportunity:
+${nextDayName} ${nextTimeDisplay.toLowerCase()} — You're both available!
 
-Bezoek: https://papa-hi.com/matches
+Visit: https://papa-hi.com/matches
 
-Met vriendelijke groet,
-Het PaPa-Hi Team
+Best regards,
+The PaPa-Hi Team
     `;
 
     const success = await sendAvailabilityEmail({
       to: user.email,
-      subject: `📅 ${matchedUser.firstName} is vrij op ${timeSlotsText}!`,
+      subject: `${matchedUser.firstName} is free on ${timeSlotsText}!`,
       htmlContent: emailHtml,
       textContent: emailText,
     });
@@ -277,8 +324,8 @@ export async function sendAvailabilityMatchPushNotification(
     const timeName = getTimeSlotDisplay(firstSlot.timeSlot as any).split(" ")[0];
 
     await sendNotificationToUser(userId, {
-      title: "📅 Nieuwe Beschikbaarheids Match!",
-      body: `${matchedUser.firstName} is ook vrij op ${dayName} ${timeName} (${distance}km)`,
+      title: "New Availability Match!",
+      body: `${matchedUser.firstName} is also free on ${dayName} ${timeName} (${distance}km)`,
       icon: "/icon-192x192.png",
       badge: "/icon-192x192.png",
       data: {
@@ -292,7 +339,7 @@ export async function sendAvailabilityMatchPushNotification(
       actions: [
         {
           action: "view_match",
-          title: "Bekijk Match",
+          title: "View Match",
           icon: "/icon-192x192.png",
         },
         {
@@ -349,125 +396,189 @@ export async function sendWeeklyAvailabilityDigest(
     if (totalMatches === 0) return false;
 
     const emailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="text-align: center; padding: 20px 0; border-bottom: 3px solid #4F46E5;">
-          <h1 style="color: #4F46E5; margin: 0; font-size: 28px;">
-            📅 Je Week Overzicht
-          </h1>
-          <p style="color: #666; margin: 10px 0 0 0;">
-            ${totalMatches} playdate mogelijkheden deze week!
-          </p>
-        </div>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Your Weekly Overview</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+          body {
+            font-family: 'Varela Round', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+          }
+          .container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 30px;
+          }
+          .logo {
+            font-family: 'Varela Round', sans-serif;
+            font-size: 32px;
+            font-weight: bold;
+            color: #FF6B35;
+            margin-bottom: 10px;
+          }
+          .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 5px;
+            text-align: center;
+          }
+          .subtitle {
+            color: #666;
+            margin: 10px 0 0 0;
+            text-align: center;
+          }
+          .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: white !important;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+          }
+          .slot-button {
+            display: inline-block;
+            background: #FF6B35;
+            color: white !important;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+          }
+          .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #718096;
+            font-size: 14px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="logo">PaPa-Hi</div>
+          </div>
 
-        <div style="padding: 30px 0;">
-          <h2 style="color: #333; margin-bottom: 20px;">Hallo ${user.firstName}!</h2>
-          
-          <p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-            Hier is jouw playdate planning voor de komende week. 
-            We hebben ${totalMatches} vaders gevonden die vrij zijn op dezelfde momenten als jij!
-          </p>
+          <h1 class="title">Your Weekly Overview</h1>
+          <p class="subtitle">${totalMatches} playdate opportunities this week!</p>
 
-          ${weekOverview
-            .filter((slot) => slot.matchesCount > 0)
-            .slice(0, 5)
-            .map(
-              (slot) => `
-            <div style="background: white; border: 2px solid #E5E7EB; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-              <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #E5E7EB;">
-                <div>
-                  <h3 style="margin: 0; color: #1F2937; font-size: 18px; display: inline-block;">${slot.dayName}</h3>
-                  <span style="background: #4F46E5; color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; float: right;">
-                    ${slot.matchesCount} ${slot.matchesCount === 1 ? "vader" : "vaders"}
-                  </span>
+          <div style="padding: 30px 0;">
+            <p>Hi ${user.firstName},</p>
+            
+            <p>Here's your playdate schedule for the coming week. 
+              We found ${totalMatches} dads who are free at the same times as you!</p>
+
+            ${weekOverview
+              .filter((slot) => slot.matchesCount > 0)
+              .slice(0, 5)
+              .map(
+                (slot) => `
+              <div style="background: white; border: 2px solid #E5E7EB; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #E5E7EB;">
+                  <div>
+                    <h3 style="margin: 0; color: #1F2937; font-size: 18px; display: inline-block;">${slot.dayName}</h3>
+                    <span style="background: #FF6B35; color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; float: right;">
+                      ${slot.matchesCount} ${slot.matchesCount === 1 ? "dad" : "dads"}
+                    </span>
+                  </div>
+                  <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 14px;">${slot.timeSlotDisplay}</p>
                 </div>
-                <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 14px;">${slot.timeSlotDisplay}</p>
-              </div>
 
-              ${
-                slot.topMatches.length > 0
-                  ? `
-                <div style="margin-top: 10px;">
-                  <p style="color: #6B7280; font-size: 14px; margin: 0 0 10px 0;">Dichtbij:</p>
-                  ${slot.topMatches
-                    .map(
-                      (match) => `
-                    <div style="padding: 10px; background: #F9FAFB; border-radius: 8px; margin-bottom: 8px;">
-                      <div style="width: 32px; height: 32px; border-radius: 50%; background: #4F46E5; color: white; display: inline-block; text-align: center; line-height: 32px; font-weight: bold; margin-right: 10px; vertical-align: middle;">
-                        ${match.firstName.charAt(0)}
+                ${
+                  slot.topMatches.length > 0
+                    ? `
+                  <div style="margin-top: 10px;">
+                    <p style="color: #6B7280; font-size: 14px; margin: 0 0 10px 0;">Nearby:</p>
+                    ${slot.topMatches
+                      .map(
+                        (match) => `
+                      <div style="padding: 10px; background: #F9FAFB; border-radius: 8px; margin-bottom: 8px;">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #FF6B35; color: white; display: inline-block; text-align: center; line-height: 32px; font-weight: bold; margin-right: 10px; vertical-align: middle;">
+                          ${match.firstName.charAt(0)}
+                        </div>
+                        <span style="font-weight: 600; color: #1F2937; vertical-align: middle;">${match.firstName} ${match.lastName}</span>
+                        <span style="font-size: 12px; color: #6B7280; vertical-align: middle;"> · ${match.distanceKm}km</span>
+                        <span style="background: #10B981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; float: right; margin-top: 6px;">
+                          ${match.matchScore}%
+                        </span>
                       </div>
-                      <span style="font-weight: 600; color: #1F2937; vertical-align: middle;">${match.firstName} ${match.lastName}</span>
-                      <span style="font-size: 12px; color: #6B7280; vertical-align: middle;"> · ${match.distanceKm}km</span>
-                      <span style="background: #10B981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; float: right; margin-top: 6px;">
-                        ${match.matchScore}%
-                      </span>
-                    </div>
-                  `
-                    )
-                    .join("")}
+                    `
+                      )
+                      .join("")}
+                  </div>
+                `
+                    : ""
+                }
+
+                <div style="margin-top: 15px;">
+                  <a href="https://papa-hi.com/matches?day=${slot.dayOfWeek}&slot=${slot.timeSlot}" class="slot-button">
+                    View Matches →
+                  </a>
                 </div>
-              `
-                  : ""
-              }
-
-              <div style="margin-top: 15px;">
-                <a href="https://papa-hi.com/matches?day=${slot.dayOfWeek}&slot=${slot.timeSlot}"
-                   style="display: inline-block; background: #4F46E5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
-                  Bekijk Matches →
-                </a>
               </div>
-            </div>
-          `
-            )
-            .join("")}
+            `
+              )
+              .join("")}
 
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="https://papa-hi.com/dad-days" 
-               style="background: linear-gradient(135deg, #4F46E5, #7C3AED); 
-                      color: white; 
-                      padding: 15px 30px; 
-                      text-decoration: none; 
-                      border-radius: 25px; 
-                      font-weight: bold; 
-                      font-size: 16px;
-                      display: inline-block;">
-              Bewerk je Dad Days
-            </a>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="https://papa-hi.com/dad-days" class="cta-button">
+                Edit Your Dad Days
+              </a>
+            </div>
+          </div>
+
+          <div class="footer">
+            <p>PaPa-Hi - Connecting Fathers, Building Communities</p>
+            <p>
+              <a href="https://papa-hi.com" style="color: #FF6B35;">papa-hi.com</a>
+            </p>
           </div>
         </div>
-
-        <div style="border-top: 1px solid #eee; padding: 20px 0; text-align: center; color: #888; font-size: 14px;">
-          <p style="margin: 0 0 10px 0;">
-            PaPa-Hi - Verbind Nederlandse vaders op het juiste moment
-          </p>
-          <p style="margin: 0;">
-            <a href="https://papa-hi.com" style="color: #4F46E5;">papa-hi.com</a>
-          </p>
-        </div>
-      </div>
+      </body>
+      </html>
     `;
 
     const emailText = `
-Hallo ${user.firstName}!
+Hi ${user.firstName},
 
-Je Week Overzicht - ${totalMatches} playdate mogelijkheden!
+Your Weekly Overview - ${totalMatches} playdate opportunities!
 
 ${weekOverview
   .filter((slot) => slot.matchesCount > 0)
   .map(
     (slot) =>
-      `${slot.dayName} ${slot.timeSlotDisplay}: ${slot.matchesCount} vaders beschikbaar`
+      `${slot.dayName} ${slot.timeSlotDisplay}: ${slot.matchesCount} dads available`
   )
   .join("\n")}
 
-Bezoek: https://papa-hi.com/matches
+Visit: https://papa-hi.com/matches
 
-Met vriendelijke groet,
-Het PaPa-Hi Team
+Best regards,
+The PaPa-Hi Team
     `;
 
     return await sendAvailabilityEmail({
       to: user.email,
-      subject: `📅 Je Week Overzicht: ${totalMatches} Playdate Kansen!`,
+      subject: `Your Weekly Overview: ${totalMatches} Playdate Opportunities!`,
       htmlContent: emailHtml,
       textContent: emailText,
     });
@@ -484,11 +595,11 @@ export async function sendAvailabilitySetupConfirmation(
 ): Promise<void> {
   try {
     await sendNotificationToUser(userId, {
-      title: "✅ Dad Days Ingesteld!",
+      title: "Dad Days Set Up!",
       body:
         matchesCount > 0
-          ? `Super! ${matchesCount} vaders delen jouw beschikbaarheid.`
-          : `Je hebt ${slotsCount} tijden toegevoegd. We zoeken naar matches!`,
+          ? `Great! ${matchesCount} dads share your availability.`
+          : `You've added ${slotsCount} time slots. We're searching for matches!`,
       icon: "/icon-192x192.png",
       badge: "/icon-192x192.png",
       data: {
