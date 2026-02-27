@@ -13,7 +13,8 @@ import {
   Rating, InsertRating, ratings,
   communityPosts, communityComments, communityReactions,
   PasswordResetToken, InsertPasswordResetToken, passwordResetTokens,
-  FamilyEvent, InsertFamilyEvent, familyEvents
+  FamilyEvent, InsertFamilyEvent, familyEvents,
+  userAvailability
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, isNotNull, not, inArray, like, or, type SQL } from "drizzle-orm";
@@ -2914,7 +2915,6 @@ export class DatabaseStorage implements IStorage {
 
   // Optimized method to get users with incomplete profiles using SQL filtering
   async getUsersWithIncompleteProfiles(): Promise<{ id: number; firstName: string; username: string; email: string; missingFields: string[] }[]> {
-    // Use SQL to filter users with incomplete profiles (missing profileImage, bio, city, or childrenInfo)
     const result = await db
       .select({
         id: users.id,
@@ -2925,6 +2925,7 @@ export class DatabaseStorage implements IStorage {
         bio: users.bio,
         city: users.city,
         childrenInfo: users.childrenInfo,
+        availabilityCount: sql<number>`(SELECT COUNT(*) FROM ${userAvailability} WHERE ${userAvailability.userId} = ${users.id} AND ${userAvailability.isActive} = true)`.as('availability_count'),
       })
       .from(users)
       .where(
@@ -2935,11 +2936,11 @@ export class DatabaseStorage implements IStorage {
           isNull(users.city),
           sql`${users.city} = ''`,
           isNull(users.childrenInfo),
-          sql`${users.childrenInfo} = '[]'::jsonb`
+          sql`${users.childrenInfo} = '[]'::jsonb`,
+          sql`(SELECT COUNT(*) FROM ${userAvailability} WHERE ${userAvailability.userId} = ${users.id} AND ${userAvailability.isActive} = true) = 0`
         )
       );
 
-    // Build missing fields for each user
     return result.map(user => {
       const missingFields: string[] = [];
       if (!user.profileImage) missingFields.push('profileImage');
@@ -2947,6 +2948,9 @@ export class DatabaseStorage implements IStorage {
       if (!user.city || user.city.trim() === '') missingFields.push('city');
       if (!user.childrenInfo || (Array.isArray(user.childrenInfo) && user.childrenInfo.length === 0)) {
         missingFields.push('childrenInfo');
+      }
+      if (!user.availabilityCount || user.availabilityCount === 0) {
+        missingFields.push('dadDaysAvailability');
       }
       
       return {

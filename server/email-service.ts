@@ -467,9 +467,12 @@ function generateProfileReminderEmailHTML(firstName: string, username: string, m
     'profileImage': 'Profile Photo',
     'bio': 'Bio/About Me',
     'city': 'City/Location',
-    'childrenInfo': 'Children Information'
+    'childrenInfo': 'Children Information',
+    'dadDaysAvailability': 'Dad Days Availability'
   };
 
+  const hasDadDaysMissing = missingFields.includes('dadDaysAvailability');
+  const profileFields = missingFields.filter(f => f !== 'dadDaysAvailability');
   const missingFieldsList = missingFields.map(field => fieldLabels[field] || field).join(', ');
 
   return `
@@ -510,13 +513,23 @@ function generateProfileReminderEmailHTML(firstName: string, username: string, m
         .cta-button {
           display: inline-block;
           background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
-          color: white;
+          color: white !important;
           text-decoration: none;
           padding: 15px 30px;
           border-radius: 8px;
           font-weight: bold;
-          margin: 20px 0;
+          margin: 10px 5px;
           transition: transform 0.2s;
+        }
+        .cta-button-secondary {
+          display: inline-block;
+          background: #10B981;
+          color: white !important;
+          text-decoration: none;
+          padding: 15px 30px;
+          border-radius: 8px;
+          font-weight: bold;
+          margin: 10px 5px;
         }
         .missing-fields {
           background-color: #fff3cd;
@@ -551,9 +564,20 @@ function generateProfileReminderEmailHTML(firstName: string, username: string, m
           <li>🏆 <strong>Trust & Safety:</strong> Complete profiles build trust in our community</li>
           <li>📍 <strong>Local Matches:</strong> Help us connect you with nearby families</li>
         </ul>
+
+        ${hasDadDaysMissing ? `
+        <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h4 style="color: #1E40AF; margin: 0 0 10px 0;">Set Up Your Dad Days</h4>
+          <p style="margin: 0; color: #1E40AF; font-size: 14px;">
+            Mark when you're free during the week (mornings, afternoons, evenings) and we'll automatically match you 
+            with nearby dads who are available at the same times. It's the easiest way to find playdate partners!
+          </p>
+        </div>
+        ` : ''}
         
         <div style="text-align: center;">
-          <a href="https://papa-hi.com/profile" class="cta-button">Complete My Profile</a>
+          ${profileFields.length > 0 ? `<a href="https://papa-hi.com/profile" class="cta-button">Complete My Profile</a>` : ''}
+          ${hasDadDaysMissing ? `<a href="https://papa-hi.com/dad-days" class="cta-button-secondary">Set Up Dad Days</a>` : ''}
         </div>
         
         <p>It only takes 2 minutes to complete your profile. Once done, you can:</p>
@@ -562,9 +586,10 @@ function generateProfileReminderEmailHTML(firstName: string, username: string, m
           <li>Create your own family activities and playdates</li>
           <li>Connect with like-minded fathers in your area</li>
           <li>Discover family-friendly places</li>
+          <li>Get matched with dads who are free when you are</li>
         </ul>
         
-        <p><strong>💡 Pro tip:</strong> After completing your profile, create your first playdate! It's the best way to start connecting with other parents and building meaningful relationships in the PaPa-Hi community.</p>
+        <p><strong>Tip:</strong> After completing your profile, set up your Dad Days! It's the best way to find dads nearby who are free at the same times as you.</p>
         
         <p>Thanks for being part of the PaPa-Hi community!</p>
         
@@ -585,9 +610,11 @@ function generateProfileReminderEmailText(firstName: string, username: string, m
     'profileImage': 'Profile Photo',
     'bio': 'Bio/About Me',
     'city': 'City/Location',
-    'childrenInfo': 'Children Information'
+    'childrenInfo': 'Children Information',
+    'dadDaysAvailability': 'Dad Days Availability'
   };
 
+  const hasDadDaysMissing = missingFields.includes('dadDaysAvailability');
   const missingFieldsList = missingFields.map(field => fieldLabels[field] || field).join(', ');
 
   return `
@@ -606,10 +633,10 @@ Why complete your profile?
 • Local Matches: Help us connect you with nearby families
 
 Complete your profile here: https://papa-hi.com/profile
+${hasDadDaysMissing ? `\nSet up your Dad Days: https://papa-hi.com/dad-days\nMark when you're free during the week and we'll match you with nearby dads available at the same times!\n` : ''}
+It only takes 2 minutes! Once done, you can browse playdates, create activities, connect with other fathers, and get matched with dads who are free when you are.
 
-It only takes 2 minutes! Once done, you can browse playdates, create activities, and connect with other fathers.
-
-Pro tip: After completing your profile, create your first playdate! It's the best way to start connecting with other parents and building meaningful relationships in the PaPa-Hi community.
+Tip: After completing your profile, set up your Dad Days! It's the best way to find dads nearby who are free at the same times as you.
 
 Thanks for being part of the PaPa-Hi community!
 
