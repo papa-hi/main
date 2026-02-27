@@ -434,23 +434,14 @@ export async function updateMatchStatus(matchId: number, userId: number, status:
  */
 async function sendDadMatchNotifications(userId: number, matchedUserId: number, candidate: MatchCandidate): Promise<void> {
   try {
-    // Get user details
-    const [user] = await db.select().from(users).where(eq(users.id, userId));
-    if (!user) return;
+    const { sendDadMatchNotificationEmail, sendDadMatchPushNotification } = await import("./dad-match-notifications");
 
-    const matchedUser = candidate.user;
-    const distance = candidate.distance || 0;
+    await Promise.allSettled([
+      sendDadMatchNotificationEmail(userId, matchedUserId, candidate),
+      sendDadMatchPushNotification(userId, matchedUserId, candidate),
+    ]);
 
-    // Simple console logging for now - in production you'd integrate with email/push services
-    console.log(`=== DAD MATCH NOTIFICATION ===`);
-    console.log(`To: ${user.firstName} (${user.email})`);
-    console.log(`Match: ${matchedUser.firstName} ${matchedUser.lastName} from ${matchedUser.city}`);
-    console.log(`Distance: ${distance}km | Score: ${candidate.matchScore}%`);
-    console.log(`Common age ranges: ${JSON.stringify(candidate.commonAgeRanges)}`);
-    console.log(`==============================`);
-
-    // Here you would integrate with your email service and push notification service
-    // For now, we'll just log the notification
+    console.log(`Dad match notifications sent to user ${userId} about match with user ${matchedUserId}`);
   } catch (error) {
     console.error('Error sending dad match notifications:', error);
   }
