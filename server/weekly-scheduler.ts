@@ -94,7 +94,15 @@ class WeeklyScheduler {
   /**
    * Start the scheduler that checks every hour
    */
+  private started = false;
+
   start(): void {
+    if (this.started) {
+      console.log('Weekly scheduler already started, skipping duplicate start');
+      return;
+    }
+    this.started = true;
+    
     console.log('Starting weekly scheduler (profile reminders + database cleanup)...');
     console.log('Will check every hour and run on Mondays at 10 AM');
     
@@ -134,8 +142,3 @@ class WeeklyScheduler {
 
 // Create and export singleton instance
 export const weeklyScheduler = new WeeklyScheduler();
-
-// Auto-start the scheduler in production
-if (process.env.NODE_ENV === 'production') {
-  weeklyScheduler.start();
-}
