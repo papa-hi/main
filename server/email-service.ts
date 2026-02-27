@@ -1,34 +1,6 @@
 import { Resend } from 'resend';
-import { db } from './db';
-import { emailLogs } from '@shared/schema';
 
 let resend: Resend | null = null;
-
-export async function logEmail(params: {
-  recipientEmail: string;
-  recipientUserId?: number | null;
-  emailType: string;
-  subject: string;
-  status: 'sent' | 'failed' | 'skipped';
-  resendId?: string | null;
-  errorMessage?: string | null;
-  metadata?: Record<string, any> | null;
-}): Promise<void> {
-  try {
-    await db.insert(emailLogs).values({
-      recipientEmail: params.recipientEmail,
-      recipientUserId: params.recipientUserId ?? null,
-      emailType: params.emailType,
-      subject: params.subject,
-      status: params.status,
-      resendId: params.resendId ?? null,
-      errorMessage: params.errorMessage ?? null,
-      metadata: params.metadata ? JSON.stringify(params.metadata) : null,
-    });
-  } catch (error) {
-    console.error('Failed to log email:', error);
-  }
-}
 
 function getResendClient(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY;
@@ -61,20 +33,21 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
   try {
     const resendClient = getResendClient();
     
-    const subject = 'Welcome to PaPa-Hi! 🎉';
-
     if (!resendClient) {
       console.warn('RESEND_API_KEY is not configured - skipping welcome email');
-      await logEmail({ recipientEmail: to, emailType: 'welcome', subject, status: 'skipped', metadata: { firstName, username } });
-      return true;
+      console.log(`Welcome email would be sent to: ${to}`);
+      console.log('Subject: Welcome to PaPa-Hi! 🎉');
+      console.log('Content: Professional welcome email with app overview');
+      return true; // Return success but don't actually send
     }
 
+    // Send emails when RESEND_API_KEY is configured
     console.log(`Sending welcome email to: ${to}`);
 
     const { data, error } = await resendClient.emails.send({
       from: 'PaPa-Hi <papa@papa-hi.com>',
       to: [to],
-      subject,
+      subject: 'Welcome to PaPa-Hi! 🎉',
       html: generateWelcomeEmailHTML(firstName, username),
       text: generateWelcomeEmailText(firstName, username),
       headers: {
@@ -86,16 +59,29 @@ export async function sendWelcomeEmail({ to, firstName, username }: WelcomeEmail
 
     if (error) {
       console.error('❌ RESEND ERROR: Failed to send welcome email:', error);
-      await logEmail({ recipientEmail: to, emailType: 'welcome', subject, status: 'failed', errorMessage: error.message || 'Unknown error', metadata: { firstName, username } });
+      console.log(`📧 EMAIL FAILURE: ${to} - ${error.message || 'Unknown error'}`);
+      
+      // Handle common Resend validation errors gracefully
+      if (error.message && (
+        error.message.includes('Invalid `to` field') ||
+        error.message.includes('You can only send testing emails') ||
+        error.message.includes('verify a domain')
+      )) {
+        console.log('🚫 DOMAIN RESTRICTION: Email blocked by Resend validation');
+        console.log('⚠️  Registration continues without email delivery');
+        return false; // Return false to indicate email failure
+      }
+      
+      console.log('💥 SMTP FAILURE: Technical error sending email');
       return false;
     }
 
     console.log('Welcome email sent successfully:', data?.id);
-    await logEmail({ recipientEmail: to, emailType: 'welcome', subject, status: 'sent', resendId: data?.id, metadata: { firstName, username } });
+    console.log('Email details:', { from: 'papa@papa-hi.com', to, subject: 'Welcome to PaPa-Hi! 🎉' });
+    console.log('Check your spam folder and email delivery status in Resend dashboard');
     return true;
   } catch (error) {
     console.error('Failed to send welcome email:', error);
-    await logEmail({ recipientEmail: to, emailType: 'welcome', subject: 'Welcome to PaPa-Hi! 🎉', status: 'failed', errorMessage: String(error) });
     return false;
   }
 }
