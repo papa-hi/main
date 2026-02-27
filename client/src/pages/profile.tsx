@@ -700,7 +700,7 @@ export default function ProfilePage() {
           <TabsList className="w-full flex overflow-x-auto scrollbar-hide gap-1 p-1 h-auto">
             <TabsTrigger value="playdates" className="flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 py-1.5 whitespace-nowrap">{t('profile.myPlaydates', 'My Playdates')}</TabsTrigger>
             <TabsTrigger value="places" className="flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 py-1.5 whitespace-nowrap">{t('profile.favoritePlaces', 'Favorite Places')}</TabsTrigger>
-            <TabsTrigger value="matches" className="flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 py-1.5 whitespace-nowrap">Dad Matches</TabsTrigger>
+            <TabsTrigger value="matches" className="flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 py-1.5 whitespace-nowrap">{t('matches.profileTabTitle')}</TabsTrigger>
             <TabsTrigger value="notifications" className="flex-shrink-0 text-xs sm:text-sm px-2 sm:px-3 py-1.5 whitespace-nowrap">{t('profile.notifications', 'Notifications')}</TabsTrigger>
           </TabsList>
           
@@ -835,10 +835,10 @@ export default function ProfilePage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Heart className="h-5 w-5" />
-                  Dad Matches
+                  {t('matches.profileTabTitle')}
                 </CardTitle>
                 <CardDescription>
-                  Connect with dads based on schedule availability, location, and children's ages
+                  {t('matches.profileTabSubtitle')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -846,14 +846,14 @@ export default function ProfilePage() {
                   <Users className="h-10 w-10 text-muted-foreground mx-auto" />
                   <div>
                     <p className="text-muted-foreground text-sm">
-                      We match you with fathers nearby who have similar-age children and share your free time slots.
+                      {t('matches.profileTabDescription')}
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
                     <Link to="/matches">
                       <Button className="w-full">
                         <Heart className="h-4 w-4 mr-2" />
-                        View All Matches
+                        {t('matches.viewAllMatches')}
                       </Button>
                     </Link>
                     <Link to="/dad-days">
@@ -864,7 +864,7 @@ export default function ProfilePage() {
                     </Link>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Set your Dad Days calendar and match preferences in settings
+                    {t('matches.profileTabHint')}
                   </p>
                 </div>
               </CardContent>
