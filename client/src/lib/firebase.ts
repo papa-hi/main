@@ -2,9 +2,7 @@ import { initializeApp } from "firebase/app";
 import { 
   getAuth, 
   GoogleAuthProvider, 
-  signInWithRedirect, 
   signInWithPopup, 
-  getRedirectResult, 
   signOut,
   onAuthStateChanged,
   type User as FirebaseUser
@@ -27,7 +25,7 @@ googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(): Promise<FirebaseUser> {
   console.log("Using Firebase with:", {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY ? "API key is set" : "API key is missing",
     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "Project ID is missing",
@@ -35,25 +33,9 @@ export async function signInWithGoogle() {
     authDomain: firebaseConfig.authDomain
   });
 
-  console.log("Starting Google sign-in via redirect...");
-  await signInWithRedirect(auth, googleProvider);
-  return null;
-}
-
-export async function handleRedirectResult() {
-  try {
-    console.log("Checking for redirect sign-in result...");
-    const result = await getRedirectResult(auth);
-    if (result) {
-      console.log("Redirect result found for user:", result.user.email);
-      return result.user;
-    }
-    console.log("No redirect result found");
-    return null;
-  } catch (error) {
-    console.error("Error handling redirect result:", error);
-    throw error;
-  }
+  const result = await signInWithPopup(auth, googleProvider);
+  console.log("Google sign in successful:", result.user.displayName);
+  return result.user;
 }
 
 export function signOutUser() {

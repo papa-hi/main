@@ -20,14 +20,23 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
     try {
       setIsLoading(true);
       await signInWithGoogle();
+      if (onSuccess) onSuccess();
     } catch (error: any) {
+      if (error.code === 'auth/popup-closed-by-user' || 
+          error.code === 'auth/cancelled-popup-request') {
+        return;
+      }
+      
       console.error("Google sign-in error:", error);
-      setIsLoading(false);
       toast({
         title: t('auth.googleSignInError', 'Google sign-in error'),
-        description: error.message || t('auth.unknownError', 'Could not sign in with Google'),
+        description: error.code === 'auth/configuration-not-found' 
+          ? t('auth.configRequired', 'Google Sign-in is not configured. Please use email/password login.')
+          : (error.message || t('auth.unknownError', 'Could not sign in with Google')),
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
