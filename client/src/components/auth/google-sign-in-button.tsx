@@ -17,11 +17,8 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
   async function handleSignIn() {
     try {
       setIsLoading(true);
-      const user = await signInWithGoogle();
-      if (user && onSuccess) {
-        onSuccess();
-      }
-    } finally {
+      await signInWithGoogle();
+    } catch {
       setIsLoading(false);
     }
   }

@@ -2,7 +2,6 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import {
   getAuth,
   GoogleAuthProvider,
-  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
   onAuthStateChanged,
@@ -24,21 +23,8 @@ export function onAuthChange(callback: (user: FirebaseUser | null) => void) {
   return onAuthStateChanged(auth, callback);
 }
 
-export async function signInWithGoogle(): Promise<FirebaseUser | null> {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    return result.user;
-  } catch (error: any) {
-    if (
-      error.code === "auth/popup-closed-by-user" ||
-      error.code === "auth/popup-blocked" ||
-      error.code === "auth/cancelled-popup-request"
-    ) {
-      await signInWithRedirect(auth, googleProvider);
-      return null;
-    }
-    throw error;
-  }
+export async function signInWithGoogle(): Promise<void> {
+  await signInWithRedirect(auth, googleProvider);
 }
 
 export async function handleRedirectResult(): Promise<FirebaseUser | null> {
