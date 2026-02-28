@@ -60,6 +60,7 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
     handleRedirectResult()
       .then(async (firebaseUser) => {
         if (firebaseUser) {
+          console.log("[Firebase Auth] Redirect completed for:", firebaseUser.email);
           try {
             await authenticateWithServer(firebaseUser);
             toast({
@@ -87,15 +88,7 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
   const handleSignInWithGoogle = async () => {
     try {
       setError(null);
-      const firebaseUser = await signInWithGoogle();
-
-      if (firebaseUser) {
-        await authenticateWithServer(firebaseUser);
-        toast({
-          title: t('auth.signInSuccess', 'Sign-in successful'),
-          description: t('auth.welcomeMessage', 'Welcome back!'),
-        });
-      }
+      await signInWithGoogle();
     } catch (e) {
       const err = e as Error;
       setError(err);
