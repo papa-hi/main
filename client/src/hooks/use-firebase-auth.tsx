@@ -8,6 +8,7 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 interface AuthContextType {
   currentUser: FirebaseUser | null;
   isLoading: boolean;
+  isProcessingRedirect: boolean;
   error: Error | null;
   signInWithGoogle: () => Promise<FirebaseUser | null>;
   signOut: () => Promise<void>;
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProcessingRedirect, setIsProcessingRedirect] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -60,6 +62,8 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
       }
     }).catch((err) => {
       console.error("Redirect result error:", err);
+    }).finally(() => {
+      setIsProcessingRedirect(false);
     });
   }, []);
 
@@ -101,6 +105,7 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
   const value = {
     currentUser,
     isLoading,
+    isProcessingRedirect,
     error,
     signInWithGoogle: handleSignInWithGoogle,
     signOut: handleSignOut,
