@@ -15,6 +15,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
+const RedirectStateContext = createContext<boolean>(true);
 
 async function authenticateWithServer(user: FirebaseUser) {
   const idToken = await user.getIdToken(true);
@@ -127,7 +128,13 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
     signOut: handleSignOut,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      <RedirectStateContext.Provider value={isProcessingRedirect}>
+        {children}
+      </RedirectStateContext.Provider>
+    </AuthContext.Provider>
+  );
 }
 
 export function useFirebaseAuth() {
@@ -136,4 +143,8 @@ export function useFirebaseAuth() {
     throw new Error('useFirebaseAuth must be used within a FirebaseAuthProvider');
   }
   return context;
+}
+
+export function useIsProcessingRedirect() {
+  return useContext(RedirectStateContext);
 }

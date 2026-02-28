@@ -8,6 +8,7 @@ import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { useIsProcessingRedirect } from "@/hooks/use-firebase-auth";
 
 type AuthContextType = {
   user: SelectUser | null;
@@ -25,6 +26,7 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const { t } = useTranslation("auth");
+  const isProcessingRedirect = useIsProcessingRedirect();
   
   const {
     data: user,
@@ -33,6 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } = useQuery<SelectUser | null, Error>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
+    enabled: !isProcessingRedirect,
   });
 
   const loginMutation = useMutation({
@@ -112,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user: user ?? null,
-        isLoading,
+        isLoading: isLoading || isProcessingRedirect,
         error,
         loginMutation,
         logoutMutation,
