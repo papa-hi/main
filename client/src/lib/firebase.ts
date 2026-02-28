@@ -26,13 +26,7 @@ googleProvider.setCustomParameters({
 });
 
 export async function signInWithGoogle(): Promise<FirebaseUser> {
-  console.log("Using Firebase with:", {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY ? "API key is set" : "API key is missing",
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "Project ID is missing",
-    appId: import.meta.env.VITE_FIREBASE_APP_ID || "App ID is missing",
-    authDomain: firebaseConfig.authDomain
-  });
-
+  console.log("Starting Google sign-in popup...");
   const result = await signInWithPopup(auth, googleProvider);
   console.log("Google sign in successful:", result.user.displayName);
   return result.user;
