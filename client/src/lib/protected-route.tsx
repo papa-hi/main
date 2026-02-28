@@ -1,5 +1,4 @@
 import { useAuth } from "@/hooks/use-auth";
-import { useFirebaseAuth } from "@/hooks/use-firebase-auth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
@@ -14,13 +13,12 @@ export function ProtectedRoute({
   component: Component,
 }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
-  const { isProcessingRedirect } = useFirebaseAuth();
   const { t } = useTranslation("common");
   
   return (
     <Route path={path}>
       {() => {
-        if (isLoading || isProcessingRedirect) {
+        if (isLoading) {
           return (
             <div className="flex items-center justify-center min-h-screen">
               <div className="text-center">

@@ -1,12 +1,8 @@
-import { Button } from "@/components/ui/button";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { useFirebaseAuth } from "@/hooks/use-firebase-auth";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
 
 interface GoogleSignInButtonProps {
   onSuccess?: () => void;
@@ -17,118 +13,14 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
   const { signInWithGoogle } = useFirebaseAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
-  const { toast } = useToast();
 
   async function handleSignIn() {
     try {
       setIsLoading(true);
-      
-      // Display Firebase configuration for debugging
-      console.log("Using Firebase config:", {
-        apiKey: import.meta.env.VITE_FIREBASE_API_KEY ? "Set" : "Not set",
-        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ? "Set" : "Not set",
-        appId: import.meta.env.VITE_FIREBASE_APP_ID ? "Set" : "Not set"
-      });
-      
-      // Show a message to the user about the configuration status
-      toast({
-        title: "Google Sign-In",
-        description: "Attempting to sign in with Google...",
-        variant: "default"
-      });
-      
-      const firebaseUser = await signInWithGoogle().catch((error) => {
-        console.error("Google sign-in error:", error);
-        if (error.code === 'auth/configuration-not-found') {
-          toast({
-            title: "Authentication Setup Required",
-            description: "Google Sign-in is not configured in Firebase. Please contact the administrator or use email/password login.",
-            variant: "destructive"
-          });
-        } else {
-          toast({
-            title: "Google Sign-in Failed",
-            description: error.message || "Could not sign in with Google. Please try again or use email/password login.",
-            variant: "destructive"
-          });
-        }
-        return null;
-      });
-      
-      if (!firebaseUser) {
-        // null means redirect was triggered or popup was cancelled - don't show error
-        return;
+      const user = await signInWithGoogle();
+      if (user && onSuccess) {
+        onSuccess();
       }
-      
-      if (firebaseUser) {
-        console.log("Firebase user authenticated:", firebaseUser.email);
-        // Send Firebase user data to our server to authenticate in our system
-        try {
-          console.log("Sending data to server:", {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            photoURL: firebaseUser.photoURL
-          });
-          
-          const response = await apiRequest("POST", "/api/firebase-auth", {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            photoURL: firebaseUser.photoURL
-          });
-          
-          console.log("Server response status:", response.status);
-          
-          if (response.ok) {
-            // Successfully authenticated with our server
-            const user = await response.json();
-            console.log("User authenticated with server:", user);
-            // Update the user data in the cache
-            queryClient.setQueryData(["/api/user"], user);
-            
-            toast({
-              title: t("auth:signInSuccess", "Sign-in successful"),
-              description: t("auth:welcomeMessage", "Welcome back!"),
-              variant: "default"
-            });
-            
-            if (onSuccess) {
-              onSuccess();
-            }
-          } else {
-            // Handle server authentication error
-            let errorDetails = "Unknown error";
-            try {
-              const errorData = await response.json();
-              errorDetails = errorData.error || "Unknown error";
-              console.error("Server authentication error:", errorData);
-            } catch (e) {
-              console.error("Could not parse error response:", e);
-            }
-            
-            toast({
-              title: t("auth:googleAuthError", "Google authentication error"),
-              description: errorDetails,
-              variant: "destructive"
-            });
-          }
-        } catch (error) {
-          console.error("Server authentication error:", error);
-          toast({
-            title: t("auth:serverError", "Server error"),
-            description: t("auth:serverAuthError", "Could not authenticate with the server"),
-            variant: "destructive"
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Google sign-in error:", error);
-      toast({
-        title: t("auth:googleSignInError", "Google sign-in error"),
-        description: error instanceof Error ? error.message : t("auth:unknownError", "An unknown error occurred"),
-        variant: "destructive"
-      });
     } finally {
       setIsLoading(false);
     }

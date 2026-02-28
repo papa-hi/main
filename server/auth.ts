@@ -423,11 +423,11 @@ export function setupAuth(app: Express) {
   // Handle Firebase Google authentication
   app.post("/api/firebase-auth", async (req, res, next) => {
     try {
-      console.log("Firebase auth request received:", req.body);
-      const { uid, email, displayName, photoURL } = req.body;
+      console.log("[Firebase Auth] Request received");
+      const { idToken, uid, email, displayName, photoURL } = req.body;
       
       if (!uid || !email) {
-        console.log("Missing required Firebase data:", { uid, email });
+        console.log("[Firebase Auth] Missing required data:", { uid, email });
         return res.status(400).json({ error: "Missing required Firebase user data" });
       }
       
