@@ -32,29 +32,34 @@ googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
 
-// Google sign in with popup
+// Google sign in - tries popup first, falls back to redirect
 export async function signInWithGoogle() {
   try {
-    // Log configuration for debugging
     console.log("Using Firebase with:", {
       apiKey: import.meta.env.VITE_FIREBASE_API_KEY ? "API key is set" : "API key is missing",
       projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "Project ID is missing",
       appId: import.meta.env.VITE_FIREBASE_APP_ID || "App ID is missing"
     });
     
-    const result = await signInWithPopup(auth, googleProvider);
-    console.log("Google sign in successful:", result.user.displayName);
-    return result.user;
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log("Google sign in successful (popup):", result.user.displayName);
+      return result.user;
+    } catch (popupError: any) {
+      if (popupError.code === 'auth/popup-closed-by-user' || 
+          popupError.code === 'auth/popup-blocked' ||
+          popupError.code === 'auth/cancelled-popup-request') {
+        console.log("Popup failed, falling back to redirect...");
+        signInWithRedirect(auth, googleProvider);
+        return null;
+      }
+      throw popupError;
+    }
   } catch (error: any) {
     console.error("Error signing in with Google:", error);
     
-    // Provide more specific error messaging
     if (error.code === 'auth/configuration-not-found') {
-      console.error("AUTH SETUP REQUIRED: You need to enable Google authentication in the Firebase console for this project.");
-      console.error("Please make sure that:");
-      console.error("1. Google Sign-In is enabled in Firebase Console > Authentication > Sign-in methods");
-      console.error("2. The current domain is added to authorized domains in Firebase Console");
-      console.error("3. The Firebase API key, Project ID, and App ID are correctly set as environment variables");
+      console.error("AUTH SETUP REQUIRED: Enable Google authentication in Firebase Console.");
     }
     
     throw error;

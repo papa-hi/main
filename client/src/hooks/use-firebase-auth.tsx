@@ -1,8 +1,9 @@
-import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import { auth, onAuthChange, signInWithGoogle, signOutUser } from '@/lib/firebase';
+import { createContext, useState, useEffect, useContext, useRef, ReactNode } from 'react';
+import { auth, onAuthChange, signInWithGoogle, signOutUser, handleRedirectResult } from '@/lib/firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 
 interface AuthContextType {
   currentUser: FirebaseUser | null;
@@ -20,6 +21,7 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<Error | null>(null);
   const { toast } = useToast();
   const { t } = useTranslation();
+  const redirectHandled = useRef(false);
 
   useEffect(() => {
     const unsubscribe = onAuthChange((user) => {
@@ -28,6 +30,37 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (redirectHandled.current) return;
+    redirectHandled.current = true;
+    
+    handleRedirectResult().then(async (firebaseUser) => {
+      if (firebaseUser) {
+        console.log("Redirect sign-in completed:", firebaseUser.email);
+        try {
+          const response = await apiRequest("POST", "/api/firebase-auth", {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            photoURL: firebaseUser.photoURL
+          });
+          if (response.ok) {
+            const user = await response.json();
+            queryClient.setQueryData(["/api/user"], user);
+            toast({
+              title: t("auth:signInSuccess", "Sign-in successful"),
+              description: t("auth:welcomeMessage", "Welcome back!"),
+            });
+          }
+        } catch (err) {
+          console.error("Server auth after redirect failed:", err);
+        }
+      }
+    }).catch((err) => {
+      console.error("Redirect result error:", err);
+    });
   }, []);
 
   const handleSignInWithGoogle = async () => {

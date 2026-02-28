@@ -37,10 +37,8 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
         variant: "default"
       });
       
-      // Attempt Google sign-in with fallback to email/password authentication
       const firebaseUser = await signInWithGoogle().catch((error) => {
         console.error("Google sign-in error:", error);
-        // Provide better error message to user
         if (error.code === 'auth/configuration-not-found') {
           toast({
             title: "Authentication Setup Required",
@@ -56,6 +54,11 @@ export function GoogleSignInButton({ onSuccess, className = "" }: GoogleSignInBu
         }
         return null;
       });
+      
+      if (!firebaseUser) {
+        // null means redirect was triggered or popup was cancelled - don't show error
+        return;
+      }
       
       if (firebaseUser) {
         console.log("Firebase user authenticated:", firebaseUser.email);
