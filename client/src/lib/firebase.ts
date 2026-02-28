@@ -2,52 +2,95 @@ import { initializeApp } from "firebase/app";
 import { 
   getAuth, 
   GoogleAuthProvider, 
+  signInWithRedirect, 
   signInWithPopup, 
+  getRedirectResult, 
   signOut,
   onAuthStateChanged,
   type User as FirebaseUser
 } from "firebase/auth";
 
-const authDomain = (() => {
-  if (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN) {
-    return import.meta.env.VITE_FIREBASE_AUTH_DOMAIN;
-  }
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    return window.location.hostname;
-  }
-  return `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`;
-})();
-
+// Firebase configuration using environment variables
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
   messagingSenderId: "000000000000"
 };
 
-console.log("[Firebase] Using authDomain:", authDomain);
-
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase auth
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
+// Configure Google provider
 googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
 
-export async function signInWithGoogle(): Promise<FirebaseUser> {
-  console.log("Starting Google sign-in popup...");
-  const result = await signInWithPopup(auth, googleProvider);
-  console.log("Google sign in successful:", result.user.displayName);
-  return result.user;
+// Google sign in - tries popup first, falls back to redirect
+export async function signInWithGoogle() {
+  try {
+    console.log("Using Firebase with:", {
+      apiKey: import.meta.env.VITE_FIREBASE_API_KEY ? "API key is set" : "API key is missing",
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "Project ID is missing",
+      appId: import.meta.env.VITE_FIREBASE_APP_ID || "App ID is missing"
+    });
+    
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log("Google sign in successful (popup):", result.user.displayName);
+      return result.user;
+    } catch (popupError: any) {
+      if (popupError.code === 'auth/popup-closed-by-user' || 
+          popupError.code === 'auth/popup-blocked' ||
+          popupError.code === 'auth/cancelled-popup-request') {
+        console.log("Popup failed, falling back to redirect...");
+        signInWithRedirect(auth, googleProvider);
+        return null;
+      }
+      throw popupError;
+    }
+  } catch (error: any) {
+    console.error("Error signing in with Google:", error);
+    
+    if (error.code === 'auth/configuration-not-found') {
+      console.error("AUTH SETUP REQUIRED: Enable Google authentication in Firebase Console.");
+    }
+    
+    throw error;
+  }
 }
 
+// Google sign in with redirect (better for mobile)
+export function signInWithGoogleRedirect() {
+  signInWithRedirect(auth, googleProvider);
+}
+
+// Handle redirect result
+export async function handleRedirectResult() {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result) {
+      return result.user;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error handling redirect result:", error);
+    throw error;
+  }
+}
+
+// Sign out
 export function signOutUser() {
   return signOut(auth);
 }
 
+// Monitor auth state
 export function onAuthChange(callback: (user: FirebaseUser | null) => void) {
   return onAuthStateChanged(auth, callback);
 }

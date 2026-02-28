@@ -1,5 +1,5 @@
-import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import { onAuthChange, signInWithGoogle, signOutUser } from '@/lib/firebase';
+import { createContext, useState, useEffect, useContext, useRef, ReactNode } from 'react';
+import { auth, onAuthChange, signInWithGoogle, signOutUser, handleRedirectResult } from '@/lib/firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
@@ -19,9 +19,11 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProcessingRedirect, setIsProcessingRedirect] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const { toast } = useToast();
   const { t } = useTranslation();
+  const redirectHandled = useRef(false);
 
   useEffect(() => {
     const unsubscribe = onAuthChange((user) => {
@@ -32,13 +34,13 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const handleSignInWithGoogle = async () => {
-    try {
-      setError(null);
-      const firebaseUser = await signInWithGoogle();
-      
+  useEffect(() => {
+    if (redirectHandled.current) return;
+    redirectHandled.current = true;
+    
+    handleRedirectResult().then(async (firebaseUser) => {
       if (firebaseUser) {
-        console.log("Firebase user authenticated:", firebaseUser.email);
+        console.log("Redirect sign-in completed:", firebaseUser.email);
         try {
           const response = await apiRequest("POST", "/api/firebase-auth", {
             uid: firebaseUser.uid,
@@ -46,29 +48,39 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
             displayName: firebaseUser.displayName,
             photoURL: firebaseUser.photoURL
           });
-
           if (response.ok) {
             const user = await response.json();
             queryClient.setQueryData(["/api/user"], user);
             toast({
-              title: t("auth.signInSuccess", "Sign-in successful"),
-              description: t("auth.welcomeMessage", "Welcome back!"),
+              title: t("auth:signInSuccess", "Sign-in successful"),
+              description: t("auth:welcomeMessage", "Welcome back!"),
             });
-          } else {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error || "Server authentication failed");
           }
         } catch (err) {
-          console.error("Server auth failed:", err);
-          throw err;
+          console.error("Server auth after redirect failed:", err);
         }
       }
-      
-      return firebaseUser;
+    }).catch((err) => {
+      console.error("Redirect result error:", err);
+    }).finally(() => {
+      setIsProcessingRedirect(false);
+    });
+  }, []);
+
+  const handleSignInWithGoogle = async () => {
+    try {
+      setError(null);
+      const user = await signInWithGoogle();
+      return user;
     } catch (e) {
       const error = e as Error;
       setError(error);
-      throw error;
+      toast({
+        title: t('auth.errorSigningIn', 'Error signing in'),
+        description: error.message,
+        variant: 'destructive',
+      });
+      return null;
     }
   };
 
@@ -93,7 +105,7 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
   const value = {
     currentUser,
     isLoading,
-    isProcessingRedirect: false,
+    isProcessingRedirect,
     error,
     signInWithGoogle: handleSignInWithGoogle,
     signOut: handleSignOut,

@@ -4,7 +4,6 @@ import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 import fs from "fs";
 import helmet from "helmet";
-import https from "https";
 
 const app = express();
 
@@ -22,35 +21,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     return res.status(400).send('Malformed URL');
   }
   next(err);
-});
-
-const FIREBASE_PROJECT_ID = process.env.VITE_FIREBASE_PROJECT_ID || "papa-hi";
-app.use('/__/auth', (req: Request, res: Response) => {
-  const targetHost = `${FIREBASE_PROJECT_ID}.firebaseapp.com`;
-  const targetPath = `/__/auth${req.url}`;
-  
-  const proxyReq = https.request({
-    hostname: targetHost,
-    port: 443,
-    path: targetPath,
-    method: req.method,
-    headers: {
-      ...req.headers,
-      host: targetHost,
-    },
-  }, (proxyRes) => {
-    const headers = { ...proxyRes.headers };
-    delete headers['x-frame-options'];
-    res.writeHead(proxyRes.statusCode || 200, headers);
-    proxyRes.pipe(res);
-  });
-  
-  proxyReq.on('error', (err) => {
-    console.error('[Firebase Auth Proxy] Error:', err.message);
-    res.status(502).send('Firebase auth proxy error');
-  });
-  
-  req.pipe(proxyReq);
 });
 
 app.use(express.json({ limit: '10mb' }));
