@@ -27,6 +27,41 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false }));
 
+// Reverse proxy Firebase Auth handler to support custom domain auth
+// When authDomain is papa-hi.com, Firebase redirects to /__/auth/handler on our domain
+// We proxy these requests to papa-hi.firebaseapp.com where the handler actually lives
+app.use('/__', async (req: Request, res: Response) => {
+  try {
+    const firebaseProject = process.env.VITE_FIREBASE_PROJECT_ID || 'papa-hi';
+    const targetUrl = `https://${firebaseProject}.firebaseapp.com/__${req.url}`;
+    const response = await fetch(targetUrl, {
+      method: req.method,
+      headers: {
+        'Accept': req.headers.accept || '*/*',
+        'User-Agent': req.headers['user-agent'] || '',
+      },
+      redirect: 'manual',
+    });
+
+    // Forward status code
+    res.status(response.status);
+
+    // Forward relevant headers
+    const headersToForward = ['content-type', 'location', 'cache-control', 'set-cookie'];
+    headersToForward.forEach(header => {
+      const value = response.headers.get(header);
+      if (value) res.setHeader(header, value);
+    });
+
+    // Forward body
+    const body = await response.text();
+    res.send(body);
+  } catch (error) {
+    console.error('Firebase auth proxy error:', error);
+    res.status(502).send('Auth proxy error');
+  }
+});
+
 // Ensure uploads directories exist
 const uploadsDir = path.join(process.cwd(), 'uploads');
 const placeImagesDir = path.join(uploadsDir, 'place-images');
