@@ -1,0 +1,182 @@
+firebase.ts
+
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
+
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+};
+
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+
+export function onAuthChange(callback: (user: FirebaseUser | null) => void) {
+  return onAuthStateChanged(auth, callback);
+}
+
+export async function signInWithGoogle(): Promise<FirebaseUser | null> {
+  const result = await signInWithPopup(auth, googleProvider);
+  return result.user;
+}
+
+export async function signOutUser(): Promise<void> {
+  await auth.signOut();
+}
+
+
+use-firebase-auth.tsx
+
+import { createContext, useState, useEffect, useContext, type ReactNode } from "react";
+import { onAuthChange, signInWithGoogle, signOutUser } from "@/lib/firebase";
+import type { User as FirebaseUser } from "firebase/auth";
+import { apiRequest, clearCsrfToken, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
+
+interface AuthContextType {
+  currentUser: FirebaseUser | null;
+  isLoading: boolean;
+  error: Error | null;
+  signInWithGoogle: () => Promise<FirebaseUser | null>;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    const unsubscribe = onAuthChange((user) => {
+      setCurrentUser(user);
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleSignInWithGoogle = async () => {
+    try {
+      setError(null);
+      const user = await signInWithGoogle();
+
+      if (user) {
+        const idToken = await user.getIdToken(true);
+        await apiRequest("POST", "/api/firebase-auth", {
+          idToken,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          uid: user.uid,
+        });
+
+        clearCsrfToken();
+        await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        setLocation("/dashboard");
+      }
+
+      return user;
+    } catch (e) {
+      const err = e as Error;
+      setError(err);
+      toast({
+        title: "Error signing in",
+        description: err.message,
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOutUser();
+      toast({
+        title: "Signed out",
+        description: "You have been signed out successfully",
+      });
+    } catch (e) {
+      const err = e as Error;
+      setError(err);
+      toast({
+        title: "Error signing out",
+        description: err.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const value = {
+    currentUser,
+    isLoading,
+    error,
+    signInWithGoogle: handleSignInWithGoogle,
+    signOut: handleSignOut,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useFirebaseAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useFirebaseAuth must be used within a FirebaseAuthProvider");
+  }
+  return context;
+}
+
+
+
+routes.tsx should have this 
+
+ app.post("/api/firebase-auth", authLimiter, async (req, res) => {
+    try {
+      const { idToken, email: clientEmail, displayName, photoURL, uid } = req.body;
+      if (!idToken || typeof idToken !== "string") {
+        return res.status(400).json({ message: "Missing ID token" });
+      }
+
+      console.log("[Firebase Auth] Verifying ID token...");
+      const decoded = await admin.auth().verifyIdToken(idToken);
+      console.log("[Firebase Auth] Token verified for:", decoded.email);
+      const email = decoded.email || clientEmail;
+      if (!email) {
+        return res.status(400).json({ message: "No email associated with this Google account" });
+      }
+
+      let user = await storage.getUserByEmail(email);
+      if (!user) {
+        console.log("[Firebase Auth] Creating new user for:", email);
+        const randomPass = randomBytes(32).toString("hex");
+        const hashed = await bcrypt.hash(randomPass, 10);
+        user = await storage.createUser({ email, password: hashed });
+        const name = decoded.name || displayName;
+        if (name) {
+          await storage.updateUser(user.id, { name });
+          user = (await storage.getUser(user.id))!;
+        }
+        const photo = decoded.picture || photoURL;
+        if (photo) {
+          await storage.updateUser(user.id, { avatar: photo });
+          user = (await storage.getUser(user.id))!;
+        }
+      }
+
+      req.session.userId = user.id;
+      req.session.csrfToken = randomBytes(32).toString("hex");
+      console.log("[Firebase Auth] Session created for user:", user.id);
+      const { password, ...safeUser } = user;
+      res.json(safeUser);
+    } catch (err: any) {
+      console.error("[Firebase Auth] Error:", err.message || err);
+      res.status(401).json({ message: err.message || "Invalid Google token" });
+    }
+  });
