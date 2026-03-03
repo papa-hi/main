@@ -46,11 +46,8 @@ export default function PlacesPage() {
     }
   }, [activeTab, setLocation]);
 
-  // Use public API for unauthenticated users, authenticated API for logged-in users
-  const placesEndpoint = user ? '/api/places' : '/api/public/places';
-  
   const { data: places, isLoading } = useQuery<Place[]>({
-    queryKey: [placesEndpoint, latitude, longitude, activeTab],
+    queryKey: ['/api/places', latitude, longitude, activeTab],
   });
   
   const filteredPlaces = places?.filter(place => {

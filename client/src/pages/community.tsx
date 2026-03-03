@@ -146,12 +146,10 @@ export default function CommunityPage() {
     queryFn: () => fetch('/api/community/categories').then(res => res.json()),
   });
 
-  // Fetch events when Events tab is active - use public API for unauthenticated users
-  const eventsEndpoint = user ? '/api/events?upcoming=true' : '/api/public/events';
   const { data: events = [], isLoading: eventsLoading } = useQuery<FamilyEvent[]>({
-    queryKey: [eventsEndpoint],
+    queryKey: ['/api/events', 'upcoming'],
     queryFn: async () => {
-      const response = await fetch(eventsEndpoint);
+      const response = await fetch('/api/events?upcoming=true');
       if (!response.ok) {
         throw new Error('Failed to fetch events');
       }
