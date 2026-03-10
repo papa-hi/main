@@ -2031,9 +2031,10 @@ export class DatabaseStorage implements IStorage {
       .where(and(
         eq(userFavorites.userId, userId),
         eq(userFavorites.placeId, placeId)
-      ));
+      ))
+      .returning({ id: userFavorites.id });
     
-    return result.rowCount! > 0;
+    return result.length > 0;
   }
   
   async createPlace(placeData: any): Promise<Place> {
@@ -2549,9 +2550,10 @@ export class DatabaseStorage implements IStorage {
           // Finally, delete the user
           const result = await tx
             .delete(users)
-            .where(eq(users.id, id));
+            .where(eq(users.id, id))
+            .returning({ id: users.id });
           
-          const success = result.rowCount ? result.rowCount > 0 : true;
+          const success = result.length > 0;
           console.log(`[DatabaseStorage] User ${id} deletion result: ${success}`);
           return success;
         } catch (txError) {
@@ -2658,9 +2660,10 @@ export class DatabaseStorage implements IStorage {
           eq(playdateParticipants.playdateId, playdateId),
           eq(playdateParticipants.userId, userId)
         )
-      );
+      )
+      .returning({ id: playdateParticipants.id });
     
-    return result.rowCount ? result.rowCount > 0 : true;
+    return result.length > 0;
   }
 
   // Community posts methods
@@ -2783,9 +2786,10 @@ export class DatabaseStorage implements IStorage {
     try {
       const result = await db
         .delete(communityPosts)
-        .where(eq(communityPosts.id, postId));
+        .where(eq(communityPosts.id, postId))
+        .returning({ id: communityPosts.id });
 
-      return result.rowCount ? result.rowCount > 0 : false;
+      return result.length > 0;
     } catch (error) {
       console.error("Error deleting community post:", error);
       return false;
@@ -2891,9 +2895,10 @@ export class DatabaseStorage implements IStorage {
     try {
       const result = await db
         .delete(familyEvents)
-        .where(eq(familyEvents.id, id));
+        .where(eq(familyEvents.id, id))
+        .returning({ id: familyEvents.id });
 
-      return result.rowCount ? result.rowCount > 0 : false;
+      return result.length > 0;
     } catch (error) {
       console.error("Error deleting event:", error);
       return false;
