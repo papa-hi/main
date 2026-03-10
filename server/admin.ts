@@ -622,10 +622,19 @@ export function setupAdminRoutes(app: Express) {
   });
 }
 
+function extractCityFromLocation(location: string): string {
+  const lastPart = location.split(',').pop()?.trim() || location.trim();
+  const cleaned = lastPart
+    .replace(/·/g, ' ')
+    .replace(/\d{4}\s*[A-Z]{0,2}/g, '')
+    .trim();
+  const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+  return words[words.length - 1] || cleaned;
+}
+
 async function sendNewEventNotifications(event: any): Promise<void> {
   try {
-    const locationParts = event.location.split(',');
-    const city = locationParts[locationParts.length - 1].trim();
+    const city = extractCityFromLocation(event.location);
 
     const usersInCity = await storage.getUsersInCity(city);
     const eligibleUsers = usersInCity.filter(u => u.email);
