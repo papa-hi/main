@@ -27,8 +27,6 @@ import PrivacyPolicyPage from "./pages/privacy-policy";
 
 import AdminDashboard from "./pages/admin";
 import AdminCheck from "./pages/admin-check";
-import TestCreatePlaydate from "./pages/test-create-playdate";
-import SimpleTestPage from "./pages/simple-test";
 import AboutPage from "./pages/about";
 import DadDaysPage from "./pages/dad-days";
 import { useState, useEffect } from "react";
@@ -90,8 +88,6 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <Route path="/forgot-password" component={ForgotPasswordPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
-      <Route path="/test-create" component={TestCreatePlaydate} />
-      <Route path="/simple-test" component={SimpleTestPage} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
