@@ -928,84 +928,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // IMPORTANT: This route MUST come before /api/users/:id to avoid conflicts!
   app.get("/api/users/featured", isAuthenticated, async (req, res) => {
     try {
-      console.log("Fetching featured user");
-      
-      // Get all users to select a random one
-      const allUsers = await storage.getAllUsers();
-      
-      // Check if we have users to feature
-      if (!allUsers || allUsers.length === 0) {
+      const featuredUser = await storage.getFeaturedUser(req.user?.id);
+
+      if (!featuredUser) {
         return res.status(404).json({ message: "No users found" });
       }
       
-      // Filter out the current logged-in user (if authenticated)
-      let otherUsers = allUsers;
-      if (req.user && req.user.id) {
-        otherUsers = allUsers.filter(user => user.id !== req.user?.id);
-      }
-      
-      if (otherUsers.length === 0) {
-        // If there are no other users, just return a random user anyway
-        otherUsers = allUsers;
-      }
-      
-      // Select a random user as the featured dad
-      const randomIndex = Math.floor(Math.random() * otherUsers.length);
-      const featuredUser = otherUsers[randomIndex];
-      
-      // Generate consistent favorite places based on user ID
-      const cityBasedLocations = {
-        'Amsterdam': ["Vondelpark", "NEMO Science Museum", "Artis Zoo"],
-        'Rotterdam': ["Plaswijckpark", "Maritiem Museum", "Euromast Park"],
-        'Utrecht': ["Griftpark", "TivoliVredenburg", "Wilhelminapark"],
-        'Den Haag': ["Madurodam", "Scheveningen Beach", "Zuiderpark"],
-        'Eindhoven': ["Genneper Parken", "Philips Museum", "Stadswandelpark"]
-      };
-      
-      // Use the user's city or default to Amsterdam
-      const userCity = featuredUser.city || 'Amsterdam';
-      const defaultLocations = cityBasedLocations[userCity as keyof typeof cityBasedLocations] || 
-                              cityBasedLocations['Amsterdam'];
-      
-      // Get user's real favorite places and track if they have actually set them
+      // Fetch the user's real favourite places (up to 3)
       let userFavoritePlaces: string[] = [];
       let hasSetFavorites = false;
-      
+
       try {
         const favoritePlaces = await storage.getUserFavoritePlaces(featuredUser.id);
         if (favoritePlaces && favoritePlaces.length > 0) {
           userFavoritePlaces = favoritePlaces.map(place => place.name).slice(0, 3);
           hasSetFavorites = true;
-          console.log(`Using user's actual favorite places: ${userFavoritePlaces.join(', ')}`);
-        } else {
-          console.log(`No favorite places found for ${featuredUser.firstName}`);
         }
-      } catch (error) {
-        console.log(`Could not fetch favorite places for user ${featuredUser.id}: ${error}`);
+      } catch {
+        // Non-critical — favourite places are optional
       }
-      
-      // Check if the user has actual children data
-      const hasChildrenInfo = featuredUser.childrenInfo && 
-                           Array.isArray(featuredUser.childrenInfo) && 
-                           featuredUser.childrenInfo.length > 0;
-      
-      console.log(`Children info for ${featuredUser.firstName}: ${hasChildrenInfo ? 'Available' : 'Not available'}`);
-                           
-      // Use actual user data for badge and children
-      const userWithDetails = {
+
+      const hasChildrenInfo = Array.isArray(featuredUser.childrenInfo) &&
+                              featuredUser.childrenInfo.length > 0;
+
+      res.json({
         ...featuredUser,
         badge: featuredUser.badge || "Actieve Papa",
-        // Use default avatar if no profile image is set
         profileImage: featuredUser.profileImage || "/avatar.png",
-        // Only include real children data, no fictional data
         childrenInfo: hasChildrenInfo ? featuredUser.childrenInfo : [],
-        hasChildrenInfo: hasChildrenInfo,
+        hasChildrenInfo,
         favoriteLocations: userFavoritePlaces,
-        hasSetFavorites: hasSetFavorites
-      };
-      
-      console.log(`Selected featured user: ${featuredUser.firstName} ${featuredUser.lastName}`);
-      res.json(userWithDetails);
+        hasSetFavorites,
+      });
     } catch (err) {
       console.error("Error fetching featured user:", err);
       res.status(500).json({ message: "Failed to fetch featured user" });

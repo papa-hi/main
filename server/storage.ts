@@ -17,7 +17,7 @@ import {
   userAvailability
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, isNotNull, not, inArray, like, or, type SQL } from "drizzle-orm";
+import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, isNotNull, not, ne, inArray, like, or, type SQL } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -30,7 +30,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, userData: Partial<User>): Promise<User>;
   deleteUser(id: number): Promise<boolean>;
-  getFeaturedUser(): Promise<User | undefined>;
+  getFeaturedUser(excludeUserId?: number): Promise<User | undefined>;
   
   // Password reset methods
   createPasswordResetToken(data: InsertPasswordResetToken): Promise<PasswordResetToken>;
@@ -459,9 +459,12 @@ export class MemStorage implements IStorage {
     return updatedUser;
   }
   
-  async getFeaturedUser(): Promise<User | undefined> {
-    // For demo purposes, just return the second user as featured
-    return this.users.get(2);
+  async getFeaturedUser(excludeUserId?: number): Promise<User | undefined> {
+    const all = Array.from(this.users.values());
+    const candidates = excludeUserId ? all.filter(u => u.id !== excludeUserId) : all;
+    const pool = candidates.length > 0 ? candidates : all;
+    if (pool.length === 0) return undefined;
+    return pool[Math.floor(Math.random() * pool.length)];
   }
 
   // Playdate methods
@@ -1427,13 +1430,23 @@ export class DatabaseStorage implements IStorage {
     return updatedUser;
   }
   
-  async getFeaturedUser(): Promise<User | undefined> {
-    // For demo purposes, just return a random user as featured
+  async getFeaturedUser(excludeUserId?: number): Promise<User | undefined> {
     const [user] = await db
       .select()
       .from(users)
+      .where(excludeUserId ? ne(users.id, excludeUserId) : undefined)
+      .orderBy(sql`RANDOM()`)
       .limit(1);
-    return user || undefined;
+    // If we excluded the only user in the DB, fall back without the filter
+    if (!user && excludeUserId) {
+      const [fallback] = await db
+        .select()
+        .from(users)
+        .orderBy(sql`RANDOM()`)
+        .limit(1);
+      return fallback ?? undefined;
+    }
+    return user ?? undefined;
   }
 
   // Password reset methods
