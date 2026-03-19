@@ -64,6 +64,38 @@ The application is designed for scalability and real-time interaction, leveragin
 - Profile update hardening: strips role, id, and password fields from update requests
 - Registration hardening: "admin" username blocked, role always forced to 'user'
 
+## Testing Infrastructure
+
+### Tooling
+- **Unit + Integration**: Vitest (`vitest.config.ts`) — runs in Node environment, no browser required
+- **E2E**: Playwright (`playwright.config.ts`) — requires browser binaries; run `npx playwright install chromium` first
+
+### Running Tests
+```
+npx vitest run                  # all unit + integration tests (one-shot)
+npx vitest                      # watch mode (re-runs on file change)
+npx vitest run --coverage       # with coverage report
+npx playwright test             # E2E (requires app running + browser binaries)
+```
+
+### Test Structure
+```
+tests/
+  unit/
+    sanitize.test.ts    # XSS sanitization logic (17 tests)
+    matching.test.ts    # distance calc, city coords, match scoring, age ranges (27 tests)
+    auth.test.ts        # password hashing and comparison (14 tests)
+  integration/
+    routes.test.ts      # HTTP route contracts with mocked storage (5 tests)
+  e2e/
+    smoke.spec.ts       # Playwright browser tests — public pages + API smoke
+```
+
+### Exported for Testability
+The following previously-private functions were exported to enable unit testing:
+- `server/dad-matching-service.ts`: `calculateMatchScore`, `findCommonAgeRanges`
+- `server/auth.ts`: `comparePasswords`
+
 ## External Dependencies
 - **Email Service**: Resend API (`resend` package)
 - **Maps & Location**: OpenStreetMap (Overpass API, Nominatim), Leaflet

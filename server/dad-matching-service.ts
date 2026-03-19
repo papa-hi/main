@@ -64,7 +64,7 @@ export function getCityCoordinates(city: string): { lat: number; lon: number } |
 /**
  * Find common age ranges between two users' children
  */
-function findCommonAgeRanges(
+export function findCommonAgeRanges(
   children1: ChildInfo[], 
   children2: ChildInfo[], 
   ageFlexibility: number = 2
@@ -97,7 +97,7 @@ function findCommonAgeRanges(
 /**
  * Calculate match score based on distance and age compatibility
  */
-function calculateMatchScore(distance: number, commonAgeRanges: Array<{ overlap: number }>): number {
+export function calculateMatchScore(distance: number, commonAgeRanges: Array<{ overlap: number }>): number {
   // Distance score (closer = higher score)
   const maxDistance = 50; // km
   const distanceScore = Math.max(0, (maxDistance - distance) / maxDistance * 50);
