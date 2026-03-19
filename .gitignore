@@ -10,3 +10,10 @@ vite.config.ts.*
 cookies.txt
 *.env.local
 *.pem
+
+# Test/debug files
+test.jpg
+test2.jpg
+test3.jpg
+create_admin.js
+create_admin.mjs
