@@ -7,9 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function PlaydatesPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("upcoming");
   
   const { data: upcomingPlaydates, isLoading: upcomingLoading } = useQuery<Playdate[]>({
@@ -24,11 +26,13 @@ export default function PlaydatesPage() {
     <div className="py-2">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-heading font-bold">{t('playdates.create')}</h1>
-        <Link href="/create">
-          <Button className="bg-primary hover:bg-accent text-white">
-            <i className="fas fa-plus mr-2"></i> {t('playdates.newPlaydate')}
-          </Button>
-        </Link>
+        {user && (
+          <Link href="/create">
+            <Button className="bg-primary hover:bg-accent text-white">
+              <i className="fas fa-plus mr-2"></i> {t('playdates.newPlaydate')}
+            </Button>
+          </Link>
+        )}
       </div>
       
       <Tabs defaultValue="upcoming" onValueChange={setActiveTab}>
@@ -58,11 +62,25 @@ export default function PlaydatesPage() {
               ))}
             </div>
           ) : upcomingPlaydates && upcomingPlaydates.length > 0 ? (
-            <div className="space-y-4">
-              {upcomingPlaydates.map((playdate) => (
-                <PlaydateCard key={playdate.id} playdate={playdate} />
-              ))}
-            </div>
+            <>
+              <div className="space-y-4">
+                {upcomingPlaydates.map((playdate) => (
+                  <PlaydateCard key={playdate.id} playdate={playdate} />
+                ))}
+              </div>
+              {!user && (
+                <div className="mt-6 bg-orange-50 border border-orange-200 rounded-xl p-5 text-center">
+                  <p className="text-sm text-orange-800 font-medium mb-3">
+                    Sign in to join playdates and connect with other dads
+                  </p>
+                  <Link href="/auth">
+                    <Button className="bg-primary hover:bg-accent text-white">
+                      Sign in or create account
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </>
           ) : (
             <div className="bg-white rounded-xl p-6 shadow-sm text-center">
               <img 
@@ -70,11 +88,23 @@ export default function PlaydatesPage() {
                 alt={t('playdates.emptyCalendarAlt', 'Father with children')} 
                 className="w-28 h-28 object-cover rounded-full mx-auto mb-4"
               />
-              <h3 className="font-heading font-medium text-lg mb-2">{t('playdates.noPlaydatesPlanned')}</h3>
-              <p className="text-dark/70 text-sm mb-4">{t('playdates.planNewMeetDads')}</p>
-              <Link href="/create">
-                <Button className="bg-primary text-white hover:bg-accent transition">{t('playdates.newPlaydate')}</Button>
-              </Link>
+              {user ? (
+                <>
+                  <h3 className="font-heading font-medium text-lg mb-2">{t('playdates.noPlaydatesPlanned')}</h3>
+                  <p className="text-dark/70 text-sm mb-4">{t('playdates.planNewMeetDads')}</p>
+                  <Link href="/create">
+                    <Button className="bg-primary text-white hover:bg-accent transition">{t('playdates.newPlaydate')}</Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <h3 className="font-heading font-medium text-lg mb-2">No public playdates yet</h3>
+                  <p className="text-dark/70 text-sm mb-4">Sign in to see all playdates and join the community.</p>
+                  <Link href="/auth">
+                    <Button className="bg-primary text-white hover:bg-accent transition">Sign in or create account</Button>
+                  </Link>
+                </>
+              )}
             </div>
           )}
         </TabsContent>

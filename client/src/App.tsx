@@ -63,7 +63,7 @@ function Router() {
     <Switch>
       <ProtectedRoute path="/" component={HomePage} />
       <Route path="/playdates/:id" component={PlaydateDetailPage} />
-      <ProtectedRoute path="/playdates" component={PlaydatesPage} />
+      <Route path="/playdates" component={PlaydatesPage} />
       <Route path="/places/:id" component={PlaceDetailsPage} />
       <Route path="/places" component={PlacesPage} />
       <Route path="/events/:id" component={EventDetailsPage} />
