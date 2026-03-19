@@ -65,10 +65,10 @@ The application is designed for scalability and real-time interaction, leveragin
 - Registration hardening: "admin" username blocked, role always forced to 'user'
 
 ## External Dependencies
-- **Email Service**: Resend API
+- **Email Service**: Resend API (`resend` package)
 - **Maps & Location**: OpenStreetMap (Overpass API, Nominatim), Leaflet
 - **Weather**: OpenWeatherMap API
-- **Authentication**: Google OAuth
+- **Authentication**: Google OAuth (via Firebase frontend SDK)
 - **Push Notifications**: Web Push Protocol, VAPID
 - **Calendar**: Google Calendar URL API for event integration
-- **Database**: Supabase (PostgreSQL)
+- **Database**: Supabase (PostgreSQL); `postgres` for Drizzle ORM, `pg` for session pool (`connect-pg-simple` requires pg.Pool), `@supabase/supabase-js` for image storage bucket
