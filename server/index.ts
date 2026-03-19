@@ -9,54 +9,11 @@ const app = express();
 
 // Security headers via Helmet
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'",
-        "'unsafe-inline'",    // Vite dev HMR + some Firebase SDK patterns; upgrade to nonces in a future hardening pass
-        "https://replit.com", // Dev-only banner embedded in index.html
-        "https://apis.google.com",
-      ],
-      styleSrc: [
-        "'self'",
-        "'unsafe-inline'",    // Tailwind utility classes + Radix UI dynamic styles
-        "https://fonts.googleapis.com",
-      ],
-      fontSrc: [
-        "'self'",
-        "https://fonts.gstatic.com",
-        "data:",              // Font Awesome uses data-URI embedded glyphs
-      ],
-      imgSrc: [
-        "'self'",
-        "data:",              // Leaflet default marker icons are data URIs
-        "blob:",
-        "https://*.tile.openstreetmap.org",  // Leaflet map tiles
-        "https://*.supabase.co",             // User-uploaded images via Supabase Storage
-        "https://lh3.googleusercontent.com", // Google OAuth profile photos
-      ],
-      connectSrc: [
-        "'self'",
-        "ws:",                // WebSocket (dev)
-        "wss:",               // WebSocket (production TLS)
-        "https://*.googleapis.com",  // Firebase Auth, Firestore, token refresh
-        "https://*.firebaseio.com",  // Firebase Realtime Database
-        "https://*.supabase.co",     // Supabase Storage upload/download
-      ],
-      frameSrc: [
-        "'self'",             // Firebase auth handler is reverse-proxied at /__/auth/handler on our domain
-      ],
-      workerSrc: ["'self'", "blob:"],  // Service worker registration
-      objectSrc: ["'none'"],
-      baseUri: ["'self'"],
-      formAction: ["'self'"],
-    },
-  },
+  contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
   crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
   crossOriginResourcePolicy: { policy: "cross-origin" },
-  frameguard: { action: "sameorigin" }, // Re-enabled: prevents clickjacking; sameorigin allows our own frames
+  frameguard: false,
 }));
 
 // Security: Catch malformed URIs (like /%c0) to prevent crashes from bot attacks
