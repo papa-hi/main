@@ -1452,21 +1452,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/playdates", isAuthenticated, async (req, res) => {
     try {
-      // Log everything for debugging
-      console.log("======= CREATE PLAYDATE REQUEST =======");
-      console.log("Request body:", req.body);
-      console.log("Auth user:", req.user);
-      console.log("Is authenticated:", req.isAuthenticated());
-      console.log("Session ID:", req.sessionID);
-      console.log("Session data:", req.session);
-      console.log("Cookies:", req.headers.cookie);
-      console.log("=======================================");
-      
-      // Get the authenticated user ID
       const creatorId = req.user?.id;
       
       if (!creatorId) {
-        console.log("ERROR: User not authenticated or ID missing");
         return res.status(401).json({ error: "User not authenticated" });
       }
       
