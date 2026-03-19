@@ -3536,7 +3536,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Search users for mentions
-  app.get("/api/community/users/search", async (req: Request, res: Response) => {
+  app.get("/api/community/users/search", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const { q } = req.query;
       
