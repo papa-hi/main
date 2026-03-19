@@ -1376,8 +1376,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user?.id;
       const isAuthenticated = !!userId;
       
-      // Public playdates: visible to everyone (Deep Link Preview Mode)
+      // Public playdates: visible to everyone, but anonymized for guests
       if (playdate.visibility === 'public') {
+        if (!isAuthenticated) {
+          // Strip all personal info — only structural data is returned
+          const { participants, creatorId, ...publicFields } = playdate as any;
+          return res.json({
+            ...publicFields,
+            participantCount: Array.isArray(participants) ? participants.length : 0,
+            participants: [],
+          });
+        }
         return res.json(playdate);
       }
       

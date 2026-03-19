@@ -45,12 +45,15 @@ export default function PlaydateDetailPage() {
     retry: false,
   });
 
+  // For public playdates viewed by guests, the API returns participants: [] and participantCount: N
+  const participantCount = (playdate as any)?.participantCount ?? playdate?.participants.length ?? 0;
+
   // Check if user has already joined
   const hasJoined = user && playdate?.participants.some(p => p.id === user.id);
   // Check if user is the creator (first participant)
   const isCreator = user && playdate?.participants[0]?.id === user.id;
   // Check if playdate is full
-  const isFull = playdate && playdate.participants.length >= playdate.maxParticipants;
+  const isFull = playdate && participantCount >= playdate.maxParticipants;
 
   // Handle join playdate
   const joinPlaydateMutation = useMutation({
@@ -289,7 +292,7 @@ export default function PlaydateDetailPage() {
               <i className="fas fa-users mt-1 mr-3 text-primary"></i>
               <div>
                 <p>
-                  {t('playdates.capacity', 'Capacity')}: {playdate.participants.length} / {playdate.maxParticipants}
+                  {t('playdates.capacity', 'Capacity')}: {participantCount} / {playdate.maxParticipants}
                 </p>
               </div>
             </div>
@@ -337,23 +340,40 @@ export default function PlaydateDetailPage() {
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <h2 className="text-lg font-heading font-medium mb-4">{t('playdates.participants', 'Participants')}</h2>
           
-          <div className="space-y-4 mb-6">
-            {playdate.participants.map((participant) => (
-              <div key={participant.id} className="flex items-center gap-3">
-                <img 
-                  src={participant.profileImage || '/assets/default-avatar.png'} 
-                  alt={`${participant.firstName} ${participant.lastName}`}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <div>
-                  <p className="font-medium">{participant.firstName} {participant.lastName}</p>
-                  {participant.id === playdate.participants[0].id && (
-                    <span className="text-xs text-accent">{t('playdates.organizer', 'Organizer')}</span>
-                  )}
+          {user ? (
+            <div className="space-y-4 mb-6">
+              {playdate.participants.map((participant) => (
+                <div key={participant.id} className="flex items-center gap-3">
+                  <img 
+                    src={participant.profileImage || '/assets/default-avatar.png'} 
+                    alt={`${participant.firstName} ${participant.lastName}`}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="font-medium">{participant.firstName} {participant.lastName}</p>
+                    {participant.id === playdate.participants[0].id && (
+                      <span className="text-xs text-accent">{t('playdates.organizer', 'Organizer')}</span>
+                    )}
+                  </div>
                 </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 mb-6 p-3 bg-muted/40 rounded-lg">
+              <div className="flex -space-x-2">
+                {Array.from({ length: Math.min(participantCount, 3) }).map((_, i) => (
+                  <div key={i} className="w-10 h-10 rounded-full bg-primary/20 border-2 border-white flex items-center justify-center">
+                    <i className="fas fa-user text-primary/60 text-sm"></i>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+              <p className="text-sm text-muted-foreground">
+                {participantCount === 1
+                  ? '1 dad is joining — sign in to see who'
+                  : `${participantCount} dads are joining — sign in to see who`}
+              </p>
+            </div>
+          )}
           
           {user && !isCreator && (
             <div>
