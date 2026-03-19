@@ -48,8 +48,8 @@ test.describe("API smoke tests", () => {
     const res = await request.get("/api/config");
     expect(res.status()).toBe(200);
     const body = await res.json();
-    expect(body).toHaveProperty("weatherApiKey");
-    expect(body).toHaveProperty("firebaseConfig");
+    expect(body).toHaveProperty("vapidPublicKey");
+    expect(body).not.toHaveProperty("weatherApiKey");
   });
 
   test("GET /api/user returns 401 when not authenticated", async ({ request }) => {

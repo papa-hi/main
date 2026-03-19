@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation } from './use-location';
-import { useAppConfig } from './use-app-config';
 
 interface WeatherData {
   temperature: number;
@@ -13,9 +12,17 @@ interface WeatherData {
   error?: string;
 }
 
+const AMSTERDAM_FALLBACK: WeatherData = {
+  temperature: 18,
+  condition: "Clear",
+  icon: "01d",
+  city: "Amsterdam",
+  country: "NL",
+  isLoading: false,
+};
+
 export function useWeather(): WeatherData {
   const { latitude, longitude, city, country, error: locationError, isLoading: locationLoading } = useLocation();
-  const { weatherApiKey, isLoading: configLoading } = useAppConfig();
   const [weatherData, setWeatherData] = useState<WeatherData>({
     temperature: 0,
     condition: '',
@@ -29,40 +36,16 @@ export function useWeather(): WeatherData {
     let isMounted = true;
 
     const fetchWeather = async () => {
-      if (locationLoading || configLoading) return;
+      if (locationLoading) return;
 
       if (locationError || !latitude || !longitude) {
-        if (isMounted) {
-          setWeatherData({
-            temperature: 18,
-            condition: "Clear",
-            icon: "01d",
-            city: "Amsterdam",
-            country: "NL",
-            isLoading: false
-          });
-        }
-        return;
-      }
-
-      if (!weatherApiKey) {
-        if (isMounted) {
-          setWeatherData({
-            temperature: 18,
-            condition: "Clear",
-            icon: "01d",
-            city: city || "Amsterdam",
-            country: country || "NL",
-            isLoading: false,
-            error: "Weather API key not configured"
-          });
-        }
+        if (isMounted) setWeatherData(AMSTERDAM_FALLBACK);
         return;
       }
 
       try {
         const response = await axios.get(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${weatherApiKey}`
+          `/api/weather?lat=${latitude}&lon=${longitude}`
         );
 
         if (isMounted && response.data) {
@@ -80,12 +63,9 @@ export function useWeather(): WeatherData {
         console.error('Weather fetch error:', error);
         if (isMounted) {
           setWeatherData({
-            temperature: 18,
-            condition: "Clear",
-            icon: "01d",
+            ...AMSTERDAM_FALLBACK,
             city: city || "Amsterdam",
             country: country || "NL",
-            isLoading: false,
             error: "Unable to fetch current weather"
           });
         }
@@ -94,7 +74,7 @@ export function useWeather(): WeatherData {
 
     fetchWeather();
     return () => { isMounted = false; };
-  }, [latitude, longitude, city, country, locationLoading, locationError, weatherApiKey, configLoading]);
+  }, [latitude, longitude, city, country, locationLoading, locationError]);
 
   return weatherData;
 }

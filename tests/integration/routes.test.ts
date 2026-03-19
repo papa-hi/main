@@ -78,12 +78,7 @@ beforeAll(async () => {
 
   app.get("/api/config", (_req, res) => {
     res.json({
-      weatherApiKey: process.env.VITE_WEATHER_API_KEY || null,
-      firebaseConfig: {
-        apiKey: process.env.VITE_FIREBASE_API_KEY || null,
-        projectId: process.env.VITE_FIREBASE_PROJECT_ID || null,
-        authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || null,
-      },
+      vapidPublicKey: process.env.VAPID_PUBLIC_KEY || null,
     });
   });
 
@@ -105,15 +100,12 @@ describe("GET /api/config", () => {
   it("returns 200 with a config object", async () => {
     const res = await request(app).get("/api/config");
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("weatherApiKey");
-    expect(res.body).toHaveProperty("firebaseConfig");
+    expect(res.body).toHaveProperty("vapidPublicKey");
   });
 
-  it("firebaseConfig has the expected keys", async () => {
+  it("does NOT expose the weather API key", async () => {
     const res = await request(app).get("/api/config");
-    expect(res.body.firebaseConfig).toHaveProperty("apiKey");
-    expect(res.body.firebaseConfig).toHaveProperty("projectId");
-    expect(res.body.firebaseConfig).toHaveProperty("authDomain");
+    expect(res.body).not.toHaveProperty("weatherApiKey");
   });
 });
 

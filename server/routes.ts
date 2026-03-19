@@ -571,9 +571,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/config", (req, res) => {
     res.json({
-      weatherApiKey: process.env.OPEN_WEATHER_API_KEY ?? null,
       vapidPublicKey: getVapidPublicKey() ?? null,
     });
+  });
+
+  app.get("/api/weather", async (req, res) => {
+    const { lat, lon } = req.query;
+    if (!lat || !lon) {
+      return res.status(400).json({ error: "lat and lon are required" });
+    }
+    const apiKey = process.env.OPEN_WEATHER_API_KEY;
+    if (!apiKey) {
+      return res.status(503).json({ error: "Weather service not configured" });
+    }
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
+      );
+      if (!response.ok) {
+        return res.status(response.status).json({ error: "Weather service error" });
+      }
+      const data = await response.json();
+      res.json(data);
+    } catch (err) {
+      res.status(502).json({ error: "Failed to reach weather service" });
+    }
+  });
+
+  app.get("/api/weather/geocode", async (req, res) => {
+    const { lat, lon } = req.query;
+    if (!lat || !lon) {
+      return res.status(400).json({ error: "lat and lon are required" });
+    }
+    const apiKey = process.env.OPEN_WEATHER_API_KEY;
+    if (!apiKey) {
+      return res.status(503).json({ error: "Weather service not configured" });
+    }
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`
+      );
+      if (!response.ok) {
+        return res.status(response.status).json({ error: "Geocode service error" });
+      }
+      const data = await response.json();
+      res.json(data);
+    } catch (err) {
+      res.status(502).json({ error: "Failed to reach geocode service" });
+    }
   });
 
   app.post("/api/push/subscribe", isAuthenticated, async (req, res) => {
