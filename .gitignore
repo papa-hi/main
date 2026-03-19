@@ -4,3 +4,9 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Sensitive data - never commit these
+*.sql
+cookies.txt
+*.env.local
+*.pem
