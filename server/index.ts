@@ -9,10 +9,45 @@ const app = express();
 
 // Security headers via Helmet
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc:  ["'self'"],
+      // 'unsafe-inline' required for React event handlers & some Firebase SDK paths;
+      // googleapis/gstatic are needed for Firebase Auth + Google Sign-In
+      scriptSrc:   ["'self'", "'unsafe-inline'", "https://apis.google.com", "https://www.gstatic.com"],
+      styleSrc:    ["'self'", "'unsafe-inline'"],
+      // User photos can come from Supabase Storage, Unsplash, Google profile photos, etc.
+      imgSrc:      ["'self'", "data:", "blob:", "https:"],
+      fontSrc:     ["'self'", "data:", "https://fonts.gstatic.com"],
+      connectSrc:  [
+        "'self'",
+        // Supabase (database / storage bucket)
+        "https://*.supabase.co",
+        // Google / Firebase APIs
+        "https://*.googleapis.com",
+        "https://*.firebaseio.com",
+        "https://identitytoolkit.googleapis.com",
+        "https://securetoken.googleapis.com",
+        "https://oauth2.googleapis.com",
+        // Weather API
+        "https://api.openweathermap.org",
+        // OpenStreetMap geocoding & Overpass API
+        "https://nominatim.openstreetmap.org",
+        "https://overpass-api.de",
+      ],
+      // Firebase Auth popup uses an iframe on firebaseapp.com
+      frameSrc:    ["'self'", "https://*.firebaseapp.com"],
+      workerSrc:   ["'self'", "blob:"],
+      objectSrc:   ["'none'"],
+      // Upgrade insecure requests in production
+      ...(process.env.NODE_ENV === 'production' ? { upgradeInsecureRequests: [] } : {}),
+    },
+  },
   crossOriginEmbedderPolicy: false,
+  // same-origin-allow-popups keeps Google Sign-In popup working
   crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
   crossOriginResourcePolicy: { policy: "cross-origin" },
+  // frameguard left off: Firebase Auth redirect flow uses iframes on our domain
   frameguard: false,
 }));
 

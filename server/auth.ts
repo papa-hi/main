@@ -430,13 +430,48 @@ export function setupAuth(app: Express) {
   app.post("/api/firebase-auth", async (req, res, next) => {
     try {
       console.log("[Firebase Auth] Request received");
-      const { idToken, uid, email, displayName, photoURL } = req.body;
-      
-      if (!uid || !email) {
-        console.log("[Firebase Auth] Missing required data:", { uid, email });
-        return res.status(400).json({ error: "Missing required Firebase user data" });
+      const { idToken } = req.body;
+
+      if (!idToken) {
+        return res.status(400).json({ error: "Missing Firebase ID token" });
       }
-      
+
+      // Verify the idToken server-side with Google's token verification endpoint.
+      // This ensures the token is genuine — we NEVER trust uid/email from the request body.
+      let uid: string;
+      let email: string;
+      let displayName: string | undefined;
+      let photoURL: string | undefined;
+      try {
+        const tokenInfoRes = await fetch(
+          `https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`
+        );
+        if (!tokenInfoRes.ok) {
+          console.log("[Firebase Auth] Token verification failed:", tokenInfoRes.status);
+          return res.status(401).json({ error: "Invalid or expired Firebase ID token" });
+        }
+        const claims = await tokenInfoRes.json() as any;
+
+        // Verify the token was issued for our Firebase project
+        const expectedProjectId = process.env.VITE_FIREBASE_PROJECT_ID;
+        if (expectedProjectId && claims.aud !== expectedProjectId) {
+          console.log("[Firebase Auth] Token audience mismatch:", claims.aud, "!=", expectedProjectId);
+          return res.status(401).json({ error: "Token audience mismatch" });
+        }
+
+        if (!claims.sub || !claims.email) {
+          return res.status(401).json({ error: "Token missing required claims" });
+        }
+
+        uid = claims.sub;
+        email = claims.email;
+        displayName = claims.name;
+        photoURL = claims.picture;
+      } catch (tokenError) {
+        console.error("[Firebase Auth] Token verification error:", tokenError);
+        return res.status(401).json({ error: "Failed to verify Firebase ID token" });
+      }
+
       // Check if user exists with this email
       console.log("Checking if user exists with email:", email);
       let user = await storage.getUserByEmail(email);

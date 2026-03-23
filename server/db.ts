@@ -7,7 +7,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 const databaseUrl = process.env.SUPABASE_DATABASE_URL;
 
 if (!databaseUrl) {
-  console.error("WARNING: Database URL not set. Configure SUPABASE_DATABASE_URL.");
+  throw new Error("SUPABASE_DATABASE_URL is required. Server cannot start without a database connection.");
 }
 
 // Detect if SSL is required based on the database URL (Supabase requires SSL)
@@ -53,8 +53,14 @@ console.log('Session URL set:', !!process.env.SUPABASE_SESSION_URL);
 console.log('Session port:', sessionDatabaseUrl?.match(/:(\d+)\//)?.[1]);
 console.log('sessionDatabaseUrl host:', sessionDatabaseUrl?.match(/@([^:]+)/)?.[1]);
 
-export const pool = sessionDatabaseUrl ? new pg.Pool({
+// sessionDatabaseUrl is always defined: databaseUrl is guaranteed non-null above,
+// and sessionDatabaseUrl falls back to it.
+if (!sessionDatabaseUrl) {
+  throw new Error("Session database URL could not be resolved. Server cannot start.");
+}
+
+export const pool = new pg.Pool({
   connectionString: sessionDatabaseUrl,
   ssl: requiresSSL ? { rejectUnauthorized: false } : false,
   ...({ family: 4 } as any),
-}) : null as any;
+});

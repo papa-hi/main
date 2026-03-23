@@ -1,0 +1,57 @@
+⚠️ Firebase Auth Endpoint Trusts Client-Supplied uid Without Token Verification
+papa-hi / main / server / auth.ts
+v2
+const { idToken, uid, email, displayName, photoURL } = req.body;
+// idToken is received but never verified server-side
+if (!uid || !email) { ... }
+let user = await storage.getUserByEmail(email);
+
+Problem: The idToken from Firebase is accepted in the request body but never verified with the Firebase Admin SDK. Any attacker can POST { uid: "anything", email: "victim@example.com" } and get logged in as that user.
+
+Fix: Install firebase-admin, call admin.auth().verifyIdToken(idToken) and use only the resulting decoded token claims — never trust uid or email from the request body.
+
+⚠️ Missing Database URL Causes Silent Startup — Not a Hard Crash
+papa-hi / main / server / db.ts
+v1
+if (!databaseUrl) {
+  console.error("WARNING: Database URL not set. Configure SUPABASE_DATABASE_URL.");
+}
+
+Problem: The server continues starting without a database URL, only logging a warning. The first actual DB query will throw a runtime error instead of a clear startup failure.
+
+Fix:
+
+TypeScript
+if (!databaseUrl) {
+  throw new Error("SUPABASE_DATABASE_URL is required. Server cannot start.");
+}
+⚠️ pool is null as any When No Database URL
+papa-hi / main / server / db.ts
+v2
+export const pool = sessionDatabaseUrl ? new pg.Pool({ ... }) : null as any;
+
+Problem: Using null as any bypasses TypeScript's type system. Code consuming pool (e.g., session store setup) will crash at runtime in an unpredictable way.
+
+Fix: Throw at startup if sessionDatabaseUrl is missing, or add proper null guards downstream.
+
+⚠️ WebSocket Messages Not Rate-Limited
+papa-hi / main / server / routes.ts
+v3
+ws.on('message', async (message) => {
+  const data = JSON.parse(message.toString());
+  // No rate limiting or message size check
+
+Problem: Any authenticated user can flood the WebSocket endpoint with unlimited messages. There's no per-user rate limiting or maximum message size check, making this vulnerable to DoS or chat flooding.
+
+Fix: Track message timestamps per user in the clients Map and enforce a limit (e.g., max 5 messages/second), and validate message.length before parsing.
+
+⚠️ Content-Security-Policy Still Disabled
+papa-hi / main / server / index.ts
+v2
+app.use(helmet({
+  contentSecurityPolicy: false,
+  frameguard: false,
+  ...
+
+CSP is still off. This was flagged in the previous scan. Now that the app has a known set of external sources (Supabase, Firebase, Resend, Unsplash, OpenStreetMap), a proper CSP can be defined.
+

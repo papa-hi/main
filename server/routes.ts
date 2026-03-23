@@ -3759,7 +3759,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const wss = new WebSocketServer({ noServer: true });
   
   // Client connections and their associated user IDs
-  const clients = new Map<WebSocket, { userId: number | null }>();
+  // Per-connection rate limit state: max 5 messages per second per user
+  const WS_RATE_LIMIT = 5;
+  const WS_RATE_WINDOW_MS = 1000;
+  const WS_MAX_MESSAGE_BYTES = 16 * 1024; // 16 KB
+
+  const clients = new Map<WebSocket, {
+    userId: number | null;
+    rl: { count: number; windowStart: number };
+  }>();
 
   // Wire up session-based auth on WebSocket upgrade
   httpServer.on('upgrade', (req: any, socket, head) => {
@@ -3806,13 +3814,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     (ws as any).isAlive = true;
     ws.on('pong', () => { (ws as any).isAlive = true; });
 
-    clients.set(ws, { userId });
+    clients.set(ws, { userId, rl: { count: 0, windowStart: Date.now() } });
     console.log(`WebSocket client connected, userId=${userId}`);
 
     ws.send(JSON.stringify({ type: 'authenticated', success: true }));
     
     ws.on('message', async (message) => {
       try {
+        // Enforce max message size
+        if (message instanceof Buffer && message.length > WS_MAX_MESSAGE_BYTES) {
+          ws.send(JSON.stringify({ type: 'error', message: 'Message too large' }));
+          return;
+        }
+
+        // Enforce per-user rate limit
+        const clientInfo = clients.get(ws);
+        if (clientInfo) {
+          const now = Date.now();
+          if (now - clientInfo.rl.windowStart > WS_RATE_WINDOW_MS) {
+            clientInfo.rl.count = 0;
+            clientInfo.rl.windowStart = now;
+          }
+          clientInfo.rl.count++;
+          if (clientInfo.rl.count > WS_RATE_LIMIT) {
+            ws.send(JSON.stringify({ type: 'error', message: 'Rate limit exceeded' }));
+            return;
+          }
+        }
+
         const data = JSON.parse(message.toString());
         
         // Handle get_messages request
