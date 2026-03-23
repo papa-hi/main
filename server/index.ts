@@ -15,7 +15,7 @@ app.use(helmet({
       // 'unsafe-inline' required for React event handlers & some Firebase SDK paths;
       // googleapis/gstatic are needed for Firebase Auth + Google Sign-In
       scriptSrc:   ["'self'", "'unsafe-inline'", "https://apis.google.com", "https://www.gstatic.com"],
-      styleSrc:    ["'self'", "'unsafe-inline'"],
+      styleSrc:    ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       // User photos can come from Supabase Storage, Unsplash, Google profile photos, etc.
       imgSrc:      ["'self'", "data:", "blob:", "https:"],
       fontSrc:     ["'self'", "data:", "https://fonts.gstatic.com"],
