@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import express, { Express } from "express";
 import session from "express-session";
-import { scrypt, randomBytes, timingSafeEqual } from "crypto";
+import { scrypt, randomBytes, timingSafeEqual, createVerify } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser, matchPreferences } from "@shared/schema";
@@ -21,6 +21,77 @@ declare global {
 }
 
 const scryptAsync = promisify(scrypt);
+
+// ── Firebase ID token verification ──────────────────────────────────────────
+// Firebase issues RS256 JWTs. Public certificates rotate every ~6 hours and are
+// published at the URL below. We cache them for the duration specified by the
+// server's Cache-Control header so we don't fetch on every login request.
+const FIREBASE_CERTS_URL =
+  "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com";
+
+let _certCache: { certs: Record<string, string>; expiresAt: number } | null = null;
+
+async function getFirebaseCerts(): Promise<Record<string, string>> {
+  if (_certCache && _certCache.expiresAt > Date.now()) return _certCache.certs;
+
+  const res = await fetch(FIREBASE_CERTS_URL);
+  if (!res.ok) throw new Error(`Failed to fetch Firebase public certs: ${res.status}`);
+
+  const cacheControl = res.headers.get("cache-control") ?? "";
+  const maxAgeMatch = cacheControl.match(/max-age=(\d+)/);
+  const ttlMs = maxAgeMatch ? parseInt(maxAgeMatch[1]) * 1000 : 3_600_000;
+
+  const certs = (await res.json()) as Record<string, string>;
+  _certCache = { certs, expiresAt: Date.now() + ttlMs };
+  return certs;
+}
+
+interface FirebaseClaims {
+  uid: string;
+  email: string;
+  name?: string;
+  picture?: string;
+}
+
+async function verifyFirebaseIdToken(idToken: string): Promise<FirebaseClaims> {
+  const parts = idToken.split(".");
+  if (parts.length !== 3) throw new Error("Malformed JWT");
+
+  const [headerB64, payloadB64, sigB64] = parts;
+
+  // Decode header to find the key ID
+  const header = JSON.parse(Buffer.from(headerB64, "base64url").toString("utf8"));
+  if (header.alg !== "RS256") throw new Error(`Unexpected algorithm: ${header.alg}`);
+  if (!header.kid) throw new Error("Missing kid in JWT header");
+
+  // Fetch (or use cached) Firebase public certificates
+  const certs = await getFirebaseCerts();
+  const cert = certs[header.kid];
+  if (!cert) throw new Error(`No Firebase certificate for kid=${header.kid}`);
+
+  // Verify the RS256 signature against the matching certificate
+  const verifier = createVerify("RSA-SHA256");
+  verifier.update(`${headerB64}.${payloadB64}`);
+  const sig = Buffer.from(sigB64, "base64url");
+  if (!verifier.verify(cert, sig)) throw new Error("JWT signature invalid");
+
+  // Decode and validate payload claims
+  const payload = JSON.parse(Buffer.from(payloadB64, "base64url").toString("utf8"));
+  const nowSec = Math.floor(Date.now() / 1000);
+  const projectId = process.env.VITE_FIREBASE_PROJECT_ID;
+
+  if (payload.exp < nowSec) throw new Error("Token expired");
+  if (payload.iat > nowSec + 60) throw new Error("Token issued in the future");
+  if (projectId && payload.aud !== projectId) throw new Error(`aud mismatch: ${payload.aud}`);
+  if (projectId && payload.iss !== `https://securetoken.google.com/${projectId}`) {
+    throw new Error(`iss mismatch: ${payload.iss}`);
+  }
+  if (!payload.sub) throw new Error("Missing sub claim");
+  if (!payload.email) throw new Error("Missing email claim");
+
+  return { uid: payload.sub, email: payload.email, name: payload.name, picture: payload.picture };
+}
+// ────────────────────────────────────────────────────────────────────────────
 
 async function initializeMatchPreferences(userId: number): Promise<void> {
   try {
@@ -436,40 +507,22 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ error: "Missing Firebase ID token" });
       }
 
-      // Verify the idToken server-side with Google's token verification endpoint.
-      // This ensures the token is genuine — we NEVER trust uid/email from the request body.
+      // Verify the idToken by checking its RS256 signature against Firebase's
+      // published public certificates. Claims (uid, email) come only from the
+      // verified token — nothing from the request body is trusted.
       let uid: string;
       let email: string;
       let displayName: string | undefined;
       let photoURL: string | undefined;
       try {
-        const tokenInfoRes = await fetch(
-          `https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`
-        );
-        if (!tokenInfoRes.ok) {
-          console.log("[Firebase Auth] Token verification failed:", tokenInfoRes.status);
-          return res.status(401).json({ error: "Invalid or expired Firebase ID token" });
-        }
-        const claims = await tokenInfoRes.json() as any;
-
-        // Verify the token was issued for our Firebase project
-        const expectedProjectId = process.env.VITE_FIREBASE_PROJECT_ID;
-        if (expectedProjectId && claims.aud !== expectedProjectId) {
-          console.log("[Firebase Auth] Token audience mismatch:", claims.aud, "!=", expectedProjectId);
-          return res.status(401).json({ error: "Token audience mismatch" });
-        }
-
-        if (!claims.sub || !claims.email) {
-          return res.status(401).json({ error: "Token missing required claims" });
-        }
-
-        uid = claims.sub;
+        const claims = await verifyFirebaseIdToken(idToken);
+        uid = claims.uid;
         email = claims.email;
         displayName = claims.name;
         photoURL = claims.picture;
-      } catch (tokenError) {
-        console.error("[Firebase Auth] Token verification error:", tokenError);
-        return res.status(401).json({ error: "Failed to verify Firebase ID token" });
+      } catch (tokenError: any) {
+        console.error("[Firebase Auth] Token verification failed:", tokenError?.message);
+        return res.status(401).json({ error: "Invalid or expired Firebase ID token" });
       }
 
       // Check if user exists with this email
