@@ -22,6 +22,16 @@ declare global {
 
 const scryptAsync = promisify(scrypt);
 
+// ── Password strength validation ─────────────────────────────────────────────
+// Must match the client-side rules shown in the registration strength indicator.
+function validatePasswordStrength(password: string): string | null {
+  if (password.length < 8) return "Password must be at least 8 characters long";
+  if (!/[A-Z]/.test(password)) return "Password must contain at least one uppercase letter";
+  if (!/[0-9]/.test(password)) return "Password must contain at least one number";
+  return null; // valid
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 // ── Firebase ID token verification ──────────────────────────────────────────
 // Firebase issues RS256 JWTs. Public certificates rotate every ~6 hours and are
 // published at the URL below. We cache them for the duration specified by the
@@ -246,6 +256,9 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ error: "This username is reserved" });
       }
 
+      const pwError = validatePasswordStrength(req.body.password ?? '');
+      if (pwError) return res.status(400).json({ error: pwError });
+
       const hashedPassword = await hashPassword(req.body.password);
       
       const user = await storage.createUser({
@@ -409,10 +422,9 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ error: "Token and new password are required" });
       }
 
-      // Validate password length
-      if (newPassword.length < 6) {
-        return res.status(400).json({ error: "Password must be at least 6 characters long" });
-      }
+      // Validate password strength
+      const pwError1 = validatePasswordStrength(newPassword);
+      if (pwError1) return res.status(400).json({ error: pwError1 });
 
       // Find and validate token
       const resetToken = await storage.getPasswordResetToken(token);
@@ -460,9 +472,8 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ error: "Current password and new password are required" });
       }
 
-      if (newPassword.length < 6) {
-        return res.status(400).json({ error: "New password must be at least 6 characters long" });
-      }
+      const pwError2 = validatePasswordStrength(newPassword);
+      if (pwError2) return res.status(400).json({ error: pwError2 });
 
       const user = req.user as SelectUser;
       
@@ -724,9 +735,8 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ error: "Token and new password are required" });
       }
 
-      if (newPassword.length < 6) {
-        return res.status(400).json({ error: "Password must be at least 6 characters long" });
-      }
+      const pwError3 = validatePasswordStrength(newPassword);
+      if (pwError3) return res.status(400).json({ error: pwError3 });
 
       // Find the token in the database
       const resetToken = await storage.getPasswordResetToken(token);
