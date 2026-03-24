@@ -115,10 +115,28 @@ export default function SettingsPage() {
       return;
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       toast({
         title: t('settings.account.passwordError', 'Error'),
-        description: t('settings.account.passwordTooShort', 'Password must be at least 6 characters'),
+        description: t('settings.account.passwordTooShort', 'Password must be at least 8 characters'),
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!/[A-Z]/.test(newPassword)) {
+      toast({
+        title: t('settings.account.passwordError', 'Error'),
+        description: t('settings.account.passwordNoUppercase', 'Password must contain at least one uppercase letter'),
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!/[0-9]/.test(newPassword)) {
+      toast({
+        title: t('settings.account.passwordError', 'Error'),
+        description: t('settings.account.passwordNoNumber', 'Password must contain at least one number'),
         variant: 'destructive'
       });
       return;
