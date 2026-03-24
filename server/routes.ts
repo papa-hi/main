@@ -865,13 +865,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Not authenticated" });
       }
 
-      // Gather all user data for GDPR export
-      const userData = await storage.getUserById(userId);
-      const userPlaydates = await storage.getUserPlaydates(userId);
-      // Get user's favorite places
-      const userFavoritesList = await storage.getUserFavoritePlaces(userId);
-      const userChatMessages = await db.select().from(chatMessages).where(eq(chatMessages.senderId, userId));
-      const userSubscriptions = await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.userId, userId));
+      // Gather all user data for GDPR export (parallel queries for speed)
+      const [
+        userData,
+        userPlaydates,
+        userFavoritesList,
+        userChatMessages,
+        userSubscriptions,
+        consentHistory,
+      ] = await Promise.all([
+        storage.getUserById(userId),
+        storage.getUserPlaydates(userId),
+        storage.getUserFavoritePlaces(userId),
+        db.select().from(chatMessages).where(eq(chatMessages.senderId, userId)),
+        db.select().from(pushSubscriptions).where(eq(pushSubscriptions.userId, userId)),
+        storage.getAllConsents(userId),
+      ]);
+
+      // Current consent state (latest per type, derived from the full history)
+      const latestConsent: Record<string, { granted: boolean; since: string; policyVersion: string }> = {};
+      for (const r of consentHistory) {
+        latestConsent[r.consentType] = {
+          granted: r.granted,
+          since: r.consentedAt.toISOString(),
+          policyVersion: r.policyVersion,
+        };
+      }
 
       // Create comprehensive data export
       const exportData = {
@@ -912,11 +931,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           sentAt: message.sentAt
         })),
         pushSubscriptions: userSubscriptions.length,
-        dataProcessingConsent: {
-          analytics: req.headers['analytics-consent'] || 'not-set',
-          marketing: req.headers['marketing-consent'] || 'not-set',
-          location: req.headers['location-consent'] || 'not-set'
-        }
+        // Current consent state — what permissions are active right now
+        consentStatus: latestConsent,
+        // Full audit trail — every grant/revocation in chronological order
+        consentHistory: consentHistory.map(r => ({
+          type: r.consentType,
+          action: r.granted ? 'granted' : 'revoked',
+          at: r.consentedAt.toISOString(),
+          policyVersion: r.policyVersion,
+          // ipHash included for audit completeness; it is a one-way SHA-256 hash
+          ipHash: r.ipHash,
+        })),
       };
 
       res.json(exportData);

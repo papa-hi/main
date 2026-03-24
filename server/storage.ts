@@ -118,6 +118,7 @@ export interface IStorage {
   // GDPR consent records
   recordConsent(data: { userId: number; consentType: string; granted: boolean; policyVersion: string; ipHash: string | null }): Promise<ConsentRecord>;
   getLatestConsents(userId: number): Promise<ConsentRecord[]>;
+  getAllConsents(userId: number): Promise<ConsentRecord[]>;
 }
 
 // MemStorage (in-memory implementation) lives in tests/helpers/mem-storage.ts
@@ -2171,6 +2172,15 @@ export class DatabaseStorage implements IStorage {
       seen.add(r.consentType);
       return true;
     });
+  }
+
+  async getAllConsents(userId: number): Promise<ConsentRecord[]> {
+    // Full audit trail — every grant/revocation, oldest first
+    return db
+      .select()
+      .from(consentRecords)
+      .where(eq(consentRecords.userId, userId))
+      .orderBy(asc(consentRecords.consentedAt));
   }
   // ─────────────────────────────────────────────────────────────────────────
 }
