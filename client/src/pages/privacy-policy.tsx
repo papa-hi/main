@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Shield, Eye, Download, Trash2, Edit } from "lucide-react";
+import { ArrowLeft, Shield, Eye, Download, Trash2, Edit, Baby, Lock } from "lucide-react";
 import { useLocation } from "wouter";
 import { Separator } from "@/components/ui/separator";
 
@@ -26,7 +26,7 @@ export default function PrivacyPolicyPage() {
           <h1 className="text-3xl font-bold">{t('privacy.title', 'Privacy Policy')}</h1>
         </div>
         <p className="text-muted-foreground">
-          {t('privacy.lastUpdated', 'Last updated: January 2025')}
+          {t('privacy.lastUpdated', 'Last updated: March 2026')}
         </p>
       </div>
 
@@ -77,6 +77,68 @@ export default function PrivacyPolicyPage() {
                 <li>{t('privacy.dataCollection.playdates', 'Playdates you create or join')}</li>
                 <li>{t('privacy.dataCollection.preferences', 'App preferences and settings')}</li>
               </ul>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Children's Data — Special Category */}
+        <Card className="border-orange-200 bg-orange-50/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Baby className="h-5 w-5 text-orange-500" />
+              {t('privacy.children.title', "Children's Data — Heightened Protection")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-orange-100 border border-orange-200 rounded-lg p-4">
+              <p className="text-sm font-semibold text-orange-800 mb-1">
+                {t('privacy.children.sensitiveLabel', 'Special Category — GDPR Article 9')}
+              </p>
+              <p className="text-sm text-orange-700">
+                {t('privacy.children.sensitiveDesc', "Information about children (names and ages) is treated as sensitive personal data and receives the highest level of protection we apply.")}
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <Lock className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-sm">{t('privacy.children.namesPrivate', "Children's Names Are Private")}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {t('privacy.children.namesDesc', "A child's name is visible only to the parent who entered it. Other PaPa-Hi members see ages only — never names.")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Lock className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-sm">{t('privacy.children.noPublic', 'Never Shared Publicly')}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {t('privacy.children.noPublicDesc', "Children's information is never included in any public-facing API or page. It is only accessible to authenticated, registered fathers.")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Lock className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-sm">{t('privacy.children.purpose', 'Limited Use')}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {t('privacy.children.purposeDesc', "Ages are used solely to suggest compatible playdate matches between children of similar age. No data relating to children is used for advertising or shared with third parties.")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Lock className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-sm">{t('privacy.children.delete', 'Easy to Remove')}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {t('privacy.children.deleteDesc', "You can edit or delete your children's information at any time from your profile. Deleting your account permanently removes all related data.")}
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

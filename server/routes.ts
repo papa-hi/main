@@ -1015,14 +1015,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Non-critical — favourite places are optional
       }
 
-      const hasChildrenInfo = Array.isArray(featuredUser.childrenInfo) &&
-                              featuredUser.childrenInfo.length > 0;
+      // Featured user is always someone else — expose ages only, never names.
+      const rawFeaturedChildren = Array.isArray(featuredUser.childrenInfo)
+        ? (featuredUser.childrenInfo as { name?: string; age: number }[])
+        : [];
+      const redactedChildren = rawFeaturedChildren.map(({ age }) => ({ age }));
+      const hasChildrenInfo = redactedChildren.length > 0;
 
       res.json({
         ...featuredUser,
         badge: featuredUser.badge || "Actieve Papa",
         profileImage: featuredUser.profileImage || "/avatar.png",
-        childrenInfo: hasChildrenInfo ? featuredUser.childrenInfo : [],
+        childrenInfo: redactedChildren,
         hasChildrenInfo,
         favoriteLocations: userFavoritePlaces,
         hasSetFavorites,
@@ -1050,11 +1054,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userWithoutSensitive = { ...user } as Partial<SelectUser>;
       delete userWithoutSensitive.password;
       
-      // Add some additional details if it's not already there
-      if (!userWithoutSensitive.childrenInfo) {
-        userWithoutSensitive.childrenInfo = [];
-      }
-      
+      // Children's names are private — only the account owner sees them.
+      // Other users receive ages only (needed for playdate/match compatibility).
+      const rawChildren = Array.isArray(userWithoutSensitive.childrenInfo)
+        ? (userWithoutSensitive.childrenInfo as { name?: string; age: number }[])
+        : [];
+      userWithoutSensitive.childrenInfo =
+        userId === req.user!.id
+          ? rawChildren
+          : rawChildren.map(({ age }) => ({ age }));
+
       // Use default avatar if no profile image is set
       if (!userWithoutSensitive.profileImage) {
         userWithoutSensitive.profileImage = "/avatar.png";
@@ -1238,11 +1247,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       delete userWithoutSensitive.email;
       delete userWithoutSensitive.phoneNumber;
       
-      // Make sure childrenInfo is available
-      if (!userWithoutSensitive.childrenInfo) {
-        userWithoutSensitive.childrenInfo = [];
-      }
-      
+      // Children's names are private — only the account owner sees them.
+      // Other users receive ages only (needed for match compatibility).
+      const rawChildrenB = Array.isArray(userWithoutSensitive.childrenInfo)
+        ? (userWithoutSensitive.childrenInfo as { name?: string; age: number }[])
+        : [];
+      userWithoutSensitive.childrenInfo =
+        userId === req.user!.id
+          ? rawChildrenB
+          : rawChildrenB.map(({ age }) => ({ age }));
+
       // Make sure favoriteLocations is available
       if (!userWithoutSensitive.favoriteLocations) {
         userWithoutSensitive.favoriteLocations = [];
