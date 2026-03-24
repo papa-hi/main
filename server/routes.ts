@@ -219,14 +219,9 @@ async function notifyNearbyUsers(playdateId: number): Promise<void> {
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  if (req.path.includes("/search")) {
-    return next();
-  }
-  
   if (req.isAuthenticated()) {
     return next();
   }
-  
   return res.status(401).json({ error: "Not authenticated" });
 };
 
