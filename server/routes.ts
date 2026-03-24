@@ -2872,15 +2872,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid place ID" });
       }
       
-      // Get the existing place to ensure it exists
-      const existingPlace = await storage.getPlaces({ 
-        // Using empty filters to get all places
-      }).then(places => places.find(p => p.id === placeId));
-      
+      // Fetch by ID — single targeted query, not a full table scan
+      const existingPlace = await storage.getPlaceById(placeId);
+
       if (!existingPlace) {
         return res.status(404).json({ error: "Place not found" });
       }
-      
+
+      // Only the creator or an admin may edit a place
+      if (existingPlace.createdBy !== req.user!.id && req.user!.role !== 'admin') {
+        return res.status(403).json({ error: "Not authorised to edit this place" });
+      }
+
       // Prepare the update data
       const updateData: Partial<typeof existingPlace> = {};
       
