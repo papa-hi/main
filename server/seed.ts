@@ -1,5 +1,12 @@
 import { db } from "./db";
 import { users, playdates, playdateParticipants, places, userFavorites } from "@shared/schema";
+import { hashPassword } from "./auth";
+
+// ⚠️  DEV-ONLY — never run against production
+if (process.env.NODE_ENV === "production") {
+  console.error("ERROR: seed.ts must not be run in production. Aborting.");
+  process.exit(1);
+}
 
 async function seed() {
   console.log("🌱 Seeding database...");
@@ -17,7 +24,7 @@ async function seed() {
     // Seed users
     const [user1] = await db.insert(users).values({
       username: "thomas",
-      password: "hashed_password", // In production, use bcrypt to hash passwords
+      password: await hashPassword("Thomas-dev-2026"),
       firstName: "Thomas",
       lastName: "de Vries",
       email: "thomas@example.com",
@@ -34,7 +41,7 @@ async function seed() {
     
     const [user2] = await db.insert(users).values({
       username: "martijn",
-      password: "hashed_password",
+      password: await hashPassword("Martijn-dev-2026"),
       firstName: "Martijn",
       lastName: "van der Berg",
       email: "martijn@example.com",
