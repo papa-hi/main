@@ -8,13 +8,24 @@ import helmet from "helmet";
 const app = express();
 
 // Security headers via Helmet
+const isDev = process.env.NODE_ENV !== 'production';
+
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc:  ["'self'"],
-      // 'unsafe-inline' required for React event handlers & some Firebase SDK paths;
-      // googleapis/gstatic are needed for Firebase Auth + Google Sign-In
-      scriptSrc:   ["'self'", "'unsafe-inline'", "https://apis.google.com", "https://www.gstatic.com"],
+      // In production, Vite emits only external <script src="..."> tags — no inline scripts.
+      // 'unsafe-inline' is kept for development only, where Vite HMR injects inline scripts.
+      // replit.com is allowed for the dev banner embedded in the HTML template.
+      scriptSrc:   [
+        "'self'",
+        ...(isDev ? ["'unsafe-inline'"] : []),
+        "https://apis.google.com",
+        "https://www.gstatic.com",
+        "https://replit.com",
+      ],
+      // Inline styles are used by Vite's theme injection (<style data-vite-theme>)
+      // in both dev and production, so 'unsafe-inline' stays in styleSrc.
       styleSrc:    ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       // User photos can come from Supabase Storage, Unsplash, Google profile photos, etc.
       imgSrc:      ["'self'", "data:", "blob:", "https:"],
