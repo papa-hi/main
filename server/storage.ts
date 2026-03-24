@@ -14,7 +14,8 @@ import {
   communityPosts, communityComments, communityReactions,
   PasswordResetToken, InsertPasswordResetToken, passwordResetTokens,
   FamilyEvent, InsertFamilyEvent, familyEvents,
-  userAvailability
+  userAvailability,
+  ConsentRecord, consentRecords,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, isNotNull, not, ne, inArray, like, or, type SQL } from "drizzle-orm";
@@ -113,6 +114,10 @@ export interface IStorage {
   // Optimized methods for scheduled tasks
   getUsersWithIncompleteProfiles(): Promise<{ id: number; firstName: string; username: string; email: string; missingFields: string[] }[]>;
   getUsersInCity(city: string): Promise<{ id: number; email: string; firstName: string }[]>;
+
+  // GDPR consent records
+  recordConsent(data: { userId: number; consentType: string; granted: boolean; policyVersion: string; ipHash: string | null }): Promise<ConsentRecord>;
+  getLatestConsents(userId: number): Promise<ConsentRecord[]>;
 }
 
 // MemStorage (in-memory implementation) lives in tests/helpers/mem-storage.ts
@@ -2135,6 +2140,39 @@ export class DatabaseStorage implements IStorage {
         )
       );
   }
+
+  // ── GDPR consent records ──────────────────────────────────────────────────
+  async recordConsent(data: {
+    userId: number;
+    consentType: string;
+    granted: boolean;
+    policyVersion: string;
+    ipHash: string | null;
+  }): Promise<ConsentRecord> {
+    const [record] = await db
+      .insert(consentRecords)
+      .values(data)
+      .returning();
+    return record;
+  }
+
+  async getLatestConsents(userId: number): Promise<ConsentRecord[]> {
+    // Return the most recent row per consent type for this user
+    const rows = await db
+      .select()
+      .from(consentRecords)
+      .where(eq(consentRecords.userId, userId))
+      .orderBy(desc(consentRecords.consentedAt));
+
+    // De-duplicate: keep only the first (latest) row per consentType
+    const seen = new Set<string>();
+    return rows.filter((r) => {
+      if (seen.has(r.consentType)) return false;
+      seen.add(r.consentType);
+      return true;
+    });
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 }
 
 // Use the database storage implementation

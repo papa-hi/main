@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings, communityPosts, communityComments, communityReactions, communityMentions, insertCommunityPostSchema, insertCommunityCommentSchema, insertCommunityReactionSchema, familyEvents } from "@shared/schema";
+import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings, communityPosts, communityComments, communityReactions, communityMentions, insertCommunityPostSchema, insertCommunityCommentSchema, insertCommunityReactionSchema, familyEvents, CURRENT_POLICY_VERSION } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth, sessionMiddleware, passportInitMiddleware, passportSessionMiddleware } from "./auth";
@@ -795,6 +795,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
+
+  // ── GDPR consent endpoints ───────────────────────────────────────────────
+  // GET  /api/consent — latest consent record per type for the current user
+  app.get("/api/consent", isAuthenticated, async (req, res) => {
+    try {
+      const records = await storage.getLatestConsents(req.user!.id);
+      // Return a map of consentType → { granted, consentedAt, policyVersion }
+      const result: Record<string, { granted: boolean; consentedAt: string; policyVersion: string }> = {};
+      for (const r of records) {
+        result[r.consentType] = {
+          granted: r.granted,
+          consentedAt: r.consentedAt.toISOString(),
+          policyVersion: r.policyVersion,
+        };
+      }
+      res.json(result);
+    } catch (err) {
+      console.error("Error fetching consent records:", err);
+      res.status(500).json({ error: "Failed to fetch consent records" });
+    }
+  });
+
+  // POST /api/consent — record a consent change (always appends, never updates)
+  app.post("/api/consent", isAuthenticated, async (req, res) => {
+    try {
+      const { consentType, granted } = req.body;
+      const validTypes = ["analytics", "marketing", "location"];
+      if (!validTypes.includes(consentType)) {
+        return res.status(400).json({ error: "Invalid consentType" });
+      }
+      if (typeof granted !== "boolean") {
+        return res.status(400).json({ error: "granted must be a boolean" });
+      }
+
+      // Hash the client IP — we never store the raw IP
+      const rawIp = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ?? req.socket.remoteAddress ?? "";
+      const ipHash = rawIp
+        ? crypto.createHash("sha256").update(rawIp).digest("hex")
+        : null;
+
+      const record = await storage.recordConsent({
+        userId: req.user!.id,
+        consentType,
+        granted,
+        policyVersion: CURRENT_POLICY_VERSION,
+        ipHash,
+      });
+
+      res.status(201).json({
+        consentType: record.consentType,
+        granted: record.granted,
+        consentedAt: record.consentedAt.toISOString(),
+        policyVersion: record.policyVersion,
+      });
+    } catch (err) {
+      console.error("Error recording consent:", err);
+      res.status(500).json({ error: "Failed to record consent" });
+    }
+  });
+  // ────────────────────────────────────────────────────────────────────────────
 
   // Get all users for user directory
   // GDPR Data Export endpoint

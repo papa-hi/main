@@ -14,6 +14,8 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'wouter';
 import type { User } from '@shared/schema';
 
+type ConsentMap = Record<string, { granted: boolean; consentedAt: string; policyVersion: string }>;
+
 interface MatchPreferences {
   id: number;
   userId: number;
@@ -38,7 +40,8 @@ export default function SettingsPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   
-  // GDPR consent states
+  // GDPR consent states — localStorage is used as fast initial value while the
+  // server response loads. Server records are authoritative (GDPR Art. 7).
   const [analyticsConsent, setAnalyticsConsent] = useState(
     localStorage.getItem('analytics_consent') === 'true'
   );
@@ -48,6 +51,25 @@ export default function SettingsPage() {
   const [locationConsent, setLocationConsent] = useState(
     localStorage.getItem('location_consent') === 'true'
   );
+
+  // Load authoritative consent state from server and sync localStorage
+  const { data: serverConsents } = useQuery<ConsentMap>({
+    queryKey: ['/api/consent'],
+    queryFn: getQueryFn({ on401: 'returnNull' }),
+  });
+
+  useEffect(() => {
+    if (!serverConsents) return;
+    const a = serverConsents['analytics']?.granted ?? false;
+    const m = serverConsents['marketing']?.granted ?? false;
+    const l = serverConsents['location']?.granted ?? false;
+    setAnalyticsConsent(a);
+    setMarketingConsent(m);
+    setLocationConsent(l);
+    localStorage.setItem('analytics_consent', String(a));
+    localStorage.setItem('marketing_consent', String(m));
+    localStorage.setItem('location_consent', String(l));
+  }, [serverConsents]);
 
   // Dad matching preferences states
   const [maxDistance, setMaxDistance] = useState(20);
@@ -180,37 +202,49 @@ export default function SettingsPage() {
     }
   };
 
-  // Update consent preferences
+  // Persist a consent change to the server (GDPR Art. 7 audit trail)
+  const consentMutation = useMutation({
+    mutationFn: ({ consentType, granted }: { consentType: string; granted: boolean }) =>
+      apiRequest('POST', '/api/consent', { consentType, granted }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/consent'] });
+    },
+  });
+
+  // Update consent preferences — optimistically update UI + localStorage, then persist
   const updateAnalyticsConsent = (checked: boolean) => {
     setAnalyticsConsent(checked);
     localStorage.setItem('analytics_consent', checked.toString());
+    consentMutation.mutate({ consentType: 'analytics', granted: checked });
     toast({
       title: t('settings.privacy.consentUpdated', 'Preferences Updated'),
-      description: checked 
-        ? t('settings.privacy.analyticsEnabled', 'Analytics enabled') 
-        : t('settings.privacy.analyticsDisabled', 'Analytics disabled')
+      description: checked
+        ? t('settings.privacy.analyticsEnabled', 'Analytics enabled')
+        : t('settings.privacy.analyticsDisabled', 'Analytics disabled'),
     });
   };
 
   const updateMarketingConsent = (checked: boolean) => {
     setMarketingConsent(checked);
     localStorage.setItem('marketing_consent', checked.toString());
+    consentMutation.mutate({ consentType: 'marketing', granted: checked });
     toast({
       title: t('settings.privacy.consentUpdated', 'Preferences Updated'),
-      description: checked 
-        ? t('settings.privacy.marketingEnabled', 'Marketing communications enabled') 
-        : t('settings.privacy.marketingDisabled', 'Marketing communications disabled')
+      description: checked
+        ? t('settings.privacy.marketingEnabled', 'Marketing communications enabled')
+        : t('settings.privacy.marketingDisabled', 'Marketing communications disabled'),
     });
   };
 
   const updateLocationConsent = (checked: boolean) => {
     setLocationConsent(checked);
     localStorage.setItem('location_consent', checked.toString());
+    consentMutation.mutate({ consentType: 'location', granted: checked });
     toast({
       title: t('settings.privacy.consentUpdated', 'Preferences Updated'),
-      description: checked 
-        ? t('settings.privacy.locationEnabled', 'Location services enabled') 
-        : t('settings.privacy.locationDisabled', 'Location services disabled')
+      description: checked
+        ? t('settings.privacy.locationEnabled', 'Location services enabled')
+        : t('settings.privacy.locationDisabled', 'Location services disabled'),
     });
   };
 

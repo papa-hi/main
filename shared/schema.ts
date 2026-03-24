@@ -935,3 +935,36 @@ export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions
 
 export type InsertPushSubscription = z.infer<typeof insertPushSubscriptionSchema>;
 export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+
+// ── GDPR consent records ─────────────────────────────────────────────────────
+// Art. 7 GDPR requires the controller to demonstrate that consent was given.
+// Each change (grant or withdraw) appends a new row — records are never updated
+// in place so the full audit trail is preserved.
+// policyVersion should be bumped whenever the privacy policy text changes.
+export const CURRENT_POLICY_VERSION = "2026-01";
+
+export const consentRecords = pgTable("consent_records", {
+  id:            serial("id").primaryKey(),
+  userId:        integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  consentType:   text("consent_type").notNull(),   // 'analytics' | 'marketing' | 'location'
+  granted:       boolean("granted").notNull(),
+  consentedAt:   timestamp("consented_at").defaultNow().notNull(),
+  policyVersion: text("policy_version").notNull(),
+  ipHash:        text("ip_hash"),                   // SHA-256 of client IP, never the raw IP
+});
+
+export const consentRecordsRelations = relations(consentRecords, ({ one }) => ({
+  user: one(users, {
+    fields: [consentRecords.userId],
+    references: [users.id],
+  }),
+}));
+
+export const insertConsentRecordSchema = createInsertSchema(consentRecords).omit({
+  id: true,
+  consentedAt: true,
+});
+
+export type InsertConsentRecord = z.infer<typeof insertConsentRecordSchema>;
+export type ConsentRecord = typeof consentRecords.$inferSelect;
+// ─────────────────────────────────────────────────────────────────────────────
