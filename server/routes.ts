@@ -3821,8 +3821,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     ws.on('message', async (message) => {
       try {
-        // Enforce max message size
-        if (message instanceof Buffer && message.length > WS_MAX_MESSAGE_BYTES) {
+        // Normalise to a single Buffer early — ws delivers text frames as string,
+        // binary frames as Buffer, and fragmented messages as Buffer[].
+        // Doing this once here means the size check covers every frame type and
+        // JSON.parse always receives a consistent utf-8 string.
+        const raw: Buffer = Array.isArray(message)
+          ? Buffer.concat(message)
+          : message instanceof Buffer
+            ? message
+            : Buffer.from(message as string, 'utf8');
+
+        // Enforce max message size (text *and* binary frames)
+        if (raw.length > WS_MAX_MESSAGE_BYTES) {
           ws.send(JSON.stringify({ type: 'error', message: 'Message too large' }));
           return;
         }
@@ -3842,7 +3852,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
 
-        const data = JSON.parse(message.toString());
+        const data = JSON.parse(raw.toString('utf8'));
         
         // Handle get_messages request
         if (data.type === 'get_messages') {
