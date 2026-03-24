@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Settings, User as UserIcon, Bell, Shield, HelpCircle, Heart, Lock, Eye, EyeOff } from 'lucide-react';
+import { Settings, User as UserIcon, Bell, Shield, HelpCircle, Heart, Lock, Eye, EyeOff, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import NotificationSettings from '@/components/NotificationSettings';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -39,6 +39,11 @@ export default function SettingsPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  // Email change states
+  const [newEmailInput, setNewEmailInput] = useState('');
+  const [emailChangePassword, setEmailChangePassword] = useState('');
+  const [emailChangeSent, setEmailChangeSent] = useState(false);
   
   // GDPR consent states — localStorage is used as fast initial value while the
   // server response loads. Server records are authoritative (GDPR Art. 7).
@@ -200,6 +205,36 @@ export default function SettingsPage() {
     } finally {
       setIsChangingPassword(false);
     }
+  };
+
+  // Email change mutation
+  const emailChangeMutation = useMutation({
+    mutationFn: (data: { newEmail: string; currentPassword: string }) =>
+      apiRequest('POST', '/api/user/request-email-change', data),
+    onSuccess: () => {
+      setEmailChangeSent(true);
+      setEmailChangePassword('');
+    },
+    onError: (err: any) => {
+      toast({
+        title: t('settings.account.emailChangeError', 'Email Change Failed'),
+        description: err?.message || t('settings.account.emailChangeFailed', 'Could not send verification email. Check your password and try again.'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleRequestEmailChange = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmailInput)) {
+      toast({ title: t('settings.account.emailChangeError', 'Invalid Email'), description: t('settings.account.emailInvalid', 'Please enter a valid email address.'), variant: 'destructive' });
+      return;
+    }
+    if (!emailChangePassword) {
+      toast({ title: t('settings.account.emailChangeError', 'Password Required'), description: t('settings.account.passwordRequired', 'Enter your current password to confirm.'), variant: 'destructive' });
+      return;
+    }
+    emailChangeMutation.mutate({ newEmail: newEmailInput, currentPassword: emailChangePassword });
   };
 
   // Persist a consent change to the server (GDPR Art. 7 audit trail)
@@ -489,9 +524,75 @@ export default function SettingsPage() {
                 </div>
                 <Separator />
                 <Button variant="outline" onClick={() => navigate('/profile')}>{t('settings.account.editProfile')}</Button>
-                
+
                 <Separator />
-                
+
+                {/* Change Email Section */}
+                <div>
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    {t('settings.account.changeEmail', 'Change Email Address')}
+                  </h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {t('settings.account.changeEmailDesc', 'We will send a verification link to the new address. Your email changes only after you click the link.')}
+                  </p>
+
+                  {emailChangeSent ? (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-2">
+                      <p className="text-sm font-semibold text-green-800 flex items-center gap-2">
+                        <Mail className="h-4 w-4" />
+                        {t('settings.account.emailSentTitle', 'Verification email sent')}
+                      </p>
+                      <p className="text-sm text-green-700">
+                        {t('settings.account.emailSentDesc', 'Check your new inbox and click the confirmation link. It expires in 24 hours.')}
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => { setEmailChangeSent(false); setNewEmailInput(''); }}
+                      >
+                        {t('settings.account.emailSentReset', 'Send to a different address')}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="newEmail">{t('settings.account.newEmail', 'New Email Address')}</Label>
+                        <Input
+                          id="newEmail"
+                          type="email"
+                          value={newEmailInput}
+                          onChange={(e) => setNewEmailInput(e.target.value)}
+                          placeholder="new@example.com"
+                          autoComplete="email"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="emailChangePassword">{t('settings.account.currentPassword', 'Current Password')}</Label>
+                        <Input
+                          id="emailChangePassword"
+                          type="password"
+                          value={emailChangePassword}
+                          onChange={(e) => setEmailChangePassword(e.target.value)}
+                          placeholder="••••••••"
+                          autoComplete="current-password"
+                        />
+                      </div>
+                      <Button
+                        onClick={handleRequestEmailChange}
+                        disabled={emailChangeMutation.isPending}
+                        className="mt-1"
+                      >
+                        {emailChangeMutation.isPending
+                          ? t('settings.account.sendingEmail', 'Sending…')
+                          : t('settings.account.sendVerification', 'Send Verification Email')}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                <Separator />
+
                 {/* Change Password Section */}
                 <div>
                   <h4 className="font-medium mb-2 flex items-center gap-2">

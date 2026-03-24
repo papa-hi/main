@@ -16,6 +16,7 @@ import {
   FamilyEvent, InsertFamilyEvent, familyEvents,
   userAvailability,
   ConsentRecord, consentRecords,
+  EmailChangeRequest, emailChangeRequests,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gt, lt, desc, sql, asc, count, gte, lte, max, isNull, isNotNull, not, ne, inArray, like, or, type SQL } from "drizzle-orm";
@@ -119,6 +120,11 @@ export interface IStorage {
   recordConsent(data: { userId: number; consentType: string; granted: boolean; policyVersion: string; ipHash: string | null }): Promise<ConsentRecord>;
   getLatestConsents(userId: number): Promise<ConsentRecord[]>;
   getAllConsents(userId: number): Promise<ConsentRecord[]>;
+
+  // Email change verification
+  createEmailChangeRequest(userId: number, newEmail: string, token: string, expiresAt: Date): Promise<EmailChangeRequest>;
+  getEmailChangeRequestByToken(token: string): Promise<EmailChangeRequest | undefined>;
+  markEmailChangeUsed(id: number): Promise<void>;
 }
 
 // MemStorage (in-memory implementation) lives in tests/helpers/mem-storage.ts
@@ -2181,6 +2187,30 @@ export class DatabaseStorage implements IStorage {
       .from(consentRecords)
       .where(eq(consentRecords.userId, userId))
       .orderBy(asc(consentRecords.consentedAt));
+  }
+
+  // ── Email change verification ───────────────────────────────────────────
+  async createEmailChangeRequest(userId: number, newEmail: string, token: string, expiresAt: Date): Promise<EmailChangeRequest> {
+    const [row] = await db
+      .insert(emailChangeRequests)
+      .values({ userId, newEmail, token, expiresAt })
+      .returning();
+    return row;
+  }
+
+  async getEmailChangeRequestByToken(token: string): Promise<EmailChangeRequest | undefined> {
+    const [row] = await db
+      .select()
+      .from(emailChangeRequests)
+      .where(eq(emailChangeRequests.token, token));
+    return row;
+  }
+
+  async markEmailChangeUsed(id: number): Promise<void> {
+    await db
+      .update(emailChangeRequests)
+      .set({ used: true })
+      .where(eq(emailChangeRequests.id, id));
   }
   // ─────────────────────────────────────────────────────────────────────────
 }

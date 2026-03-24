@@ -1136,3 +1136,147 @@ PaPa-Hi - Connecting Fathers, Building Communities
 Manage notification preferences: https://papa-hi.com/settings
   `.trim();
 }
+
+// ── Email change verification ─────────────────────────────────────────────────
+
+export async function sendEmailChangeVerification({
+  to,
+  firstName,
+  confirmLink,
+  expiresInHours = 24,
+}: {
+  to: string;
+  firstName: string;
+  confirmLink: string;
+  expiresInHours?: number;
+}): Promise<boolean> {
+  const resendClient = getResendClient();
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f9f9f9;font-family:Arial,Helvetica,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f9f9;padding:40px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+        <tr><td style="background:#FF6B35;padding:32px 40px;text-align:center">
+          <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700">PaPa-Hi</h1>
+          <p style="margin:8px 0 0;color:#ffe0d0;font-size:14px">Confirm your new email address</p>
+        </td></tr>
+        <tr><td style="padding:40px">
+          <p style="margin:0 0 16px;font-size:16px;color:#333">Hi ${firstName},</p>
+          <p style="margin:0 0 24px;font-size:15px;color:#555;line-height:1.6">
+            We received a request to change the email address on your PaPa-Hi account to <strong>${to}</strong>.
+            Click the button below to confirm this change. The link expires in ${expiresInHours} hours.
+          </p>
+          <div style="text-align:center;margin:32px 0">
+            <a href="${confirmLink}" style="background:#FF6B35;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:600;display:inline-block">
+              Confirm New Email
+            </a>
+          </div>
+          <p style="margin:24px 0 0;font-size:13px;color:#888;line-height:1.6">
+            If you didn't request this change, you can safely ignore this email — your current email address will remain unchanged.
+          </p>
+          <p style="margin:8px 0 0;font-size:12px;color:#aaa">
+            Or copy this link: ${confirmLink}
+          </p>
+        </td></tr>
+        <tr><td style="background:#f5f5f5;padding:20px 40px;text-align:center">
+          <p style="margin:0;font-size:12px;color:#999">
+            PaPa-Hi — Connecting Fathers, Building Communities<br>
+            <a href="https://papa-hi.com/privacy" style="color:#FF6B35;text-decoration:none">Privacy Policy</a>
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  const text = `Hi ${firstName},\n\nConfirm your new email address for PaPa-Hi:\n\n${confirmLink}\n\nThis link expires in ${expiresInHours} hours.\n\nIf you didn't request this, ignore this email.\n\n— The PaPa-Hi Team`;
+
+  if (!resendClient) {
+    console.log(`[email-change] would send verification to ${to}: ${confirmLink}`);
+    return true;
+  }
+
+  const { error } = await resendClient.emails.send({
+    from: 'PaPa-Hi <papa@papa-hi.com>',
+    to: [to],
+    subject: 'Confirm your new email address — PaPa-Hi',
+    html,
+    text,
+  });
+
+  if (error) {
+    console.error('sendEmailChangeVerification error:', error);
+    return false;
+  }
+  return true;
+}
+
+export async function sendEmailChangeNotification({
+  to,
+  firstName,
+  newEmail,
+}: {
+  to: string;
+  firstName: string;
+  newEmail: string;
+}): Promise<boolean> {
+  const resendClient = getResendClient();
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f9f9f9;font-family:Arial,Helvetica,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f9f9;padding:40px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+        <tr><td style="background:#FF6B35;padding:32px 40px;text-align:center">
+          <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700">PaPa-Hi</h1>
+        </td></tr>
+        <tr><td style="padding:40px">
+          <p style="margin:0 0 16px;font-size:16px;color:#333">Hi ${firstName},</p>
+          <p style="margin:0 0 16px;font-size:15px;color:#555;line-height:1.6">
+            This is a security notice. The email address for your PaPa-Hi account has been changed to:
+          </p>
+          <p style="margin:0 0 24px;font-size:16px;font-weight:700;color:#FF6B35">${newEmail}</p>
+          <p style="margin:0 0 16px;font-size:14px;color:#555;line-height:1.6">
+            If you made this change, no action is needed. If you did <strong>not</strong> authorise this,
+            please contact us immediately at <a href="mailto:papa@papa-hi.com" style="color:#FF6B35">papa@papa-hi.com</a>.
+          </p>
+        </td></tr>
+        <tr><td style="background:#f5f5f5;padding:20px 40px;text-align:center">
+          <p style="margin:0;font-size:12px;color:#999">PaPa-Hi — Connecting Fathers, Building Communities</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  const text = `Hi ${firstName},\n\nYour PaPa-Hi email address has been changed to ${newEmail}.\n\nIf you didn't do this, contact papa@papa-hi.com immediately.\n\n— The PaPa-Hi Team`;
+
+  if (!resendClient) {
+    console.log(`[email-change] would send notification to ${to} about change to ${newEmail}`);
+    return true;
+  }
+
+  const { error } = await resendClient.emails.send({
+    from: 'PaPa-Hi <papa@papa-hi.com>',
+    to: [to],
+    subject: 'Your PaPa-Hi email address has been changed',
+    html,
+    text,
+  });
+
+  if (error) {
+    console.error('sendEmailChangeNotification error:', error);
+    return false;
+  }
+  return true;
+}
+// ─────────────────────────────────────────────────────────────────────────────

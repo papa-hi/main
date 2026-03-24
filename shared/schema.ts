@@ -967,4 +967,24 @@ export const insertConsentRecordSchema = createInsertSchema(consentRecords).omit
 
 export type InsertConsentRecord = z.infer<typeof insertConsentRecordSchema>;
 export type ConsentRecord = typeof consentRecords.$inferSelect;
+
+// ── Email change verification ─────────────────────────────────────────────────
+export const emailChangeRequests = pgTable("email_change_requests", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  newEmail: text("new_email").notNull(),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  used: boolean("used").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const emailChangeRequestsRelations = relations(emailChangeRequests, ({ one }) => ({
+  user: one(users, {
+    fields: [emailChangeRequests.userId],
+    references: [users.id],
+  }),
+}));
+
+export type EmailChangeRequest = typeof emailChangeRequests.$inferSelect;
 // ─────────────────────────────────────────────────────────────────────────────

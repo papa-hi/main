@@ -4,8 +4,9 @@ import { storage } from "./storage";
 import { playdates, places, users, chatMessages, imageStorage, insertPlaydateSchema, insertPlaceSchema, User as SelectUser, insertChatMessageSchema, playdateParticipants, userFavorites, ratings, communityPosts, communityComments, communityReactions, communityMentions, insertCommunityPostSchema, insertCommunityCommentSchema, insertCommunityReactionSchema, familyEvents, CURRENT_POLICY_VERSION } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { setupAuth, sessionMiddleware, passportInitMiddleware, passportSessionMiddleware } from "./auth";
+import { setupAuth, sessionMiddleware, passportInitMiddleware, passportSessionMiddleware, comparePasswords } from "./auth";
 import { setupAdminRoutes, logUserActivity } from "./admin";
+import { sendEmailChangeVerification, sendEmailChangeNotification } from "./email-service";
 import { upload, uploadToSupabase } from "./upload";
 import { WebSocketServer, WebSocket } from 'ws';
 import { fetchNearbyPlaygrounds } from "./maps-service";
@@ -795,6 +796,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
+
+  // ── Email change flow ─────────────────────────────────────────────────────
+  const emailChangeLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 3,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many email change requests. Please try again later." },
+  });
+
+  // POST /api/user/request-email-change
+  // Validates current password, checks new email is not taken,
+  // sends a 24-hour verification link to the NEW address.
+  app.post("/api/user/request-email-change", isAuthenticated, emailChangeLimiter, async (req, res) => {
+    try {
+      const { newEmail, currentPassword } = req.body;
+
+      if (!newEmail || !currentPassword) {
+        return res.status(400).json({ error: "newEmail and currentPassword are required" });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(newEmail)) {
+        return res.status(400).json({ error: "Invalid email address" });
+      }
+
+      const user = await storage.getUserById(req.user!.id);
+      if (!user?.password) {
+        return res.status(400).json({ error: "Cannot change email for accounts using social login" });
+      }
+
+      // Verify current password
+      const passwordOk = await comparePasswords(currentPassword, user.password);
+      if (!passwordOk) {
+        return res.status(403).json({ error: "Current password is incorrect" });
+      }
+
+      // Check new email is not already in use
+      const existing = await storage.getUserByEmail(newEmail);
+      if (existing) {
+        return res.status(409).json({ error: "That email address is already in use" });
+      }
+
+      // Generate a secure token valid for 24 hours
+      const token = crypto.randomBytes(32).toString("hex");
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+      await storage.createEmailChangeRequest(req.user!.id, newEmail, token, expiresAt);
+
+      const confirmLink = `${process.env.APP_URL ?? "https://papa-hi.com"}/confirm-email-change?token=${token}`;
+      await sendEmailChangeVerification({
+        to: newEmail,
+        firstName: user.firstName ?? user.username,
+        confirmLink,
+      });
+
+      res.json({ message: "Verification email sent. Check your new inbox and click the link to confirm." });
+    } catch (err) {
+      console.error("Error requesting email change:", err);
+      res.status(500).json({ error: "Failed to send verification email" });
+    }
+  });
+
+  // GET /api/user/confirm-email-change?token=xxx
+  // Verifies the token, updates the email, notifies the old address.
+  app.get("/api/user/confirm-email-change", async (req, res) => {
+    try {
+      const { token } = req.query as { token?: string };
+      if (!token) {
+        return res.status(400).json({ error: "Missing token" });
+      }
+
+      const request = await storage.getEmailChangeRequestByToken(token);
+
+      if (!request) {
+        return res.status(404).json({ error: "Invalid or expired token" });
+      }
+      if (request.used) {
+        return res.status(410).json({ error: "This link has already been used" });
+      }
+      if (new Date() > request.expiresAt) {
+        return res.status(410).json({ error: "This link has expired. Please request a new email change." });
+      }
+
+      // Check the target email is still not in use (someone else may have claimed it)
+      const conflict = await storage.getUserByEmail(request.newEmail);
+      if (conflict) {
+        return res.status(409).json({ error: "That email address has since been taken by another account" });
+      }
+
+      const user = await storage.getUserById(request.userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const oldEmail = user.email!;
+
+      // Update the email and mark the token as used (in parallel)
+      await Promise.all([
+        db.update(users).set({ email: request.newEmail }).where(eq(users.id, request.userId)),
+        storage.markEmailChangeUsed(request.id),
+      ]);
+
+      // Notify the old address that it was changed (security notice)
+      sendEmailChangeNotification({
+        to: oldEmail,
+        firstName: user.firstName ?? user.username,
+        newEmail: request.newEmail,
+      }).catch((e) => console.error("Failed to send email-change notification:", e));
+
+      res.json({ message: "Email address updated successfully", newEmail: request.newEmail });
+    } catch (err) {
+      console.error("Error confirming email change:", err);
+      res.status(500).json({ error: "Failed to confirm email change" });
+    }
+  });
+  // ────────────────────────────────────────────────────────────────────────────
 
   // ── GDPR consent endpoints ───────────────────────────────────────────────
   // GET  /api/consent — latest consent record per type for the current user

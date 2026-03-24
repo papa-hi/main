@@ -24,6 +24,7 @@ import EventDetailsPage from "./pages/event-details";
 import SettingsPage from "./pages/SettingsPage";
 import DeleteAccountPage from "./pages/delete-account";
 import PrivacyPolicyPage from "./pages/privacy-policy";
+import ConfirmEmailChangePage from "./pages/confirm-email-change";
 
 import AdminDashboard from "./pages/admin";
 import AdminCheck from "./pages/admin-check";
@@ -81,6 +82,7 @@ function Router() {
       <ProtectedRoute path="/users/:id" component={UserProfilePage} />
       <Route path="/privacy" component={PrivacyPolicyPage} />
       <Route path="/privacy-policy" component={PrivacyPolicyPage} />
+      <Route path="/confirm-email-change" component={ConfirmEmailChangePage} />
       <Route path="/about" component={AboutPage} />
 
       <ProtectedRoute path="/admin" component={AdminDashboardWithProvider} />
