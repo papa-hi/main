@@ -3892,10 +3892,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const oneWeekAgo = new Date();
             oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
             
-            // Get messages for this chat, limited to the last week
-            const messages = await db
-              .select()
+            // Single JOIN query — one round-trip regardless of message count
+            const messagesWithSenders = await db
+              .select({
+                id: chatMessages.id,
+                chatId: chatMessages.chatId,
+                senderId: chatMessages.senderId,
+                content: chatMessages.content,
+                sentAt: chatMessages.sentAt,
+                sender: {
+                  id: users.id,
+                  firstName: users.firstName,
+                  lastName: users.lastName,
+                  profileImage: users.profileImage,
+                },
+              })
               .from(chatMessages)
+              .innerJoin(users, eq(chatMessages.senderId, users.id))
               .where(
                 and(
                   eq(chatMessages.chatId, data.chatId),
@@ -3903,26 +3916,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 )
               )
               .orderBy(asc(chatMessages.sentAt));
-            
-            // Get sender details for all messages
-            const messagesWithSenders = await Promise.all(
-              messages.map(async (message) => {
-                const [sender] = await db
-                  .select({
-                    id: users.id,
-                    firstName: users.firstName,
-                    lastName: users.lastName,
-                    profileImage: users.profileImage
-                  })
-                  .from(users)
-                  .where(eq(users.id, message.senderId));
-                
-                return {
-                  ...message,
-                  sender
-                };
-              })
-            );
             
             // Send all messages to the client
             ws.send(JSON.stringify({

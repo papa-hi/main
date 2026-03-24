@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from "react";
 import { useAuth } from "@/hooks/use-auth";
 
-const MESSAGE_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000;
 const RECONNECT_BASE_DELAY = 3000;
 const RECONNECT_MAX_DELAY = 30000;
 
@@ -28,44 +27,27 @@ type ChatContextType = {
 
 const ChatContext = createContext<ChatContextType | null>(null);
 
-function saveMessagesToStorage(msgs: Record<number, Message[]>, chatId?: number) {
-  try {
-    const existing = localStorage.getItem('papa-hi-chat-messages');
-    const existingTimestamps = existing
-      ? JSON.parse(existing).timestamps || {}
-      : {};
-    localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
-      messages: msgs,
-      timestamps: {
-        ...existingTimestamps,
-        ...(chatId != null ? { [chatId]: Date.now() } : {}),
-      },
-    }));
-  } catch {
-    // localStorage quota or parse error — ignore
-  }
-}
-
 export function ChatProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const socketRef = useRef<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
-  const [messages, setMessages] = useState<Record<number, Message[]>>(() => {
-    try {
-      const storedData = localStorage.getItem('papa-hi-chat-messages');
-      if (storedData) {
-        const { messages: storedMessages } = JSON.parse(storedData);
-        return storedMessages || {};
-      }
-    } catch {
-      // ignore
-    }
-    return {};
-  });
+  // Messages are never persisted to localStorage — they are loaded fresh from
+  // the server on every connection via get_messages. This prevents private
+  // conversations from accumulating in plain text on shared/compromised devices.
+  const [messages, setMessages] = useState<Record<number, Message[]>>({});
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const unmountedRef = useRef(false);
+
+  // Clear in-memory messages when the user logs out
+  useEffect(() => {
+    if (!user) {
+      setMessages({});
+      // Also remove any stale data left by older app versions
+      try { localStorage.removeItem('papa-hi-chat-messages'); } catch { /* ignore */ }
+    }
+  }, [user]);
 
   useEffect(() => {
     unmountedRef.current = false;
@@ -148,9 +130,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 const combined = [...existing, ...incoming].sort(
                   (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
                 );
-                const updated = { ...prev, [data.chatId]: combined };
-                saveMessagesToStorage(updated, data.chatId);
-                return updated;
+                return { ...prev, [data.chatId]: combined };
               });
             } else if (data.type === "message") {
               const msg = data.message;
@@ -162,9 +142,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 chatMsgs.sort(
                   (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
                 );
-                const updated = { ...prev, [msg.chatId]: chatMsgs };
-                saveMessagesToStorage(updated, msg.chatId);
-                return updated;
+                return { ...prev, [msg.chatId]: chatMsgs };
               });
             }
           } catch {
@@ -225,60 +203,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [connected]);
-
-  useEffect(() => {
-    const checkExpiredMessages = () => {
-      try {
-        const storedData = localStorage.getItem('papa-hi-chat-messages');
-        if (!storedData) return;
-
-        const { messages: storedMessages, timestamps } = JSON.parse(storedData);
-        if (!timestamps) {
-          const now = Date.now();
-          localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
-            messages: storedMessages,
-            timestamps: Object.keys(storedMessages).reduce((acc: Record<string, number>, chatId: string) => {
-              acc[chatId] = now;
-              return acc;
-            }, {}),
-          }));
-          return;
-        }
-
-        let hasExpired = false;
-        const updatedMessages = { ...storedMessages };
-        const updatedTimestamps = { ...timestamps };
-        const now = Date.now();
-
-        Object.entries(timestamps).forEach(([chatId, timestamp]) => {
-          if (now - Number(timestamp) >= MESSAGE_EXPIRATION_TIME) {
-            delete updatedMessages[chatId];
-            delete updatedTimestamps[chatId];
-            hasExpired = true;
-          }
-        });
-
-        if (hasExpired) {
-          if (Object.keys(updatedMessages).length === 0) {
-            localStorage.removeItem('papa-hi-chat-messages');
-            setMessages({});
-          } else {
-            localStorage.setItem('papa-hi-chat-messages', JSON.stringify({
-              messages: updatedMessages,
-              timestamps: updatedTimestamps,
-            }));
-            setMessages(updatedMessages);
-          }
-        }
-      } catch {
-        // ignore
-      }
-    };
-
-    checkExpiredMessages();
-    const dailyCheck = setInterval(checkExpiredMessages, 24 * 60 * 60 * 1000);
-    return () => clearInterval(dailyCheck);
-  }, []);
 
   return (
     <ChatContext.Provider value={{ connected, connecting, sendMessage, messages }}>
