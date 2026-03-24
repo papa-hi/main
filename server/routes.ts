@@ -18,6 +18,7 @@ import availabilityRouter from "./availability-routes";
 import { schedulePlaydateReminders, notifyNewParticipant, notifyPlaydateModified } from "./notification-scheduler";
 import { calculateDistance, getCityCoordinates } from "./dad-matching-service";
 import { sanitizeText, sanitizeObject } from "./sanitize";
+import rateLimit from "express-rate-limit";
 import { geocodeAddress } from "./geocoding";
 
 // Counter to track which playground image to use next
@@ -704,7 +705,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/upload/profile-image", upload.single('profileImage'), async (req: Request, res: Response) => {
+  // Rate limiter for unauthenticated upload endpoint (used during registration).
+  // 10 uploads per IP per hour is generous for legitimate sign-ups but blocks bulk abuse.
+  const uploadLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 10,
+    message: { message: "Too many uploads from this IP, please try again later" },
+    standardHeaders: true,
+    legacyHeaders: false,
+    validate: { trustProxy: false },
+  });
+
+  app.post("/api/upload/profile-image", uploadLimiter, upload.single('profileImage'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
