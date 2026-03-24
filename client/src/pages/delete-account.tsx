@@ -70,7 +70,7 @@ export default function DeleteAccountPage() {
 
     setIsDeleting(true);
     try {
-      const response = await fetch('/api/user/delete-account', {
+      const response = await fetch('/api/users/me', {
         method: 'DELETE',
         credentials: 'include'
       });

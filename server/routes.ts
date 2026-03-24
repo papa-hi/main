@@ -1069,43 +1069,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GDPR Account Deletion endpoint
-  app.delete("/api/user/delete-account", isAuthenticated, async (req, res) => {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
-
-      // Delete user data in correct order to maintain referential integrity
-      await db.delete(pushSubscriptions).where(eq(pushSubscriptions.userId, userId));
-      await db.delete(chatMessages).where(eq(chatMessages.senderId, userId));
-      await db.delete(playdateParticipants).where(eq(playdateParticipants.userId, userId));
-      await db.delete(playdates).where(eq(playdates.creatorId, userId));
-      await db.delete(userFavorites).where(eq(userFavorites.userId, userId));
-      await db.delete(ratings).where(eq(ratings.userId, userId));
-      
-      // Finally delete the user account
-      const success = await storage.deleteUser(userId);
-      
-      if (success) {
-        // Destroy the session
-        req.session.destroy((err) => {
-          if (err) {
-            console.error("Session destruction error:", err);
-          }
-        });
-        
-        res.json({ success: true, message: "Account deleted successfully" });
-      } else {
-        res.status(500).json({ error: "Failed to delete account" });
-      }
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      res.status(500).json({ error: "Failed to delete account" });
-    }
-  });
-
   app.get("/api/users", isAuthenticated, async (req, res) => {
     try {
       // Get all users from storage, limiting what data is returned
@@ -1454,48 +1417,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Delete user profile
+  // DELETE /api/users/me — canonical account deletion endpoint
+  // storage.deleteUser() handles all relational cleanup in a single transaction.
   app.delete("/api/users/me", isAuthenticated, async (req, res) => {
+    const userId = req.user!.id;
     try {
-      // Get the authenticated user ID
-      const userId = req.user?.id;
-      
-      if (!userId) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-      
-      console.log(`[DELETE USER] Attempting to delete user with ID ${userId}`);
-      
-      // Get the current user to find the profile image (if any)
-      const currentUser = await storage.getUserById(userId);
-      console.log(`[DELETE USER] Current user:`, currentUser);
-      
-      if (currentUser?.profileImage) {
-        // Extract filename from the URL if it exists
-        console.log(`[DELETE USER] Profile image will be cleaned up: ${currentUser.profileImage}`);
-      }
-      
-      // Delete the user
-      console.log(`[DELETE USER] Calling storage.deleteUser(${userId})`);
       const deleted = await storage.deleteUser(userId);
-      console.log(`[DELETE USER] Result:`, deleted);
-      
+
       if (!deleted) {
-        console.log(`[DELETE USER] Failed to delete user - returned false`);
-        return res.status(500).json({ message: "Failed to delete user" });
+        return res.status(500).json({ error: "Failed to delete account" });
       }
-      
-      // Log the user out
-      req.logout((err) => {
-        if (err) {
-          console.error("[DELETE USER] Error logging out:", err);
-          return res.status(500).json({ message: "Failed to log out after deleting account" });
+
+      // Clear Passport session state, then destroy the session cookie
+      req.logout((logoutErr) => {
+        if (logoutErr) {
+          console.error("Logout error after account deletion:", logoutErr);
         }
-        console.log(`[DELETE USER] User ${userId} successfully deleted and logged out`);
-        res.status(200).json({ message: "User account deleted successfully" });
+        req.session.destroy((sessionErr) => {
+          if (sessionErr) {
+            console.error("Session destroy error after account deletion:", sessionErr);
+          }
+          res.clearCookie("connect.sid");
+          res.json({ success: true, message: "Account deleted successfully" });
+        });
       });
     } catch (err: any) {
-      console.error("[DELETE USER] Error deleting user:", err);
-      res.status(500).json({ message: "Failed to delete user account", error: err?.message || String(err) });
+      console.error("Error deleting user account:", err);
+      res.status(500).json({ error: "Failed to delete account" });
     }
   });
   
