@@ -864,18 +864,26 @@ interface NewEventEmailData {
   eventId: number;
 }
 
-export async function sendNewEventNotification({ to, firstName, eventTitle, eventDescription, eventDate, eventEndDate, eventLocation, eventCategory, eventId }: NewEventEmailData): Promise<boolean> {
+export async function sendNewEventNotification(data: NewEventEmailData): Promise<boolean> {
+  return sendNewEventNotificationWithRetry(data, 0);
+}
+
+async function sendNewEventNotificationWithRetry(
+  { to, firstName, eventTitle, eventDescription, eventDate, eventEndDate, eventLocation, eventCategory, eventId }: NewEventEmailData,
+  attempt: number
+): Promise<boolean> {
+  const MAX_ATTEMPTS = 2;
+  const RETRY_DELAY_MS = 2000;
+
   try {
     const resendClient = getResendClient();
-    
+
     if (!resendClient) {
       console.warn('RESEND_API_KEY is not configured - skipping new event notification email');
-      console.log(`New event notification would be sent to: ${to}`);
-      console.log(`Event: ${eventTitle}`);
       return true;
     }
 
-    console.log(`Sending new event notification to: ${to}`);
+    console.log(`Sending new event notification to: ${to}${attempt > 0 ? ` (attempt ${attempt + 1})` : ''}`);
 
     const { data, error } = await resendClient.emails.send({
       from: 'PaPa-Hi <papa@papa-hi.com>',
@@ -891,6 +899,16 @@ export async function sendNewEventNotification({ to, firstName, eventTitle, even
     });
 
     if (error) {
+      // Retry once on rate-limit (429) errors
+      const isRateLimit = (error as any)?.statusCode === 429 || (error as any)?.name === 'rate_limit_exceeded';
+      if (isRateLimit && attempt < MAX_ATTEMPTS - 1) {
+        console.warn(`Rate limit hit sending to ${to}, retrying in ${RETRY_DELAY_MS}ms…`);
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+        return sendNewEventNotificationWithRetry(
+          { to, firstName, eventTitle, eventDescription, eventDate, eventEndDate, eventLocation, eventCategory, eventId },
+          attempt + 1
+        );
+      }
       console.error('New event notification email error:', error);
       return false;
     }

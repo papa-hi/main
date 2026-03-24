@@ -647,9 +647,13 @@ async function sendNewEventNotifications(event: any): Promise<void> {
     let successCount = 0;
     let failCount = 0;
 
-    const batchSize = 10;
-    for (let i = 0; i < eligibleUsers.length; i += batchSize) {
-      const batch = eligibleUsers.slice(i, i + batchSize);
+    // Resend allows 5 requests/second. Batches of 5 with a 1.1 s gap stay safely under that.
+    const BATCH_SIZE = 5;
+    const BATCH_DELAY_MS = 1100;
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    for (let i = 0; i < eligibleUsers.length; i += BATCH_SIZE) {
+      const batch = eligibleUsers.slice(i, i + BATCH_SIZE);
       const results = await Promise.allSettled(
         batch.map(user => sendNewEventNotification({
           to: user.email!,
@@ -672,8 +676,8 @@ async function sendNewEventNotifications(event: any): Promise<void> {
         }
       }
 
-      if (i + batchSize < eligibleUsers.length) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+      if (i + BATCH_SIZE < eligibleUsers.length) {
+        await sleep(BATCH_DELAY_MS);
       }
     }
 
