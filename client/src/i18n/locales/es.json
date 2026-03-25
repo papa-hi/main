@@ -693,5 +693,14 @@
     "step2Desc": "Encuentra padres cerca de ti con hijos de edades similares",
     "step3Title": "Crea tu primera cita de juego",
     "step3Desc": "Planifica un encuentro e invita a la comunidad"
+  },
+  "community": {
+    "categories": {
+      "general": "Discusión general",
+      "playdates": "Citas de juego",
+      "advice": "Consejos parentales",
+      "events": "Eventos y Actividades",
+      "recommendations": "Recomendaciones"
+    }
   }
 }

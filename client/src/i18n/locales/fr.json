@@ -693,5 +693,14 @@
     "step2Desc": "Trouve des pères près de toi avec des enfants du même âge",
     "step3Title": "Crée ta première rencontre de jeu",
     "step3Desc": "Planifie un rendez-vous et invite la communauté"
+  },
+  "community": {
+    "categories": {
+      "general": "Discussion générale",
+      "playdates": "Rencontres de jeu",
+      "advice": "Conseils parentaux",
+      "events": "Événements & Activités",
+      "recommendations": "Recommandations"
+    }
   }
 }

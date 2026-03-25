@@ -418,7 +418,6 @@
     "searchPlaceholder": "Zoek op titel, inhoud, of hashtags",
     "filterByCategory": "Filter op categorie",
     "allCategories": "Alle Categorieën",
-    "categoriesHeading": "Categorieën",
     "noPostsFound": "Geen berichten gevonden",
     "noPostsMessage": "Wees de eerste om een gesprek te starten!",
     "postUpdated": "Bericht Bijgewerkt",
@@ -457,11 +456,10 @@
     "categoriesHeading": "Categorieën",
     "categories": {
       "general": "Algemene Discussie",
-      "parenting-tips": "Opvoedingstips",
-      "activities": "Kinderactiviteiten",
-      "health": "Gezondheid & Welzijn",
-      "education": "Onderwijs",
-      "local": "Lokale Gemeenschap"
+      "playdates": "Speelafspraken",
+      "advice": "Opvoedingsadvies",
+      "events": "Evenementen & Activiteiten",
+      "recommendations": "Aanbevelingen"
     },
     "subtitle": "Verbind, deel, en doe mee met mede-vaders",
     "loginRequired": "Word lid van de Community",

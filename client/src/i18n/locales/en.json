@@ -794,7 +794,13 @@
     "hashtagTip": "Use #hashtags to categorize your post",
     "search": "Search",
     "searchPlaceholder": "Search posts, users, or hashtags...",
-    "categories": "Categories",
+    "categories": {
+      "general": "General Discussion",
+      "playdates": "Playdates",
+      "advice": "Parenting Advice",
+      "events": "Events & Activities",
+      "recommendations": "Recommendations"
+    },
     "categoriesHeading": "Categories",
     "activeHashtag": "Active Hashtag",
     "latest": "Latest",

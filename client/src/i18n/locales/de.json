@@ -701,5 +701,14 @@
     "step2Desc": "Finde Väter in deiner Nähe mit Kindern im ähnlichen Alter",
     "step3Title": "Erstes Spieltreffen erstellen",
     "step3Desc": "Plane ein Treffen und lade die Community ein"
+  },
+  "community": {
+    "categories": {
+      "general": "Allgemeine Diskussion",
+      "playdates": "Spieltreffen",
+      "advice": "Elterntipps",
+      "events": "Events & Aktivitäten",
+      "recommendations": "Empfehlungen"
+    }
   }
 }

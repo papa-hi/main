@@ -93,12 +93,11 @@ interface Category {
 }
 
 const COMMUNITY_CATEGORIES: Category[] = [
-  { id: 'general',       name: 'General Discussion', description: 'General parenting topics and conversations' },
-  { id: 'parenting-tips',name: 'Parenting Tips',     description: 'Share and discover parenting advice' },
-  { id: 'activities',    name: 'Kids Activities',    description: 'Fun activities and ideas for children' },
-  { id: 'health',        name: 'Health & Wellness',  description: 'Health tips and wellness discussions' },
-  { id: 'education',     name: 'Education',          description: 'School, learning, and educational resources' },
-  { id: 'local',         name: 'Local Community',    description: 'Local events and neighborhood discussions' },
+  { id: 'general',         name: 'General Discussion', description: 'General parenting topics and conversations' },
+  { id: 'playdates',       name: 'Playdates',          description: 'Organise and share playdate ideas' },
+  { id: 'advice',          name: 'Parenting Advice',   description: 'Share and discover parenting advice' },
+  { id: 'events',          name: 'Events & Activities', description: 'Local events and fun activities for kids' },
+  { id: 'recommendations', name: 'Recommendations',    description: 'Tips on places, products, and services' },
 ];
 
 // Form schemas
