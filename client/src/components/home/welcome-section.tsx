@@ -218,7 +218,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
             <p className="text-white text-sm mb-3">
               {t('home.noPlaydatesDesc', 'Create a playdate to connect with other dads!')}
             </p>
-            <Link to="/create">
+            <Link href="/create">
               <button className="bg-white text-primary hover:bg-accent hover:text-white transition py-2 px-4 rounded-lg font-medium text-sm w-fit">
                 {t('home.createPlaydate', 'Create Playdate')}
               </button>
