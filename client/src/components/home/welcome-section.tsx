@@ -126,7 +126,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
         
         {/* Weather Widget */}
         {!weatherLoading && !weatherError && city && (
-          <div className="bg-white rounded-lg p-3 shadow-sm flex items-center space-x-3 hover:shadow-md transition-all duration-300 transform hover:scale-105 cursor-pointer group">
+          <div className="bg-card rounded-lg p-3 shadow-sm flex items-center space-x-3 hover:shadow-md transition-all duration-300 transform hover:scale-105 cursor-pointer group">
             {getWeatherIcon()}
             <div>
               <span className="text-sm font-medium group-hover:text-primary transition-colors duration-300">{temperature}°C</span>
@@ -137,7 +137,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
         
         {/* Loading state */}
         {weatherLoading && (
-          <div className="bg-white rounded-lg p-3 shadow-sm flex items-center space-x-3 animate-pulse">
+          <div className="bg-card rounded-lg p-3 shadow-sm flex items-center space-x-3 animate-pulse">
             <div className="w-5 h-5 rounded-full bg-accent/30"></div>
             <div className="space-y-1">
               <div className="h-3 w-10 bg-muted rounded"></div>
@@ -148,7 +148,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
         
         {/* Fallback state when both loading is false and there's an error/no city data */}
         {!weatherLoading && (weatherError || !city) && (
-          <div className="bg-white rounded-lg p-3 shadow-sm flex items-center space-x-3">
+          <div className="bg-card rounded-lg p-3 shadow-sm flex items-center space-x-3">
             <Sun className="h-5 w-5 text-amber-500" />
             <div>
               <span className="text-sm font-medium">18°C</span>
@@ -161,7 +161,7 @@ export function WelcomeSection({ userName }: WelcomeSectionProps) {
       {/* Featured Section - Promoted Community Events */}
       {playdatesLoading && (
         <div className="relative rounded-xl overflow-hidden mb-6 animate-pulse">
-          <div className="w-full h-52 bg-slate-200"></div>
+          <div className="w-full h-52 bg-muted"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent flex flex-col justify-end p-6">
             <div className="bg-accent/80 h-6 w-24 rounded-full mb-2"></div>
             <div className="bg-white/40 h-7 w-3/4 rounded mb-2"></div>

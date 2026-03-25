@@ -17,27 +17,22 @@ export function NearbyEvents() {
   const { data: events, isLoading, error} = useQuery<FamilyEvent[]>({
     queryKey: ['/api/events', locationState.latitude, locationState.longitude, activeFilter],
     queryFn: async () => {
-      // Build query string with location and category parameters
       const params = new URLSearchParams();
       if (locationState.latitude) params.append('latitude', locationState.latitude.toString());
       if (locationState.longitude) params.append('longitude', locationState.longitude.toString());
       if (activeFilter !== "all") params.append('category', activeFilter);
-      params.append('upcoming', 'true'); // Only show upcoming events
+      params.append('upcoming', 'true');
       
       const queryString = params.toString();
       const eventsUrl = queryString ? `/api/events?${queryString}` : '/api/events?upcoming=true';
       
       const res = await fetch(eventsUrl, { credentials: "include" });
-      if (!res.ok) {
-        throw new Error(`${res.status}: ${res.statusText}`);
-      }
+      if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`);
       return await res.json();
     }
   });
 
-  const handleFilterChange = (filter: EventCategory) => {
-    setActiveFilter(filter);
-  };
+  const handleFilterChange = (filter: EventCategory) => setActiveFilter(filter);
 
   if (isLoading) {
     return (
@@ -50,11 +45,10 @@ export function NearbyEvents() {
             <Skeleton className="w-24 h-8 rounded-lg" />
           </div>
         </div>
-        
         <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
           <div className="flex space-x-4 pb-4 w-max">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-xl shadow-sm flex-shrink-0 w-80">
+              <div key={i} className="bg-card rounded-xl shadow-sm flex-shrink-0 w-80">
                 <Skeleton className="w-full h-48 rounded-t-xl" />
                 <div className="p-4">
                   <Skeleton className="h-5 w-3/4 mb-2" />
@@ -102,7 +96,7 @@ export function NearbyEvents() {
               key={cat.value}
               className={`py-1 px-3 rounded-lg font-medium whitespace-nowrap ${activeFilter === cat.value 
                 ? "bg-primary text-white" 
-                : "bg-white text-dark"}`}
+                : "bg-muted text-foreground"}`}
               onClick={() => handleFilterChange(cat.value as EventCategory)}
               data-testid={`button-filter-${cat.value}`}
             >
@@ -120,9 +114,9 @@ export function NearbyEvents() {
             ))
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center py-8 min-w-full">
-              <Calendar className="h-12 w-12 text-gray-400 mb-3" />
-              <p className="text-gray-500 mb-2">{t('events.noEventsNearby')}</p>
-              <p className="text-sm text-gray-400">{t('events.checkBackLater')}</p>
+              <Calendar className="h-12 w-12 text-muted-foreground mb-3" />
+              <p className="text-muted-foreground mb-2">{t('events.noEventsNearby')}</p>
+              <p className="text-sm text-muted-foreground">{t('events.checkBackLater')}</p>
             </div>
           )}
         </div>

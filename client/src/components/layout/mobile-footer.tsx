@@ -12,11 +12,11 @@ export function MobileFooter() {
 
   const navItemClass = (isActive: boolean) => 
     `flex flex-col items-center justify-center py-1.5 px-1 min-w-0 flex-1 rounded-lg transition-colors ${
-      isActive ? 'bg-primary/10 text-primary font-medium' : 'text-dark/70 hover:bg-gray-100'
+      isActive ? 'bg-primary/10 text-primary font-medium' : 'text-muted-foreground hover:bg-muted'
     }`;
 
   return (
-    <footer className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-[1000] safe-area-inset-bottom">
+    <footer className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-[1000] safe-area-inset-bottom">
       <nav className="flex items-stretch w-full px-0.5 py-1.5 overflow-hidden">
         <Link href="/" className={navItemClass(location === '/')}>
           <Home className={`w-5 h-5 ${location === '/' ? 'text-primary' : ''}`} />

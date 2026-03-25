@@ -17,11 +17,11 @@ export function UpcomingPlaydates() {
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-heading font-bold">{t('home.upcomingPlaydates', 'Upcoming Playdates')}</h2>
-          <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-6 w-24 bg-muted rounded animate-pulse"></div>
         </div>
         <div className="space-y-4">
           {[1, 2].map((i) => (
-            <div key={i} className="bg-white rounded-xl p-4 shadow-sm">
+            <div key={i} className="bg-card rounded-xl p-4 shadow-sm">
               <div className="flex items-start">
                 <Skeleton className="flex-shrink-0 w-14 h-14 rounded-lg mr-4" />
                 <div className="flex-grow">
@@ -64,14 +64,14 @@ export function UpcomingPlaydates() {
           </Link>
         </div>
         
-        <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+        <div className="bg-card rounded-xl p-6 shadow-sm text-center">
           <img 
             src="/images/father.png" 
             alt={t('playdates.emptyCalendarAlt', 'Father with children')} 
             className="w-28 h-28 object-cover rounded-full mx-auto mb-4"
           />
           <h3 className="font-heading font-medium text-lg mb-2">{t('playdates.noPlaydatesPlanned', 'No playdates planned')}</h3>
-          <p className="text-dark/70 text-sm mb-4">{t('playdates.planNewMeetDads', 'Plan a new playdate to meet other fathers!')}</p>
+          <p className="text-muted-foreground text-sm mb-4">{t('playdates.planNewMeetDads', 'Plan a new playdate to meet other fathers!')}</p>
           <Link href="/create">
             <button className="bg-primary text-white hover:bg-accent transition py-2 px-6 rounded-lg font-medium text-sm">
               {t('playdates.newPlaydate', 'New Playdate')}

@@ -156,7 +156,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
 
   return (
     <div 
-      className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.01] cursor-pointer"
+      className="bg-card rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.01] cursor-pointer"
       onClick={handleCardClick}
     >
       <div className="flex items-start">
@@ -166,7 +166,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
         </div>
         <div className="flex-grow">
           <h3 className="font-heading font-medium text-base mb-1">{playdate.title}</h3>
-          <div className="flex items-center text-sm text-dark/70 mb-2">
+          <div className="flex items-center text-sm text-muted-foreground mb-2">
             <i className="fas fa-clock mr-1 text-xs"></i>
             <span>{timeRange}</span>
             <i className="fas fa-map-marker-alt ml-3 mr-1 text-xs"></i>
@@ -174,7 +174,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
           </div>
           <div className="flex items-center text-sm mb-2">
             <i className="fas fa-euro-sign mr-1 text-xs text-primary"></i>
-            <span className={`${playdate.cost?.toLowerCase() === 'free' ? 'text-green-600 font-medium' : 'text-dark/70'}`}>
+            <span className={`${playdate.cost?.toLowerCase() === 'free' ? 'text-green-600 font-medium' : 'text-muted-foreground'}`}>
               {playdate.cost || 'Free'}
             </span>
             {playdate.isRecurring && (
@@ -206,7 +206,7 @@ export function PlaydateCard({ playdate }: PlaydateCardProps) {
                 </div>
               )}
             </div>
-            <span className="text-xs text-dark/60">
+            <span className="text-xs text-muted-foreground">
               {playdate.participants.length} / {playdate.maxParticipants} {t('playdates.participants', 'deelnemers')}
             </span>
           </div>

@@ -15,7 +15,6 @@ export function NearbyPlaces() {
   const [activeFilter, setActiveFilter] = useState<PlaceType>("all");
   const { t } = useTranslation();
   
-  // Extract type from URL query parameters if coming from places page
   useEffect(() => {
     if (location.includes("type=restaurant")) {
       setActiveFilter("restaurant");
@@ -24,16 +23,13 @@ export function NearbyPlaces() {
     }
   }, [location]);
 
-  // Build query URL with parameters
   const queryUrl = `/api/places/nearby?latitude=${locationState.latitude}&longitude=${locationState.longitude}&activeFilter=${activeFilter}`;
   
   const { data: places, isLoading, error } = useQuery<Place[]>({
     queryKey: [queryUrl],
   });
 
-  const handleFilterChange = (filter: PlaceType) => {
-    setActiveFilter(filter);
-  };
+  const handleFilterChange = (filter: PlaceType) => setActiveFilter(filter);
 
   if (isLoading) {
     return (
@@ -46,11 +42,10 @@ export function NearbyPlaces() {
             <Skeleton className="w-24 h-8 rounded-lg" />
           </div>
         </div>
-        
         <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
           <div className="flex space-x-4 pb-4 w-max">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64">
+              <div key={i} className="bg-card rounded-xl shadow-sm flex-shrink-0 w-64">
                 <Skeleton className="w-full h-40 rounded-t-xl" />
                 <div className="p-4">
                   <Skeleton className="h-5 w-3/4 mb-2" />
@@ -82,43 +77,29 @@ export function NearbyPlaces() {
     ? places.filter(place => place.type === activeFilter)
     : places;
 
+  const filterButtons: { value: PlaceType; label: string }[] = [
+    { value: "all", label: t('places.all', 'All') },
+    { value: "restaurant", label: t('places.restaurant', 'Restaurants') },
+    { value: "playground", label: t('places.playground', 'Playgrounds') },
+    { value: "museum", label: t('places.museum', 'Museums') },
+  ];
+
   return (
     <section className="mb-10">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-heading font-bold">{t('home.nearbyPlaces', 'Nearby Places')}</h2>
         <div className="flex space-x-2 text-sm">
-          <button 
-            className={`py-1 px-3 rounded-lg font-medium ${activeFilter === "all" 
-              ? "bg-primary text-white" 
-              : "bg-white text-dark"}`}
-            onClick={() => handleFilterChange("all")}
-          >
-            {t('places.all', 'All')}
-          </button>
-          <button 
-            className={`py-1 px-3 rounded-lg font-medium ${activeFilter === "restaurant" 
-              ? "bg-primary text-white" 
-              : "bg-white text-dark"}`}
-            onClick={() => handleFilterChange("restaurant")}
-          >
-            {t('places.restaurant', 'Restaurants')}
-          </button>
-          <button 
-            className={`py-1 px-3 rounded-lg font-medium ${activeFilter === "playground" 
-              ? "bg-primary text-white" 
-              : "bg-white text-dark"}`}
-            onClick={() => handleFilterChange("playground")}
-          >
-            {t('places.playground', 'Playgrounds')}
-          </button>
-          <button 
-            className={`py-1 px-3 rounded-lg font-medium ${activeFilter === "museum" 
-              ? "bg-primary text-white" 
-              : "bg-white text-dark"}`}
-            onClick={() => handleFilterChange("museum")}
-          >
-            {t('places.museum', 'Museums')}
-          </button>
+          {filterButtons.map(({ value, label }) => (
+            <button
+              key={value}
+              className={`py-1 px-3 rounded-lg font-medium ${activeFilter === value
+                ? "bg-primary text-white"
+                : "bg-muted text-foreground"}`}
+              onClick={() => handleFilterChange(value)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
       
@@ -130,7 +111,7 @@ export function NearbyPlaces() {
             ))
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center py-8">
-              <p className="text-gray-500 mb-2">{t('places.noPlacesFound', 'No places found')}</p>
+              <p className="text-muted-foreground mb-2">{t('places.noPlacesFound', 'No places found')}</p>
               <Link href="/places">
                 <button className="bg-primary text-white hover:bg-accent transition py-2 px-6 rounded-lg font-medium text-sm">
                   {t('places.viewAllPlaces', 'View all places')}

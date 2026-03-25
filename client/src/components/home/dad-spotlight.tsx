@@ -45,7 +45,7 @@ export function DadSpotlight() {
           <Skeleton className="h-6 w-24" />
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-card rounded-xl shadow-sm overflow-hidden">
           <div className="md:flex">
             <Skeleton className="md:w-1/3 h-64" />
             <div className="p-6 md:w-2/3">
@@ -73,8 +73,8 @@ export function DadSpotlight() {
           </Link>
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-          <p className="text-dark/70">{t('dads.noFeaturedDadAvailable', 'No featured dad is currently available.')}</p>
+        <div className="bg-card rounded-xl shadow-sm p-6 text-center">
+          <p className="text-muted-foreground">{t('dads.noFeaturedDadAvailable', 'No featured dad is currently available.')}</p>
         </div>
       </section>
     );
@@ -96,7 +96,7 @@ export function DadSpotlight() {
         </Link>
       </div>
       
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300">
+      <div className="bg-card rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300">
         <div className="md:flex">
           <div className="md:w-1/3 relative group">
             <img 
@@ -115,7 +115,7 @@ export function DadSpotlight() {
                 {t('dads.activeDad', 'Active Dad')}
               </span>
             </div>
-            <p className="text-dark/80 mb-4 line-clamp-3">{featuredDad.bio || t('profile.noBio', 'This dad has not added a bio yet.')}</p>
+            <p className="text-muted-foreground mb-4 line-clamp-3">{featuredDad.bio || t('profile.noBio', 'This dad has not added a bio yet.')}</p>
             
             {/* Children information only if user has real children data */}
             {featuredDad.hasChildrenInfo && featuredDad.childrenInfo && featuredDad.childrenInfo.length > 0 && (

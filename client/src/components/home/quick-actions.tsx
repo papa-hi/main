@@ -7,17 +7,13 @@ interface QuickActionButtonProps {
   href: string;
 }
 
-function QuickActionButton({ 
-  customIcon,
-  label, 
-  href
-}: QuickActionButtonProps) {
+function QuickActionButton({ customIcon, label, href }: QuickActionButtonProps) {
   return (
     <Link 
       href={href}
-      className="flex flex-col items-center bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition transform hover:scale-105"
+      className="flex flex-col items-center bg-card p-5 rounded-xl shadow-sm hover:shadow-md transition transform hover:scale-105"
     >
-      <div className={`w-24 h-24 rounded-full mb-3 shadow-md overflow-hidden relative`}>
+      <div className="w-24 h-24 rounded-full mb-3 shadow-md overflow-hidden relative">
         {customIcon && (
           <img 
             src={customIcon} 

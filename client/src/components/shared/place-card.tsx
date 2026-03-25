@@ -95,7 +95,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
 
   return (
     <div 
-      className="bg-white rounded-xl shadow-sm flex-shrink-0 w-64 transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-md cursor-pointer"
+      className="bg-card rounded-xl shadow-sm flex-shrink-0 w-64 transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-md cursor-pointer"
       onClick={handleCardClick}
     >
       <div className="relative">
@@ -116,7 +116,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
           }}
           className="w-full h-40 object-cover rounded-t-xl" 
         />
-        <div className="absolute top-3 left-3 bg-white py-1 px-3 rounded-full text-xs font-medium">
+        <div className="absolute top-3 left-3 bg-card/90 py-1 px-3 rounded-full text-xs font-medium">
           {place.type === 'restaurant' ? (
             <>
               <i className="fas fa-utensils text-primary mr-1"></i>
@@ -138,7 +138,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
           className={`absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center shadow-md ${
             isSaved 
               ? 'bg-orange-500 text-white' 
-              : 'bg-white text-orange-500 hover:bg-orange-50'
+              : 'bg-card text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950'
           } transition-all duration-200 transform hover:scale-110`} 
           aria-label={isSaved ? t('places.unsavePlace', 'Remove from saved') : t('places.savePlace', 'Save Place')}
           onClick={toggleSave}
@@ -177,7 +177,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
             )}
           </div>
         </div>
-        <div className="flex items-center text-sm text-dark/70 mb-2">
+        <div className="flex items-center text-sm text-muted-foreground mb-2">
           <i className="fas fa-map-marker-alt mr-1 text-xs"></i>
           <span>{place.address}</span>
         </div>
@@ -218,7 +218,7 @@ export function PlaceCard({ place, onEdit }: PlaceCardProps) {
         </div>
         
         {/* Rating moved to bottom */}
-        <div className="mt-auto pt-2 border-t border-gray-100">
+        <div className="mt-auto pt-2 border-t border-border">
           <StarRating placeId={place.id} size="sm" showCount={true} />
         </div>
       </div>
