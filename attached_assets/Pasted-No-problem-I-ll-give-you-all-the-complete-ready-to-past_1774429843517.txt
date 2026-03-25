@@ -1,0 +1,879 @@
+No problem — I'll give you all the complete, ready-to-paste fixed files right here. Here are every changed file in full:
+
+---
+
+### File 1: `client/src/index.css`
+
+```css name=client/src/index.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Varela Round', 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Varela Round', 'Outfit', sans-serif;
+  }
+
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+
+  /* Safe area inset for notched devices (iPhone X and later) */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  :root {
+    --background: 60 17% 96%;
+    --foreground: 126 10% 23%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 126 10% 23%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 126 10% 23%;
+
+    --primary: 126 17% 31%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 126 10% 45%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 60 10% 90%;
+    --muted-foreground: 126 5% 45%;
+
+    --accent: 30 100% 61%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 60 10% 85%;
+    --input: 60 10% 85%;
+    --ring: 126 17% 31%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 20% 12%;
+    --foreground: 60 10% 90%;
+
+    --card: 222 20% 16%;
+    --card-foreground: 60 10% 90%;
+
+    --popover: 222 20% 16%;
+    --popover-foreground: 60 10% 90%;
+
+    --primary: 142 30% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 222 15% 25%;
+    --secondary-foreground: 60 10% 85%;
+
+    --muted: 222 15% 22%;
+    --muted-foreground: 60 5% 60%;
+
+    --accent: 30 100% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 15% 25%;
+    --input: 222 15% 25%;
+    --ring: 142 30% 45%;
+  }
+}
+```
+
+---
+
+### File 2: `client/src/components/ui/theme-provider.tsx`
+
+```tsx name=client/src/components/ui/theme-provider.tsx
+import { createContext, useContext, useEffect, useState } from "react";
+
+type Theme = "light" | "dark" | "system";
+
+type ThemeProviderProps = {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+};
+
+type ThemeProviderState = {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+};
+
+const initialState: ThemeProviderState = {
+  theme: "light",
+  setTheme: () => null,
+};
+
+const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+
+export function ThemeProvider({
+  children,
+  defaultTheme = "light",
+  ...props
+}: ThemeProviderProps) {
+  const [theme, setTheme] = useState<Theme>(
+    () => (localStorage.getItem("ui-theme") as Theme) || defaultTheme
+  );
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove("dark");
+
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+
+      if (systemTheme === "dark") {
+        root.classList.add("dark");
+      }
+    } else if (theme === "dark") {
+      root.classList.add("dark");
+    }
+  }, [theme]);
+
+  const value = {
+    theme,
+    setTheme: (newTheme: Theme) => {
+      localStorage.setItem("ui-theme", newTheme);
+      setTheme(newTheme);
+    },
+  };
+
+  return (
+    <ThemeProviderContext.Provider {...props} value={value}>
+      {children}
+    </ThemeProviderContext.Provider>
+  );
+}
+
+export const useTheme = () => {
+  const context = useContext(ThemeProviderContext);
+
+  if (context === undefined)
+    throw new Error("useTheme must be used within a ThemeProvider");
+
+  return context;
+};
+```
+
+---
+
+### File 3: `client/src/components/layout/mobile-footer.tsx`
+
+```tsx name=client/src/components/layout/mobile-footer.tsx
+import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
+import { useAuth } from "@/hooks/use-auth";
+import { Home, Calendar, MapPin, Users, MessageCircle, MessageSquare, ShieldCheck } from "lucide-react";
+
+export function MobileFooter() {
+  const [location] = useLocation();
+  const { t } = useTranslation();
+  const { user } = useAuth();
+
+  const totalUnread = (user as any)?.unreadMessages || 0;
+
+  const navItemClass = (isActive: boolean) =>
+    `flex flex-col items-center justify-center py-1.5 px-1 min-w-0 flex-1 rounded-lg transition-colors ${
+      isActive ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted"
+    }`;
+
+  return (
+    <footer className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-[1000] safe-area-inset-bottom">
+      <nav className="flex items-stretch w-full px-0.5 py-1.5 overflow-hidden">
+        <Link href="/" className={navItemClass(location === "/")}>
+          <Home className={`w-5 h-5 ${location === "/" ? "text-primary" : ""}`} />
+          <span className="text-[10px] mt-0.5 font-medium truncate max-w-full">{t("navigation.home", "Home")}</span>
+        </Link>
+
+        <Link href="/playdates" className={navItemClass(location === "/playdates")}>
+          <Calendar className={`w-5 h-5 ${location === "/playdates" ? "text-primary" : ""}`} />
+          <span className="text-[10px] mt-0.5 font-medium truncate max-w-full">{t("navigation.playdates", "Playdates")}</span>
+        </Link>
+
+        <Link href="/places" className={navItemClass(location.includes("/places"))}>
+          <MapPin className={`w-5 h-5 ${location.includes("/places") ? "text-primary" : ""}`} />
+          <span className="text-[10px] mt-0.5 font-medium truncate max-w-full">{t("navigation.places", "Places")}</span>
+        </Link>
+
+        <Link href="/discover" className={navItemClass(location === "/discover")}>
+          <Users className={`w-5 h-5 ${location === "/discover" ? "text-primary" : ""}`} />
+          <span className="text-[10px] mt-0.5 font-medium truncate max-w-full">{t("navigation.discover", "Discover")}</span>
+        </Link>
+
+        <Link href="/community" className={navItemClass(location === "/community")}>
+          <MessageSquare className={`w-5 h-5 ${location === "/community" ? "text-primary" : ""}`} />
+          <span className="text-[10px] mt-0.5 font-medium truncate max-w-full">{t("nav.community", "Community")}</span>
+        </Link>
+
+        <Link href="/chat" className={`${navItemClass(location.includes("/chat"))} relative`}>
+          <div className="relative">
+            <MessageCircle className={`w-5 h-5 ${location.includes("/chat") ? "text-primary" : ""}`} />
+            {totalUnread > 0 && (
+              <span className="absolute -top-1.5 -right-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white px-0.5">
+                {totalUnread > 9 ? "9+" : totalUnread}
+              </span>
+            )}
+          </div>
+          <span className="text-[10px] mt-0.5 font-medium truncate max-w-full">{t("navigation.chat", "Messages")}</span>
+        </Link>
+
+        {user?.role === "admin" && (
+          <Link href="/admin" className={navItemClass(location.includes("/admin"))}>
+            <ShieldCheck className={`w-5 h-5 ${location.includes("/admin") ? "text-primary" : ""}`} />
+            <span className="text-[10px] mt-0.5 font-medium truncate max-w-full">Admin</span>
+          </Link>
+        )}
+      </nav>
+    </footer>
+  );
+}
+
+export default MobileFooter;
+```
+
+---
+
+### File 4: `client/src/components/home/welcome-section.tsx`
+
+```tsx name=client/src/components/home/welcome-section.tsx
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useWeather } from "@/hooks/use-weather";
+import { useQuery } from "@tanstack/react-query";
+import { Playdate } from "@shared/schema";
+import { Link } from "wouter";
+import { format } from "date-fns";
+import { nl, enUS } from "date-fns/locale";
+import { Sun, Moon, Cloud, CloudSun, CloudMoon, CloudRain, CloudDrizzle, CloudLightning, Snowflake, CloudFog } from "lucide-react";
+
+interface WelcomeSectionProps {
+  userName: string;
+}
+
+export function WelcomeSection({ userName }: WelcomeSectionProps) {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [randomPlaydate, setRandomPlaydate] = useState<Playdate | null>(null);
+  const [currentBanner, setCurrentBanner] = useState(1);
+  const { t, i18n } = useTranslation();
+  const { temperature, condition, icon, city, country, isLoading: weatherLoading, error: weatherError } = useWeather();
+
+  // Fetch upcoming playdates
+  const { data: playdates, isLoading: playdatesLoading } = useQuery<Playdate[]>({
+    queryKey: ["/api/playdates/upcoming"],
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Rotate banner every 10 seconds
+  useEffect(() => {
+    const bannerTimer = setInterval(() => {
+      setCurrentBanner((prev) => (prev === 3 ? 1 : prev + 1));
+    }, 10000);
+    return () => clearInterval(bannerTimer);
+  }, []);
+
+  // Select a random playdate when data is loaded
+  useEffect(() => {
+    if (playdates && playdates.length > 0) {
+      const randomIndex = Math.floor(Math.random() * playdates.length);
+      setRandomPlaydate(playdates[randomIndex]);
+    }
+  }, [playdates]);
+
+  const getGreeting = () => {
+    const hour = currentTime.getHours();
+    const currentLang = i18n.language;
+
+    if (currentLang === "nl") {
+      if (hour < 12) return "Goedemorgen";
+      if (hour < 18) return "Goedemiddag";
+      return "Goedenavond";
+    } else {
+      if (hour < 12) return "Good morning";
+      if (hour < 18) return "Good afternoon";
+      return "Good evening";
+    }
+  };
+
+  const formatPlaydateDate = (date: Date) => {
+    const currentLang = i18n.language;
+    const locale = currentLang === "nl" ? nl : enUS;
+    return format(date, "EEEE, d MMMM • HH:mm", { locale });
+  };
+
+  const getWeatherIcon = () => {
+    const iconClass = "h-5 w-5 text-amber-500 group-hover:animate-weather";
+    if (icon) {
+      const iconMap: Record<string, JSX.Element> = {
+        "01d": <Sun className={iconClass} />,
+        "01n": <Moon className={iconClass} />,
+        "02d": <CloudSun className={iconClass} />,
+        "02n": <CloudMoon className={iconClass} />,
+        "03d": <Cloud className={iconClass} />,
+        "03n": <Cloud className={iconClass} />,
+        "04d": <Cloud className={iconClass} />,
+        "04n": <Cloud className={iconClass} />,
+        "09d": <CloudDrizzle className={iconClass} />,
+        "09n": <CloudDrizzle className={iconClass} />,
+        "10d": <CloudRain className={iconClass} />,
+        "10n": <CloudRain className={iconClass} />,
+        "11d": <CloudLightning className={iconClass} />,
+        "11n": <CloudLightning className={iconClass} />,
+        "13d": <Snowflake className={iconClass} />,
+        "13n": <Snowflake className={iconClass} />,
+        "50d": <CloudFog className={iconClass} />,
+        "50n": <CloudFog className={iconClass} />,
+      };
+      return iconMap[icon] || <Cloud className={iconClass} />;
+    }
+    const conditionLower = condition.toLowerCase();
+    if (conditionLower.includes("clear")) return <Sun className={iconClass} />;
+    if (conditionLower.includes("cloud")) return <Cloud className={iconClass} />;
+    if (conditionLower.includes("rain") || conditionLower.includes("shower")) return <CloudRain className={iconClass} />;
+    if (conditionLower.includes("snow")) return <Snowflake className={iconClass} />;
+    if (conditionLower.includes("thunder")) return <CloudLightning className={iconClass} />;
+    if (conditionLower.includes("fog") || conditionLower.includes("mist")) return <CloudFog className={iconClass} />;
+    return <Cloud className={iconClass} />;
+  };
+
+  return (
+    <section className="mb-8">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-heading font-bold mb-1">
+            {getGreeting()}, {userName}!
+          </h2>
+          <p className="text-sm text-secondary">{t("home.readyToday", "Ready to plan a fun day?")}</p>
+        </div>
+
+        {/* Weather Widget — loaded */}
+        {!weatherLoading && !weatherError && city && (
+          <div className="bg-card text-card-foreground rounded-lg p-3 shadow-sm flex items-center space-x-3 hover:shadow-md transition-all duration-300 transform hover:scale-105 cursor-pointer group">
+            {getWeatherIcon()}
+            <div>
+              <span className="text-sm font-medium group-hover:text-primary transition-colors duration-300">{temperature}°C</span>
+              <p className="text-xs text-muted-foreground">
+                {city}
+                {country ? `, ${country}` : ""}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Weather Widget — loading */}
+        {weatherLoading && (
+          <div className="bg-card rounded-lg p-3 shadow-sm flex items-center space-x-3 animate-pulse">
+            <div className="w-5 h-5 rounded-full bg-accent/30"></div>
+            <div className="space-y-1">
+              <div className="h-3 w-10 bg-muted rounded"></div>
+              <div className="h-2 w-16 bg-muted/70 rounded"></div>
+            </div>
+          </div>
+        )}
+
+        {/* Weather Widget — fallback */}
+        {!weatherLoading && (weatherError || !city) && (
+          <div className="bg-card text-card-foreground rounded-lg p-3 shadow-sm flex items-center space-x-3">
+            <Sun className="h-5 w-5 text-amber-500" />
+            <div>
+              <span className="text-sm font-medium">18°C</span>
+              <p className="text-xs text-muted-foreground">Amsterdam, NL</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Featured Section skeleton */}
+      {playdatesLoading && (
+        <div className="relative rounded-xl overflow-hidden mb-6 animate-pulse">
+          <div className="w-full h-52 bg-muted"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
+            <div className="bg-accent/80 h-6 w-24 rounded-full mb-2"></div>
+            <div className="bg-white/40 h-7 w-3/4 rounded mb-2"></div>
+            <div className="bg-white/40 h-5 w-1/2 rounded mb-3"></div>
+            <div className="bg-white/80 h-9 w-32 rounded-lg"></div>
+          </div>
+        </div>
+      )}
+
+      {/* Featured Section — with playdate */}
+      {!playdatesLoading && randomPlaydate && (
+        <div className="relative rounded-xl overflow-hidden mb-6">
+          <img
+            src={`/banner${currentBanner}.png`}
+            alt="Children playing together"
+            className="w-full h-52 object-cover transition-opacity duration-1000"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
+            <span className="text-white text-xs font-medium bg-accent py-1 px-3 rounded-full inline-block mb-2 w-fit">
+              {t("home.featured", "Featured Playdate")}
+            </span>
+            <h3 className="text-white text-xl font-heading font-bold">
+              {t(`playdate.title.${randomPlaydate.id}`, randomPlaydate.title)}
+            </h3>
+            <p className="text-white text-sm mb-3">
+              {formatPlaydateDate(new Date(randomPlaydate.startTime))} • {t(`playdate.location.${randomPlaydate.id}`, randomPlaydate.location)}
+            </p>
+            <Link href={`/playdates/${randomPlaydate.id}`}>
+              <button className="bg-white dark:bg-card text-primary dark:text-foreground hover:bg-accent hover:text-white transition py-2 px-4 rounded-lg font-medium text-sm w-fit">
+                {t("common.moreInfo", "More Info")}
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Featured Section — no playdates */}
+      {!playdatesLoading && !randomPlaydate && (
+        <div className="relative rounded-xl overflow-hidden mb-6">
+          <img
+            src={`/banner${currentBanner}.png`}
+            alt="Children playing together"
+            className="w-full h-52 object-cover transition-opacity duration-1000"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
+            <span className="text-white text-xs font-medium bg-accent py-1 px-3 rounded-full inline-block mb-2 w-fit">
+              {t("home.featured", "Get Started")}
+            </span>
+            <h3 className="text-white text-xl font-heading font-bold">
+              {t("home.noPlaydatesTitle", "No Upcoming Playdates")}
+            </h3>
+            <p className="text-white text-sm mb-3">
+              {t("home.noPlaydatesDesc", "Create a playdate to connect with other dads!")}
+            </p>
+            <Link href="/create">
+              <button className="bg-white dark:bg-card text-primary dark:text-foreground hover:bg-accent hover:text-white transition py-2 px-4 rounded-lg font-medium text-sm w-fit">
+                {t("home.createPlaydate", "Create Playdate")}
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+export default WelcomeSection;
+```
+
+---
+
+### File 5: `client/src/components/home/upcoming-playdates.tsx`
+
+```tsx name=client/src/components/home/upcoming-playdates.tsx
+import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { PlaydateCard } from "../shared/playdate-card";
+import { Playdate } from "@shared/schema";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
+
+export function UpcomingPlaydates() {
+  const { t } = useTranslation();
+  const { data: playdates, isLoading, error } = useQuery<Playdate[]>({
+    queryKey: ["/api/playdates/upcoming"],
+  });
+
+  if (isLoading) {
+    return (
+      <section className="mb-10">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-heading font-bold">{t("home.upcomingPlaydates", "Upcoming Playdates")}</h2>
+          <div className="h-6 w-24 bg-muted rounded animate-pulse"></div>
+        </div>
+        <div className="space-y-4">
+          {[1, 2].map((i) => (
+            <div key={i} className="bg-card rounded-xl p-4 shadow-sm">
+              <div className="flex items-start">
+                <Skeleton className="flex-shrink-0 w-14 h-14 rounded-lg mr-4" />
+                <div className="flex-grow">
+                  <Skeleton className="h-5 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-2/3 mb-2" />
+                  <div className="flex space-x-1">
+                    <Skeleton className="w-6 h-6 rounded-full" />
+                    <Skeleton className="w-6 h-6 rounded-full" />
+                    <Skeleton className="w-6 h-6 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="mb-10">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-heading font-bold">{t("home.upcomingPlaydates", "Upcoming Playdates")}</h2>
+        </div>
+        <div className="bg-destructive/10 text-destructive p-4 rounded-lg">
+          {t("playdates.loadError", "An error occurred while loading your playdates.")}
+        </div>
+      </section>
+    );
+  }
+
+  if (!playdates || playdates.length === 0) {
+    return (
+      <section className="mb-10">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-heading font-bold">{t("home.upcomingPlaydates", "Upcoming Playdates")}</h2>
+          <Link href="/playdates">
+            <a className="text-primary text-sm font-medium hover:text-accent transition">{t("home.seeAll", "See All")}</a>
+          </Link>
+        </div>
+
+        <div className="bg-card rounded-xl p-6 shadow-sm text-center">
+          <img
+            src="/images/father.png"
+            alt={t("playdates.emptyCalendarAlt", "Father with children")}
+            className="w-28 h-28 object-cover rounded-full mx-auto mb-4"
+          />
+          <h3 className="font-heading font-medium text-lg mb-2">{t("playdates.noPlaydatesPlanned", "No playdates planned")}</h3>
+          <p className="text-muted-foreground text-sm mb-4">{t("playdates.planNewMeetDads", "Plan a new playdate to meet other fathers!")}</p>
+          <Link href="/create">
+            <button className="bg-primary text-white hover:bg-accent transition py-2 px-6 rounded-lg font-medium text-sm">
+              {t("playdates.newPlaydate", "New Playdate")}
+            </button>
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mb-10">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-heading font-bold">{t("home.upcomingPlaydates", "Upcoming Playdates")}</h2>
+        <Link href="/playdates">
+          <a className="text-primary text-sm font-medium hover:text-accent transition">{t("home.seeAll", "See All")}</a>
+        </Link>
+      </div>
+
+      <div className="space-y-4">
+        {playdates.map((playdate) => (
+          <PlaydateCard key={playdate.id} playdate={playdate} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default UpcomingPlaydates;
+```
+
+---
+
+### File 6: `client/src/components/home/nearby-places.tsx`
+
+```tsx name=client/src/components/home/nearby-places.tsx
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { Place } from "@shared/schema";
+import { PlaceCard } from "../shared/place-card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useLocation as useGeoLocation } from "@/hooks/use-location";
+import { useTranslation } from "react-i18next";
+
+type PlaceType = "all" | "restaurant" | "playground" | "museum";
+
+export function NearbyPlaces() {
+  const [location] = useLocation();
+  const locationState = useGeoLocation();
+  const [activeFilter, setActiveFilter] = useState<PlaceType>("all");
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    if (location.includes("type=restaurant")) {
+      setActiveFilter("restaurant");
+    } else if (location.includes("type=playground")) {
+      setActiveFilter("playground");
+    }
+  }, [location]);
+
+  const queryUrl = `/api/places/nearby?latitude=${locationState.latitude}&longitude=${locationState.longitude}&activeFilter=${activeFilter}`;
+
+  const { data: places, isLoading, error } = useQuery<Place[]>({
+    queryKey: [queryUrl],
+  });
+
+  const handleFilterChange = (filter: PlaceType) => {
+    setActiveFilter(filter);
+  };
+
+  if (isLoading) {
+    return (
+      <section className="mb-10">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-heading font-bold">{t("home.nearbyPlaces", "Nearby Places")}</h2>
+          <div className="flex space-x-2 text-sm">
+            <Skeleton className="w-16 h-8 rounded-lg" />
+            <Skeleton className="w-24 h-8 rounded-lg" />
+            <Skeleton className="w-24 h-8 rounded-lg" />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+          <div className="flex space-x-4 pb-4 w-max">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-card rounded-xl shadow-sm flex-shrink-0 w-64">
+                <Skeleton className="w-full h-40 rounded-t-xl" />
+                <div className="p-4">
+                  <Skeleton className="h-5 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-2/3 mb-2" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="mb-10">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-heading font-bold">{t("home.nearbyPlaces", "Nearby Places")}</h2>
+        </div>
+        <div className="bg-destructive/10 text-destructive p-4 rounded-lg">
+          {t("common.error", "An error occurred")}
+        </div>
+      </section>
+    );
+  }
+
+  const filteredPlaces =
+    places && activeFilter !== "all" ? places.filter((place) => place.type === activeFilter) : places;
+
+  const filterButtonClass = (filter: PlaceType) =>
+    `py-1 px-3 rounded-lg font-medium transition-colors ${
+      activeFilter === filter
+        ? "bg-primary text-white"
+        : "bg-card text-foreground border border-border hover:bg-muted"
+    }`;
+
+  return (
+    <section className="mb-10">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-heading font-bold">{t("home.nearbyPlaces", "Nearby Places")}</h2>
+        <div className="flex space-x-2 text-sm">
+          <button className={filterButtonClass("all")} onClick={() => handleFilterChange("all")}>
+            {t("places.all", "All")}
+          </button>
+          <button className={filterButtonClass("restaurant")} onClick={() => handleFilterChange("restaurant")}>
+            {t("places.restaurant", "Restaurants")}
+          </button>
+          <button className={filterButtonClass("playground")} onClick={() => handleFilterChange("playground")}>
+            {t("places.playground", "Playgrounds")}
+          </button>
+          <button className={filterButtonClass("museum")} onClick={() => handleFilterChange("museum")}>
+            {t("places.museum", "Museums")}
+          </button>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+        <div className="flex space-x-4 pb-4 w-max">
+          {filteredPlaces && filteredPlaces.length > 0 ? (
+            filteredPlaces.map((place) => <PlaceCard key={place.id} place={place} />)
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center py-8">
+              <p className="text-muted-foreground mb-2">{t("places.noPlacesFound", "No places found")}</p>
+              <Link href="/places">
+                <button className="bg-primary text-white hover:bg-accent transition py-2 px-6 rounded-lg font-medium text-sm">
+                  {t("places.viewAllPlaces", "View all places")}
+                </button>
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default NearbyPlaces;
+```
+
+---
+
+### File 7: `client/src/components/home/quick-actions.tsx`
+
+```tsx name=client/src/components/home/quick-actions.tsx
+import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
+
+interface QuickActionButtonProps {
+  customIcon?: string;
+  label: string;
+  href: string;
+}
+
+function QuickActionButton({ customIcon, label, href }: QuickActionButtonProps) {
+  return (
+    <Link
+      href={href}
+      className="flex flex-col items-center bg-card p-5 rounded-xl shadow-sm hover:shadow-md transition transform hover:scale-105"
+    >
+      <div className="w-24 h-24 rounded-full mb-3 shadow-md overflow-hidden relative">
+        {customIcon && (
+          <img src={customIcon} alt={label} className="w-full h-full object-cover absolute inset-0" />
+        )}
+      </div>
+      <span className="text-center text-sm font-medium">{label}</span>
+    </Link>
+  );
+}
+
+export function QuickActions() {
+  const { t } = useTranslation();
+
+  return (
+    <section className="mb-10">
+      <h2 className="text-xl font-heading font-bold mb-4">{t("home.quickActions", "Quick Actions")}</h2>
+      <div className="grid grid-cols-3 gap-4">
+        <QuickActionButton customIcon="/icons/playdate.png" label={t("quickActions.newPlaydate", "New Playdate")} href="/create" />
+        <QuickActionButton customIcon="/icons/restaurant.png" label={t("places.restaurant", "Restaurants")} href="/places?type=restaurant" />
+        <QuickActionButton customIcon="/icons/playground.png" label={t("places.playground", "Playgrounds")} href="/places?type=playground" />
+      </div>
+    </section>
+  );
+}
+
+export default QuickActions;
+```
+
+---
+
+### File 8: `client/src/pages/not-found.tsx`
+
+```tsx name=client/src/pages/not-found.tsx
+import { Link } from "wouter";
+import { AlertCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
+
+export default function NotFound() {
+  const { t } = useTranslation("errors");
+
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center bg-background">
+      <Card className="w-full max-w-md mx-4">
+        <CardContent className="pt-6">
+          <div className="flex mb-4 gap-2">
+            <AlertCircle className="h-8 w-8 text-destructive" />
+            <h1 className="text-2xl font-bold text-foreground">{t("notFound.title", "404 Page Not Found")}</h1>
+          </div>
+
+          <p className="mt-4 text-sm text-muted-foreground">
+            {t("notFound.message", "The page you are looking for does not exist.")}
+          </p>
+
+          <div className="mt-6">
+            <Link href="/">
+              <Button>{t("notFound.backToHome", "Back to Home")}</Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+```
+
+---
+
+### What to do with `SettingsPage.tsx` (theme toggle addition)
+
+In `client/src/pages/SettingsPage.tsx`, add these two lines near the top of the existing imports/hooks:
+
+```tsx name=client/src/pages/SettingsPage.tsx
+// Add this import at the top with other imports
+import { useTheme } from '@/components/ui/theme-provider';
+
+// Add this inside the SettingsPage component function, near the other useState declarations
+const { theme, setTheme } = useTheme();
+```
+
+Then in the `case 'account'` section, right after the `<Button variant="outline" onClick={() => navigate('/profile')}>Edit Profile</Button>` and before the first `<Separator />` for "Change Email":
+
+```tsx name=client/src/pages/SettingsPage.tsx
+<Separator />
+<div>
+  <h4 className="font-medium mb-2 flex items-center gap-2">
+    <Settings className="h-4 w-4" />
+    {t('settings.account.appearance', 'Appearance')}
+  </h4>
+  <p className="text-sm text-muted-foreground mb-3">
+    {t('settings.account.appearanceDesc', 'Choose your preferred colour scheme')}
+  </p>
+  <div className="flex gap-2">
+    {(['light', 'dark', 'system'] as const).map((opt) => (
+      <button
+        key={opt}
+        onClick={() => setTheme(opt)}
+        className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+          theme === opt
+            ? 'bg-primary text-white border-primary'
+            : 'bg-card text-foreground border-border hover:bg-muted'
+        }`}
+      >
+        {opt.charAt(0).toUpperCase() + opt.slice(1)}
+      </button>
+    ))}
+  </div>
+</div>
+```
+
+---
+
+### Summary of all changes
+
+| File | Changes |
+|---|---|
+| `index.css` | Removed hardcoded body hex colors; added full `.dark {}` CSS variable block |
+| `theme-provider.tsx` | Added `localStorage` persistence for theme selection |
+| `mobile-footer.tsx` | `bg-white` → `bg-background border-t border-border`; `text-dark/70 hover:bg-gray-100` → `text-muted-foreground hover:bg-muted` |
+| `welcome-section.tsx` | All 3 weather widgets: `bg-white` → `bg-card`; skeleton: `bg-slate-200` → `bg-muted`; banner buttons: added `dark:bg-card dark:text-foreground` |
+| `upcoming-playdates.tsx` | `bg-white` → `bg-card`; `bg-gray-200` → `bg-muted`; `text-dark/70` → `text-muted-foreground`; error: `bg-red-50` → `bg-destructive/10` |
+| `nearby-places.tsx` | `bg-white` → `bg-card`; filter buttons inactive: `bg-white text-dark` → `bg-card text-foreground border border-border`; `bg-red-50` → `bg-destructive/10`; `text-gray-500` → `text-muted-foreground` |
+| `quick-actions.tsx` | `bg-white` → `bg-card` |
+| `not-found.tsx` | `bg-gray-50` → `bg-background`; `text-gray-900` → `text-foreground`; `text-gray-600` → `text-muted-foreground` |
+| `SettingsPage.tsx` | Added Light/Dark/System theme toggle UI in the Account section |
