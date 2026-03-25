@@ -13,6 +13,7 @@ import { emailQueue } from "./email-queue";
 import { passwordResetTokens } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { sanitizeObject } from "./sanitize";
+import { generateCsrfToken } from "./csrf";
 
 declare global {
   namespace Express {
@@ -298,6 +299,7 @@ export function setupAuth(app: Express) {
 
       req.login(user, (err) => {
         if (err) return next(err);
+        req.session.csrfToken = generateCsrfToken();
         const userWithoutPassword = { ...user } as Partial<SelectUser>;
         delete userWithoutPassword.password;
         res.status(201).json(userWithoutPassword);
@@ -325,6 +327,7 @@ export function setupAuth(app: Express) {
           return next(loginErr);
         }
         console.log(`[LOGIN] Success for user id=${user.id}, username="${user.username}", session.id=${req.session?.id}`);
+        req.session.csrfToken = generateCsrfToken();
         const userWithoutPassword = { ...user } as Partial<SelectUser>;
         delete userWithoutPassword.password;
         res.status(200).json(userWithoutPassword);
@@ -629,6 +632,7 @@ export function setupAuth(app: Express) {
         }
         
         console.log("User logged in successfully:", user.id);
+        req.session.csrfToken = generateCsrfToken();
         const userWithoutPassword = { ...user } as Partial<SelectUser>;
         delete userWithoutPassword.password;
         res.status(200).json(userWithoutPassword);

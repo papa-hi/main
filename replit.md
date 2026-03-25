@@ -54,6 +54,7 @@ The application features a modern and intuitive user interface built with Radix 
 The application is designed for scalability and real-time interaction, leveraging a robust backend for handling user data, authentication, and communication. Performance optimizations include database indexing, N+1 query problem resolution, and caching mechanisms for external API calls (e.g., Overpass API). Drizzle queries use single `.where(and(...))` pattern (not chained `.where()` calls).
 
 ### Security Hardening
+- **CSRF Protection**: Synchronizer-token pattern via `server/csrf.ts`. Token generated on login/register/firebase-auth, stored in session, returned via `GET /api/csrf-token`. All POST/PUT/PATCH/DELETE routes validate `x-csrf-token` header (exemptions: login, register, logout, password-reset, firebase-auth). Frontend auto-fetches + attaches the token in `apiRequest()` with transparent single-retry on stale token. Disabled in `NODE_ENV=test`.
 - URIError handler for malformed URL attacks
 - Disabled directory listing for /uploads
 - robots.txt with AI crawler blocking and sitemap reference

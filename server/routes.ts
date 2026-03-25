@@ -21,6 +21,7 @@ import { calculateDistance, getCityCoordinates } from "./dad-matching-service";
 import { sanitizeText, sanitizeObject } from "./sanitize";
 import rateLimit from "express-rate-limit";
 import { geocodeAddress } from "./geocoding";
+import { csrfMiddleware, generateCsrfToken } from "./csrf";
 
 // Counter to track which playground image to use next
 let playgroundImageCounter = 0;
@@ -227,9 +228,20 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Setup authentication
+  // Setup authentication (login/register/logout — exempt from CSRF)
   setupAuth(app);
-  
+
+  // CSRF protection — validates x-csrf-token header on all state-mutating requests
+  app.use(csrfMiddleware);
+
+  // Returns the CSRF token for the current session (frontend fetches this once on load)
+  app.get("/api/csrf-token", (req, res) => {
+    if (!req.session?.csrfToken) {
+      req.session.csrfToken = generateCsrfToken();
+    }
+    res.json({ csrfToken: req.session.csrfToken });
+  });
+
   // Setup admin routes
   setupAdminRoutes(app);
 
