@@ -47,7 +47,8 @@ export function OnboardingCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
 
-  const [dismissed, setDismissed] = useState(true);
+  const [ready, setReady] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [step2Done, setStep2Done] = useState(false);
   const [step3Done, setStep3Done] = useState(false);
 
@@ -55,9 +56,10 @@ export function OnboardingCard() {
     setDismissed(localStorage.getItem(DISMISSED_KEY) === "true");
     setStep2Done(localStorage.getItem(STEP2_KEY) === "true");
     setStep3Done(localStorage.getItem(STEP3_KEY) === "true");
+    setReady(true);
   }, []);
 
-  if (!user) return null;
+  if (!user || !ready) return null;
 
   const childrenInfo = user.childrenInfo as { name: string; age: number }[] | null;
   const step1Done = !!(user.bio && user.city && childrenInfo && childrenInfo.length > 0);
