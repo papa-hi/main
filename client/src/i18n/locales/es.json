@@ -169,6 +169,12 @@
     "couldNotGetLocation": "No se pudo obtener tu ubicación actual.",
     "browserNotSupported": "Navegador no compatible",
     "geolocationNotSupported": "La geolocalización no es compatible con este navegador.",
+    "noRatings": "Sin valoraciones",
+    "ratingSubmittedTitle": "¡Valoración enviada!",
+    "ratingSubmittedDesc": "Gracias por valorar este lugar.",
+    "ratingFailedTitle": "Error al enviar la valoración",
+    "ratingLoginTitle": "Por favor, inicia sesión",
+    "ratingLoginDesc": "Debes iniciar sesión para valorar lugares.",
     "restaurantFeatures": {
       "kidsMenu": "Menú infantil",
       "highChairs": "Sillas altas",

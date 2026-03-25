@@ -223,6 +223,12 @@
     "couldNotGetLocation": "Could not get your current location.",
     "browserNotSupported": "Browser Not Supported",
     "geolocationNotSupported": "Geolocation is not supported by this browser.",
+    "noRatings": "No ratings",
+    "ratingSubmittedTitle": "Rating submitted!",
+    "ratingSubmittedDesc": "Thank you for rating this place.",
+    "ratingFailedTitle": "Failed to submit rating",
+    "ratingLoginTitle": "Please log in",
+    "ratingLoginDesc": "You need to be logged in to rate places.",
     "restaurantFeatures": {
       "kidsMenu": "Kids menu",
       "highChairs": "High Chairs",

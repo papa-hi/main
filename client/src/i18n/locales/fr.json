@@ -169,6 +169,12 @@
     "couldNotGetLocation": "Impossible d'obtenir votre position actuelle.",
     "browserNotSupported": "Navigateur non supporté",
     "geolocationNotSupported": "La géolocalisation n'est pas prise en charge par ce navigateur.",
+    "noRatings": "Aucune évaluation",
+    "ratingSubmittedTitle": "Évaluation soumise !",
+    "ratingSubmittedDesc": "Merci d'avoir évalué cet endroit.",
+    "ratingFailedTitle": "Échec de la soumission",
+    "ratingLoginTitle": "Veuillez vous connecter",
+    "ratingLoginDesc": "Vous devez être connecté pour évaluer des lieux.",
     "restaurantFeatures": {
       "kidsMenu": "Menu enfant",
       "highChairs": "Chaises hautes",

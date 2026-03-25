@@ -169,6 +169,12 @@
     "couldNotGetLocation": "Dein aktueller Standort konnte nicht ermittelt werden.",
     "browserNotSupported": "Browser nicht unterstützt",
     "geolocationNotSupported": "Geolokalisierung wird von diesem Browser nicht unterstützt.",
+    "noRatings": "Keine Bewertungen",
+    "ratingSubmittedTitle": "Bewertung abgesendet!",
+    "ratingSubmittedDesc": "Danke für deine Bewertung dieses Ortes.",
+    "ratingFailedTitle": "Bewertung fehlgeschlagen",
+    "ratingLoginTitle": "Bitte einloggen",
+    "ratingLoginDesc": "Du musst eingeloggt sein, um Orte zu bewerten.",
     "restaurantFeatures": {
       "kidsMenu": "Kindermenü",
       "highChairs": "Hochstühle",

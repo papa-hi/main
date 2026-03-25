@@ -4,6 +4,7 @@ import { Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
+import { useTranslation } from "react-i18next";
 
 interface StarRatingProps {
   placeId: number;
@@ -16,6 +17,7 @@ export function StarRating({ placeId, size = "md", showCount = true }: StarRatin
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   // Get current user's rating for this place
   const { data: userRating } = useQuery({
@@ -38,13 +40,13 @@ export function StarRating({ placeId, size = "md", showCount = true }: StarRatin
       queryClient.invalidateQueries({ queryKey: [`/api/places/${placeId}/user-rating`] });
       queryClient.invalidateQueries({ queryKey: ["/api/places"] });
       toast({
-        title: "Rating submitted!",
-        description: "Thank you for rating this place.",
+        title: t('places.ratingSubmittedTitle'),
+        description: t('places.ratingSubmittedDesc'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to submit rating",
+        title: t('places.ratingFailedTitle'),
         description: error.message,
         variant: "destructive",
       });
@@ -54,8 +56,8 @@ export function StarRating({ placeId, size = "md", showCount = true }: StarRatin
   const handleRating = (rating: number) => {
     if (!user) {
       toast({
-        title: "Please log in",
-        description: "You need to be logged in to rate places.",
+        title: t('places.ratingLoginTitle'),
+        description: t('places.ratingLoginDesc'),
         variant: "destructive",
       });
       return;
@@ -77,7 +79,7 @@ export function StarRating({ placeId, size = "md", showCount = true }: StarRatin
     <div className="flex items-center justify-between">
       {/* Show just the numeric rating */}
       <span className="text-sm font-medium text-gray-600">
-        {totalRatings > 0 ? averageRating.toFixed(1) : "No ratings"}
+        {totalRatings > 0 ? averageRating.toFixed(1) : t('places.noRatings')}
       </span>
 
       {/* Interactive rating for logged-in users */}

@@ -222,6 +222,12 @@
     "couldNotGetLocation": "Kon je huidige locatie niet ophalen.",
     "browserNotSupported": "Browser Niet Ondersteund",
     "geolocationNotSupported": "Geolocatie wordt niet ondersteund door deze browser.",
+    "noRatings": "Geen beoordelingen",
+    "ratingSubmittedTitle": "Beoordeling ingediend!",
+    "ratingSubmittedDesc": "Bedankt voor het beoordelen van deze plek.",
+    "ratingFailedTitle": "Beoordeling mislukt",
+    "ratingLoginTitle": "Log in a.u.b.",
+    "ratingLoginDesc": "Je moet ingelogd zijn om plekken te beoordelen.",
     "restaurantFeatures": {
       "kidsMenu": "Kindermenu",
       "highChairs": "Kinderstoelen",
