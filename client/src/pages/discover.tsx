@@ -43,23 +43,30 @@ function useDebounce<T>(value: T, delay: number): T {
 export default function DiscoverPage() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [nearMe, setNearMe] = useState(false);
   const [ageFilter, setAgeFilter] = useState<AgeFilter>(null);
   const debouncedQuery = useDebounce(searchQuery, 400);
   const { city } = useLocation();
 
-  // Build query params — include every active filter so the cache key is exact
+  const trimmedQuery = debouncedQuery.trim();
+
+  // Build query params:
+  //   - No search text → default to dads in your city
+  //   - Search text    → ILIKE across name / bio / city (no city pre-filter)
+  //   - Age filter     → always appended on top
   const params = new URLSearchParams({ limit: "20" });
-  if (debouncedQuery.trim()) params.set("q", debouncedQuery.trim());
-  if (nearMe && city)        params.set("city", city);
+  if (trimmedQuery) {
+    params.set("q", trimmedQuery);
+  } else if (city) {
+    params.set("city", city);
+  }
   if (ageFilter) {
     params.set("childMinAge", String(ageFilter[0]));
     params.set("childMaxAge", String(ageFilter[1]));
   }
   const apiUrl = `/api/users?${params.toString()}`;
 
-  // Key includes every filter dimension — no stale-cache cross-contamination
-  const queryKey = ["/api/users", debouncedQuery.trim(), nearMe ? city : null, ageFilter?.join("-") ?? null];
+  // Every filter dimension is in the key — no stale-cache cross-contamination
+  const queryKey = ["/api/users", trimmedQuery, trimmedQuery ? null : (city ?? null), ageFilter?.join("-") ?? null];
 
   const { data: users, isLoading, error } = useQuery<User[]>({
     queryKey,
@@ -67,7 +74,7 @@ export default function DiscoverPage() {
     staleTime: STALE_TIMES.PLAYDATES,
   });
 
-  const hasActiveFilter = nearMe || ageFilter !== null;
+  const hasActiveFilter = ageFilter !== null;
 
   return (
     <div className="py-4">
@@ -104,36 +111,30 @@ export default function DiscoverPage() {
         />
       </div>
 
-      {/* Filter Row */}
+      {/* Filter Row — age group chips */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {/* Near me toggle */}
-        <Button
-          size="sm"
-          variant={nearMe ? "default" : "outline"}
-          onClick={() => setNearMe(v => !v)}
-          disabled={!city}
-          className="gap-1.5"
-        >
-          <MapPin className="h-3.5 w-3.5" />
-          Near me
-        </Button>
-
-        {/* Age group buttons */}
         {AGE_GROUPS.map(({ label, range }) => {
-          const key = range?.join("-") ?? "all";
           const active = ageFilter?.join("-") === range?.join("-");
           return (
             <Button
-              key={key}
+              key={label}
               size="sm"
               variant={active ? "default" : "outline"}
-              onClick={() => setAgeFilter(range === null && active ? null : range)}
+              onClick={() => setAgeFilter(active ? null : range)}
             >
               {label}
             </Button>
           );
         })}
       </div>
+
+      {/* Context label */}
+      {!trimmedQuery && city && (
+        <p className="text-xs text-muted-foreground mb-4 flex items-center gap-1">
+          <MapPin className="h-3 w-3" />
+          Showing dads in <span className="font-medium">{city}</span>
+        </p>
+      )}
 
       {/* Loading State */}
       {isLoading && (
@@ -176,10 +177,10 @@ export default function DiscoverPage() {
           <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
           <h3 className="text-lg font-medium mb-2">{t('discover.noUsersFound')}</h3>
           <p className="text-muted-foreground">
-            {debouncedQuery.trim()
-              ? `No dads found for "${debouncedQuery.trim()}"${hasActiveFilter ? " with the selected filters" : ""}.`
+            {trimmedQuery
+              ? `No dads found for "${trimmedQuery}"${hasActiveFilter ? " with the selected age filter" : ""}.`
               : hasActiveFilter
-                ? "No dads match the selected filters."
+                ? "No dads match the selected age filter in your area."
                 : t('discover.tryOtherSearch')}
           </p>
         </div>
@@ -214,7 +215,7 @@ export default function DiscoverPage() {
                       <div className="flex items-center text-sm text-muted-foreground">
                         <MapPin className="h-3 w-3 mr-1" />
                         <span>{user.city}</span>
-                        {city && user.city.includes(city) && (
+                        {city && user.city.toLowerCase().includes(city.toLowerCase()) && (
                           <Badge variant="secondary" className="ml-2 text-xs">{t('discover.nearby')}</Badge>
                         )}
                       </div>

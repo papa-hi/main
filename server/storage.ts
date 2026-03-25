@@ -495,19 +495,26 @@ export class DatabaseStorage implements IStorage {
   }): Promise<User[]> {
     const conditions: SQL[] = [];
     
+    // Never expose admin accounts in discover results
+    conditions.push(sql`${users.role} != 'admin'`);
+
     if (filters) {
       if (filters.searchQuery) {
         const searchTerm = `%${filters.searchQuery}%`;
+        // Include city in ILIKE so typing "Amsterdam" works naturally
         conditions.push(
-          sql`(${users.firstName} ILIKE ${searchTerm} OR 
-               ${users.lastName} ILIKE ${searchTerm} OR 
+          sql`(${users.firstName} ILIKE ${searchTerm} OR
+               ${users.lastName} ILIKE ${searchTerm} OR
                ${users.username} ILIKE ${searchTerm} OR
-               ${users.bio} ILIKE ${searchTerm})`
+               ${users.bio} ILIKE ${searchTerm} OR
+               ${users.city} ILIKE ${searchTerm})`
         );
       }
 
       if (filters.city) {
-        conditions.push(eq(users.city, filters.city));
+        // Case-insensitive city match so "amsterdam" == "Amsterdam"
+        const cityTerm = `%${filters.city}%`;
+        conditions.push(sql`${users.city} ILIKE ${cityTerm}`);
       }
 
       if (filters.childAgeRange) {
