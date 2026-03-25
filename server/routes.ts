@@ -1297,48 +1297,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         offset 
       } = req.query;
       
-      let searchQuery = query as string;
-      console.log("Search query:", searchQuery);
-      
-      // If no query provided, return empty array to avoid returning all users
-      if (!searchQuery || searchQuery.trim() === '') {
+      const searchQuery = (query as string)?.trim();
+
+      if (!searchQuery) {
         return res.json([]);
       }
-      
-      // Get all users first
-      const allUsers = await storage.getAllUsers({});
-      
-      // Filter users based on username, firstName, or lastName matching the query
-      const filteredUsers = allUsers.filter(user => {
-        const lowerQuery = searchQuery.toLowerCase();
-        const username = user.username?.toLowerCase() || '';
-        const firstName = user.firstName?.toLowerCase() || '';
-        const lastName = user.lastName?.toLowerCase() || '';
-        
-        return username.includes(lowerQuery) || 
-               firstName.includes(lowerQuery) || 
-               lastName.includes(lowerQuery) ||
-               `${firstName} ${lastName}`.includes(lowerQuery);
+
+      const limitValue = Math.min(
+        parseInt(limit as string) || 10,
+        50 // hard cap
+      );
+
+      // DB-side ILIKE search — no full table scan
+      const matchedUsers = await storage.getAllUsers({
+        searchQuery,
+        limit: limitValue,
       });
-      
-      // Apply limit if specified
-      let limitValue = 10; // Default limit
-      if (limit) {
-        const parsedLimit = parseInt(limit as string);
-        if (!isNaN(parsedLimit) && parsedLimit > 0) {
-          limitValue = parsedLimit;
-        }
-      }
-      
-      const limitedUsers = filteredUsers.slice(0, limitValue);
-      
+
       // Remove sensitive information
-      const sanitizedUsers = limitedUsers.map(user => {
-        const { password, email, phoneNumber, ...rest } = user;
-        return rest;
-      });
-      
-      console.log(`Found ${sanitizedUsers.length} users matching query: ${searchQuery}`);
+      const sanitizedUsers = matchedUsers.map(({ password, email, phoneNumber, ...rest }) => rest);
+
       res.json(sanitizedUsers);
     } catch (error) {
       console.error("Error searching users:", error);
