@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { WelcomeSection } from "../components/home/welcome-section";
+import { OnboardingCard } from "../components/home/onboarding-card";
 import { QuickActions } from "../components/home/quick-actions";
 import { UpcomingPlaydates } from "../components/home/upcoming-playdates";
 import { NearbyEvents } from "../components/home/nearby-events";
@@ -46,6 +47,7 @@ export default function HomePage() {
   return (
     <div>
       <WelcomeSection userName={user?.firstName || "Bezoeker"} />
+      <OnboardingCard />
       <QuickActions />
       <UpcomingPlaydates />
       <NearbyEvents />

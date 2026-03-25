@@ -672,5 +672,16 @@
     "profileTabDescription": "Wir matchen dich mit Vätern in der Nähe, die Kinder im ähnlichen Alter haben und die gleichen freien Zeiten teilen.",
     "viewAllMatches": "Alle Matches Ansehen",
     "profileTabHint": "Stelle deinen Papa-Tage Kalender und Matchpräferenzen in den Einstellungen ein"
+  },
+  "onboarding": {
+    "title": "👋 Willkommen bei PaPa-Hi!",
+    "progress": "{{count}} von {{total}} Schritten abgeschlossen",
+    "dismiss": "Schließen",
+    "step1Title": "Profil vervollständigen",
+    "step1Desc": "Füge deine Bio, Stadt und Kinderdaten hinzu, damit Väter dich finden können",
+    "step2Title": "Väter in der Nähe entdecken",
+    "step2Desc": "Finde Väter in deiner Nähe mit Kindern im ähnlichen Alter",
+    "step3Title": "Erstes Spieltreffen erstellen",
+    "step3Desc": "Plane ein Treffen und lade die Community ein"
   }
 }

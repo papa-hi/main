@@ -664,5 +664,16 @@
     "profileTabDescription": "Te emparejamos con padres cercanos que tienen hijos de edades similares y comparten tus horarios libres.",
     "viewAllMatches": "Ver Todos los Matches",
     "profileTabHint": "Configura tu calendario de Días de Papá y preferencias de emparejamiento en ajustes"
+  },
+  "onboarding": {
+    "title": "👋 ¡Bienvenido a PaPa-Hi!",
+    "progress": "{{count}} de {{total}} pasos completados",
+    "dismiss": "Cerrar",
+    "step1Title": "Completa tu perfil",
+    "step1Desc": "Añade tu bio, ciudad y datos de tus hijos para que otros padres te encuentren",
+    "step2Title": "Descubre padres cercanos",
+    "step2Desc": "Encuentra padres cerca de ti con hijos de edades similares",
+    "step3Title": "Crea tu primera cita de juego",
+    "step3Desc": "Planifica un encuentro e invita a la comunidad"
   }
 }

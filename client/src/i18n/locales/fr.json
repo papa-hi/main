@@ -664,5 +664,16 @@
     "profileTabDescription": "On te matche avec des pères proches qui ont des enfants d'âge similaire et qui partagent tes créneaux libres.",
     "viewAllMatches": "Voir Tous les Matches",
     "profileTabHint": "Configure ton calendrier Papa Days et tes préférences de matching dans les paramètres"
+  },
+  "onboarding": {
+    "title": "👋 Bienvenue sur PaPa-Hi !",
+    "progress": "{{count}} sur {{total}} étapes complétées",
+    "dismiss": "Fermer",
+    "step1Title": "Complète ton profil",
+    "step1Desc": "Ajoute ta bio, ta ville et les infos de tes enfants pour que les pères te trouvent",
+    "step2Title": "Découvre les pères à proximité",
+    "step2Desc": "Trouve des pères près de toi avec des enfants du même âge",
+    "step3Title": "Crée ta première rencontre de jeu",
+    "step3Desc": "Planifie un rendez-vous et invite la communauté"
   }
 }

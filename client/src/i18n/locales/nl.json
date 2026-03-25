@@ -864,5 +864,16 @@
     "profileTabDescription": "We matchen je met vaders in de buurt die kinderen van vergelijkbare leeftijd hebben en dezelfde vrije tijden delen.",
     "viewAllMatches": "Bekijk Alle Matches",
     "profileTabHint": "Stel je Papa Dagen kalender en matchvoorkeuren in via instellingen"
+  },
+  "onboarding": {
+    "title": "👋 Welkom bij PaPa-Hi!",
+    "progress": "{{count}} van {{total}} stappen voltooid",
+    "dismiss": "Sluiten",
+    "step1Title": "Voltooi je profiel",
+    "step1Desc": "Voeg je bio, stad en kindergegevens toe zodat andere vaders je kunnen vinden",
+    "step2Title": "Ontdek vaders in de buurt",
+    "step2Desc": "Vind vaders bij jou in de buurt met kinderen van gelijke leeftijd",
+    "step3Title": "Maak je eerste speelafspraak",
+    "step3Desc": "Plan een ontmoeting en nodig de community uit"
   }
 }

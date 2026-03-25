@@ -930,5 +930,16 @@
     "profileTabDescription": "We match you with fathers nearby who have similar-age children and share your free time slots.",
     "viewAllMatches": "View All Matches",
     "profileTabHint": "Set your Dad Days calendar and match preferences in settings"
+  },
+  "onboarding": {
+    "title": "👋 Welcome to PaPa-Hi!",
+    "progress": "{{count}} of {{total}} steps complete",
+    "dismiss": "Dismiss",
+    "step1Title": "Complete your profile",
+    "step1Desc": "Add your bio, city, and children's details so dads can find you",
+    "step2Title": "Discover nearby dads",
+    "step2Desc": "Find dads near you with similar-aged kids and shared schedules",
+    "step3Title": "Create your first playdate",
+    "step3Desc": "Plan a meetup and invite the community"
   }
 }
