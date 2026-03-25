@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { STALE_TIMES } from "@/lib/queryClient";
 import { Place } from "@shared/schema";
 import { PlaceCard } from "../shared/place-card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,6 +28,7 @@ export function NearbyPlaces() {
   
   const { data: places, isLoading, error } = useQuery<Place[]>({
     queryKey: [queryUrl],
+    staleTime: STALE_TIMES.PLACES,
   });
 
   const handleFilterChange = (filter: PlaceType) => setActiveFilter(filter);

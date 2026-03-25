@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, STALE_TIMES } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useChat } from "@/hooks/use-chat";
 import { formatTime } from "@/lib/utils";
@@ -38,6 +38,7 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
   const { data: chatDetails, isLoading: isLoadingChatDetails } = useQuery<ChatDetails>({
     queryKey: [`/api/chats/${chatId}`],
     enabled: !!chatId && !!user,
+    staleTime: STALE_TIMES.REALTIME,
   });
   
   useEffect(() => {

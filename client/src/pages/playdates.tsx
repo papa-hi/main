@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { STALE_TIMES } from "@/lib/queryClient";
 import { Playdate } from "@shared/schema";
 import { PlaydateCard } from "@/components/shared/playdate-card";
 import { Button } from "@/components/ui/button";
@@ -16,10 +17,12 @@ export default function PlaydatesPage() {
   
   const { data: upcomingPlaydates, isLoading: upcomingLoading } = useQuery<Playdate[]>({
     queryKey: ['/api/playdates/upcoming'],
+    staleTime: STALE_TIMES.PLAYDATES,
   });
   
   const { data: pastPlaydates, isLoading: pastLoading } = useQuery<Playdate[]>({
     queryKey: ['/api/playdates/past'],
+    staleTime: STALE_TIMES.PLAYDATES,
   });
 
   return (

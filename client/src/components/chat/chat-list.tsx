@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { STALE_TIMES } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -38,6 +39,7 @@ export function ChatList({ onSelectChat, selectedChatId }: ChatListProps) {
   const { data: chats, isLoading } = useQuery<Chat[]>({
     queryKey: ["/api/chats"],
     enabled: !!user,
+    staleTime: STALE_TIMES.REALTIME,
   });
   
   // Filter out the current user from participants and filter by search query

@@ -66,6 +66,20 @@ export async function apiRequest(
   return res;
 }
 
+// --- Stale time constants (import these in useQuery calls for appropriate TTLs) ---
+export const STALE_TIMES = {
+  /** Static config, VAPID keys — never changes during a session */
+  STATIC: Infinity,
+  /** Nearby places, map data — changes rarely */
+  PLACES: 10 * 60 * 1000,
+  /** User profile, match preferences — changes occasionally */
+  PROFILE: 5 * 60 * 1000,
+  /** Playdates list, events — changes moderately */
+  PLAYDATES: 2 * 60 * 1000,
+  /** Chat messages, notifications — changes frequently */
+  REALTIME: 30 * 1000,
+} as const;
+
 type UnauthorizedBehavior = "returnNull" | "throw";
 export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
@@ -90,7 +104,7 @@ export const queryClient = new QueryClient({
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: Infinity,
+      staleTime: STALE_TIMES.PROFILE, // 5 minutes — sensible default for most data
       retry: false,
     },
     mutations: {

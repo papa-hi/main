@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { STALE_TIMES } from "@/lib/queryClient";
 import { PlaydateCard } from "../shared/playdate-card";
 import { Playdate } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,6 +11,7 @@ export function UpcomingPlaydates() {
   const { t } = useTranslation();
   const { data: playdates, isLoading, error } = useQuery<Playdate[]>({
     queryKey: ['/api/playdates/upcoming'],
+    staleTime: STALE_TIMES.PLAYDATES,
   });
   
   if (isLoading) {
