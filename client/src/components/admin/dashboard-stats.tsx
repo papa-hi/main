@@ -72,13 +72,13 @@ export default function DashboardStats() {
             {isLoadingUserStats ? (
               <Skeleton className="h-7 w-16" />
             ) : (
-              <div className="text-2xl font-bold">48</div>
+              <div className="text-2xl font-bold">{userStats?.totalPlaydates ?? 0}</div>
             )}
             {isLoadingUserStats ? (
               <Skeleton className="h-3 w-24 mt-1" />
             ) : (
               <p className="text-xs text-muted-foreground">
-                +12 from last month
+                +{userStats?.newPlaydatesLastMonth ?? 0} from last month
               </p>
             )}
           </CardContent>
@@ -94,13 +94,13 @@ export default function DashboardStats() {
             {isLoadingUserStats ? (
               <Skeleton className="h-7 w-16" />
             ) : (
-              <div className="text-2xl font-bold">128</div>
+              <div className="text-2xl font-bold">{userStats?.totalPlaces ?? 0}</div>
             )}
             {isLoadingUserStats ? (
               <Skeleton className="h-3 w-24 mt-1" />
             ) : (
               <p className="text-xs text-muted-foreground">
-                +24 from last month
+                +{userStats?.newPlacesLastMonth ?? 0} from last month
               </p>
             )}
           </CardContent>

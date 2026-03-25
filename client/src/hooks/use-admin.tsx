@@ -13,6 +13,10 @@ type UserStats = {
   total: number;
   newLastWeek: number;
   activeLastMonth: number;
+  totalPlaydates: number;
+  newPlaydatesLastMonth: number;
+  totalPlaces: number;
+  newPlacesLastMonth: number;
 };
 
 type PageStat = {

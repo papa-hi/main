@@ -44,7 +44,15 @@ export interface IStorage {
   getAdminUsers(options?: { limit?: number; offset?: number }): Promise<{ users: User[]; total: number }>;
   setUserRole(userId: number, role: string): Promise<User>;
   getUsersByRole(role: string): Promise<User[]>;
-  getUserStats(): Promise<{ total: number, newLastWeek: number, activeLastMonth: number }>;
+  getUserStats(): Promise<{
+    total: number;
+    newLastWeek: number;
+    activeLastMonth: number;
+    totalPlaydates: number;
+    newPlaydatesLastMonth: number;
+    totalPlaces: number;
+    newPlacesLastMonth: number;
+  }>;
   
   // Analytics methods
   logUserActivity(activity: InsertUserActivity): Promise<UserActivity>;
@@ -187,37 +195,48 @@ export class DatabaseStorage implements IStorage {
     }));
   }
   
-  async getUserStats(): Promise<{ total: number, newLastWeek: number, activeLastMonth: number }> {
-    // Get total users
-    const totalResult = await db
-      .select({ count: count() })
-      .from(users);
-    const total = totalResult[0]?.count ?? 0;
-      
-    // Get users created in the last week
+  async getUserStats(): Promise<{
+    total: number;
+    newLastWeek: number;
+    activeLastMonth: number;
+    totalPlaydates: number;
+    newPlaydatesLastMonth: number;
+    totalPlaces: number;
+    newPlacesLastMonth: number;
+  }> {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    
-    const newLastWeekResult = await db
-      .select({ count: count() })
-      .from(users)
-      .where(gte(users.createdAt, oneWeekAgo));
-    const newLastWeek = newLastWeekResult[0]?.count ?? 0;
-      
-    // Get users who logged in in the last month
+
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    
-    const activeLastMonthResult = await db
-      .select({ count: count() })
-      .from(users)
-      .where(gte(users.lastLogin, oneMonthAgo));
-    const activeLastMonth = activeLastMonthResult[0]?.count ?? 0;
-      
+
+    // Run all six counts in parallel
+    const [
+      totalResult,
+      newLastWeekResult,
+      activeLastMonthResult,
+      totalPlaydatesResult,
+      newPlaydatesResult,
+      totalPlacesResult,
+      newPlacesResult,
+    ] = await Promise.all([
+      db.select({ count: count() }).from(users),
+      db.select({ count: count() }).from(users).where(gte(users.createdAt, oneWeekAgo)),
+      db.select({ count: count() }).from(users).where(gte(users.lastLogin, oneMonthAgo)),
+      db.select({ count: count() }).from(playdates),
+      db.select({ count: count() }).from(playdates).where(gte(playdates.createdAt, oneMonthAgo)),
+      db.select({ count: count() }).from(places),
+      db.select({ count: count() }).from(places).where(gte(places.createdAt, oneMonthAgo)),
+    ]);
+
     return {
-      total: Number(total) || 0,
-      newLastWeek: Number(newLastWeek) || 0,
-      activeLastMonth: Number(activeLastMonth) || 0
+      total:                  Number(totalResult[0]?.count)           || 0,
+      newLastWeek:            Number(newLastWeekResult[0]?.count)     || 0,
+      activeLastMonth:        Number(activeLastMonthResult[0]?.count) || 0,
+      totalPlaydates:         Number(totalPlaydatesResult[0]?.count)  || 0,
+      newPlaydatesLastMonth:  Number(newPlaydatesResult[0]?.count)    || 0,
+      totalPlaces:            Number(totalPlacesResult[0]?.count)     || 0,
+      newPlacesLastMonth:     Number(newPlacesResult[0]?.count)       || 0,
     };
   }
   
