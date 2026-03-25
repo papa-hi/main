@@ -1,38 +1,18 @@
+import { lazy, Suspense, useState, useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { Loader2 } from "lucide-react";
+
+// Layout & shell — eagerly loaded (always visible on first render)
 import NotFound from "@/pages/not-found";
 import AppShell from "./components/layout/app-shell";
-import HomePage from "./pages/home";
-import PlaydatesPage from "./pages/playdates";
-import PlaydateDetailPage from "./pages/playdate-detail";
-import PlacesPage from "./pages/places";
-import ProfilePage from "./pages/profile";
-import UserProfilePage from "./pages/user-profile";
-import DiscoverPage from "./pages/discover";
-import CommunityPage from "./pages/community";
-import CreatePage from "./pages/create";
-import EditPlaydatePage from "./pages/edit-playdate";
-import ChatPage from "./pages/chat";
-import MatchesPage from "./pages/matches";
-import AuthPage from "./pages/auth-page";
-import ForgotPasswordPage from "./pages/forgot-password";
-import ResetPasswordPage from "./pages/reset-password";
-import PlaceDetailsPage from "./pages/place-details";
-import EventDetailsPage from "./pages/event-details";
-import SettingsPage from "./pages/SettingsPage";
-import DeleteAccountPage from "./pages/delete-account";
-import PrivacyPolicyPage from "./pages/privacy-policy";
-import ConfirmEmailChangePage from "./pages/confirm-email-change";
-
-import AdminDashboard from "./pages/admin";
-import AdminCheck from "./pages/admin-check";
-import AboutPage from "./pages/about";
-import DadDaysPage from "./pages/dad-days";
-import { useState, useEffect } from "react";
-import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
 import ErrorBoundary from "./components/shared/error-boundary";
+import AnimatedWelcome from "./components/welcome/animated-welcome";
+import { PrivacyConsentDialog, InstallPWAPrompt } from "./lib/pwa";
+
+// Providers
 import { AuthProvider, useAuth } from "./hooks/use-auth";
 import { FirebaseAuthProvider } from "./hooks/use-firebase-auth";
 import { ChatProvider } from "./hooks/use-chat";
@@ -40,59 +20,40 @@ import { AdminProvider } from "./hooks/use-admin";
 import { AppConfigProvider } from "./hooks/use-app-config";
 import { ProtectedRoute } from "./lib/protected-route";
 import { useWelcome } from "./hooks/use-welcome";
-import AnimatedWelcome from "./components/welcome/animated-welcome";
 import { usePageTracking } from "./hooks/use-analytics";
 
-function Router() {
-  const { user } = useAuth();
-  const { showWelcome, completeWelcome } = useWelcome();
-  
-  // Track page views for analytics
-  usePageTracking();
+// Pages — lazy loaded for code splitting
+const HomePage           = lazy(() => import("./pages/home"));
+const PlaydatesPage      = lazy(() => import("./pages/playdates"));
+const PlaydateDetailPage = lazy(() => import("./pages/playdate-detail"));
+const PlacesPage         = lazy(() => import("./pages/places"));
+const PlaceDetailsPage   = lazy(() => import("./pages/place-details"));
+const EventDetailsPage   = lazy(() => import("./pages/event-details"));
+const CommunityPage      = lazy(() => import("./pages/community"));
+const ProfilePage        = lazy(() => import("./pages/profile"));
+const UserProfilePage    = lazy(() => import("./pages/user-profile"));
+const DiscoverPage       = lazy(() => import("./pages/discover"));
+const CreatePage         = lazy(() => import("./pages/create"));
+const EditPlaydatePage   = lazy(() => import("./pages/edit-playdate"));
+const ChatPage           = lazy(() => import("./pages/chat"));
+const MatchesPage        = lazy(() => import("./pages/matches"));
+const DadDaysPage        = lazy(() => import("./pages/dad-days"));
+const SettingsPage       = lazy(() => import("./pages/SettingsPage"));
+const DeleteAccountPage  = lazy(() => import("./pages/delete-account"));
+const AuthPage           = lazy(() => import("./pages/auth-page"));
+const ForgotPasswordPage = lazy(() => import("./pages/forgot-password"));
+const ResetPasswordPage  = lazy(() => import("./pages/reset-password"));
+const PrivacyPolicyPage  = lazy(() => import("./pages/privacy-policy"));
+const ConfirmEmailChangePage = lazy(() => import("./pages/confirm-email-change"));
+const AboutPage          = lazy(() => import("./pages/about"));
+const AdminDashboard     = lazy(() => import("./pages/admin"));
+const AdminCheck         = lazy(() => import("./pages/admin-check"));
 
-  // Show welcome screen for authenticated users who haven't seen it
-  if (showWelcome && user) {
-    return (
-      <AnimatedWelcome 
-        onComplete={completeWelcome}
-        userName={user.firstName}
-      />
-    );
-  }
-
+function PageLoader() {
   return (
-    <Switch>
-      <ProtectedRoute path="/" component={HomePage} />
-      <Route path="/playdates/:id" component={PlaydateDetailPage} />
-      <Route path="/playdates" component={PlaydatesPage} />
-      <Route path="/places/:id" component={PlaceDetailsPage} />
-      <Route path="/places" component={PlacesPage} />
-      <Route path="/events/:id" component={EventDetailsPage} />
-      <Route path="/community" component={CommunityPage} />
-      <ProtectedRoute path="/profile" component={ProfilePage} />
-      <ProtectedRoute path="/create" component={CreatePage} />
-      <ProtectedRoute path="/edit-playdate/:id" component={EditPlaydatePage} />
-      <ProtectedRoute path="/chat" component={ChatPage} />
-      <ProtectedRoute path="/chat/:id" component={ChatPage} />
-      <ProtectedRoute path="/matches" component={MatchesPage} />
-      <ProtectedRoute path="/discover" component={DiscoverPage} />
-      <ProtectedRoute path="/dad-days" component={DadDaysPage} />
-      <ProtectedRoute path="/settings" component={SettingsPage} />
-      <ProtectedRoute path="/settings/delete-account" component={DeleteAccountPage} />
-      <ProtectedRoute path="/users/:id" component={UserProfilePage} />
-      <Route path="/privacy" component={PrivacyPolicyPage} />
-      <Route path="/privacy-policy" component={PrivacyPolicyPage} />
-      <Route path="/confirm-email-change" component={ConfirmEmailChangePage} />
-      <Route path="/about" component={AboutPage} />
-
-      <ProtectedRoute path="/admin" component={AdminDashboardWithProvider} />
-      <Route path="/admin-check" component={AdminCheck} />
-      <Route path="/auth" component={AuthPage} />
-      <Route path="/forgot-password" component={ForgotPasswordPage} />
-      <Route path="/reset-password" component={ResetPasswordPage} />
-      {/* Fallback to 404 */}
-      <Route component={NotFound} />
-    </Switch>
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
   );
 }
 
@@ -104,6 +65,57 @@ function AdminDashboardWithProvider() {
   );
 }
 
+function Router() {
+  const { user } = useAuth();
+  const { showWelcome, completeWelcome } = useWelcome();
+
+  usePageTracking();
+
+  if (showWelcome && user) {
+    return (
+      <AnimatedWelcome
+        onComplete={completeWelcome}
+        userName={user.firstName}
+      />
+    );
+  }
+
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Switch>
+        <ProtectedRoute path="/" component={HomePage} />
+        <Route path="/playdates/:id" component={PlaydateDetailPage} />
+        <Route path="/playdates" component={PlaydatesPage} />
+        <Route path="/places/:id" component={PlaceDetailsPage} />
+        <Route path="/places" component={PlacesPage} />
+        <Route path="/events/:id" component={EventDetailsPage} />
+        <Route path="/community" component={CommunityPage} />
+        <ProtectedRoute path="/profile" component={ProfilePage} />
+        <ProtectedRoute path="/create" component={CreatePage} />
+        <ProtectedRoute path="/edit-playdate/:id" component={EditPlaydatePage} />
+        <ProtectedRoute path="/chat" component={ChatPage} />
+        <ProtectedRoute path="/chat/:id" component={ChatPage} />
+        <ProtectedRoute path="/matches" component={MatchesPage} />
+        <ProtectedRoute path="/discover" component={DiscoverPage} />
+        <ProtectedRoute path="/dad-days" component={DadDaysPage} />
+        <ProtectedRoute path="/settings" component={SettingsPage} />
+        <ProtectedRoute path="/settings/delete-account" component={DeleteAccountPage} />
+        <ProtectedRoute path="/users/:id" component={UserProfilePage} />
+        <Route path="/privacy" component={PrivacyPolicyPage} />
+        <Route path="/privacy-policy" component={PrivacyPolicyPage} />
+        <Route path="/confirm-email-change" component={ConfirmEmailChangePage} />
+        <Route path="/about" component={AboutPage} />
+        <ProtectedRoute path="/admin" component={AdminDashboardWithProvider} />
+        <Route path="/admin-check" component={AdminCheck} />
+        <Route path="/auth" component={AuthPage} />
+        <Route path="/forgot-password" component={ForgotPasswordPage} />
+        <Route path="/reset-password" component={ResetPasswordPage} />
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
+  );
+}
+
 function App() {
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
   const [showPWAPrompt, setShowPWAPrompt] = useState(false);
@@ -111,18 +123,13 @@ function App() {
 
   useEffect(() => {
     let reloading = false;
-    
-    // Register service worker for PWA capabilities
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/service-worker.js')
           .then(registration => {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            
-            // Force check for updates every time the page loads
             registration.update();
-            
-            // When a new service worker is waiting, activate it immediately
             registration.addEventListener('updatefound', () => {
               const newWorker = registration.installing;
               if (newWorker) {
@@ -139,8 +146,7 @@ function App() {
             console.log('ServiceWorker registration failed: ', error);
           });
       });
-      
-      // Listen for controller change and reload the page (only once)
+
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!reloading) {
           reloading = true;
@@ -150,20 +156,14 @@ function App() {
       });
     }
 
-    // Check if privacy consent is already given
     const hasGivenConsent = localStorage.getItem('privacy_consent');
     if (!hasGivenConsent) {
       setShowPrivacyConsent(true);
     }
 
-    // Capture beforeinstallprompt event for PWA installation
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent the default prompt
       e.preventDefault();
-      // Store the event for later use
       setDeferredPrompt(e);
-      
-      // Only show the prompt if the user hasn't explicitly installed
       const hasInstalled = localStorage.getItem('pwa_installed');
       if (!hasInstalled) {
         const timer = setTimeout(() => {
@@ -173,7 +173,6 @@ function App() {
       }
     });
 
-    // Listen for the appinstalled event
     window.addEventListener('appinstalled', () => {
       localStorage.setItem('pwa_installed', 'true');
       setShowPWAPrompt(false);
@@ -202,16 +201,11 @@ function App() {
     setShowPrivacyConsent(false);
   };
 
-  const handleDismissPWA = () => {
-    setShowPWAPrompt(false);
-  };
+  const handleDismissPWA = () => setShowPWAPrompt(false);
 
   const handleInstallPWA = () => {
     if (deferredPrompt) {
-      // Show the install prompt
       deferredPrompt.prompt();
-      
-      // Wait for the user to respond to the prompt
       deferredPrompt.userChoice.then((choiceResult: { outcome: string }) => {
         if (choiceResult.outcome === 'accepted') {
           localStorage.setItem('pwa_installed', 'true');
@@ -219,11 +213,9 @@ function App() {
         } else {
           console.log('User dismissed the install prompt');
         }
-        // Clear the saved prompt as it can't be used again
         setDeferredPrompt(null);
       });
     } else {
-      // If deferredPrompt is not available, iOS or other browser might not support PWA install via prompt
       console.log('PWA installation not supported directly. Setting flag anyway.');
       localStorage.setItem('pwa_installed', 'true');
     }
@@ -234,30 +226,30 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AppConfigProvider>
-        <FirebaseAuthProvider>
-          <AuthProvider>
+          <FirebaseAuthProvider>
+            <AuthProvider>
               <ChatProvider>
                 <AppShell>
                   <Router />
                 </AppShell>
                 <Toaster />
-                
+
                 {showPrivacyConsent && (
-                  <PrivacyConsentDialog 
-                    onAccept={handleAcceptPrivacy} 
-                    onReject={handleRejectPrivacy} 
+                  <PrivacyConsentDialog
+                    onAccept={handleAcceptPrivacy}
+                    onReject={handleRejectPrivacy}
                   />
                 )}
-                
+
                 {showPWAPrompt && (
-                  <InstallPWAPrompt 
-                    onDismiss={handleDismissPWA} 
-                    onInstall={handleInstallPWA} 
+                  <InstallPWAPrompt
+                    onDismiss={handleDismissPWA}
+                    onInstall={handleInstallPWA}
                   />
                 )}
               </ChatProvider>
-          </AuthProvider>
-        </FirebaseAuthProvider>
+            </AuthProvider>
+          </FirebaseAuthProvider>
         </AppConfigProvider>
       </QueryClientProvider>
     </ErrorBoundary>
