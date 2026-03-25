@@ -609,7 +609,12 @@
       "email": "Email",
       "city": "Stad",
       "notSet": "Niet ingesteld",
-      "editProfile": "Profiel Bewerken"
+      "editProfile": "Profiel Bewerken",
+      "theme": "Weergave",
+      "themeDesc": "Kies hoe PaPa-Hi er voor jou uitziet.",
+      "themeLight": "Licht",
+      "themeDark": "Donker",
+      "themeSystem": "Systeemstandaard"
     },
     "privacy": {
       "title": "Privacy",

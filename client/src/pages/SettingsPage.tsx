@@ -5,7 +5,9 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Settings, User as UserIcon, Bell, Shield, HelpCircle, Heart, Lock, Eye, EyeOff, Mail } from 'lucide-react';
+import { Settings, User as UserIcon, Bell, Shield, HelpCircle, Heart, Lock, Eye, EyeOff, Mail, Sun, Moon, Monitor } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTheme } from '@/components/ui/theme-provider';
 import { useToast } from '@/hooks/use-toast';
 import NotificationSettings from '@/components/NotificationSettings';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -30,6 +32,7 @@ export default function SettingsPage() {
   const { t } = useTranslation();
   const [_, navigate] = useLocation();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
   
   // Password change states
   const [currentPassword, setCurrentPassword] = useState('');
@@ -524,6 +527,44 @@ export default function SettingsPage() {
                 </div>
                 <Separator />
                 <Button variant="outline" onClick={() => navigate('/profile')}>{t('settings.account.editProfile')}</Button>
+
+                <Separator />
+
+                {/* Appearance / Theme Section */}
+                <div>
+                  <h4 className="font-medium mb-1 flex items-center gap-2">
+                    {theme === 'dark' ? <Moon className="h-4 w-4" /> : theme === 'system' ? <Monitor className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                    {t('settings.account.theme', 'Appearance')}
+                  </h4>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t('settings.account.themeDesc', 'Choose how PaPa-Hi looks for you.')}
+                  </p>
+                  <Select value={theme} onValueChange={(v) => setTheme(v as 'light' | 'dark' | 'system')}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="light">
+                        <span className="flex items-center gap-2">
+                          <Sun className="h-4 w-4" />
+                          {t('settings.account.themeLight', 'Light')}
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="dark">
+                        <span className="flex items-center gap-2">
+                          <Moon className="h-4 w-4" />
+                          {t('settings.account.themeDark', 'Dark')}
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="system">
+                        <span className="flex items-center gap-2">
+                          <Monitor className="h-4 w-4" />
+                          {t('settings.account.themeSystem', 'System default')}
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
                 <Separator />
 

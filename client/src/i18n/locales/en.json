@@ -631,7 +631,12 @@
       "email": "Email",
       "city": "City",
       "notSet": "Not set",
-      "editProfile": "Edit Profile"
+      "editProfile": "Edit Profile",
+      "theme": "Appearance",
+      "themeDesc": "Choose how PaPa-Hi looks for you.",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeSystem": "System default"
     },
     "privacy": {
       "title": "Privacy",

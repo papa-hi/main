@@ -438,7 +438,12 @@
       "email": "Email",
       "city": "Ville",
       "notSet": "Non défini",
-      "editProfile": "Modifier le Profil"
+      "editProfile": "Modifier le Profil",
+      "theme": "Apparence",
+      "themeDesc": "Choisis comment PaPa-Hi s'affiche pour toi.",
+      "themeLight": "Clair",
+      "themeDark": "Sombre",
+      "themeSystem": "Défaut du système"
     },
     "notifications": {
       "pushNotifications": "Notifications Push",

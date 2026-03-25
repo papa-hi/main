@@ -475,7 +475,12 @@
       "email": "E-Mail",
       "city": "Stadt",
       "notSet": "Nicht festgelegt",
-      "editProfile": "Profil bearbeiten"
+      "editProfile": "Profil bearbeiten",
+      "theme": "Erscheinungsbild",
+      "themeDesc": "Wähle, wie PaPa-Hi für dich aussieht.",
+      "themeLight": "Hell",
+      "themeDark": "Dunkel",
+      "themeSystem": "Systemstandard"
     },
     "privacy": {
       "title": "Datenschutz",

@@ -438,7 +438,12 @@
       "email": "Email",
       "city": "Ciudad",
       "notSet": "No establecido",
-      "editProfile": "Editar Perfil"
+      "editProfile": "Editar Perfil",
+      "theme": "Apariencia",
+      "themeDesc": "Elige cómo se ve PaPa-Hi para ti.",
+      "themeLight": "Claro",
+      "themeDark": "Oscuro",
+      "themeSystem": "Predeterminado del sistema"
     },
     "notifications": {
       "pushNotifications": "Notificaciones Push",
