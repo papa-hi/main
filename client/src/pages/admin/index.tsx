@@ -39,7 +39,7 @@ export default function AdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-7 max-w-4xl">
+        <TabsList className="flex flex-wrap h-auto gap-1 p-1">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <BarChart className="h-4 w-4" />
             <span className="hidden sm:inline">Dashboard</span>
