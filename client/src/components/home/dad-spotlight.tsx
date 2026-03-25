@@ -25,16 +25,9 @@ export function DadSpotlight() {
     refetchInterval: 300000, // Refetch every 5 minutes for variety
   });
 
-  // Function to add cache-busting parameter to image URLs
   const getProfileImage = (imageUrl: string | null | undefined) => {
     if (!imageUrl) return "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=500&q=80";
-    
-    // If it's already a full URL, return it
-    if (imageUrl.startsWith('http')) return imageUrl;
-    
-    // Add timestamp for cache-busting
-    const timestamp = new Date().getTime();
-    return `${imageUrl}?t=${timestamp}`;
+    return imageUrl;
   };
 
   if (isLoading) {

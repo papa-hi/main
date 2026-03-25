@@ -345,9 +345,8 @@ export default function ProfilePage() {
     <div className="bg-card rounded-xl shadow-sm overflow-hidden">
       <div className="md:flex">
         <div className="md:w-1/3">
-          {/* Use a direct image with cache-busting parameter to avoid caching issues */}
           <img 
-            src={`${user.profileImage}?t=${new Date().getTime()}`} 
+            src={user.profileImage ?? ''} 
             alt={`${user.firstName} ${user.lastName}`} 
             className="w-full h-64 md:h-full object-cover"
             onError={(e) => {
