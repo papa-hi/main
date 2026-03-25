@@ -21,6 +21,8 @@ export function NearbyPlaces() {
       setActiveFilter("restaurant");
     } else if (location.includes("type=playground")) {
       setActiveFilter("playground");
+    } else if (location.includes("type=museum")) {
+      setActiveFilter("museum");
     }
   }, [location]);
 
