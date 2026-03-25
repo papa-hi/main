@@ -23,59 +23,19 @@ import rateLimit from "express-rate-limit";
 import { geocodeAddress } from "./geocoding";
 import { csrfMiddleware, generateCsrfToken } from "./csrf";
 
-// Counter to track which playground image to use next
-let playgroundImageCounter = 0;
-// Counter to track which restaurant image to use next
-let restaurantImageCounter = 0;
-// Counter to track which museum image to use next
-let museumImageCounter = 0;
-
-// Helper function to get a playground image with variety
 function getRandomPlaygroundImage(): string {
-  const playgroundImages = [
-    "/assets/playground1.png",
-    "/assets/playground2.png",
-    "/assets/playground3.png", 
-    "/assets/playground4.png"
-  ];
-  
-  // Cycle through images sequentially to ensure variety
-  const selectedImage = playgroundImages[playgroundImageCounter % playgroundImages.length];
-  playgroundImageCounter++;
-  
-  return selectedImage;
+  const images = ["/assets/playground1.png","/assets/playground2.png","/assets/playground3.png","/assets/playground4.png"];
+  return images[Math.floor(Math.random() * images.length)];
 }
 
-// Helper function to get a restaurant image with variety
 function getRandomRestaurantImage(): string {
-  const restaurantImages = [
-    "/assets/restaurant1.png",
-    "/assets/restaurant2.png", 
-    "/assets/restaurant3.png",
-    "/assets/restaurant4.png"
-  ];
-  
-  // Cycle through images sequentially to ensure variety
-  const selectedImage = restaurantImages[restaurantImageCounter % restaurantImages.length];
-  restaurantImageCounter++;
-  
-  return selectedImage;
+  const images = ["/assets/restaurant1.png","/assets/restaurant2.png","/assets/restaurant3.png","/assets/restaurant4.png"];
+  return images[Math.floor(Math.random() * images.length)];
 }
 
-// Helper function to get a museum image with variety
 function getRandomMuseumImage(): string {
-  const museumImages = [
-    "/assets/museum1.png",
-    "/assets/museum2.png", 
-    "/assets/museum3.png",
-    "/assets/museum4.png"
-  ];
-  
-  // Cycle through images sequentially to ensure variety
-  const selectedImage = museumImages[museumImageCounter % museumImages.length];
-  museumImageCounter++;
-  
-  return selectedImage;
+  const images = ["/assets/museum1.png","/assets/museum2.png","/assets/museum3.png","/assets/museum4.png"];
+  return images[Math.floor(Math.random() * images.length)];
 }
 
 // Helper function to notify nearby users about new playdates
@@ -746,27 +706,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Public geocoding endpoint to avoid CORS issues
   app.get('/api/geocode', async (req: Request, res: Response) => {
-    console.log('[GEOCODE_API] Endpoint hit - Address:', req.query.address);
-    console.log('[GEOCODE_API] Full URL:', req.url);
-    console.log('[GEOCODE_API] Request method:', req.method);
-    
     try {
       const address = req.query.address as string;
-      
-      if (!address) {
-        console.log('[GEOCODE_API] ERROR: No address parameter provided');
-        return res.status(400).json({ error: 'Address parameter is required' });
-      }
-      
-      console.log('[GEOCODE_API] Calling geocodeAddress for:', address);
+      if (!address) return res.status(400).json({ error: 'Address parameter is required' });
       const coordinates = await geocodeAddress(address);
-      
-      if (!coordinates) {
-        console.log('[GEOCODE_API] ERROR: Could not geocode address:', address);
-        return res.status(404).json({ error: 'Could not geocode address' });
-      }
-      
-      console.log('[GEOCODE_API] SUCCESS: Coordinates found:', coordinates);
+      if (!coordinates) return res.status(404).json({ error: 'Could not geocode address' });
       res.json(coordinates);
     } catch (error) {
       console.error('[GEOCODE_API] EXCEPTION:', error);
@@ -3697,25 +3641,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error handling reaction:", error);
       res.status(500).json({ error: "Failed to handle reaction" });
-    }
-  });
-
-  // Get community categories
-  app.get("/api/community/categories", async (req: Request, res: Response) => {
-    try {
-      const categories = [
-        { id: 'general', name: 'General Discussion', description: 'General parenting topics and conversations' },
-        { id: 'parenting-tips', name: 'Parenting Tips', description: 'Share and discover parenting advice' },
-        { id: 'activities', name: 'Kids Activities', description: 'Fun activities and ideas for children' },
-        { id: 'health', name: 'Health & Wellness', description: 'Health tips and wellness discussions' },
-        { id: 'education', name: 'Education', description: 'School, learning, and educational resources' },
-        { id: 'local', name: 'Local Community', description: 'Local events and neighborhood discussions' },
-      ];
-
-      res.json(categories);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      res.status(500).json({ error: "Failed to fetch categories" });
     }
   });
 

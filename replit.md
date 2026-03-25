@@ -6,6 +6,10 @@ PaPa-Hi is a social platform designed for fathers in the Netherlands. Its primar
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (March 2026)
+- **Codebase Cleanup (dead weight / security)**: Removed `/admin-check` debug page (exposed raw user JSON to any logged-in user); replaced 7-second animated character intro (bears/foxes) with an instant 2-screen welcome; stripped 4 verbose `[GEOCODE_API]` console.log lines from server; merged redundant "Activity" and "Reminders" admin tabs (Activity merged into Analytics "Admin Logs" sub-tab; Profile Reminders moved into Users tab); flattened nested tabs in DashboardStats into a scrollable layout; replaced `/api/community/categories` round-trip with a frontend constant; replaced mutable global image counters (`restaurantImageCounter`, etc.) with stateless `Math.random()` selection; deleted 8 draft implementation files from `attached_assets/`; removed orphaned `UserActivity`/`AdminLog` types and queries from `use-admin.tsx`.
+- **Bug fix — Discover page**: `jsonb_array_elements(children_info)` crashed (code 22023) when `children_info` was `NULL` or scalar; fixed with `CASE WHEN jsonb_typeof(...) = 'array'` guard; also hardened the `queryFn` to throw on non-ok responses so errors surface properly instead of showing empty results.
+
 ## Recent Changes (February 2026)
 - **Full i18n for Matches**: Added `matches` translation section to all 5 locale files (EN, NL, DE, FR, ES) with 21 keys. Wired `t()` calls in `matches.tsx` (standalone page) and `profile.tsx` (matches tab) — replacing all hardcoded English strings for titles, subtitles, tab labels, empty states, buttons, and match card content.
 - **Weather Icon Fix**: Replaced Font Awesome weather icons (which were never loaded) with Lucide React icons (`Sun`, `Moon`, `Cloud`, `CloudSun`, `CloudRain`, `Snowflake`, `CloudLightning`, `CloudFog`, etc.) in `welcome-section.tsx`. Icons update dynamically based on OpenWeatherMap API conditions.

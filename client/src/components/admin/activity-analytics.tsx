@@ -3,9 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Users, Activity, TrendingUp, Clock, BarChart3 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Calendar, Users, Activity, TrendingUp, Clock, BarChart3, Shield } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 import { useTranslation } from "react-i18next";
+import { formatDistanceToNow, format } from "date-fns";
 
 interface ActivityStats {
   totalActions: number;
@@ -121,11 +123,12 @@ export function ActivityAnalytics() {
       </div>
 
       <Tabs defaultValue="charts" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="charts">Charts</TabsTrigger>
           <TabsTrigger value="actions">Top Actions</TabsTrigger>
           <TabsTrigger value="users">Active Users</TabsTrigger>
           <TabsTrigger value="recent">Recent Activity</TabsTrigger>
+          <TabsTrigger value="admin-logs">Admin Logs</TabsTrigger>
         </TabsList>
 
         <TabsContent value="charts" className="space-y-6">
@@ -340,7 +343,74 @@ export function ActivityAnalytics() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="admin-logs">
+          <AdminLogsTab />
+        </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function AdminLogsTab() {
+  const { data: adminLogs = [], isLoading } = useQuery<any[]>({
+    queryKey: ['/api/admin/logs'],
+    refetchInterval: 60000,
+  });
+
+  const formatTimestamp = (timestamp: Date) => {
+    try {
+      const date = new Date(timestamp);
+      return { relative: formatDistanceToNow(date, { addSuffix: true }), full: format(date, "PPpp") };
+    } catch {
+      return { relative: "Unknown time", full: "Invalid date" };
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Shield className="h-5 w-5" />
+          Admin Action Log
+        </CardTitle>
+        <CardDescription>History of administrative actions</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {isLoading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex flex-col space-y-1 border-b pb-3">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          ))
+        ) : adminLogs.length === 0 ? (
+          <div className="text-center py-6 text-muted-foreground">No admin actions recorded</div>
+        ) : (
+          adminLogs.map((log: any, index: number) => {
+            const time = formatTimestamp(log.timestamp);
+            return (
+              <div key={index} className="flex flex-col space-y-1 border-b pb-3 last:border-0">
+                <div className="flex items-center space-x-2">
+                  <Shield className="h-4 w-4 text-red-500" />
+                  <span className="font-medium">Admin {log.adminId || "System"}</span>
+                </div>
+                <p className="text-sm">{log.action}</p>
+                {log.details && (
+                  <p className="text-xs text-muted-foreground">
+                    {typeof log.details === 'object' ? JSON.stringify(log.details) : String(log.details)}
+                  </p>
+                )}
+                <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1">
+                  <Clock className="h-3 w-3" />
+                  <span title={time.full}>{time.relative}</span>
+                  {log.ipAddress && <><span>•</span><span>IP: {log.ipAddress}</span></>}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </CardContent>
+    </Card>
   );
 }

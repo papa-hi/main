@@ -47,7 +47,6 @@ const PrivacyPolicyPage  = lazy(() => import("./pages/privacy-policy"));
 const ConfirmEmailChangePage = lazy(() => import("./pages/confirm-email-change"));
 const AboutPage          = lazy(() => import("./pages/about"));
 const AdminDashboard     = lazy(() => import("./pages/admin"));
-const AdminCheck         = lazy(() => import("./pages/admin-check"));
 
 function PageLoader() {
   return (
@@ -106,7 +105,6 @@ function Router() {
         <Route path="/confirm-email-change" component={ConfirmEmailChangePage} />
         <Route path="/about" component={AboutPage} />
         <ProtectedRoute path="/admin" component={AdminDashboardWithProvider} />
-        <Route path="/admin-check" component={AdminCheck} />
         <Route path="/auth" component={AuthPage} />
         <Route path="/forgot-password" component={ForgotPasswordPage} />
         <Route path="/reset-password" component={ResetPasswordPage} />

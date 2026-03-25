@@ -29,25 +29,6 @@ type FeatureStat = {
   count: number;
 };
 
-type UserActivity = {
-  id: number;
-  userId: number | null;
-  action: string;
-  timestamp: Date;
-  details?: any;
-  ipAddress?: string | null;
-  userAgent?: string | null;
-};
-
-type AdminLog = {
-  id: number;
-  adminId: number | null;
-  action: string;
-  timestamp: Date;
-  details?: any;
-  ipAddress?: string | null;
-};
-
 type User = {
   id: number;
   username: string;
@@ -78,12 +59,6 @@ type AdminContextType = {
   isLoadingPageStats: boolean;
   featureStats: FeatureStat[];
   isLoadingFeatureStats: boolean;
-  
-  // Activity logs
-  activityLogs: UserActivity[];
-  isLoadingActivityLogs: boolean;
-  adminLogs: AdminLog[];
-  isLoadingAdminLogs: boolean;
   
   // Refetch functions
   refetchUsers: () => void;
@@ -178,50 +153,6 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     refetchInterval: false,
   });
 
-  // Activity logs query
-  const {
-    data: activityData,
-    isLoading: isLoadingActivityLogs,
-    refetch: refetchActivityLogs,
-  } = useQuery({
-    queryKey: ["/api/admin/activity"],
-    queryFn: async () => {
-      const res = await apiRequest("GET", "/api/admin/activity");
-      if (!res.ok) throw new Error("Failed to fetch activity logs");
-      return await res.json();
-    },
-    enabled: !!user,
-    retry: false,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
-  });
-
-  // Extract activity array from paginated response
-  const activityLogs = activityData?.activity || [];
-
-  // Admin logs query
-  const {
-    data: logsData,
-    isLoading: isLoadingAdminLogs,
-    refetch: refetchAdminLogs,
-  } = useQuery({
-    queryKey: ["/api/admin/logs"],
-    queryFn: async () => {
-      const res = await apiRequest("GET", "/api/admin/logs");
-      if (!res.ok) throw new Error("Failed to fetch admin logs");
-      return await res.json();
-    },
-    enabled: !!user,
-    retry: false,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchInterval: false,
-  });
-
-  // Extract logs array from paginated response
-  const adminLogs = logsData?.logs || [];
-
   // Change user role mutation
   const changeUserRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: number; role: string }) => {
@@ -293,8 +224,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   };
 
   const refetchLogs = () => {
-    refetchActivityLogs();
-    refetchAdminLogs();
+    // activity/admin logs are now fetched directly by the Analytics component
   };
 
   return (
@@ -315,12 +245,6 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         isLoadingPageStats,
         featureStats,
         isLoadingFeatureStats,
-        
-        // Logs
-        activityLogs,
-        isLoadingActivityLogs,
-        adminLogs,
-        isLoadingAdminLogs,
         
         // Refetch functions
         refetchUsers,

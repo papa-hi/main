@@ -92,6 +92,15 @@ interface Category {
   description: string;
 }
 
+const COMMUNITY_CATEGORIES: Category[] = [
+  { id: 'general',       name: 'General Discussion', description: 'General parenting topics and conversations' },
+  { id: 'parenting-tips',name: 'Parenting Tips',     description: 'Share and discover parenting advice' },
+  { id: 'activities',    name: 'Kids Activities',    description: 'Fun activities and ideas for children' },
+  { id: 'health',        name: 'Health & Wellness',  description: 'Health tips and wellness discussions' },
+  { id: 'education',     name: 'Education',          description: 'School, learning, and educational resources' },
+  { id: 'local',         name: 'Local Community',    description: 'Local events and neighborhood discussions' },
+];
+
 // Form schemas
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200, 'Title is too long'),
@@ -140,11 +149,7 @@ export default function CommunityPage() {
     },
   });
 
-  // Fetch categories
-  const { data: categories = [] } = useQuery<Category[]>({
-    queryKey: ['/api/community/categories'],
-    queryFn: () => fetch('/api/community/categories').then(res => res.json()),
-  });
+  const categories = COMMUNITY_CATEGORIES;
 
   const { data: events = [], isLoading: eventsLoading } = useQuery<FamilyEvent[]>({
     queryKey: ['/api/events', 'upcoming'],
