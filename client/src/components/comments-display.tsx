@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
@@ -101,7 +102,8 @@ function MentionSuggestions({
 // Helper function to highlight @mentions in text
 function highlightMentions(text: string) {
   const mentionRegex = /@(\w+)/g;
-  return text.replace(mentionRegex, '<span class="text-blue-600 font-medium">@$1</span>');
+  const withMentions = text.replace(mentionRegex, '<span class="text-blue-600 font-medium">@$1</span>');
+  return DOMPurify.sanitize(withMentions, { ALLOWED_TAGS: ['span'], ALLOWED_ATTR: ['class'] });
 }
 
 function CommentItem({ comment, postId, onReaction, depth = 0 }: { 
