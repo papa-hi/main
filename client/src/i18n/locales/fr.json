@@ -323,7 +323,12 @@
     "delete": "Supprimer",
     "edit": "Modifier",
     "moreInfo": "Plus d'informations",
-    "search": "Rechercher"
+    "search": "Rechercher",
+    "onlineTitle": "De retour en ligne",
+    "onlineDesc": "Vous avez à nouveau accès à toutes les fonctionnalités",
+    "offlineTitle": "Vous êtes hors ligne",
+    "offlineDesc": "Certaines fonctionnalités sont limitées",
+    "profileLoadError": "Impossible de charger le profil utilisateur. Veuillez réessayer plus tard."
   },
   "dads": {
     "moreDads": "Plus de pères",

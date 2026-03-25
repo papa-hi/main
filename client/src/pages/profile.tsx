@@ -334,7 +334,7 @@ export default function ProfilePage() {
     return (
       <div className="py-2">
         <div className="bg-red-50 text-red-500 p-4 rounded-lg">
-          Kon gebruikersprofiel niet laden. Probeer later nog eens.
+          {t('common.profileLoadError')}
         </div>
       </div>
     );

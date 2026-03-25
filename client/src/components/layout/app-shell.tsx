@@ -3,6 +3,7 @@ import { MobileFooter } from "./mobile-footer";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { useTranslation } from "react-i18next";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -11,6 +12,7 @@ type AppShellProps = {
 export default function AppShell({ children }: AppShellProps) {
   const { toast } = useToast();
   const { user: authUser, isLoading } = useAuth();
+  const { t } = useTranslation();
   
   // Default user info when not authenticated or loading
   const [userDisplay, setUserDisplay] = useState({
@@ -35,16 +37,16 @@ export default function AppShell({ children }: AppShellProps) {
     const handleOnline = () => {
       setIsOnline(true);
       toast({
-        title: "Je bent weer online",
-        description: "Je hebt nu weer toegang tot alle functies",
+        title: t('common.onlineTitle'),
+        description: t('common.onlineDesc'),
       });
     };
 
     const handleOffline = () => {
       setIsOnline(false);
       toast({
-        title: "Je bent offline",
-        description: "Sommige functies zijn beperkt beschikbaar",
+        title: t('common.offlineTitle'),
+        description: t('common.offlineDesc'),
         variant: "destructive",
       });
     };

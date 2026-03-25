@@ -488,7 +488,12 @@
     "delete": "Delete",
     "edit": "Edit",
     "remove": "Remove",
-    "moreInfo": "More Info"
+    "moreInfo": "More Info",
+    "onlineTitle": "Back online",
+    "onlineDesc": "You now have access to all features",
+    "offlineTitle": "You're offline",
+    "offlineDesc": "Some features are limited",
+    "profileLoadError": "Could not load user profile. Please try again later."
   },
   "dads": {
     "moreDads": "More Dads",

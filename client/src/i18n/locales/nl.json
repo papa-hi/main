@@ -496,7 +496,12 @@
     "edit": "Bewerken",
     "moreInfo": "Meer Info",
     "search": "Zoeken",
-    "map": "Kaart"
+    "map": "Kaart",
+    "onlineTitle": "Je bent weer online",
+    "onlineDesc": "Je hebt nu weer toegang tot alle functies",
+    "offlineTitle": "Je bent offline",
+    "offlineDesc": "Sommige functies zijn beperkt beschikbaar",
+    "profileLoadError": "Kon gebruikersprofiel niet laden. Probeer later nog eens."
   },
   "dads": {
     "moreDads": "Meer Papa's",

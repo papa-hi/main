@@ -347,7 +347,12 @@
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "moreInfo": "Mehr Informationen",
-    "search": "Suchen"
+    "search": "Suchen",
+    "onlineTitle": "Wieder online",
+    "onlineDesc": "Du hast jetzt wieder Zugang zu allen Funktionen",
+    "offlineTitle": "Du bist offline",
+    "offlineDesc": "Einige Funktionen sind eingeschränkt verfügbar",
+    "profileLoadError": "Benutzerprofil konnte nicht geladen werden. Bitte versuche es später noch einmal."
   },
   "dads": {
     "moreDads": "Weitere Väter",
