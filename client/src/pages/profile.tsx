@@ -314,7 +314,7 @@ export default function ProfilePage() {
           <Skeleton className="h-5 w-60" />
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-card rounded-xl shadow-sm overflow-hidden">
           <div className="md:flex">
             <Skeleton className="w-full md:w-1/3 h-64" />
             <div className="p-6 md:w-2/3">
@@ -342,7 +342,7 @@ export default function ProfilePage() {
   
   // Render profile view
   const renderProfileView = () => (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div className="bg-card rounded-xl shadow-sm overflow-hidden">
       <div className="md:flex">
         <div className="md:w-1/3">
           {/* Use a direct image with cache-busting parameter to avoid caching issues */}
@@ -365,7 +365,7 @@ export default function ProfilePage() {
                 {user.firstName} {user.lastName}
               </h2>
               {user.city && (
-                <p className="text-dark/70 flex items-center mb-4">
+                <p className="text-muted-foreground flex items-center mb-4">
                   <i className="fas fa-map-marker-alt mr-2"></i> {user.city}
                 </p>
               )}
@@ -380,7 +380,7 @@ export default function ProfilePage() {
           </div>
           
           <h3 className="font-heading font-medium text-lg mb-2">{t('profile.aboutMe', 'About me')}</h3>
-          <p className="text-dark/80 mb-4">
+          <p className="text-muted-foreground mb-4">
             {user.bio || t('profile.noBio', 'No bio set. Click edit to add information about yourself.')}
           </p>
           
@@ -419,7 +419,7 @@ export default function ProfilePage() {
   
   // Render profile edit form
   const renderProfileEditForm = () => (
-    <div className="bg-white rounded-xl shadow-sm p-6">
+    <div className="bg-card rounded-xl shadow-sm p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-heading font-bold text-xl">{t('profile.editProfile', 'Edit Profile')}</h2>
         <Button 
@@ -714,7 +714,7 @@ export default function ProfilePage() {
             ) : createdPlaydates && createdPlaydates.length > 0 ? (
               <div className="space-y-4">
                 {createdPlaydates.map((playdate) => (
-                  <div key={playdate.id} className="bg-white rounded-xl p-4 shadow-sm">
+                  <div key={playdate.id} className="bg-card rounded-xl p-4 shadow-sm">
                     <div className="flex items-start">
                       <div className="flex-shrink-0 w-14 h-14 bg-accent/10 rounded-lg flex flex-col items-center justify-center mr-4">
                         <span className="text-accent font-bold text-lg">{playdate.startTime ? new Date(playdate.startTime).getDate() : ''}</span>
@@ -724,7 +724,7 @@ export default function ProfilePage() {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-heading font-medium text-base mb-1">{playdate.title}</h3>
-                        <div className="flex items-center text-sm text-dark/70 mb-2">
+                        <div className="flex items-center text-sm text-muted-foreground mb-2">
                           <i className="fas fa-clock mr-1 text-xs"></i>
                           <span>
                             {playdate.startTime && new Date(playdate.startTime).toLocaleTimeString('nl-NL', {hour: '2-digit', minute:'2-digit'})} - 
@@ -734,7 +734,7 @@ export default function ProfilePage() {
                           <span>{playdate.location}</span>
                         </div>
                         <div className="flex items-center mb-2">
-                          <span className="text-xs text-dark/60">
+                          <span className="text-xs text-muted-foreground">
                             {playdate.participants.length} / {playdate.maxParticipants} deelnemers
                           </span>
                         </div>
@@ -790,9 +790,9 @@ export default function ProfilePage() {
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+              <div className="bg-card rounded-xl p-6 shadow-sm text-center">
                 <h3 className="font-heading font-medium text-lg mb-2">{t('profile.noPlaydatesPlanned', 'No playdates planned')}</h3>
-                <p className="text-dark/70 text-sm mb-4">{t('profile.noPlaydatesMade', 'You haven\'t made any playdates yet.')}</p>
+                <p className="text-muted-foreground text-sm mb-4">{t('profile.noPlaydatesMade', 'You haven\'t made any playdates yet.')}</p>
                 <Button 
                   className="bg-primary text-white hover:bg-accent transition"
                   onClick={() => navigate("/create")}
@@ -817,9 +817,9 @@ export default function ProfilePage() {
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+              <div className="bg-card rounded-xl p-6 shadow-sm text-center">
                 <h3 className="font-heading font-medium text-lg mb-2">Geen favoriete plekken</h3>
-                <p className="text-dark/70 text-sm mb-4">Je hebt nog geen plekken als favoriet gemarkeerd.</p>
+                <p className="text-muted-foreground text-sm mb-4">Je hebt nog geen plekken als favoriet gemarkeerd.</p>
                 <Button 
                   className="bg-primary text-white hover:bg-accent transition"
                   onClick={() => navigate("/places")}
