@@ -40,15 +40,15 @@ export function QuickActions() {
         />
         <QuickActionButton 
           icon={MapPin}
-          iconBg="bg-blue-100"
-          iconColor="text-blue-500"
+          iconBg="bg-orange-100"
+          iconColor="text-orange-500"
           label={t('quickActions.places', 'Places')} 
           href="/places" 
         />
         <QuickActionButton 
           icon={Compass}
-          iconBg="bg-green-100"
-          iconColor="text-green-500"
+          iconBg="bg-orange-100"
+          iconColor="text-orange-500"
           label={t('quickActions.discover', 'Discover')} 
           href="/discover" 
         />
