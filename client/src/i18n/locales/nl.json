@@ -164,7 +164,9 @@
     "createPlaydate": "Speelafspraak Maken"
   },
   "quickActions": {
-    "newPlaydate": "Nieuwe Afspraak"
+    "newPlaydate": "Nieuwe Afspraak",
+    "places": "Plekken",
+    "discover": "Ontdekken"
   },
   "places": {
     "all": "Alle",

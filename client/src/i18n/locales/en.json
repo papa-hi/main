@@ -165,7 +165,9 @@
     "createPlaydate": "Create Playdate"
   },
   "quickActions": {
-    "newPlaydate": "New Playdate"
+    "newPlaydate": "New Playdate",
+    "places": "Places",
+    "discover": "Discover"
   },
   "places": {
     "all": "All",

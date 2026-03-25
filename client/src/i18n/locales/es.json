@@ -111,7 +111,9 @@
     "createPlaydate": "Crear cita de juego"
   },
   "quickActions": {
-    "newPlaydate": "Nueva cita de juego"
+    "newPlaydate": "Nueva cita de juego",
+    "places": "Lugares",
+    "discover": "Descubrir"
   },
   "places": {
     "all": "Todos",

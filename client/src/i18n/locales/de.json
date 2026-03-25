@@ -111,7 +111,9 @@
     "createPlaydate": "Spieltreffen erstellen"
   },
   "quickActions": {
-    "newPlaydate": "Neues Spieltreffen"
+    "newPlaydate": "Neues Spieltreffen",
+    "places": "Orte",
+    "discover": "Entdecken"
   },
   "places": {
     "all": "Alle",

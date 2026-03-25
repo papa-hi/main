@@ -111,7 +111,9 @@
     "createPlaydate": "Créer une rencontre"
   },
   "quickActions": {
-    "newPlaydate": "Nouvelle rencontre"
+    "newPlaydate": "Nouvelle rencontre",
+    "places": "Lieux",
+    "discover": "Découvrir"
   },
   "places": {
     "all": "Tous",
