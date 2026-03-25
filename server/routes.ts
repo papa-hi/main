@@ -1083,25 +1083,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/users", isAuthenticated, async (req, res) => {
     try {
-      // Get all users from storage, limiting what data is returned
-      const users = await storage.getAllUsers();
-      
-      // Filter out sensitive information
-      const safeUsers = users.map(user => {
-        const userWithoutSensitive = { ...user } as Partial<SelectUser>;
-        delete userWithoutSensitive.password;
-        
-        return {
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          profileImage: user.profileImage || "/avatar.png",
-          city: user.city,
-          badge: user.badge,
-          bio: user.bio
-        };
+      const { q, limit, offset } = req.query;
+
+      const limitValue  = Math.min(parseInt(limit  as string) || 20, 100);
+      const offsetValue = Math.max(parseInt(offset as string) || 0,  0);
+      const searchQuery = (q as string)?.trim() || undefined;
+
+      const users = await storage.getAllUsers({
+        searchQuery,
+        limit: limitValue,
+        offset: offsetValue,
       });
-      
+
+      const safeUsers = users.map(user => ({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        profileImage: user.profileImage || "/avatar.png",
+        city: user.city,
+        badge: user.badge,
+        bio: user.bio,
+      }));
+
       res.json(safeUsers);
     } catch (err) {
       console.error("Error fetching users:", err);

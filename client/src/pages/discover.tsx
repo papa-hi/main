@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { ProfileAvatar } from "@/components/ui/profile-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLocation } from "@/hooks/use-location";
 import { Calendar, MapPin, Search, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { STALE_TIMES } from "@/lib/queryClient";
 
 interface User {
   id: number;
@@ -21,39 +22,38 @@ interface User {
   bio: string | null;
 }
 
+function useDebounce<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return debounced;
+}
+
 export default function DiscoverPage() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedQuery = useDebounce(searchQuery, 400);
   const { city } = useLocation();
-  
-  // Fetch all users
-  const {
-    data: users,
-    isLoading,
-    error
-  } = useQuery<User[]>({
-    queryKey: ["/api/users"],
+
+  const apiUrl = debouncedQuery.trim()
+    ? `/api/users?q=${encodeURIComponent(debouncedQuery.trim())}&limit=20`
+    : `/api/users?limit=20`;
+
+  const { data: users, isLoading, error } = useQuery<User[]>({
+    queryKey: ["/api/users", debouncedQuery.trim()],
+    queryFn: () => fetch(apiUrl, { credentials: "include" }).then(r => r.json()),
+    staleTime: STALE_TIMES.PLAYDATES,
   });
-  
-  // Filter users based on search query
-  const filteredUsers = users?.filter(user => {
-    if (!searchQuery) return true;
-    
-    const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-    const query = searchQuery.toLowerCase();
-    
-    return fullName.includes(query) || 
-           (user.city && user.city.toLowerCase().includes(query)) ||
-           (user.bio && user.bio.toLowerCase().includes(query));
-  });
-  
+
   return (
     <div className="py-4">
       <div className="mb-6">
         <h1 className="text-2xl font-heading font-bold">{t('discover.title')}</h1>
         <p className="text-muted-foreground">{t('discover.subtitle')}</p>
       </div>
-      
+
       <Link href="/dad-days">
         <Card className="mb-6 cursor-pointer hover:shadow-md transition-shadow border-primary/30 bg-primary/5">
           <CardContent className="flex items-center gap-4 py-4">
@@ -81,7 +81,7 @@ export default function DiscoverPage() {
           className="pl-10"
         />
       </div>
-      
+
       {/* Loading State */}
       {isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -106,7 +106,7 @@ export default function DiscoverPage() {
           ))}
         </div>
       )}
-      
+
       {/* Error State */}
       {error && (
         <div className="text-center py-8">
@@ -116,9 +116,9 @@ export default function DiscoverPage() {
           </Button>
         </div>
       )}
-      
+
       {/* No Users Found */}
-      {filteredUsers?.length === 0 && (
+      {!isLoading && users?.length === 0 && (
         <div className="text-center py-8 bg-muted/40 rounded-lg">
           <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
           <h3 className="text-lg font-medium mb-2">{t('discover.noUsersFound')}</h3>
@@ -127,25 +127,24 @@ export default function DiscoverPage() {
           </p>
         </div>
       )}
-      
+
       {/* Users Grid */}
-      {filteredUsers && filteredUsers.length > 0 && (
+      {users && users.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredUsers.map((user) => (
+          {users.map((user) => (
             <Card key={user.id} className="overflow-hidden">
-              {/* Random gradient background */}
               <CardHeader className="p-0 h-24 bg-gradient-to-r from-primary/20 to-accent/30" />
-              
+
               <CardContent className="pt-0">
                 <div className="flex items-center gap-4 -mt-12">
-                  <ProfileAvatar 
+                  <ProfileAvatar
                     profileImage={user.profileImage}
                     firstName={user.firstName}
                     lastName={user.lastName}
                     size="lg"
                     className="border-4 border-white"
                   />
-                  
+
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">{`${user.firstName} ${user.lastName}`}</h3>
@@ -153,7 +152,7 @@ export default function DiscoverPage() {
                         <Badge variant="outline" className="text-xs">{user.badge}</Badge>
                       )}
                     </div>
-                    
+
                     {user.city && (
                       <div className="flex items-center text-sm text-muted-foreground">
                         <MapPin className="h-3 w-3 mr-1" />
@@ -165,14 +164,14 @@ export default function DiscoverPage() {
                     )}
                   </div>
                 </div>
-                
+
                 {user.bio && (
                   <p className="mt-4 text-sm text-muted-foreground line-clamp-2">
                     {user.bio}
                   </p>
                 )}
               </CardContent>
-              
+
               <CardFooter className="flex justify-end">
                 <Link href={`/users/${user.id}`}>
                   <Button size="sm" variant="outline">{t('discover.viewProfile')}</Button>
