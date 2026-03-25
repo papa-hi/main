@@ -22,6 +22,15 @@ interface User {
   bio: string | null;
 }
 
+type AgeFilter = null | [number, number];
+
+const AGE_GROUPS: { label: string; range: AgeFilter }[] = [
+  { label: "All ages", range: null },
+  { label: "0–2",      range: [0, 2] },
+  { label: "3–5",      range: [3, 5] },
+  { label: "6–10",     range: [6, 10] },
+];
+
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -34,18 +43,31 @@ function useDebounce<T>(value: T, delay: number): T {
 export default function DiscoverPage() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
+  const [nearMe, setNearMe] = useState(false);
+  const [ageFilter, setAgeFilter] = useState<AgeFilter>(null);
   const debouncedQuery = useDebounce(searchQuery, 400);
   const { city } = useLocation();
 
-  const apiUrl = debouncedQuery.trim()
-    ? `/api/users?q=${encodeURIComponent(debouncedQuery.trim())}&limit=20`
-    : `/api/users?limit=20`;
+  // Build query params — include every active filter so the cache key is exact
+  const params = new URLSearchParams({ limit: "20" });
+  if (debouncedQuery.trim()) params.set("q", debouncedQuery.trim());
+  if (nearMe && city)        params.set("city", city);
+  if (ageFilter) {
+    params.set("childMinAge", String(ageFilter[0]));
+    params.set("childMaxAge", String(ageFilter[1]));
+  }
+  const apiUrl = `/api/users?${params.toString()}`;
+
+  // Key includes every filter dimension — no stale-cache cross-contamination
+  const queryKey = ["/api/users", debouncedQuery.trim(), nearMe ? city : null, ageFilter?.join("-") ?? null];
 
   const { data: users, isLoading, error } = useQuery<User[]>({
-    queryKey: ["/api/users", debouncedQuery.trim()],
+    queryKey,
     queryFn: () => fetch(apiUrl, { credentials: "include" }).then(r => r.json()),
     staleTime: STALE_TIMES.PLAYDATES,
   });
+
+  const hasActiveFilter = nearMe || ageFilter !== null;
 
   return (
     <div className="py-4">
@@ -72,7 +94,7 @@ export default function DiscoverPage() {
       </Link>
 
       {/* Search Bar */}
-      <div className="relative mb-6">
+      <div className="relative mb-3">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder={t('discover.searchPlaceholder')}
@@ -80,6 +102,37 @@ export default function DiscoverPage() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
         />
+      </div>
+
+      {/* Filter Row */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {/* Near me toggle */}
+        <Button
+          size="sm"
+          variant={nearMe ? "default" : "outline"}
+          onClick={() => setNearMe(v => !v)}
+          disabled={!city}
+          className="gap-1.5"
+        >
+          <MapPin className="h-3.5 w-3.5" />
+          Near me
+        </Button>
+
+        {/* Age group buttons */}
+        {AGE_GROUPS.map(({ label, range }) => {
+          const key = range?.join("-") ?? "all";
+          const active = ageFilter?.join("-") === range?.join("-");
+          return (
+            <Button
+              key={key}
+              size="sm"
+              variant={active ? "default" : "outline"}
+              onClick={() => setAgeFilter(range === null && active ? null : range)}
+            >
+              {label}
+            </Button>
+          );
+        })}
       </div>
 
       {/* Loading State */}
@@ -123,7 +176,11 @@ export default function DiscoverPage() {
           <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
           <h3 className="text-lg font-medium mb-2">{t('discover.noUsersFound')}</h3>
           <p className="text-muted-foreground">
-            {t('discover.tryOtherSearch')}
+            {debouncedQuery.trim()
+              ? `No dads found for "${debouncedQuery.trim()}"${hasActiveFilter ? " with the selected filters" : ""}.`
+              : hasActiveFilter
+                ? "No dads match the selected filters."
+                : t('discover.tryOtherSearch')}
           </p>
         </div>
       )}

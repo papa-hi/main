@@ -1083,14 +1083,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/users", isAuthenticated, async (req, res) => {
     try {
-      const { q, limit, offset } = req.query;
+      const { q, city, childMinAge, childMaxAge, limit, offset } = req.query;
 
       const limitValue  = Math.min(parseInt(limit  as string) || 20, 100);
       const offsetValue = Math.max(parseInt(offset as string) || 0,  0);
       const searchQuery = (q as string)?.trim() || undefined;
+      const cityFilter  = (city as string)?.trim() || undefined;
+
+      const minAge = parseInt(childMinAge as string);
+      const maxAge = parseInt(childMaxAge as string);
+      const childAgeRange: [number, number] | undefined =
+        !isNaN(minAge) && !isNaN(maxAge) ? [minAge, maxAge] : undefined;
 
       const users = await storage.getAllUsers({
         searchQuery,
+        city: cityFilter,
+        childAgeRange,
         limit: limitValue,
         offset: offsetValue,
       });

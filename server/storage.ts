@@ -505,9 +505,20 @@ export class DatabaseStorage implements IStorage {
                ${users.bio} ILIKE ${searchTerm})`
         );
       }
-      
+
       if (filters.city) {
         conditions.push(eq(users.city, filters.city));
+      }
+
+      if (filters.childAgeRange) {
+        const [minAge, maxAge] = filters.childAgeRange;
+        // Match users who have at least one child whose age falls in the range
+        conditions.push(
+          sql`EXISTS (
+            SELECT 1 FROM jsonb_array_elements(${users.childrenInfo}) AS child
+            WHERE (child->>'age')::int BETWEEN ${minAge} AND ${maxAge}
+          )`
+        );
       }
     }
     
