@@ -45,7 +45,7 @@ export default function PlaydatesPage() {
           {upcomingLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-xl p-4 shadow-sm">
+                <div key={i} className="bg-card rounded-xl p-4 shadow-sm">
                   <div className="flex items-start">
                     <Skeleton className="flex-shrink-0 w-14 h-14 rounded-lg mr-4" />
                     <div className="flex-grow">
@@ -82,7 +82,7 @@ export default function PlaydatesPage() {
               )}
             </>
           ) : (
-            <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+            <div className="bg-card rounded-xl p-6 shadow-sm text-center">
               <img 
                 src="/images/father.png" 
                 alt={t('playdates.emptyCalendarAlt', 'Father with children')} 
@@ -91,7 +91,7 @@ export default function PlaydatesPage() {
               {user ? (
                 <>
                   <h3 className="font-heading font-medium text-lg mb-2">{t('playdates.noPlaydatesPlanned')}</h3>
-                  <p className="text-dark/70 text-sm mb-4">{t('playdates.planNewMeetDads')}</p>
+                  <p className="text-muted-foreground text-sm mb-4">{t('playdates.planNewMeetDads')}</p>
                   <Link href="/create">
                     <Button className="bg-primary text-white hover:bg-accent transition">{t('playdates.newPlaydate')}</Button>
                   </Link>
@@ -99,7 +99,7 @@ export default function PlaydatesPage() {
               ) : (
                 <>
                   <h3 className="font-heading font-medium text-lg mb-2">No public playdates yet</h3>
-                  <p className="text-dark/70 text-sm mb-4">Sign in to see all playdates and join the community.</p>
+                  <p className="text-muted-foreground text-sm mb-4">Sign in to see all playdates and join the community.</p>
                   <Link href="/auth">
                     <Button className="bg-primary text-white hover:bg-accent transition">Sign in or create account</Button>
                   </Link>
@@ -113,7 +113,7 @@ export default function PlaydatesPage() {
           {pastLoading ? (
             <div className="space-y-4">
               {[1, 2].map((i) => (
-                <div key={i} className="bg-white rounded-xl p-4 shadow-sm">
+                <div key={i} className="bg-card rounded-xl p-4 shadow-sm">
                   <div className="flex items-start">
                     <Skeleton className="flex-shrink-0 w-14 h-14 rounded-lg mr-4" />
                     <div className="flex-grow">
@@ -136,14 +136,14 @@ export default function PlaydatesPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+            <div className="bg-card rounded-xl p-6 shadow-sm text-center">
               <img 
                 src="/images/father.png" 
                 alt={t('playdates.emptyCalendarAlt', 'Father with children')} 
                 className="w-28 h-28 object-cover rounded-full mx-auto mb-4"
               />
               <h3 className="font-heading font-medium text-lg mb-2">{t('playdates.noPlaydatesPlanned')}</h3>
-              <p className="text-dark/70 text-sm">{t('playdates.noPastPlaydates', 'You don\'t have any past playdates yet.')}</p>
+              <p className="text-muted-foreground text-sm">{t('playdates.noPastPlaydates', 'You don\'t have any past playdates yet.')}</p>
             </div>
           )}
         </TabsContent>
