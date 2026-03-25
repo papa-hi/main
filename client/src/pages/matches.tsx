@@ -4,8 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Users, Heart, X, RefreshCw, Settings, Baby, Calendar, Clock, MessageCircle } from "lucide-react";
+import { MapPin, Users, Heart, X, RefreshCw, Settings, Baby, Calendar, Clock, MessageCircle, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
@@ -71,6 +72,67 @@ const SLOT_EMOJI: Record<string, string> = {
   evening: "🌆",
 };
 
+function formatAgeRanges(ranges: Array<{ minAge: number; maxAge: number }>): string {
+  return ranges.map(range =>
+    range.minAge === range.maxAge ? `${range.minAge}` : `${range.minAge}-${range.maxAge}`
+  ).join(', ') + ' years';
+}
+
+function buildProfileMatchReasons(match: DadMatch, otherDad: DadMatch['dad1']): string[] {
+  const reasons: string[] = [];
+  if (match.distanceKm === 0 && otherDad.city) {
+    reasons.push(`📍 Both in ${otherDad.city}`);
+  } else if (match.distanceKm > 0) {
+    reasons.push(`📍 ${match.distanceKm} km apart`);
+  }
+  if (match.commonAgeRanges && match.commonAgeRanges.length > 0) {
+    const allMin = Math.min(...match.commonAgeRanges.map(r => r.minAge));
+    const allMax = Math.max(...match.commonAgeRanges.map(r => r.maxAge));
+    const ageLabel = allMin === allMax ? `${allMin} yrs` : `${allMin}–${allMax} yrs`;
+    reasons.push(`👶 Children aged ${ageLabel}`);
+  }
+  return reasons;
+}
+
+function buildAvailabilityMatchReasons(match: AvailabilityMatch): string[] {
+  const reasons: string[] = [];
+  if (match.distanceKm === 0 && match.user.city) {
+    reasons.push(`📍 Both in ${match.user.city}`);
+  } else if (match.distanceKm > 0) {
+    reasons.push(`📍 ${match.distanceKm} km apart`);
+  }
+  if (match.sharedSlots && match.sharedSlots.length > 0) {
+    const slots = match.sharedSlots.slice(0, 3).map(
+      s => `${s.dayName} ${s.timeSlotDisplay.split(' ')[0].toLowerCase()}`
+    );
+    reasons.push(`🗓️ ${slots.join(' · ')}`);
+  }
+  return reasons;
+}
+
+function MatchReasonTooltip({ reasons, score }: { reasons: string[]; score: number }) {
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex items-center gap-1 cursor-help">
+            <Badge variant="secondary" className="text-xs">
+              {score}% match
+            </Badge>
+            <Info className="h-3 w-3 text-muted-foreground" />
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-[220px] space-y-1">
+          <p className="text-xs font-semibold mb-1">Why you matched:</p>
+          {reasons.map((r, i) => (
+            <p key={i} className="text-xs">{r}</p>
+          ))}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 export default function MatchesPage() {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -132,12 +194,6 @@ export default function MatchesPage() {
 
   const getOtherDad = (match: DadMatch, currentUserId: number) => {
     return match.dadId1 === currentUserId ? match.dad2 : match.dad1;
-  };
-
-  const formatAgeRanges = (ranges: Array<{ minAge: number; maxAge: number }>) => {
-    return ranges.map(range => 
-      range.minAge === range.maxAge ? `${range.minAge}` : `${range.minAge}-${range.maxAge}`
-    ).join(', ') + ' years';
   };
 
   const availabilityMatches = availabilityData?.matches || [];
@@ -248,9 +304,10 @@ export default function MatchesPage() {
                                 {match.user.firstName} {match.user.lastName}
                               </h3>
                             </Link>
-                            <Badge variant="secondary" className="text-xs">
-                              {match.matchScore}% match
-                            </Badge>
+                            <MatchReasonTooltip
+                              reasons={buildAvailabilityMatchReasons(match)}
+                              score={match.matchScore}
+                            />
                           </div>
                           
                           <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
@@ -351,9 +408,10 @@ export default function MatchesPage() {
                                   {otherDad.firstName} {otherDad.lastName}
                                 </h3>
                               </Link>
-                              <Badge variant="secondary" className="text-xs">
-                                {match.matchScore}% match
-                              </Badge>
+                              <MatchReasonTooltip
+                                reasons={buildProfileMatchReasons(match, otherDad)}
+                                score={match.matchScore}
+                              />
                             </div>
                             
                             <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
