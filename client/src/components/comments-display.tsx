@@ -69,8 +69,6 @@ function MentionSuggestions({
   onSelect: (username: string) => void;
   visible: boolean;
 }) {
-  console.log('MentionSuggestions render:', { visible, suggestionsCount: suggestions.length });
-  
   if (!visible || suggestions.length === 0) return null;
 
   return (
@@ -223,14 +221,11 @@ function CommentItem({ comment, postId, onReaction, depth = 0 }: {
     
     if (mentionMatch) {
       const query = mentionMatch[1];
-      console.log('Searching for users with query:', query);
       const suggestions = await searchUsers(query);
-      console.log('Found suggestions:', suggestions);
       
       if (suggestions.length > 0) {
         setMentionSuggestions(suggestions);
         setShowSuggestions(true);
-        console.log('Showing suggestions dropdown');
       } else {
         setShowSuggestions(false);
       }

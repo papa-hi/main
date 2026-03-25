@@ -316,10 +316,8 @@ export default function CommunityPage() {
 
   // Handle post submission
   const onSubmitPost = (data: z.infer<typeof postSchema>) => {
-    console.log('Form submission data:', data);
     const hashtags = extractHashtags(data.content);
     const postData = { ...data, hashtags };
-    console.log('Post data being sent:', postData);
     
     if (editingPost) {
       editPostMutation.mutate({ postId: editingPost, data: postData });
