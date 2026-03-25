@@ -519,10 +519,15 @@ export class DatabaseStorage implements IStorage {
 
       if (filters.childAgeRange) {
         const [minAge, maxAge] = filters.childAgeRange;
-        // Match users who have at least one child whose age falls in the range
+        // Guard with jsonb_typeof so NULL / scalar values don't crash jsonb_array_elements
         conditions.push(
           sql`EXISTS (
-            SELECT 1 FROM jsonb_array_elements(${users.childrenInfo}) AS child
+            SELECT 1 FROM jsonb_array_elements(
+              CASE WHEN jsonb_typeof(${users.childrenInfo}) = 'array'
+                   THEN ${users.childrenInfo}
+                   ELSE '[]'::jsonb
+              END
+            ) AS child
             WHERE (child->>'age')::int BETWEEN ${minAge} AND ${maxAge}
           )`
         );

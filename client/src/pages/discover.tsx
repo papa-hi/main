@@ -70,7 +70,11 @@ export default function DiscoverPage() {
 
   const { data: users, isLoading, error } = useQuery<User[]>({
     queryKey,
-    queryFn: () => fetch(apiUrl, { credentials: "include" }).then(r => r.json()),
+    queryFn: async () => {
+      const r = await fetch(apiUrl, { credentials: "include" });
+      if (!r.ok) throw new Error(`Failed to fetch users: ${r.status}`);
+      return r.json();
+    },
     staleTime: STALE_TIMES.PLAYDATES,
   });
 
