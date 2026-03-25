@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { X, CheckCircle2, Circle, ChevronRight, UserCircle, Users, CalendarPlus } from "lucide-react";
+import { X, CheckCircle2, ChevronRight, UserCircle, Users, CalendarPlus } from "lucide-react";
 
 const DISMISSED_KEY = "onboarding_dismissed_v1";
-const STEP2_KEY = "onboarding_step2_done";
-const STEP3_KEY = "onboarding_step3_done";
 
 interface StepRowProps {
   done: boolean;
@@ -17,12 +16,11 @@ interface StepRowProps {
   title: string;
   description: string;
   to: string;
-  onClick?: () => void;
 }
 
-function StepRow({ done, icon, title, description, to, onClick }: StepRowProps) {
+function StepRow({ done, icon, title, description, to }: StepRowProps) {
   return (
-    <Link to={to} onClick={onClick}>
+    <Link to={to}>
       <div
         className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-primary/10 cursor-pointer ${done ? "opacity-50" : ""}`}
       >
@@ -49,20 +47,28 @@ export function OnboardingCard() {
 
   const [ready, setReady] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const [step2Done, setStep2Done] = useState(false);
-  const [step3Done, setStep3Done] = useState(false);
 
   useEffect(() => {
     setDismissed(localStorage.getItem(DISMISSED_KEY) === "true");
-    setStep2Done(localStorage.getItem(STEP2_KEY) === "true");
-    setStep3Done(localStorage.getItem(STEP3_KEY) === "true");
     setReady(true);
   }, []);
+
+  const { data: matches = [] } = useQuery<unknown[]>({
+    queryKey: ["/api/matches"],
+    enabled: !!user && ready && !dismissed,
+  });
+
+  const { data: myPlaydates = [] } = useQuery<unknown[]>({
+    queryKey: ["/api/users/me/playdates"],
+    enabled: !!user && ready && !dismissed,
+  });
 
   if (!user || !ready) return null;
 
   const childrenInfo = user.childrenInfo as { name: string; age: number }[] | null;
   const step1Done = !!(user.bio && user.city && childrenInfo && childrenInfo.length > 0);
+  const step2Done = matches.length > 0;
+  const step3Done = myPlaydates.length > 0;
   const allDone = step1Done && step2Done && step3Done;
 
   if (dismissed || allDone) return null;
@@ -72,16 +78,6 @@ export function OnboardingCard() {
   const handleDismiss = () => {
     localStorage.setItem(DISMISSED_KEY, "true");
     setDismissed(true);
-  };
-
-  const handleStep2Click = () => {
-    localStorage.setItem(STEP2_KEY, "true");
-    setStep2Done(true);
-  };
-
-  const handleStep3Click = () => {
-    localStorage.setItem(STEP3_KEY, "true");
-    setStep3Done(true);
   };
 
   return (
@@ -127,7 +123,6 @@ export function OnboardingCard() {
               title={t("onboarding.step2Title")}
               description={t("onboarding.step2Desc")}
               to="/matches"
-              onClick={handleStep2Click}
             />
             <StepRow
               done={step3Done}
@@ -135,7 +130,6 @@ export function OnboardingCard() {
               title={t("onboarding.step3Title")}
               description={t("onboarding.step3Desc")}
               to="/create"
-              onClick={handleStep3Click}
             />
           </div>
         </CardContent>
