@@ -1059,52 +1059,66 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getNearbyPlaces(options: { latitude?: number, longitude?: number, type?: string }): Promise<Place[]> {
-    let query = db
-      .select()
-      .from(places);
-    
-    // Filter by type if specified
+    // ~0.5° ≈ 55 km bounding box — pre-filters rows in Postgres before any JS work
+    const DELTA = 0.5;
+    const hasCoords = options.latitude != null && options.longitude != null;
+
+    const conditions: SQL[] = [];
+
     if (options.type && options.type !== "all") {
-      query = query.where(eq(places.type, options.type));
+      conditions.push(eq(places.type, options.type));
     }
-    
-    const placesData = await query;
-    
-    // Calculate distance for each place if user coordinates are provided
-    const result = placesData.map(place => {
-      let distance = 0;
-      
-      if (options.latitude && options.longitude && place.latitude && place.longitude) {
-        const placeLat = parseFloat(place.latitude);
-        const placeLon = parseFloat(place.longitude);
-        
-        // Haversine formula to calculate distance
-        const R = 6371; // Earth's radius in kilometers
-        const dLat = (placeLat - options.latitude) * Math.PI / 180;
-        const dLon = (placeLon - options.longitude) * Math.PI / 180;
-        const a = 
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(options.latitude * Math.PI / 180) * 
-          Math.cos(placeLat * Math.PI / 180) *
-          Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        distance = Math.round(
-          R * c * 1000
-        ); // Convert to meters
-      }
-      
-      return {
+
+    if (hasCoords) {
+      const latMin = options.latitude! - DELTA;
+      const latMax = options.latitude! + DELTA;
+      const lonMin = options.longitude! - DELTA;
+      const lonMax = options.longitude! + DELTA;
+      // latitude/longitude columns are text — cast to float for comparison
+      conditions.push(sql`CAST(${places.latitude} AS FLOAT) BETWEEN ${latMin} AND ${latMax}`);
+      conditions.push(sql`CAST(${places.longitude} AS FLOAT) BETWEEN ${lonMin} AND ${lonMax}`);
+    }
+
+    let query = db.select().from(places);
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    // With coords: fetch ≤20 candidates then sort in JS; without: just fetch 4 directly
+    const placesData = await query.limit(hasCoords ? 20 : 4);
+
+    if (!hasCoords) {
+      return placesData.map(place => ({
         ...place,
         features: place.features ?? [],
-        distance,
-        isSaved: false
-      };
+        distance: 0,
+        isSaved: false,
+      }));
+    }
+
+    // Haversine on the small candidate set only
+    const R = 6371; // km
+    const lat0 = options.latitude!;
+    const lon0 = options.longitude!;
+
+    const result = placesData.map(place => {
+      let distance = 0;
+      if (place.latitude && place.longitude) {
+        const placeLat = parseFloat(place.latitude);
+        const placeLon = parseFloat(place.longitude);
+        const dLat = (placeLat - lat0) * Math.PI / 180;
+        const dLon = (placeLon - lon0) * Math.PI / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat0 * Math.PI / 180) *
+          Math.cos(placeLat * Math.PI / 180) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        distance = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 1000); // metres
+      }
+      return { ...place, features: place.features ?? [], distance, isSaved: false };
     });
-    
-    // Sort by distance (closest first)
+
     result.sort((a, b) => a.distance - b.distance);
-    
-    // Limit to 4 nearest places
     return result.slice(0, 4);
   }
   
