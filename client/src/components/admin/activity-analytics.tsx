@@ -22,12 +22,12 @@ export function ActivityAnalytics() {
   
   const { data: stats, isLoading } = useQuery<ActivityStats>({
     queryKey: ['/api/admin/activity/stats'],
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 120000, // Refresh every 2 minutes
   });
 
   const { data: recentActivity, isLoading: isLoadingActivity } = useQuery({
     queryKey: ['/api/admin/activity'],
-    refetchInterval: 10000, // Refresh every 10 seconds
+    refetchInterval: 60000, // Refresh every 60 seconds
   });
 
   if (isLoading) {
