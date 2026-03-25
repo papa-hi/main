@@ -8,6 +8,7 @@ import { Calendar, Users, Activity, TrendingUp, Clock, BarChart3, Shield } from 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 import { useTranslation } from "react-i18next";
 import { formatDistanceToNow, format } from "date-fns";
+import { useAuth } from "@/hooks/use-auth";
 
 interface ActivityStats {
   totalActions: number;
@@ -21,15 +22,19 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'
 
 export function ActivityAnalytics() {
   const { t } = useTranslation();
-  
+  const { user } = useAuth();
+  const isAdmin = !!user && user.role === 'admin';
+
   const { data: stats, isLoading } = useQuery<ActivityStats>({
     queryKey: ['/api/admin/activity/stats'],
-    refetchInterval: 120000, // Refresh every 2 minutes
+    refetchInterval: 120000,
+    enabled: isAdmin,
   });
 
   const { data: recentActivity, isLoading: isLoadingActivity } = useQuery({
     queryKey: ['/api/admin/activity'],
-    refetchInterval: 60000, // Refresh every 60 seconds
+    refetchInterval: 60000,
+    enabled: isAdmin,
   });
 
   if (isLoading) {
@@ -352,9 +357,11 @@ export function ActivityAnalytics() {
 }
 
 function AdminLogsTab() {
+  const { user } = useAuth();
   const { data: adminLogs = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/admin/logs'],
     refetchInterval: 60000,
+    enabled: !!user && user.role === 'admin',
   });
 
   const formatTimestamp = (timestamp: Date) => {

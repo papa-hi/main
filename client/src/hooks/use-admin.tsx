@@ -140,9 +140,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     isLoading: isLoadingFeatureStats,
     refetch: refetchFeatureStats,
   } = useQuery<FeatureStat[]>({
-    queryKey: ["/api/admin/stats/features"],
+    queryKey: ["/api/admin/stats/features", 7],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/admin/stats/features");
+      const res = await apiRequest("GET", "/api/admin/stats/features?days=7");
       if (!res.ok) throw new Error("Failed to fetch feature stats");
       return await res.json();
     },
