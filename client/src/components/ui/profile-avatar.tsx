@@ -32,22 +32,13 @@ export function ProfileAvatar({
     return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`;
   };
   
-  // Generate unique key for each environment
-  const getImageUrl = (url: string) => {
-    // If URL is already absolute, use it
-    if (url?.startsWith('http')) return url;
-    
-    // Otherwise, use relative URL with timestamp to avoid caching
-    return `${url}?t=${Date.now()}`;
-  };
-  
   return (
     <Avatar className={`${sizeClasses[size]} ${className}`}>
       {profileImage && !imageError ? (
-        <AvatarImage 
-          src={getImageUrl(profileImage)} 
+        <AvatarImage
+          src={profileImage}
           alt={`${firstName} ${lastName}`}
-          onError={() => setImageError(true)} 
+          onError={() => setImageError(true)}
         />
       ) : (
         <AvatarImage 
