@@ -121,9 +121,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     isLoading: isLoadingPageStats,
     refetch: refetchPageStats,
   } = useQuery<PageStat[]>({
-    queryKey: ["/api/admin/stats/pages"],
+    queryKey: ["/api/admin/stats/pages", 7],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/admin/stats/pages");
+      const res = await apiRequest("GET", "/api/admin/stats/pages?days=7");
       if (!res.ok) throw new Error("Failed to fetch page stats");
       return await res.json();
     },
