@@ -124,6 +124,26 @@ PaPa-Hi is a comprehensive social platform designed specifically for fathers in 
 
 ## Recent Changes
 
+### March 2026 - Bug Fixes, Security & i18n Hardening
+
+#### Internationalization (i18n)
+- **Online/offline toasts**: Replaced hardcoded Dutch strings in `app-shell.tsx` with `t('common.onlineTitle/Desc')` and `t('common.offlineTitle/Desc')` — added to all 5 locale files (EN/NL/DE/FR/ES)
+- **Profile load error**: Replaced hardcoded Dutch error message in `profile.tsx` with `t('common.profileLoadError')` across all 5 locales
+- **Rating strings**: All 4 hardcoded English strings in `review-form.tsx` (rating submitted, failed, login required, no ratings) replaced with `t()` calls; keys added to all 5 locales under `places.*`
+- **Community categories**: `COMMUNITY_CATEGORIES` in `community.tsx` corrected from mismatched IDs (`parenting-tips`, `activities`, `health`, `education`, `local`) to the canonical set that matches the database (`playdates`, `advice`, `events`, `recommendations`, `general`); `community.categories` i18n sub-object added/updated across all 5 locales; removed duplicate `categoriesHeading` key from `nl.json`
+- **Quick Actions labels**: New `quickActions.places` and `quickActions.discover` keys added to all 5 locales; label for the Discover/Connect button later renamed to "Connect" (`quickActions.discover`) across all languages
+
+#### UI & Navigation
+- **Quick Actions redesign**: All three Quick Actions buttons (`New Playdate`, `Places`, `Connect`) now use consistent Lucide icons (`CalendarPlus` orange, `MapPin` blue, `Compass` green) inside circular containers — removed the old custom PNG images and dead `customIcon` prop
+- **Places button**: Changed destination from `/places?type=restaurant` → `/places` (top-level page; users filter themselves)
+- **Connect button**: Changed destination from `/places?type=playground` → `/discover` (surfaces dad-discovery feature)
+- **Museum filter sync**: Added missing `type=museum` branch to `useEffect` in `nearby-places.tsx` so Quick Actions links that include `?type=museum` correctly pre-select the museum filter chip
+- **Community page background**: Replaced `bg-gradient-to-br from-blue-50 to-green-50` with `bg-background` (`#F8F7F3`) to match the rest of the app
+
+#### Security
+- **XSS fix — `dangerouslySetInnerHTML`**: Installed `dompurify` + `@types/dompurify`; `highlightMentions()` in `comments-display.tsx` now passes output through `DOMPurify.sanitize()` with a strict allowlist (`<span class="">` only) before injecting into the DOM
+- **Console.log removal**: Removed 6 debug `console.log` calls that exposed user-generated content and form payloads in the browser console — 4 from `comments-display.tsx` (mention search traces) and 2 from `community.tsx` (form submission data)
+
 ### August 3, 2025 - Recurring Daily Playdates Implementation
 - **Complete Recurring System**: Successfully implemented daily recurring playdates allowing users to create events that repeat every day until a specified end date
 - **Enhanced Database Schema**: Added new fields (isRecurring, recurringType, recurringEndDate, parentPlaydateId) to support recurring functionality
