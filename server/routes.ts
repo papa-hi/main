@@ -1287,9 +1287,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  // Advanced search endpoint - Allow without authentication for testing
-  app.get("/api/users/search", async (req: Request, res: Response) => {
-    // Skip authentication check for testing
+  // Advanced search endpoint
+  app.get("/api/users/search", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const { 
         query, 
