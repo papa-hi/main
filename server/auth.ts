@@ -248,6 +248,9 @@ export function setupAuth(app: Express) {
   app.post("/api/register", registerLimiter, async (req, res, next) => {
     try {
       const sanitizedBody = sanitizeObject(req.body, ['username', 'firstName', 'lastName', 'bio', 'city', 'email']);
+      if (sanitizedBody.email) {
+        sanitizedBody.email = sanitizedBody.email.toLowerCase().trim();
+      }
       const existingUser = await storage.getUserByUsername(sanitizedBody.username);
       if (existingUser) {
         return res.status(400).json({ error: "Username already exists" });
@@ -419,9 +422,9 @@ export function setupAuth(app: Express) {
         return res.status(401).json({ error: "Invalid or expired Firebase ID token" });
       }
 
-      // Check if user exists with this email
-      console.log("Checking if user exists with email:", email);
-      let user = await storage.getUserByEmail(email);
+      // Check if user exists with this email (normalise before lookup)
+      const normalisedEmail = email.toLowerCase().trim();
+      let user = await storage.getUserByEmail(normalisedEmail);
       
       if (!user) {
         console.log("User not found, creating new user with email:", email);
@@ -437,7 +440,7 @@ export function setupAuth(app: Express) {
         // Create a new user with default values for required fields
         const newUser = {
           username: `google_${uid.substring(0, 8)}`,
-          email,
+          email: normalisedEmail,
           password: hashedPassword,
           firstName,
           lastName,
@@ -532,8 +535,8 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ error: "Email is required" });
       }
 
-      // Find user by email
-      const user = await storage.getUserByEmail(email);
+      // Find user by email (normalise to avoid case-mismatch misses)
+      const user = await storage.getUserByEmail(email.toLowerCase().trim());
       
       // Always return success to prevent email enumeration
       if (!user) {

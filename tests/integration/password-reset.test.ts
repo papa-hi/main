@@ -135,6 +135,16 @@ describe("POST /api/forgot-password", () => {
     expect(res.body).toHaveProperty("error");
   });
 
+  it("normalises email to lowercase before the storage lookup", async () => {
+    mockGetUserByEmail.mockResolvedValue(null);
+
+    await request(app)
+      .post("/api/forgot-password")
+      .send({ email: "Papa@PAPA-HI.COM" });
+
+    expect(mockGetUserByEmail).toHaveBeenCalledWith("papa@papa-hi.com");
+  });
+
   it("returns 200 even when the email is not registered (no enumeration)", async () => {
     mockGetUserByEmail.mockResolvedValue(null);
 

@@ -789,8 +789,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Current password is incorrect" });
       }
 
-      // Check new email is not already in use
-      const existing = await storage.getUserByEmail(newEmail);
+      // Check new email is not already in use (normalise for case-insensitive match)
+      const existing = await storage.getUserByEmail(newEmail.toLowerCase().trim());
       if (existing) {
         return res.status(409).json({ error: "That email address is already in use" });
       }
@@ -836,8 +836,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(410).json({ error: "This link has expired. Please request a new email change." });
       }
 
-      // Check the target email is still not in use (someone else may have claimed it)
-      const conflict = await storage.getUserByEmail(request.newEmail);
+      // Check the target email is still not in use (normalise for case-insensitive match)
+      const conflict = await storage.getUserByEmail(request.newEmail.toLowerCase().trim());
       if (conflict) {
         return res.status(409).json({ error: "That email address has since been taken by another account" });
       }
