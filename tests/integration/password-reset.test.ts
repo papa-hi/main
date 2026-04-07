@@ -174,6 +174,35 @@ describe("POST /api/forgot-password", () => {
     expect(callArgs.resetLink).not.toMatch(/\/reset-password\//);
   });
 
+  it("uses APP_URL as base when set (avoids http:// from reverse proxy)", async () => {
+    process.env.APP_URL = "https://papa-hi.com";
+    mockGetUserByEmail.mockResolvedValue(fakeUser);
+    mockCreatePasswordResetToken.mockResolvedValue(undefined);
+
+    await request(app)
+      .post("/api/forgot-password")
+      .send({ email: fakeUser.email });
+
+    const callArgs = mockSendPasswordResetEmail.mock.calls[0][0];
+    expect(callArgs.resetLink).toMatch(/^https:\/\/papa-hi\.com/);
+    expect(callArgs.resetLink).toMatch(/\?token=/);
+
+    delete process.env.APP_URL;
+  });
+
+  it("falls back to req.protocol + host when APP_URL is not set", async () => {
+    delete process.env.APP_URL;
+    mockGetUserByEmail.mockResolvedValue(fakeUser);
+    mockCreatePasswordResetToken.mockResolvedValue(undefined);
+
+    await request(app)
+      .post("/api/forgot-password")
+      .send({ email: fakeUser.email });
+
+    const callArgs = mockSendPasswordResetEmail.mock.calls[0][0];
+    expect(callArgs.resetLink).toMatch(/\/reset-password\?token=/);
+  });
+
   it("sends the email to user.email (not the user-supplied address)", async () => {
     mockGetUserByEmail.mockResolvedValue(fakeUser);
     mockCreatePasswordResetToken.mockResolvedValue(undefined);

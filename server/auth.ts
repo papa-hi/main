@@ -556,8 +556,14 @@ export function setupAuth(app: Express) {
         expiresAt
       });
 
-      // Create reset link
-      const resetLink = `${req.protocol}://${req.get('host')}/reset-password?token=${token}`;
+      // Create reset link — prefer APP_URL env var in production so the link
+      // uses https:// and the public hostname even behind a reverse proxy
+      // (Railway / Render / Fly.io forward internal http traffic, making
+      // req.protocol return "http" and req.get('host') return an internal host).
+      const baseUrl =
+        process.env.APP_URL?.replace(/\/$/, "") ||
+        `${req.protocol}://${req.get("host")}`;
+      const resetLink = `${baseUrl}/reset-password?token=${token}`;
       
       // Send password reset email
       const emailSent = await sendPasswordResetEmail({
